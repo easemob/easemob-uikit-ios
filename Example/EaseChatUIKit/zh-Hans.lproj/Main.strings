@@ -1,0 +1,66 @@
+
+/* Class = "UISegmentedControl"; 5fm-mB-PAJ.segmentTitles[0] = "arrow"; ObjectID = "5fm-mB-PAJ"; */
+"5fm-mB-PAJ.segmentTitles[0]" = "arrow";
+
+/* Class = "UISegmentedControl"; 5fm-mB-PAJ.segmentTitles[1] = "multiCorner"; ObjectID = "5fm-mB-PAJ"; */
+"5fm-mB-PAJ.segmentTitles[1]" = "multiCorner";
+
+/* Class = "UIViewController"; title = "Hue Setting"; ObjectID = "6Jh-tr-LTv"; */
+"6Jh-tr-LTv.title" = "Hue Setting";
+
+/* Class = "UILabel"; text = "secondary hue"; ObjectID = "98C-WL-db0"; */
+"98C-WL-db0.text" = "secondary hue";
+
+/* Class = "UIButton"; configuration.title = "HueSetting"; ObjectID = "AAS-rv-zsA"; */
+"AAS-rv-zsA.configuration.title" = "HueSetting";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "AAS-rv-zsA"; */
+"AAS-rv-zsA.normalTitle" = "Button";
+
+/* Class = "UILabel"; text = "neutral special hue"; ObjectID = "Ay1-GV-zQn"; */
+"Ay1-GV-zQn.text" = "neutral special hue";
+
+/* Class = "UILabel"; text = "error hue"; ObjectID = "HRc-62-V0B"; */
+"HRc-62-V0B.text" = "error hue";
+
+/* Class = "UIButton"; configuration.title = "配置项"; ObjectID = "Hq5-Ha-34f"; */
+"Hq5-Ha-34f.configuration.title" = "配置项";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "Hq5-Ha-34f"; */
+"Hq5-Ha-34f.normalTitle" = "配置项";
+
+/* Class = "UILabel"; text = "avatarStyle"; ObjectID = "LeB-f7-dWn"; */
+"LeB-f7-dWn.text" = "avatarStyle";
+
+/* Class = "UIButton"; configuration.title = "退出登录"; ObjectID = "MRM-YU-Trz"; */
+"MRM-YU-Trz.configuration.title" = "退出登录";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "MRM-YU-Trz"; */
+"MRM-YU-Trz.normalTitle" = "退出登录";
+
+/* Class = "UILabel"; text = "昵称"; ObjectID = "NNw-pq-Crm"; */
+"NNw-pq-Crm.text" = "昵称";
+
+/* Class = "UILabel"; text = "BubbleStyle"; ObjectID = "X1R-Cf-xUY"; */
+"X1R-Cf-xUY.text" = "BubbleStyle";
+
+/* Class = "UISegmentedControl"; YAz-vQ-HPh.segmentTitles[0] = "light"; ObjectID = "YAz-vQ-HPh"; */
+"YAz-vQ-HPh.segmentTitles[0]" = "light";
+
+/* Class = "UISegmentedControl"; YAz-vQ-HPh.segmentTitles[1] = "dark"; ObjectID = "YAz-vQ-HPh"; */
+"YAz-vQ-HPh.segmentTitles[1]" = "dark";
+
+/* Class = "UILabel"; text = "neutral hue"; ObjectID = "eHw-zc-5ks"; */
+"eHw-zc-5ks.text" = "neutral hue";
+
+/* Class = "UILabel"; text = "Ranges:0~360"; ObjectID = "fcI-7N-lVY"; */
+"fcI-7N-lVY.text" = "Ranges:0~360";
+
+/* Class = "UISegmentedControl"; jlJ-5o-6gk.segmentTitles[0] = "large"; ObjectID = "jlJ-5o-6gk"; */
+"jlJ-5o-6gk.segmentTitles[0]" = "large";
+
+/* Class = "UISegmentedControl"; jlJ-5o-6gk.segmentTitles[1] = "small"; ObjectID = "jlJ-5o-6gk"; */
+"jlJ-5o-6gk.segmentTitles[1]" = "small";
+
+/* Class = "UILabel"; text = "primary hue"; ObjectID = "wpr-YT-msa"; */
+"wpr-YT-msa.text" = "primary hue";

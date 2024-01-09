@@ -1,0 +1,170 @@
+"Sent "="Sent ";
+"Joined"="Joined";
+"Added"="Added";
+
+
+"Post Success" = "Post Success";
+"Post Failed" = "Post Failed";
+
+"to " = "to ";
+
+"Welcome to" = "Welcome to";
+
+"Joined successful!" = "Joined successful!";
+"Join IM failed!" = "join IM failed!";
+
+"Notice Posted"="Notice Posted";
+
+"Joined" = "Joined";
+
+"Content prohibited" = "Content prohibited";
+
+"StartChat" = "Let's chat";
+
+"Violation options" = "Violation options";
+
+"message doesn't exist" = "message doesn't exist";
+"Replying" = "Replying ";
+"barrage_long_press_menu_translate" = "Translate";
+"barrage_long_press_menu_delete" = "Delete";
+"barrage_long_press_menu_recall" = "Recall";
+"barrage_long_press_menu_reply" = "Reply";
+"barrage_long_press_menu_report" = "Report";
+"barrage_long_press_menu_cancel" = "Cancel";
+"barrage_long_press_menu_edit" = "Edit";
+"barrage_long_press_menu_copy" = "Copy";
+"Copied" = "Copied";
+"report_button_click_menu_button_cancel" = "Cancel";
+"Confirm" = "Confirm";
+"participant_list_title" = "Participants";
+"Ban List" = "Ban List";
+"Sent" = "Sent";
+"Editing" = "Editing";
+"Edited" = "Edited";
+"Mentioned" = "Mentioned";
+"recalled a message" = "recalled a message";
+"violation_reason_1" = "Unwelcome commercial content or spam";
+"violation_reason_2" = "Pornographic or explicit content";
+"violation_reason_3" = "Child abuse";
+"violation_reason_4" = "Hate speech or graphic violence";
+"violation_reason_5" = "Promote terrorism";
+"violation_reason_6" = "Harassment or bullying";
+"violation_reason_7" = "Suicide or self harm";
+"violation_reason_8" = "False information";
+"violation_reason_9" = "Others";
+"Search" = "Search";
+"participant_list_button_click_menu_remove" = "Remove";
+"Your were muted!" = "Your were muted!";
+"new messages" = "new messages";
+"You have added" = "You have added";
+"to say hello" = "to say hello.";
+"message doesn't exist" = "message doesn't exist";
+"Add Contact" = "Add Contact";
+
+"Contact" = "Contact";
+"Add" = "Add";
+"NewRequestDetail" = "request to add you as a friend";
+"Groups" = "Groups";
+"NewRequest" = "New Request";
+"Create" = "Create";
+"contactID" = "Contact ID";
+"add_group_members" = "Add Participants";
+"group_delete_members_alert" = "Are you sure to delete the";
+"group members" = "group participants";
+"new_chat_button_click_menu_addcontacts" = "Add Contacts";
+"new_chat_button_click_menu_creategroup" = "Create a Group";
+"new_chat_button_click_menu_selectcontacts" = "Select Contacts";
+"New Message" = "New Message";
+
+"remove_participants" = "Remove participants";
+"Remove" = "Remove";
+"group_details_button_members" = "Participants";
+"group_details_button_alias" = "My alias in group";
+"group_details_switch_donotdisturb" = "Do not disturb";
+"group_details_button_clearchathistory" = "Clear chat history";
+"group_details_button_name" = "Group name";
+"group_details_button_description" = "Group description";
+"group_details_button_announcement" = "Group Announcement";
+"group_details_switch_public" = "Set public";
+"group_details_extend_button_transfer" = "Transfer owner";
+"group_details_extend_button_disband" = "Disband group";
+"group_details_extend_button_disband_alert_title" = "Disband group";
+"group_details_extend_button_disband_alert_subtitle" = "Disbanding the group will remove all members.";
+"group_details_extend_button_disband_alert_button_confirm" = "Confirm";
+"group_details_extend_button_disband_alert_button_cancel" = "Cancel";
+"group_details_extend_button_leave" = "Leave group";
+"group_details_extend_button_leave_alert_title" = "Leave group";
+"group_details_extend_button_leave_alert_subtilte" = "Leaving a group will also delete the chat history.";
+"group_details_extend_button_leave_alert_button_confirm" = "Confirm";
+"group_details_extend_button_leave_alert_button_cancel" = "Cancel";
+"Reach content character limit." = "Reach content character limit.";
+"Group was disabled" = "Group was disabled";
+"Save" = "Save";
+"Please input" = "Please input";
+"Group" = "Group";
+"has been created." = "has been created.";
+
+"add_contacts_subtitle" = "Add Contacts by ID";
+
+"conversation_left_slide_menu_delete" = "Delete";
+"conversation_left_slide_menu_pin" = "Pin";
+"conversation_left_slide_menu_unpin" = "Unpin";
+"conversation_left_slide_menu_mute" = "Mute";
+"conversation_left_slide_menu_unmute" = "Unmute";
+"conversation_right_slide_menu_read" = "Read";
+"conversation_right_slide_menu_more" = "More";
+
+"contact_details_switch_donotdisturb" = "Do not disturb";
+"contact_details_button_clearchathistory" = "Clear chat history";
+
+
+"contact_details_extend_button_delete" = "Delete contact";
+"contact_details_extend_button_delete_alert_subtitle" = "Deleting a contact will also delete the chat history.";
+"contact_details_extend_button_delete_alert_button_confirm" = "Confirm";
+"contact_details_extend_button_delete_alert_button_cancel" = "Cancel";
+"contact_details_extend_button_cancel" = "Cancel";
+
+
+"remaining..." = "remaining...";
+
+"permissions disable" = "Permissions Disabled";
+
+"camera_disable" = "Camera permission is not enabled";
+
+"photo_disable" = "Photo library permission is not enabled";
+
+"file_disable" = "File permissions are not enabled";
+
+"input_extension_menu_photo" = "Photo";
+
+"input_extension_menu_camera" = "Camera";
+
+"input_extension_menu_file" = "File";
+
+"input_extension_menu_contact" = "Contact Card";
+
+"remaining" = "remaining";
+
+"Record" = "Record";
+
+"Recording" = "Recording";
+
+"Play" = "Play";
+
+"Playing" = "Playing";
+
+"Loading..." = "Loading...";
+
+"Share Contact" = "Share Contact";
+"Sharing contact?" = "Are you sure you want to share the contact?";
+
+"[unknown]" = "[unknown]";
+"[Image]" = "[Image]";
+"[Audio]" = "[Audio]";
+"[Video]" = "[Video]";
+"[File]" = "[File]";
+"[Location]" = "[Location]";
+"[Chat History]" = "[Chat History]";
+"[Transparent]" = "[Transparent]";
+"[Contact]" = "[Contact]";
+"[Alert]" = "[Alert]";
