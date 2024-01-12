@@ -28,8 +28,6 @@
 - [注意事项](#注意事项)
 - [进阶用法](#进阶用法)
 - [自定义](#自定义)
-- [业务流程图](#业务流程图)
-- [Api时序图](#Api时序图)
 - [设计指南](#设计指南)
 - [贡献](#贡献)
 - [许可证](#许可证)
@@ -122,19 +120,27 @@ python3 -m http.server 8080
 
 部署完成后，您可以在浏览器中访问 http://yourlocalhost:8080/documentation/EaseChatUIKit   其中`yourlocalhost`是您的本地IP地址。 或者，您可以将此文件夹部署在外部网络地址上。
 
-## Appearance
+## 1.Appearance 
 
-[Appearance](https://github.com/easemob/UIKit_Chatroom_ios/blob/dev/Documentation/Appearance.md) 即加载UI前的可配项配置类
+![Appearance](./Documentation/Appearance.md). 
 
-## ComponentRegister
+即加载UI前的所有可改动的配置项。包含公共配置以及三类业务功能配置
+- 公共配置  包含自定义皮肤的色相值配置、Alert、ActionSheet、默认头像等。
+- 会话列表  包含会话滑动后的菜单项，会话列表'+'按钮点击后菜单项的配置等。
+- 联系人    包含联系人页面以及header等配置项
+- 聊天页面  包含消息长按以及键盘发送附件消息等可配菜单项、以及消息收发方的气泡颜色、字体颜色等。
 
-[ComponentRegister](https://github.com/easemob/UIKit_Chatroom_ios/blob/dev/Documentation/ComponentRegister.md).即可继承进行定制的 UI 组件。
+## 2.ComponentRegister 
 
-## ComponentViewsActionHooker
+![ComponentRegister](./Documentation/ComponentRegister.md). 
 
-[ComponentViewsActionHooker](https://github.com/easemob/UIKit_Chatroom_ios/blob/dev/Documentation/ComponentViewsActionHooker.md)
+即可继承进行自定义定制的 UI 组件。
 
-所有可拦截的点击事件容器
+包含会话列表相关的页面以及UITableViewCell、联系人页面以及UITableViewCell、聊天页面以及不同类型消息内容的可定制组件等
+
+## 3.ComponentViewsActionHooker
+
+![ComponentViewsActionHooker](./Documentation/ComponentViewsActionHooker.md). 所有可拦截的点击事件
 
 # 快速开始
 
@@ -149,14 +155,13 @@ python3 -m http.server 8080
 
 ### 第一步：初始化EaseChatUIKit
 
-```swift
+```Swift
 import EaseChatUIKit
 
 @UIApplicationMain
 class AppDelegate：UIResponder，UIApplicationDelegate {
 
      var window：UIWindow？
-
 
      func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
          // 您可以在应用程序加载时或使用之前初始化 EaseChatUIKit。
@@ -205,7 +210,7 @@ public final class YourAppUser: NSObject, EaseProfileProtocol {
 
 # 进阶用法
 
-以下是进阶用法的三个示例。
+以下是进阶用法的部分示例。会话列表页面、消息列表页、联系人列表均可分开使用。
 
 ## 1.初始化单群聊UIKit
 相比于上面快速开始的单群聊UIKit初始化这里多了ChatOptions的参数，主要是对SDK中是否打印log以及是否自动登录，是否默认使用用户属性的开关配置。
@@ -237,71 +242,175 @@ public final class YourAppUser: NSObject, EaseProfileProtocol {
  EaseChatUIKitClient.shared.login(user: YourAppUser(), token: ExampleRequiredConfig.chatToken) { error in 
  }
 ```
-## 3.会话列表页面
 
-## 4.联系人页面
+## 3.会话列表页面及Provider
+
+```Swift
+        //前者仅限于Swift下使用，是使用协程异步返回。后者Swift OC均可使用使用闭包返回即可此处不做示例仅做协程示例
+        `let conversations = EaseChatUIKit.ComponentsRegister.shared.ConversationsController.init(provider: self)`  or `let conversations = EaseChatUIKit.ComponentsRegister.shared.ConversationsController.init(providerOC: self)`
+        //继承注册后的自定义类还可以调用ViewModel的registerEventsListener方法监听相关事件
+
+//如果是EaseProfileProviderOC 即实现EaseProfileProviderOC即可
+extension YourViewController: EaseProfileProvider {
+
+    func fetchProfiles(profilesMap: [EaseChatUIKit.EaseProfileProviderType : [String]]) async -> [EaseChatUIKit.EaseProfileProtocol] {
+        //Create a task group
+        return await withTaskGroup(of: [EaseChatUIKit.EaseProfileProtocol].self, returning: [EaseChatUIKit.EaseProfileProtocol].self) { group in
+            var resultProfiles: [EaseChatUIKit.EaseProfileProtocol] = []
+            for (type,profileIds) in profilesMap {
+                //According to condition,add task execute
+                if type == .chat {
+                    group.addTask {
+                        var resultProfiles: [EaseChatUIKit.EaseProfileProtocol] = []
+                        let result = await ChatClient.shared().userInfoManager?.fetchUserInfo(byId: profileIds, type: [NSNumber(integerLiteral: UserInfoType.avatarURL.rawValue),NSNumber(integerLiteral: UserInfoType.nickName.rawValue)])
+                        if result?.1 != nil {
+                            return resultProfiles
+                        } else {
+                            let userInfoMap = result?.0 ?? [:]
+                            for (key, value) in userInfoMap {
+                                let profile = EaseProfile()
+                                profile.id = key
+                                profile.nickname = value.nickname ?? ""
+                                profile.avatarURL = value.avatarUrl ?? ""
+                                resultProfiles.append(profile)
+                            }
+                            return resultProfiles
+                        }
+                    }
+                } else {
+                    group.addTask {
+                        var resultProfiles: [EaseChatUIKit.EaseProfileProtocol] = []
+                        //此处仅仅是示例 批量请求要展示的所有群的群头像群昵称
+                        let result = await ChatClient.shared().groupManager?.groupSpecificationFromServer(withId: profileIds.first ?? "")
+                        if result?.1 != nil {
+                            return resultProfiles
+                        } else {
+                            let group = result?.0
+                            let profile = EaseProfile()
+                            profile.id = profileIds.first ?? ""
+                            profile.nickname = group?.groupName ?? ""
+                            resultProfiles.append(profile)
+                            return resultProfiles
+                        }
+                    }
+                }
+            }
+            //Await all task were executed.Return values.
+            for await result in group {
+                resultProfiles.append(contentsOf: result)
+            }
+            return resultProfiles
+        }
+
+        
+    }
+}
+
+```
+
+## 4.联系人及其后续页面Provider
+
+### 4.1 联系人列表页Provider
+
+```Swift
+        //前者仅限于Swift下使用，是使用协程异步返回。后者Swift OC均可使用使用闭包返回即可。
+        `let vc = EaseChatUIKit.ComponentsRegister.shared.ContactsController.init(provider: self)`  or `let conversations = EaseChatUIKit.ComponentsRegister.shared.ConversationsController.init(providerOC: self)`
+        
+        //继承注册后的自定义类还可以调用ViewModel的registerEventsListener方法监听相关事件
+        
+        //扩展类似上面会话列表实现EaseProfileProvider协议后，使用协程异步返回您要显示的联系人信息。如果是EaseProfileProviderOC 即实现EaseProfileProviderOC即可。
+```
+
+### 4.2 群成员列表页Provider
+
+类同与上述Provider  协议名为`EaseGroupMemberProfileProvider` or `EaseGroupMemberProfileProviderOC`
+
+实现Provider方式略不同与上面Controller
+```Swift
+                `EaseChatUIKitContext.shared?.groupMemberAttributeCache?.provider = self` or `EaseChatUIKitContext.shared?.groupMemberAttributeCache?.providerOC = self`
+                
+                扩展实现方式与上面两个功能模块相同
+```
+
 
 ## 5.初始化聊天页面
 
-```swift
+聊天页面中大部分对消息的处理以及页面处理逻辑均可override、当然也包括ViewModel
+
+```Swift
         // 在Console中创建一个新用户，将这个用id复制后传入下面构造方法参数中，跳转页面即可。
         let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: <#刚创建用户的id#>, chatType: .chat)
+        //继承注册后的自定义类还可以调用ViewModel的registerEventsListener方法监听相关事件
         //或者push或者present都可
         ControllerStack.toDestination(vc: vc)
 ```
 
 ## 4.监听EaseChatUIKit事件和错误
 
-您可以调用`registerRoomEventsListener`方法来侦听 EaseChatUIKit 事件和错误。
+您可以调用`registerUserStateListener`方法来监听 EaseChatUIKit中用户相关以及链接状态变更的事件和错误。
 
-```swift
-EaseChatUIKitClient.shared.registerRoomEventsListener(self)
+```Swift
+EaseChatUIKitClient.shared.unregisterUserEventsListener(self)
 ```
 
 # 自定义
 
 ## 1.修改可配置项
 
-下面展示如何更改弹幕区域的整体单元格布局风格以及如何创建ChatroomView。
+下面示例展示如何更改消息内容显示
 
-```swift
-// 可以通过设置属性来改变弹幕区域的整体单元格布局风格。
-Appearance.messageDisplayStyle = .hideUserIdentity
-// 创建ChatroomView，传入布局参数、底部工具栏扩展按钮模型协议数组等参数。
-let roomView = EaseChatUIKitClient.shared.launchRoomView(roomId: "聊天室 ID",frame: <#T##CGRect#>)
-self.view.addSubView(roomView)
+```Swift
+        // 可以通过增减显示内容数组中的项，改变消息样式某一部分的显示隐藏。
+        Appearance.chat.contentStyle = [.withReply,.withAvatar,.withNickName,.withDateAndTime]
+        // 创建ChatroomView，传入布局参数、底部工具栏扩展按钮模型协议数组等参数。
+        let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: <#刚创建用户的id#>, chatType: .chat)
+        ControllerStack.toDestination(vc: vc)
 ```
 
 详情请参见[Appearance](./Documentation/Appearance.md)。
 
 ## 2.自定义组件
 
-下面展示如何自定义礼物弹幕视图cell。
+- 下面展示如何自定义位置消息cell。
 
-```swift
-class CustomGiftMessageViewCell: GiftMessageCell {
-    lazy var redDot: UIView = {
-        UIView().backgroundColor(.red).cornerRadius(.large)
-    }()
-
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        self.addSubview(redDot)
-    }
-
-    override func refresh(item: GiftEntityProtocol) {
-        super.refresh(item: item)
-        self.redDot.isHidden = item.selected
+```Swift
+class CustomLocationMessageCell: LocationMessageCell {
+    //创建返回你想展示的view即可，气泡会包裹住您的view
+    @objc open override func createContent() -> UIView {
+        UIView(frame: .zero).backgroundColor(.clear).tag(bubbleTag)
     }
 }
 //在EaseChatUIKit中注册继承原有类的自定义类来替换原来的类。
-//在创建ChatroomView或使用其他UI组件之前调用此方法。
-ComponentsRegister.shared.GiftMessageViewCell = CustomGiftMessageViewCell.self
+//在创建消息页面或使用其他UI组件之前调用此方法。
+ComponentsRegister.shared.ChatLocationCell = CustomLocationMessageCell.self
+```
+
+- 下面展示如何继承注册基础的消息类型以及消息样式
+
+```Swift
+    ComponentsRegister.shared.registerCustomizeCellClass(cellType: YourMessageCell.self)
+    class YourMessageCell: MessageCell {
+        override func createAvatar() -> ImageView {
+            ImageView(frame: .zero)
+        }
+    }
 ```
 
 详情请参见[ComponentsRegister](./Documentation/ComponentRegister.md)
 
-## 3.切换原创或自定义主题
+## 3.拦截原有组件点击事件
+
+注：拦截后原有点击事件相关业务均由用户自行处理
+
+```Swift
+        
+        ComponentViewsActionHooker.shared.conversation.longPressed = { [weak self] indexPath,info in 
+            //Process you business logic.
+        }
+
+```
+
+## 4.切换原创或自定义主题
 - 切换到 EaseChatUIKit 附带的浅色或深色主题。在初始化单群聊UIKit视图之前切换主题切换主题即可更改默认主题，在视图使用中也可以切换由开发者判断系统当前主题后切换你想对应的主题即可。
 
 ```swift
@@ -338,23 +447,13 @@ Appearance.neutralSpecialHue = 199/360.0
 Theme.switchTheme(style: .custom)
 ```
 
-# 业务流程图
-下图展示了业务请求和回调的整个逻辑。
-![业务逻辑整体流程图](/Documentation/BusinessFlowchart.png)
-
-# Api时序图
-
-下图是Example项目中最佳实践的API调用时序图。
-
-![APIUML](/Documentation/Api.png)
-
 # 设计指南
 
 如果您对设计指南和细节有任何疑问，您可以在 Figma 设计稿中添加评论并提及我们的设计师 Stevie Jiang。
 
-参见[设计图](https://www.figma.com/community/file/1322495388317476706/chatroom-uikit)。
+参见[设计图](https://www.figma.com/community/file/1327193019424263350/chat-uikit-for-mobile)。
 
-请参阅[UI设计指南](https://docs-im-beta.easemob.com/uikit/EaseChatUIKit/ios/design_guide.html)
+请参阅[UI设计指南](https://github.com/StevieJiang/Chat-UIkit-Design-Guide/blob/main/README.md)
 
 # 贡献
 

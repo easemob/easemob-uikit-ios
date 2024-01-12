@@ -10,12 +10,20 @@ import UIKit
 @objc open class TextMessageCell: MessageCell {
     
     public private(set) lazy var content: UILabel = {
-        UILabel(frame: .zero).backgroundColor(.clear).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping).numberOfLines(0)
+        self.createContent()
     }()
     
+    @objc open func createContent() -> UILabel {
+        UILabel(frame: .zero).backgroundColor(.clear).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping).numberOfLines(0)
+    }
+    
     public private(set) lazy var edit: UILabel = {
-        UILabel(frame: .zero).backgroundColor(.clear).numberOfLines(1).textAlignment(.right).font(UIFont.theme.bodyExtraSmall)
+        self.createEditSymbol()
     }()
+    
+    @objc open func createEditSymbol() -> UILabel {
+        UILabel(frame: .zero).backgroundColor(.clear).numberOfLines(1).textAlignment(.right).font(UIFont.theme.bodyExtraSmall)
+    }
     
     @objc required public init(towards: BubbleTowards,reuseIdentifier: String) {
         super.init(towards: towards, reuseIdentifier: reuseIdentifier)

@@ -7,9 +7,17 @@
 
 import UIKit
 
+/// A protocol that defines the driver for a section index list.
 @objc public protocol ISectionIndexListDriver: NSObjectProtocol {
+    
+    /// Refreshes the titles of the section index list.
+    ///
+    /// - Parameter titles: An array of strings representing the titles for each section.
     func refresh(titles: [String])
     
+    /// Selects an item at the specified index path.
+    ///
+    /// - Parameter indexPath: The index path of the item to be selected.
     func selectItem(indexPath: IndexPath)
 }
 

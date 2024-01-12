@@ -8,20 +8,36 @@ import UIKit
 @objc open class ContactCell: UITableViewCell {
     
     public private(set) lazy var checkbox: UIImageView = {
-        UIImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-28)/2.0, width: 28, height: 28)).contentMode(.scaleAspectFit).backgroundColor(.clear)
+        self.createCheckbox()
     }()
+    
+    @objc open func createCheckbox() -> UIImageView {
+        UIImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-28)/2.0, width: 28, height: 28)).contentMode(.scaleAspectFit).backgroundColor(.clear)
+    }
     
     public private(set) lazy var avatar: ImageView = {
-        ImageView(frame: CGRect(x: self.display == .normal ? 16:self.checkbox.frame.maxX+12, y: (self.contentView.frame.height-40)/2.0, width: 40, height: 40)).contentMode(.scaleAspectFit).backgroundColor(.clear).cornerRadius(Appearance.avatarRadius)
+        self.createAvatar()
     }()
+    
+    @objc open func createAvatar() -> ImageView {
+        ImageView(frame: CGRect(x: self.display == .normal ? 16:self.checkbox.frame.maxX+12, y: (self.contentView.frame.height-40)/2.0, width: 40, height: 40)).contentMode(.scaleAspectFit).backgroundColor(.clear).cornerRadius(Appearance.avatarRadius)
+    }
     
     public private(set) lazy var nickName: UILabel = {
-        UILabel(frame: CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX+4, width: self.contentView.frame.width-self.avatar.frame.maxX-12-30, height: 16)).font(UIFont.theme.titleMedium).backgroundColor(.clear).textColor(UIColor.theme.neutralColor1)
+        self.createNickName()
     }()
     
+    @objc open func createNickName() -> UILabel {
+        UILabel(frame: CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX+4, width: self.contentView.frame.width-self.avatar.frame.maxX-12-30, height: 16)).font(UIFont.theme.titleMedium).backgroundColor(.clear).textColor(UIColor.theme.neutralColor1)
+    }
+    
     public private(set) lazy var separatorLine: UIView = {
-        UIView(frame: CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5))
+        self.createSeparatorLine()
     }()
+    
+    @objc open func createSeparatorLine() -> UIView {
+        UIView(frame: CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5))
+    }
     
     public private(set) var display = ContactDisplayStyle.normal
     
@@ -39,7 +55,7 @@ import UIKit
         self.switchTheme(style: Theme.style)
     }
     
-    @objc public func refresh(profile: EaseProfileProtocol) {
+    @objc open func refresh(profile: EaseProfileProtocol) {
         self.avatar.cornerRadius(Appearance.avatarRadius)
         self.avatar.image(with: profile.avatarURL, placeHolder: Appearance.avatarPlaceHolder)
         self.nickName.text = profile.nickname.isEmpty ? profile.id:profile.nickname

@@ -7,13 +7,21 @@
 
 import UIKit
 
+/**
+ An enumeration representing the possible operations for group participants.
+ 
+ - normal: Represents a normal operation.
+ - mention: Represents an operation related to mentioning participants.
+ - transferOwner: Represents an operation related to transferring ownership of the group.
+ */
 @objc public enum GroupParticipantsOperation: UInt {
     case normal
     case mention
     case transferOwner
 }
 
-@objc open class GroupParticipantsController: UIViewController {
+/// A view controller that displays the participants of a group.
+@objcMembers open class GroupParticipantsController: UIViewController {
     
     private var pageSize = UInt(200)
     
@@ -25,6 +33,9 @@ import UIKit
     
     private var loadFinished = false
     
+    /**
+     The array of participants in the group.
+     */
     public private(set) var participants: [EaseProfileProtocol] = []
     
     public private(set) var chatGroup = ChatGroup()
@@ -34,8 +45,14 @@ import UIKit
     public private(set) var operation = GroupParticipantsOperation.normal
     
     public private(set) lazy var navigation: EaseChatNavigationBar = {
-        EaseChatNavigationBar(frame: self.operation != .normal ? CGRect(x: 0, y: 0, width: ScreenWidth, height: 44):CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: true, textAlignment: .left, rightImages:  self.rightImages ,hiddenAvatar: true).backgroundColor(.clear)
+        self.createNavigation()
     }()
+    
+    /// Creates and returns a navigation bar for the GroupParticipantsController.
+    /// - Returns: An instance of EaseChatNavigationBar.
+    @objc open func createNavigation() -> EaseChatNavigationBar {
+        EaseChatNavigationBar(frame: self.operation != .normal ? CGRect(x: 0, y: 0, width: ScreenWidth, height: 44):CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: true, textAlignment: .left, rightImages:  self.rightImages ,hiddenAvatar: true).backgroundColor(.clear)
+    }
     
     private var rightImages: [UIImage] {
         ((self.chatGroup.owner == EaseChatUIKitContext.shared?.currentUserId ?? "" && !self.chatGroup
@@ -46,7 +63,16 @@ import UIKit
         UITableView(frame: CGRect(x: 0, y: self.navigation.frame.height, width: self.view.frame.width, height: self.view.frame.height-self.navigation.frame.height), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).rowHeight(60).backgroundColor(.clear)
     }()
     
-    @objc required public init(groupId: String,operation: GroupParticipantsOperation = .normal) {
+    /**
+     Initializes a `GroupParticipantsController` with the specified group ID and operation.
+     
+     - Parameters:
+        - groupId: The ID of the group.
+        - operation: The operation to be performed on the group participants. Default value is `.normal`.
+     
+     - Returns: An initialized `GroupParticipantsController` instance.
+     */
+    @objc required public init(groupId: String, operation: GroupParticipantsOperation = .normal) {
         self.chatGroup = ChatGroup(id: groupId)
         self.operation = operation
         super.init(nibName: nil, bundle: nil)
@@ -78,7 +104,14 @@ import UIKit
         self.switchTheme(style: Theme.style)
     }
     
-    private func navigationClick(type: EaseChatNavigationBarClickEvent,indexPath: IndexPath?) {
+    /**
+     Handles the navigation bar click events.
+     
+     - Parameters:
+        - type: The type of navigation bar click event.
+        - indexPath: The index path associated with the event (optional).
+     */
+    @objc open func navigationClick(type: EaseChatNavigationBarClickEvent, indexPath: IndexPath?) {
         switch type {
         case .back: self.pop()
         case .rightItems: self.rightActions(indexPath: indexPath ?? IndexPath())
@@ -87,7 +120,7 @@ import UIKit
         }
     }
     
-    private func pop() {
+    @objc open func pop() {
         if self.navigationController != nil {
             self.navigationController?.popViewController(animated: true)
         } else {
@@ -104,7 +137,7 @@ import UIKit
         }
     }
     
-    private func ignoreContacts() -> [String] {
+    @objc open func ignoreContacts() -> [String] {
         let contacts = ChatClient.shared().contactManager?.getContacts() ?? []
         var ignoreIds = [String]()
         for participant in self.participants {
@@ -117,7 +150,7 @@ import UIKit
         return ignoreIds
     }
     
-    private func toAdd() {
+    @objc open func toAdd() {
         let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .addGroupParticipant,provider: nil,ignoreIds: self.ignoreContacts())
         vc.confirmClosure = { [weak self] users in
             guard let `self` = self else { return }
@@ -136,7 +169,7 @@ import UIKit
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
-    private func toRemove() {
+    @objc open func toRemove() {
         let vc = ComponentsRegister.shared.RemoveGroupParticipantController.init(group: self.chatGroup, profiles: self.participants.filter({ $0.id != self.chatGroup.owner })) { [weak self] userIds in
             guard let `self` = self else { return }
             self.service.remove(userIds: userIds, from: self.chatGroup.groupId) { [weak self] group, error in
@@ -155,7 +188,7 @@ import UIKit
         ControllerStack.toDestination(vc: vc)
     }
 
-    private func fetchParticipants() {
+    @objc open func fetchParticipants() {
         if self.recursiveCount > 0 {
             self.service.fetchParticipants(groupId: self.chatGroup.groupId, cursor: self.cursor, pageSize: self.pageSize) { [weak self] result, error in
                 guard let `self` = self else { return }
@@ -212,7 +245,11 @@ extension GroupParticipantsController: UITableViewDelegate,UITableViewDataSource
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cell = tableView.dequeueReusableCell(withIdentifier: "GroupParticipantCell") as? GroupParticipantCell
+        self.cellForRowAt(indexPath: indexPath)
+    }
+    
+    @objc open func cellForRowAt(indexPath: IndexPath) -> UITableViewCell {
+        var cell = self.participantsList.dequeueReusableCell(withIdentifier: "GroupParticipantCell") as? GroupParticipantCell
         if cell == nil {
             cell = GroupParticipantCell(displayStyle: .normal, identifier: "GroupParticipantCell")
         }
@@ -291,7 +328,7 @@ extension GroupParticipantsController: UITableViewDelegate,UITableViewDataSource
 }
 
 extension GroupParticipantsController: ThemeSwitchProtocol {
-    public func switchTheme(style: ThemeStyle) {
+    open func switchTheme(style: ThemeStyle) {
         self.view.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
     }
 }

@@ -43,6 +43,10 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
     
     /// Message status image.
     public var stateImage: UIImage? {
+        self.getStateImage()
+    }
+    
+    open func getStateImage() -> UIImage? {
         switch self.state {
         case .sending:
             return UIImage(named: "message_status_spinner", in: .chatBundle, with: nil)
@@ -69,12 +73,16 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
     
     /// Height for row.
     public private(set) lazy var height: CGFloat = {
+        self.cellHeight()
+    }()
+    
+    open func cellHeight() -> CGFloat {
         if let body = self.message.body as? ChatCustomMessageBody,body.event == EaseChatUIKit_alert_message {
             return self.bubbleSize.height
         } else {
             return 8+(Appearance.chat.contentStyle.contains(.withNickName) ? 28:2)+(Appearance.chat.contentStyle.contains(.withReply) ? self.replySize.height:2)+self.bubbleSize.height+(Appearance.chat.contentStyle.contains(.withDateAndTime) ? 24:8)
         }
-    }()
+    }
     
     /// Text message show content.
     public private(set) lazy var content: NSAttributedString? = {
@@ -83,12 +91,16 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
     
     /// Reply title in bubble on current message.
     public private(set) lazy var replyTitle: NSAttributedString? = {
+        self.convertReplyTitle()
+    }()
+    
+    open func convertReplyTitle() -> NSAttributedString? {
         if let quoteMessage = self.message.quoteMessage {
             return NSAttributedString {
                 AttributedText(quoteMessage.user?.nickname ?? quoteMessage.from).font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5)
             }
         } else { return nil }
-    }()
+    }
     
     public private(set) lazy var replyContent: NSAttributedString? = {
         self.convertToReply()
@@ -96,7 +108,7 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
             
     /// Calculate bubble size.
     /// - Returns: ``CGSize`` of bubble.
-    @objc public func updateBubbleSize() -> CGSize {
+    open func updateBubbleSize() -> CGSize {
         switch self.message.body.type {
         case .text: return self.textSize()
         case .image: return self.thumbnailSize(video: false)
@@ -111,18 +123,21 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
         }
     }
     
-    public func textSize() -> CGSize {
+    open func textSize() -> CGSize {
         let label = UILabel().numberOfLines(0).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
         label.attributedText = self.convertTextAttribute()
         let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-24, height: 9999))
         return CGSize(width: size.width+24, height: size.height+14+(self.message.edited ? 19:0)+(self.message.translation != nil ? self.translationHeight():0))
     }
     
-    public func translationHeight() -> CGFloat {
-        (self.message.translation?.chat.sizeWithText(font: UIFont.theme.bodyLarge, size: CGSize(width: limitBubbleWidth-24, height: 9999)).height ?? 0)+16
+    open func translationHeight() -> CGFloat {
+        if var height = self.message.translation?.chat.sizeWithText(font: UIFont.theme.bodyLarge, size: CGSize(width: limitBubbleWidth-24, height: 9999)).height {
+            return height+16
+        }
+        return 0
     }
     
-    public func thumbnailSize(video: Bool) -> CGSize {
+    open func thumbnailSize(video: Bool) -> CGSize {
         let defaultSize = CGSize(width: 135, height: 135)
         var size = CGSize.zero
         if let body = self.message.body as? ChatImageMessageBody {
@@ -162,7 +177,7 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
         }
     }
     
-    public func audioSize() -> CGSize {
+    open func audioSize() -> CGSize {
         switch Int((self.message.body as? ChatAudioMessageBody)?.duration ?? 1) {
         case 0...9:
             return CGSize(width: 75, height: audioHeight)
@@ -181,7 +196,7 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
         }
     }
     
-    public func customSize() -> CGSize {
+    open func customSize() -> CGSize {
         if let body = self.message.body as? ChatCustomMessageBody {
             if body.event == EaseChatUIKit_user_card_message {
                 return CGSize(width: limitBubbleWidth, height: contactCardHeight)
@@ -201,7 +216,7 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
     }
     
     /// Converts the message text into an attributed string, including the user's nickname, message text, and emojis.
-    @objc public func convertTextAttribute() -> NSAttributedString? {
+    open func convertTextAttribute() -> NSAttributedString? {
         var text = NSMutableAttributedString()
         if self.message.body.type != .text, self.message.body.type != .custom {
             text.append(NSAttributedString {
@@ -259,7 +274,7 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
         return text
     }
     
-    @objc public func updateReplySize() -> CGSize {
+    open func updateReplySize() -> CGSize {
         if let attributeContent = self.convertToReply(),let attributeTitle = self.replyTitle,attributeContent.length > 0 {
             let label = UILabel().numberOfLines(2).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
             label.attributedText = attributeTitle.length > attributeContent.length ? attributeTitle:attributeContent
@@ -274,7 +289,7 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
         return .zero
     }
         
-    @objc public func convertToReply() -> NSAttributedString? {
+    open func convertToReply() -> NSAttributedString? {
         if let quoteMessage = self.message.quoteMessage {
             if let msgSender = self.message.quoteMessage?.from,!msgSender.isEmpty  {
 //                let showName = quoteMessage.user?.nickName ?? msgSender
@@ -346,7 +361,7 @@ extension ChatMessage {
     }
     
     /// Message display date on conversation list cell.
-    @objc public var showDate: String {
+    @objc open var showDate: String {
         let messageDate = Date(timeIntervalSince1970: TimeInterval(self.timestamp/1000))
         if messageDate.chat.compareDays() < 0 {
             return messageDate.chat.dateString(Appearance.conversation.dateFormatOtherDay)
@@ -356,7 +371,7 @@ extension ChatMessage {
     }
     
     /// Message display date on chat cell.
-    @objc public var showDetailDate: String {
+    @objc open var showDetailDate: String {
         let messageDate = Date(timeIntervalSince1970: TimeInterval(self.timestamp/1000))
         if messageDate.chat.compareDays() < 0 {
             return messageDate.chat.dateString(Appearance.chat.dateFormatOtherDay)
@@ -366,7 +381,7 @@ extension ChatMessage {
     }
     
     /// Message show type on the conversation list.
-    @objc public var showType: String {
+    @objc open var showType: String {
         var text = "[unknown]".chat.localize
         switch self.body.type {
         case .text: text = (self.body as? ChatTextMessageBody)?.text ?? ""
@@ -391,7 +406,7 @@ extension ChatMessage {
         return text.chat.localize
     }
     
-    public var replyIcon: UIImage? {
+    @objc open var replyIcon: UIImage? {
         switch self.body.type {
         case .image:
             return UIImage(named: "reply_image", in: .chatBundle, with: nil)
@@ -416,7 +431,7 @@ extension ChatMessage {
     }
     
     /// Message show content.
-    @objc public var showContent: String {
+    @objc open var showContent: String {
         var text = ""
         switch self.body.type {
         case .text: text = (self.body as? ChatTextMessageBody)?.text ?? ""
@@ -467,7 +482,7 @@ extension ChatMessage {
         return ChatClient.shared().chatManager?.getMessageWithMessageId(quoteMessageId)
     }
     
-    @objc public var contentSize: CGSize {
+    @objc open var contentSize: CGSize {
         switch self.body.type {
         case .custom:
             return extraCustomSize
@@ -484,6 +499,7 @@ extension ChatMessage {
     @objc public var translation: String? {
         (self.body as? ChatTextMessageBody)?.translations?.first?.value
     }
+    
 }
 
 

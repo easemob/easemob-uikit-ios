@@ -1,11 +1,19 @@
 import UIKit
 import Combine
 
+/// Tag used for identifying the avatar view in the message cell.
 public let avatarTag = 900
+
+/// Tag used for identifying the reply view in the message cell.
 public let replyTag = 199
+
+/// Tag used for identifying the bubble view in the message cell.
 public let bubbleTag = 200
+
+/// Tag used for identifying the status view in the message cell.
 public let statusTag = 168
 
+/// Enum representing the style of a message cell.
 @objc public enum MessageCellStyle: UInt {
     case text
     case image
@@ -19,6 +27,7 @@ public let statusTag = 168
     case combine
 }
 
+/// Enum representing the different areas that can be clicked in a message cell.
 @objc public enum MessageCellClickArea: UInt {
     case avatar
     case reply
@@ -26,6 +35,7 @@ public let statusTag = 168
     case status
 }
 
+/// The amount of space between the message bubble and the cell.
 let message_bubble_space = CGFloat(5)
 
 @objcMembers open class MessageCell: UITableViewCell {
@@ -41,32 +51,65 @@ let message_bubble_space = CGFloat(5)
     public var longPressAction: ((MessageCellClickArea,MessageEntity) -> Void)?
     
     public private(set) lazy var avatar: ImageView = {
-        ImageView(frame: .zero).contentMode(.scaleAspectFit).backgroundColor(.clear).tag(avatarTag)
+        self.createAvatar()
     }()
+    
+    /**
+     Creates an avatar image view.
+     
+     - Returns: An instance of `ImageView` configured with the necessary properties.
+     */
+    @objc open func createAvatar() -> ImageView {
+        ImageView(frame: .zero).contentMode(.scaleAspectFit).backgroundColor(.clear).tag(avatarTag)
+    }
     
     public private(set) lazy var nickName: UILabel = {
-        UILabel(frame: .zero).backgroundColor(.clear).font(UIFont.theme.labelSmall)
+        self.createNickName()
     }()
+    
+    @objc open func createNickName() -> UILabel {
+        UILabel(frame: .zero).backgroundColor(.clear).font(UIFont.theme.labelSmall)
+    }
     
     public private(set) lazy var replyContent: MessageReplyView = {
-        MessageReplyView(frame: .zero).backgroundColor(.clear).tag(replyTag)
+        self.createReplyContent()
     }()
+    
+    @objc open func createReplyContent() -> MessageReplyView {
+        MessageReplyView(frame: .zero).backgroundColor(.clear).tag(replyTag)
+    }
     
     public private(set) lazy var bubbleWithArrow: MessageBubbleWithArrow = {
-        MessageBubbleWithArrow(frame: .zero, forward: self.towards).tag(bubbleTag)
+        self.createBubbleWithArrow()
     }()
+    
+    @objc open func createBubbleWithArrow() -> MessageBubbleWithArrow {
+        MessageBubbleWithArrow(frame: .zero, forward: self.towards).tag(bubbleTag)
+    }
     
     public private(set) lazy var bubbleMultiCorners: MessageBubbleMultiCorner = {
-        MessageBubbleMultiCorner(frame: .zero, forward: self.towards).tag(bubbleTag)
+        self.createBubbleMultiCorners()
     }()
+    
+    @objc open func createBubbleMultiCorners() -> MessageBubbleMultiCorner {
+        MessageBubbleMultiCorner(frame: .zero, forward: self.towards).tag(bubbleTag)
+    }
     
     public private(set) lazy var status: UIImageView = {
-        UIImageView(frame: .zero).backgroundColor(.clear).tag(statusTag)
+        self.statusView()
     }()
     
+    @objc open func statusView() -> UIImageView {
+        UIImageView(frame: .zero).backgroundColor(.clear).tag(statusTag)
+    }
+    
     public private(set) lazy var messageDate: UILabel = {
-        UILabel(frame: .zero).font(UIFont.theme.bodySmall).backgroundColor(.clear)
+        self.createMessageDate()
     }()
+    
+    @objc open func createMessageDate() -> UILabel {
+        UILabel(frame: .zero).font(UIFont.theme.bodySmall).backgroundColor(.clear)
+    }
     
     @objc public enum ContentDisplayStyle: UInt {
         case withReply = 1
@@ -134,7 +177,7 @@ let message_bubble_space = CGFloat(5)
         view.addGestureRecognizer(longPress)
     }
     
-    @objc func clickAction(gesture: UITapGestureRecognizer) {
+    @objc open func clickAction(gesture: UITapGestureRecognizer) {
         if let tag = gesture.view?.tag {
             switch tag {
             case statusTag:
@@ -151,7 +194,7 @@ let message_bubble_space = CGFloat(5)
         }
     }
     
-    @objc func longPressAction(gesture: UILongPressGestureRecognizer) {
+    @objc open func longPressAction(gesture: UILongPressGestureRecognizer) {
         if let tag = gesture.view?.tag {
             if self.longGestureEnabled {
                 self.longGestureEnabled = false
@@ -183,7 +226,7 @@ let message_bubble_space = CGFloat(5)
     /// Refresh cell with ``MessageEntity``
     /// - Parameter entity: ``MessageEntity``
     @objc(refreshWithEntity:)
-    public func refresh(entity: MessageEntity) {
+    open func refresh(entity: MessageEntity) {
         self.towards = entity.message.direction == .send ? .right:.left
         self.entity = entity
         self.updateAxis(entity: entity)
@@ -218,7 +261,7 @@ let message_bubble_space = CGFloat(5)
     /// Update cell subviews axis with ``MessageEntity``
     /// - Parameter entity: ``MessageEntity``
     @objc(updateAxisWithEntity:)
-    public func updateAxis(entity: MessageEntity) {
+    open func updateAxis(entity: MessageEntity) {
         if entity.message.direction == .receive {
             self.avatar.frame = CGRect(x: 12, y: entity.height - 8 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - 28, width: 28, height: 28)
             self.nickName.frame = CGRect(x:  Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+12:12, y: 10, width: limitBubbleWidth, height: 16)
@@ -269,8 +312,17 @@ let message_bubble_space = CGFloat(5)
 }
 
 
+/**
+ An extension of `MessageCell` that conforms to the `ThemeSwitchProtocol`.
+ It provides a method to switch the theme of the cell.
+ */
 extension MessageCell: ThemeSwitchProtocol {
-    public func switchTheme(style: ThemeStyle) {
+    /**
+     Switches the theme of the cell.
+     
+     - Parameter style: The style of the theme to switch to.
+     */
+    open func switchTheme(style: ThemeStyle) {
         self.replyContent.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
         self.nickName.textColor = style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5
         self.messageDate.textColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor7

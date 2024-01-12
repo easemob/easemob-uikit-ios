@@ -74,7 +74,7 @@ import AudioToolbox
     /// Bind UI driver and service
     /// - Parameters:
     ///   - driver: The object of conform``IConversationListDriver``.
-    @objc public func bind(driver: IConversationListDriver) {
+    @objc open func bind(driver: IConversationListDriver) {
         self.driver = driver
         self.service?.unbindConversationEventsListener(listener: self)
         self.service?.bindConversationEventsListener(listener: self)
@@ -87,19 +87,19 @@ import AudioToolbox
     
     /// Register to monitor when certain emergencies occur
     /// - Parameter listener: ``ConversationEmergencyListener``
-    @objc public func registerEventsListener(listener: ConversationEmergencyListener) {
+    @objc open func registerEventsListener(listener: ConversationEmergencyListener) {
         self.service?.unregisterEmergencyListener(listener: listener)
         self.service?.registerEmergencyListener(listener: listener)
     }
     
     /// When you don’t want to listen to the registered events above, you can use this method to clear the registration.
     /// - Parameter listener: ``ConversationEmergencyListener``
-    @objc public func unregisterEventsListener(listener: ConversationEmergencyListener) {
+    @objc open func unregisterEventsListener(listener: ConversationEmergencyListener) {
         self.service?.unregisterEmergencyListener(listener: listener)
     }
     
     /// Load all sessions that exist locally. If they do not exist, load them from the server.
-    @objc public func loadExistLocalDataIfEmptyFetchServer() {
+    @objc open func loadExistLocalDataIfEmptyFetchServer() {
         self.service?.loadExistConversations(completion: { [weak self] result, error in
             if error == nil {
                 self?.driver?.refreshList(infos: result)
@@ -117,7 +117,7 @@ import AudioToolbox
     ///   - text: Welcome message.
     /// - Returns: ``ConversationInfo`` object.
     @objc(loadIfNotExistCreateWithProfile:text:)
-    public func loadIfNotExistCreate(profile: EaseProfileProtocol,text: String) -> ConversationInfo? {
+    open func loadIfNotExistCreate(profile: EaseProfileProtocol,text: String) -> ConversationInfo? {
         if let conversation = self.service?.loadIfNotExistCreate(conversationId: profile.id) {
             if let info = self.mapper(objects: [conversation]).first,!info.id.isEmpty {
                 if conversation.type == .groupChat {
@@ -132,11 +132,11 @@ import AudioToolbox
         return nil
     }
     
-    private func welcomeMessage(conversationId: String,text: String) -> ChatMessage {
+    @objc open func welcomeMessage(conversationId: String,text: String) -> ChatMessage {
         ChatMessage(conversationID: conversationId, body: ChatCustomMessageBody(event: EaseChatUIKit_alert_message, customExt: nil), ext: text.isEmpty ? nil:["something":text])
     }
     
-    @objc public func destroyed() {
+    @objc open func destroyed() {
         self.driver?.removeActionHandler(actionHandler: self)
         self.service?.unbindConversationEventsListener(listener: self)
         self.multiService?.unbindMultiDeviceListener(listener: self)
@@ -192,7 +192,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         }
     }
     
-    private func renderDriver(infos: [EaseProfileProtocol]) {
+    @objc open func renderDriver(infos: [EaseProfileProtocol]) {
         self.driver?.refreshProfiles(infos: infos)
         if EaseChatUIKitClient.shared.option.option_chat.saveConversationInfo {
             for info in infos {
@@ -207,87 +207,114 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         }
     }
     
+    @objc open func pin(info: ConversationInfo) {
+        self.service?.pin(conversationId: info.id) { [weak self] error in
+            guard let `self` = self else { return }
+            if error != nil {
+                consoleLogInfo("onConversationSwipe pin:\(error?.errorDescription ?? "")", type: .error)
+            } else {
+                if let idx = Appearance.conversation.swipeLeftActions.firstIndex(where: { $0 == .pin }) {
+                    Appearance.conversation.swipeLeftActions[idx] = .unpin
+                }
+                if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
+                    self.driver?.refreshList(infos: self.mapper(objects: infos))
+                }
+            }
+        }
+    }
+    
+    @objc open func unpin(info: ConversationInfo) {
+        self.service?.unpin(conversationId: info.id) { [weak self] error in
+            guard let `self` = self else { return }
+            if error != nil {
+                consoleLogInfo("onConversationSwipe unpin:\(error?.errorDescription ?? "")", type: .error)
+            } else {
+                if let idx = Appearance.conversation.swipeLeftActions.firstIndex(where: { $0 == .unpin }) {
+                    Appearance.conversation.swipeLeftActions[idx] = .pin
+                }
+                if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
+                    self.driver?.refreshList(infos: self.mapper(objects: infos))
+                }
+            }
+        }
+    }
+    
+    @objc open func mute(info: ConversationInfo) {
+        self.service?.setSilentMode(conversationId: info.id) { [weak self] _, error in
+            if error != nil {
+                consoleLogInfo("onConversationSwipe mute:\(error?.errorDescription ?? "")", type: .error)
+            } else {
+                let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
+                var conversationMap = self?.muteMap[currentUser]
+                if conversationMap != nil {
+                    conversationMap?[info.id] = 1
+                } else {
+                    conversationMap = [info.id:1]
+                }
+                self?.muteMap[currentUser] = conversationMap
+                self?.driver?.swipeMenuOperation(info: info, type: .mute)
+            }
+        }
+    }
+    
+    @objc open func delete(info: ConversationInfo) {
+        self.service?.deleteConversation(conversationId: info.id) { [weak self] error in
+            guard let `self` = self else { return }
+                if error != nil {
+                    consoleLogInfo("onConversationSwipe delete:\(error?.errorDescription ?? "")", type: .error)
+                } else {
+                    if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
+                        self.driver?.refreshList(infos: self.mapper(objects: infos))
+                    }
+                }
+            }
+    }
+    
+    @objc open func unmute(info: ConversationInfo) {
+        self.service?.clearSilentMode(conversationId: info.id) { [weak self] _, error in
+            if error != nil {
+                consoleLogInfo("onConversationSwipe unmute:\(error?.errorDescription ?? "")", type: .error)
+            } else {
+                let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
+                var conversationMap = self?.muteMap[currentUser]
+                if conversationMap != nil {
+                    conversationMap?[info.id] = 0
+                } else {
+                    conversationMap = [info.id:0]
+                }
+                self?.muteMap[currentUser] = conversationMap
+                self?.driver?.swipeMenuOperation(info: info, type: .unmute)
+            }
+        }
+    }
+    
+    @objc open func read(info: ConversationInfo) {
+        info.unreadCount = 0
+        self.driver?.swipeMenuOperation(info: info, type: .read)
+        self.service?.markAllMessagesAsRead(conversationId: info.id)
+    }
+    
     public func onConversationSwipe(type: UIContextualActionType, info: ConversationInfo) {
         if let hooker = ComponentViewsActionHooker.shared.conversation.swipeAction {
             hooker(type, info)
         } else {
             switch type {
-            case .pin: self.service?.pin(conversationId: info.id) { [weak self] error in
-                guard let `self` = self else { return }
-                    if error != nil {
-                        consoleLogInfo("onConversationSwipe pin:\(error?.errorDescription ?? "")", type: .error)
-                    } else {
-                        if let idx = Appearance.conversation.swipeLeftActions.firstIndex(where: { $0 == .pin }) {
-                            Appearance.conversation.swipeLeftActions[idx] = .unpin
-                        }
-                        if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
-                            self.driver?.refreshList(infos: self.mapper(objects: infos))
-                        }
-                    }
-                }
-            case .unpin: self.service?.unpin(conversationId: info.id) { [weak self] error in
-                guard let `self` = self else { return }
-                    if error != nil {
-                        consoleLogInfo("onConversationSwipe unpin:\(error?.errorDescription ?? "")", type: .error)
-                    } else {
-                        if let idx = Appearance.conversation.swipeLeftActions.firstIndex(where: { $0 == .unpin }) {
-                            Appearance.conversation.swipeLeftActions[idx] = .pin
-                        }
-                        if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
-                            self.driver?.refreshList(infos: self.mapper(objects: infos))
-                        }
-                    }
-                }
-            case .mute: self.service?.setSilentMode(conversationId: info.id) { [weak self] _, error in
-                    if error != nil {
-                        consoleLogInfo("onConversationSwipe mute:\(error?.errorDescription ?? "")", type: .error)
-                    } else {
-                        let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
-                        var conversationMap = self?.muteMap[currentUser]
-                        if conversationMap != nil {
-                            conversationMap?[info.id] = 1
-                        } else {
-                            conversationMap = [info.id:1]
-                        }
-                        self?.muteMap[currentUser] = conversationMap
-                        self?.driver?.swipeMenuOperation(info: info, type: .mute)
-                    }
-                }
-            case .unmute: self.service?.clearSilentMode(conversationId: info.id) { [weak self] _, error in
-                    if error != nil {
-                        consoleLogInfo("onConversationSwipe unmute:\(error?.errorDescription ?? "")", type: .error)
-                    } else {
-                        let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
-                        var conversationMap = self?.muteMap[currentUser]
-                        if conversationMap != nil {
-                            conversationMap?[info.id] = 0
-                        } else {
-                            conversationMap = [info.id:0]
-                        }
-                        self?.muteMap[currentUser] = conversationMap
-                        self?.driver?.swipeMenuOperation(info: info, type: .unmute)
-                    }
-                }
-            case .delete: self.service?.deleteConversation(conversationId: info.id) { [weak self] error in
-                guard let `self` = self else { return }
-                    if error != nil {
-                        consoleLogInfo("onConversationSwipe delete:\(error?.errorDescription ?? "")", type: .error)
-                    } else {
-                        if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
-                            self.driver?.refreshList(infos: self.mapper(objects: infos))
-                        }
-                    }
-                }
-            case .read:
-                info.unreadCount = 0
-                self.driver?.swipeMenuOperation(info: info, type: .read)
-                self.service?.markAllMessagesAsRead(conversationId: info.id)
+            case .pin: self.pin(info: info)
+            case .unpin: self.unpin(info: info)
+            case .mute: self.mute(info: info)
+            case .unmute: self.unmute(info: info)
+            case .delete: self.delete(info: info)
+            case .read: self.read(info: info)
             case .more: self.moreAction(info: info)
             }
         }
     }
     
     public func onConversationDidSelected(indexPath: IndexPath, info: ConversationInfo) {
+        self.conversationDidSelected(indexPath: indexPath, info: info)
+    }
+    
+    @objc open func conversationDidSelected(indexPath: IndexPath, info: ConversationInfo) {
         self.chatId = info.id
         self.service?.markAllMessagesAsRead(conversationId: info.id)
         self.driver?.swipeMenuOperation(info: info, type: .read)
@@ -302,8 +329,13 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         }
     }
     
-    private func moreAction(info: ConversationInfo) {
+    @objc open func moreAction(info: ConversationInfo) {
         DialogManager.shared.showMessageActions(actions: Appearance.conversation.moreActions) { item  in
+            //According to item tag
+/// -            switch item.tag {
+/// -            case "xxx":
+/// -            default: break
+/// -            }
             item.action?(item,info)
         }
     }
@@ -313,6 +345,10 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
 //MARK: - ConversationServiceListener
 extension ConversationViewModel: ConversationServiceListener {
     public func onConversationLastMessageUpdate(message: ChatMessage, info: ConversationInfo) {
+        self.conversationLastMessageUpdate(message: message, info: info)
+    }
+    
+    @objc open func conversationLastMessageUpdate(message: ChatMessage, info: ConversationInfo) {
         if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
             let items = self.mapper(objects: infos)
             var count = UInt(0)
@@ -327,7 +363,7 @@ extension ConversationViewModel: ConversationServiceListener {
         }
     }
     
-    private func playNewMessageSound() {
+    @objc open func playNewMessageSound() {
         let audioPath = NSURL(fileURLWithPath: Appearance.chat.newMessageSoundPath)
         var soundID: SystemSoundID = 0
         let completion: @convention(c) (SystemSoundID, UnsafeMutableRawPointer?) -> Void = { soundId, pointer in
@@ -343,16 +379,23 @@ extension ConversationViewModel: ConversationServiceListener {
     }
     
     public func onConversationMessageAlreadyReadOnOtherDevice(info: ConversationInfo) {
+        self.conversationMessageAlreadyReadOnOtherDevice(info: info)
+    }
+    
+    @objc open func conversationMessageAlreadyReadOnOtherDevice(info: ConversationInfo) {
         info.unreadCount = 0
         self.service?.markAllMessagesAsRead(conversationId: info.id)
         self.driver?.swipeMenuOperation(info: info, type: .read)
     }
-    
 }
 
 //MARK: - MultiDeviceListener
 extension ConversationViewModel: MultiDeviceListener {
     public func onConversationEventDidChanged(event: MultiDeviceEvent, conversationId: String, conversationType: ChatConversationType) {
+        self.conversationEventDidChanged(event: event, conversationId: conversationId, conversationType: conversationType)
+    }
+    
+    @objc open func conversationEventDidChanged(event: MultiDeviceEvent, conversationId: String, conversationType: ChatConversationType) {
         switch event {
         case .conversationPinned,.conversationUnpinned:
             if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
@@ -371,7 +414,7 @@ extension ConversationViewModel: MultiDeviceListener {
         }
     }
     
-    private func mapper(objects: [ChatConversation]) -> [ConversationInfo] {
+    @objc open func mapper(objects: [ChatConversation]) -> [ConversationInfo] {
         objects.map {
             let conversation = ComponentsRegister.shared.Conversation.init()
             conversation.id = $0.conversationId

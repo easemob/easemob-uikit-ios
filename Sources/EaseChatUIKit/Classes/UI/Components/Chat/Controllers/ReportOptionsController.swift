@@ -76,14 +76,14 @@ extension ReportOptionsController: UITableViewDelegate,UITableViewDataSource {
         self.optionsList.reloadData()
     }
     
-    @objc private func report() {
+    @objc open func report() {
         ChatClient.shared().chatManager?.reportMessage(withId: self.reportMessage.messageId, tag: Appearance.chat.reportSelectionTags[safe: self.selectIndex] ?? "", reason: Appearance.chat.reportSelectionReasons[safe: self.selectIndex] ?? "",completion: { [weak self] error in
             self?.reportClosure?(error)
         })
         
     }
     
-    @objc private func cancelAction() {
+    @objc open func cancelAction() {
         self.reportClosure?(nil)
         self.dismiss(animated: true)
     }

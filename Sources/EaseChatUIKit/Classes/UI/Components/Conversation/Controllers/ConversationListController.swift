@@ -5,15 +5,15 @@ import UIKit
 @objc open class ConversationListController: UIViewController {
     
     public private(set) lazy var navigation: EaseChatNavigationBar = {
-        EaseChatNavigationBar( showLeftItem: false,rightImages: [UIImage(named: "add", in: .chatBundle, with: nil)!])
+        self.createNavigationBar()
     }()
     
     public private(set) lazy var search: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: 16, y: self.navigation.frame.maxY+5, width: self.view.frame.width-32, height: 36)).backgroundColor(UIColor.theme.neutralColor95).textColor(UIColor.theme.neutralColor6, .normal).title(" Search".chat.localize, .normal).image(UIImage(named: "search", in: .chatBundle, with: nil), .normal).addTargetFor(self, action: #selector(searchAction), for: .touchUpInside).cornerRadius(Appearance.avatarRadius)
+        self.createSearchBar()
     }()
     
     public private(set) lazy var conversationList: ConversationList = {
-        ConversationList(frame: CGRect(x: 0, y: self.search.frame.maxY+5, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight-49-(self.tabBarController?.tabBar.frame.height ?? 0)), style: .plain)
+        self.createList()
     }()
     
     public private(set) var viewModel: ConversationViewModel?
@@ -23,7 +23,7 @@ import UIKit
     ///   - providerOC: The object of conform ``EaseProfileProviderOC``.
     @objc(initWithProviderOC:)
     public required init(providerOC: EaseProfileProviderOC? = nil) {
-        self.viewModel = ConversationViewModel(providerOC: providerOC)
+        self.viewModel = ComponentsRegister.shared.ConversationViewService.init(providerOC: providerOC)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -32,12 +32,24 @@ import UIKit
     ///   - id: The id of the conversation.
     ///   - provider: The object of conform ``EaseProfileProvider``.
     public required init(provider: EaseProfileProvider? = nil) {
-        self.viewModel = ConversationViewModel(provider: provider)
+        self.viewModel = ComponentsRegister.shared.ConversationViewService.init(provider: provider)
         super.init(nibName: nil, bundle: nil)
     }
     
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    @objc open func createNavigationBar() -> EaseChatNavigationBar {
+        EaseChatNavigationBar( showLeftItem: false,rightImages: [UIImage(named: "add", in: .chatBundle, with: nil)!])
+    }
+    
+    @objc open func createSearchBar() -> UIButton {
+        UIButton(type: .custom).frame(CGRect(x: 16, y: self.navigation.frame.maxY+5, width: self.view.frame.width-32, height: 36)).backgroundColor(UIColor.theme.neutralColor95).textColor(UIColor.theme.neutralColor6, .normal).title(" Search".chat.localize, .normal).image(UIImage(named: "search", in: .chatBundle, with: nil), .normal).addTargetFor(self, action: #selector(searchAction), for: .touchUpInside).cornerRadius(Appearance.avatarRadius)
+    }
+    
+    @objc open func createList() -> ConversationList {
+        ConversationList(frame: CGRect(x: 0, y: self.search.frame.maxY+5, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight-49-(self.tabBarController?.tabBar.frame.height ?? 0)), style: .plain)
     }
     
     /// Update navigation avatar url.
@@ -76,7 +88,14 @@ import UIKit
 //        ConversationListController().viewModel.unregisterEventsListener(listener: <#T##ConversationEmergencyListener#>)
     }
     
-    private func navigationClick(type: EaseChatNavigationBarClickEvent,indexPath: IndexPath?) {
+    /**
+     Handles the navigation bar click event.
+
+     - Parameters:
+        - type: The type of navigation bar click event.
+        - indexPath: The index path of the clicked item, if applicable.
+     */
+    @objc open func navigationClick(type: EaseChatNavigationBarClickEvent, indexPath: IndexPath?) {
         switch type {
         case .back: self.pop()
         case .rightItems: self.rightActions(indexPath: indexPath ?? IndexPath())
@@ -85,7 +104,13 @@ import UIKit
         }
     }
     
-    private func pop() {
+    /**
+        Pops the current view controller from the navigation stack if it exists,
+        otherwise dismisses the view controller.
+
+        - Note: This method is typically used to navigate back to the previous screen.
+    */
+    @objc open func pop() {
         if self.navigationController != nil {
             self.navigationController?.popViewController(animated: true)
         } else {
@@ -93,12 +118,26 @@ import UIKit
         }
     }
     
-    private func toChat(indexPath: IndexPath,info: ConversationInfo) {
+    /**
+     Opens the chat view controller for the selected conversation.
+
+     - Parameters:
+        - indexPath: The index path of the selected conversation in the table view.
+        - info: The information of the selected conversation.
+
+     - Note: This method creates an instance of `MessageViewController` and pushes it onto the navigation stack using `ControllerStack.toDestination(vc:)`.
+     */
+    @objc open func toChat(indexPath: IndexPath, info: ConversationInfo) {
         let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: info.id, chatType: info.type == .chat ? .chat:.group)
         ControllerStack.toDestination(vc: vc)
     }
     
-    @objc private func searchAction() {
+    /**
+        Performs a search action in the conversation list.
+        - Note: This method creates a `SearchConversationsController` instance and presents it to the user.
+                When a conversation is selected from the search results, it navigates to the chat screen.
+     */
+    @objc open func searchAction() {
         var search: SearchConversationsController?
         search = SearchConversationsController(searchInfos: self.conversationList.datas) {
             search?.navigationController?.popViewController(animated: false)
@@ -109,7 +148,13 @@ import UIKit
         }
     }
     
-    private func rightActions(indexPath: IndexPath) {
+    /**
+     Handles the right actions for a given indexPath in the conversation list.
+     
+     - Parameters:
+         - indexPath: The index path of the selected row in the conversation list.
+     */
+    @objc open func rightActions(indexPath: IndexPath) {
         switch indexPath.row {
         case 0:
             DialogManager.shared.showActions(actions: Appearance.conversation.listMoreActions) { item in
@@ -126,7 +171,12 @@ import UIKit
         }
     }
     
-    private func selectContact() {
+    /**
+     Selects a contact from the contacts list.
+     
+     This method presents a view controller that displays a list of contacts. The user can select a contact, and the selected contact's profile is passed to the `chatToContact` method.
+     */
+    @objc open func selectContact() {
         let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .newChat,provider: nil)
         vc.confirmClosure = { [weak self] users in
             if let profile = users.first {
@@ -138,7 +188,13 @@ import UIKit
         self.present(vc, animated: true)
     }
     
-    private func chatToContact(profile: EaseProfileProtocol) {
+    /**
+     Opens a chat with the specified contact profile.
+     
+     - Parameters:
+        - profile: The contact profile to chat with.
+     */
+    @objc open func chatToContact(profile: EaseProfileProtocol) {
         if let info = self.conversationList.datas.first(where: { $0.id == profile.id }) {
             self.toChat(indexPath: IndexPath(row: 0, section: 0), info: info)
         } else {
@@ -146,15 +202,27 @@ import UIKit
         }
     }
     
-    private func createChat(profile: EaseProfileProtocol,info: String) {
+    /**
+     Creates a chat with the given profile and information.
+     
+     - Parameters:
+        - profile: The profile of the user to create the chat with.
+        - info: Additional information about the chat.
+     */
+    @objc open func createChat(profile: EaseProfileProtocol, info: String) {
         if let info = self.viewModel?.loadIfNotExistCreate(profile: profile, text: info) {
             let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: info.id , chatType: info.type == .chat ? .chat:.group)
             self.navigationController?.pushViewController(vc, animated: true)
         }
     }
     
-    private func addContact() {
-        DialogManager.shared.showAlert(title: "new_chat_button_click_menu_addcontacts".chat.localize, content: 
+    /**
+     Adds a contact to the conversation list.
+     
+     This method displays an alert dialog with a text field for the user to enter the contact ID. After the user confirms, the `addContact` method of the `contactService` is called to add the contact. If an error occurs during the process, it is logged.
+     */
+    @objc open func addContact() {
+        DialogManager.shared.showAlert(title: "new_chat_button_click_menu_addcontacts".chat.localize, content:
                                         "add_contacts_subtitle".chat.localize, showCancel: true, showConfirm: true,showTextFiled: true,placeHolder: "contactID".chat.localize) { [weak self] text in
             self?.viewModel?.contactService?.addContact(userId: text, invitation: "", completion: { error, userId in
                 if let error = error {
@@ -164,7 +232,7 @@ import UIKit
         }
     }
     
-    private func createGroup() {
+    @objc open func createGroup() {
         let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .newGroup,provider: nil)
         vc.confirmClosure = { [weak self] profiles in
             vc.dismiss(animated: true) {
@@ -174,7 +242,15 @@ import UIKit
         self.present(vc, animated: true)
     }
     
-    private func create(profiles: [EaseProfileProtocol]) {
+    /**
+     Creates a group conversation with the given profiles.
+     
+     - Parameters:
+        - profiles: An array of `EaseProfileProtocol` objects representing the selected profiles for the group conversation.
+     
+     This method creates a group conversation with the given profiles. It constructs the group name based on the profiles' nicknames or IDs, and then uses the `ChatGroupOption` to configure the group settings. Finally, it calls the `createGroup` method of the `ChatGroupManager` to create the group.
+     */
+    @objc open func create(profiles: [EaseProfileProtocol]) {
         var name = ""
         var ids = [String]()
         for (index,profile) in profiles.enumerated() {

@@ -11,8 +11,6 @@ import UIKit
     
     @UserDefault("EaseChatUIKit_contact_fetch_server_finished",defaultValue: false) private var loadFinished
     
-    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Double>()) private var newFriends
-
     private var responseDelegates: NSHashTable<ContactEventsResponse> = NSHashTable<ContactEventsResponse>.weakObjects()
     
     private var eventsNotifiers: NSHashTable<ContactEmergencyListener> = NSHashTable<ContactEmergencyListener>.weakObjects()
@@ -162,7 +160,6 @@ extension ContactServiceImplement: ContactEventsListener {
     }
     
     public func friendRequestDidReceive(fromUser aUsername: String, message aMessage: String?) {
-        self.newFriends[aUsername] = Date().timeIntervalSince1970
         for listener in self.responseDelegates.allObjects {
             listener.friendRequestDidReceive(by: aUsername)
         }

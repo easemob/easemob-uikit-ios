@@ -10,6 +10,13 @@ import UIKit
 
 @objc open class DetailInfoHeader: UIView {
     
+    /**
+     A property representing the state of the user.
+
+     The default value is `.online`. When the value of `userState` is set, the `willSet` block is executed on the main queue, updating the background color of the `status` view based on the new value.
+
+     - Note: The `status` view is expected to be a subview of the `DetailInfoHeader` view.
+     */
     @objc public var userState: UserState = .online {
         willSet {
             DispatchQueue.main.async {
@@ -27,6 +34,11 @@ import UIKit
         }
     }
     
+    /**
+     A property representing the detail text of the header view.
+     
+     When the `detailText` property is set, it updates the `detail` button's attributed title with the provided text and an image attachment. The image attachment is created using the "copy" image from the "chatBundle" resource bundle. The appearance of the text and image is determined by the current theme style.
+     */
     @objc public var detailText: String? {
         didSet {
             if let string = self.detailText {

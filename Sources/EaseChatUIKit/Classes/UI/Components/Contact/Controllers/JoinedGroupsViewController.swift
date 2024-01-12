@@ -26,8 +26,12 @@ import UIKit
     }
     
     public private(set) lazy var navigation: EaseChatNavigationBar = {
-        EaseChatNavigationBar(showLeftItem: true, textAlignment: .left, hiddenAvatar: true).backgroundColor(.clear)
+        self.createNavigation()
     }()
+    
+    @objc open func createNavigation() -> EaseChatNavigationBar {
+        EaseChatNavigationBar(showLeftItem: true, textAlignment: .left, hiddenAvatar: true).backgroundColor(.clear)
+    }
     
     public private(set) lazy var groupList: UITableView = {
         UITableView(frame: CGRect(x: 0, y: self.navigation.frame.maxY+10, width: self.view.frame.width, height: self.view.frame.height-self.navigation.frame.maxY-10), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).rowHeight(60).backgroundColor(.clear)
@@ -59,14 +63,14 @@ import UIKit
         NotificationCenter.default.addObserver(self, selector: #selector(removeGroup(notification:)), name: Notification.Name("EaseChatUIKit_leaveGroup"), object: nil)
     }
     
-    @objc func removeGroup(notification: Notification) {
+    @objc open func removeGroup(notification: Notification) {
         if let groupId = notification.object as? String {
             self.datas.removeAll { $0.id == groupId }
             self.groupList.reloadData()
         }
     }
     
-    private func navigationClick(type: EaseChatNavigationBarClickEvent,indexPath: IndexPath?) {
+    @objc open func navigationClick(type: EaseChatNavigationBarClickEvent,indexPath: IndexPath?) {
         switch type {
         case .back: self.pop()
         default: break
@@ -81,7 +85,7 @@ import UIKit
         }
     }
     
-    private func requestGroups() {
+    @objc open func requestGroups() {
         if !self.loadFinished {
             self.groupService.getJoinedGroups(page: self.page, pageSize: 20, needMemberCount: true, needRole: true) { [weak self] groups, error in
                 guard let `self` = self else { return }
@@ -116,7 +120,11 @@ extension JoinedGroupsViewController: UITableViewDelegate,UITableViewDataSource 
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cell = tableView.dequeueReusableCell(withIdentifier: "GroupListCell") as? GroupListCell
+        self.cellForRowAt(indexPath: indexPath)
+    }
+    
+    @objc open func cellForRowAt(indexPath: IndexPath) -> UITableViewCell {
+        var cell = self.groupList.dequeueReusableCell(withIdentifier: "GroupListCell") as? GroupListCell
         if cell == nil {
             cell = GroupListCell(style: .default, reuseIdentifier: "GroupListCell")
         }
@@ -140,14 +148,14 @@ extension JoinedGroupsViewController: UITableViewDelegate,UITableViewDataSource 
         }
     }
     
-    private func chatTo(group: String) {
+    @objc open func chatTo(group: String) {
         let vc = ComponentsRegister.shared.GroupInfoController.init(group: group) { [weak self] groupId, name in
             self?.refreshGroup(groupId: groupId, name: name)
         }
         ControllerStack.toDestination(vc: vc)
     }
     
-    private func refreshGroup(groupId: String,name: String) {
+    @objc open func refreshGroup(groupId: String,name: String) {
         var idx = 0
         for (index,profile) in self.datas.enumerated() {
             if profile.id == groupId {

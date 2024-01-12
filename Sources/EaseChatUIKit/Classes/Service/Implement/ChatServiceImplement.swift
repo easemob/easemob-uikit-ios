@@ -101,9 +101,11 @@ extension ChatServiceImplement: ChatService {
                 if error == nil,let messages = messages {
                     for message in messages {
                         if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-                            let profile = EaseProfile()
-                            profile.setValuesForKeys(dic)
-                            EaseChatUIKitContext.shared?.chatCache?[message.from] = profile
+                            if var profile = EaseChatUIKitContext.shared?.chatCache?[message.from] {
+                                let user = EaseProfile()
+                                user.setValuesForKeys(dic)
+                                EaseChatUIKitContext.shared?.chatCache?[message.from] = user
+                            }
                         }
                     }
                 }
@@ -115,9 +117,11 @@ extension ChatServiceImplement: ChatService {
                 if error == nil,let messages = result?.list {
                     for message in messages {
                         if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-                            let profile = EaseProfile()
-                            profile.setValuesForKeys(dic)
-                            EaseChatUIKitContext.shared?.chatCache?[message.from] = profile
+                            if var profile = EaseChatUIKitContext.shared?.chatCache?[message.from] {
+                                let user = EaseProfile()
+                                user.setValuesForKeys(dic)
+                                EaseChatUIKitContext.shared?.chatCache?[message.from] = user
+                            }
                         }
                     }
                 }

@@ -65,7 +65,7 @@ import UIKit
     /// - Parameters:
     ///   - driver: ``IMessageListViewDriver``
     @objc(bindWithDriver:)
-    public func bindDriver(driver: IMessageListViewDriver) {
+    open func bindDriver(driver: IMessageListViewDriver) {
         self.driver = driver
         driver.addActionHandler(actionHandler: self)
         self.loadMessages()
@@ -88,7 +88,7 @@ import UIKit
         }
     }
     
-    @objc public func loadMessages() {
+    @objc open func loadMessages() {
         if let start = self.driver?.firstMessageId {
             self.chatService?.loadMessages(start: start, pageSize: 20, completion: { [weak self] error, messages in
                 if error == nil {
@@ -128,7 +128,7 @@ import UIKit
         }
     }
     
-    func constructMessage(text: String,type: MessageCellStyle,extensionInfo: Dictionary<String,Any> = [:]) -> ChatMessage? {
+    @objc open func constructMessage(text: String,type: MessageCellStyle,extensionInfo: Dictionary<String,Any> = [:]) -> ChatMessage? {
         
         var ext = extensionInfo
         let json = EaseChatUIKitContext.shared?.currentUser?.toJsonObject() ?? [:]
@@ -208,7 +208,7 @@ import UIKit
     /// - Parameters:
     ///   - profile: ``EaseProfileProtocol``
     @objc(updateMentionIdsWithProfile:type:)
-    public func updateMentionIds(profile: EaseProfileProtocol,type: MentionUpdate) {
+    open func updateMentionIds(profile: EaseProfileProtocol,type: MentionUpdate) {
         if type == .add {
             self.driver?.addMentionUserToField(user: profile)
         } else {
@@ -222,19 +222,17 @@ import UIKit
     ///   - message: ``ChatMessage``
     ///   - text: Edit text to be passed when editing a message
     @objc(processMessageWithOperation:message:edieText:)
-    public func processMessage(operation: MessageOperation,message: ChatMessage,edit text: String = "") {
+    open func processMessage(operation: MessageOperation,message: ChatMessage,edit text: String = "") {
         switch operation {
-        case .edit: self.editMessage(operation: operation, message: message, content: text)
-        case .copy: self.driver?.processMessage(operation: .copy, message: message)
-        case .reply: self.driver?.processMessage(operation: .reply, message: message)
-        case .recall: self.recallMessage(operation: .recall, message: message)
-        case .delete:
-            self.driver?.processMessage(operation: .delete, message: message)
-            self.chatService?.removeLocalMessage(messageId: message.messageId)
+        case .edit: self.editMessage(message: message, content: text)
+        case .copy: self.copyMessage(message: message)
+        case .reply: self.replyMessage(message: message)
+        case .recall: self.recallMessage(message: message)
+        case .delete: self.deleteMessage(message: message)
         }
     }
     
-    func editMessage(operation: MessageOperation,message: ChatMessage,content: String = "") {
+    @objc open func editMessage(message: ChatMessage,content: String = "") {
         self.chatService?.edit(messageId: message.messageId, text: content, completion: { [weak self] error, editMessage in
             if error == nil,let raw = editMessage {
                 self?.driver?.processMessage(operation: .edit, message: raw)
@@ -244,7 +242,15 @@ import UIKit
         })
     }
     
-    func recallMessage(operation: MessageOperation,message: ChatMessage) {
+    @objc open func copyMessage(message: ChatMessage) {
+        self.driver?.processMessage(operation: .copy, message: message)
+    }
+    
+    @objc open func replyMessage(message: ChatMessage) {
+        self.driver?.processMessage(operation: .reply, message: message)
+    }
+    
+    @objc open func recallMessage(message: ChatMessage) {
         self.chatService?.recall(messageId: message.messageId, completion: { [weak self] error in
             if error == nil {
                 self?.recallAction(message: message)
@@ -254,7 +260,7 @@ import UIKit
         })
     }
     
-    func recallAction(message: ChatMessage) {
+    @objc open func recallAction(message: ChatMessage) {
         if let recall = self.constructMessage(text: "recalled a message".chat.localize, type: .alert, extensionInfo: [:]) {
             recall.timestamp = message.timestamp
             recall.from = message.from
@@ -262,10 +268,19 @@ import UIKit
             self.driver?.processMessage(operation: .recall, message: recall)
         }
     }
+    
+    @objc open func deleteMessage(message: ChatMessage) {
+        self.driver?.processMessage(operation: .delete, message: message)
+        self.chatService?.removeLocalMessage(messageId: message.messageId)
+    }
 }
 
 extension MessageListViewModel: MessageListViewActionEventsDelegate {
     public func onMessageVisible(entity: MessageEntity) {
+        self.messageVisibleMark(entity: entity)
+    }
+    
+    @objc open func messageVisibleMark(entity: MessageEntity) {
         let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)
         conversation?.markMessageAsRead(withId: entity.message.messageId, error: nil)
         if conversation?.type ?? .chat == .chat {
@@ -274,6 +289,10 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
     }
     
     public func onFailureMessageRetrySend(entity: MessageEntity) {
+        self.retrySendMessage(entity: entity)
+    }
+    
+    @objc open func retrySendMessage(entity: MessageEntity) {
         self.driver?.updateMessageStatus(message: entity.message, status: .sending)
         self.chatService?.send(message: entity.message, completion: { error, message in
             if error == nil {
@@ -285,7 +304,6 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
         })
     }
     
-    
     public func onMessageListPullRefresh() {
         self.loadMessages()
     }
@@ -293,8 +311,12 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
     public func onMessageReplyClicked(message: MessageEntity) {
         
     }
-    
+        
     public func onMessageContentClicked(message: MessageEntity) {
+        self.onMessageBubbleClicked(message: message)
+    }
+    
+    @objc open func onMessageBubbleClicked(message: MessageEntity) {
         let bodyType = message.message.body.type
         
         if bodyType == .voice || bodyType == .file || bodyType == .video || bodyType == .combine {
@@ -314,10 +336,9 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
                 handler.onMessageBubbleClicked(message: message.message)
             }
         }
-        
     }
     
-    func audioMessagePlay(message: MessageEntity) {
+    @objc open func audioMessagePlay(message: MessageEntity) {
         message.playing = !message.playing
         message.message.isListened = true
         let body = (message.message.body as? ChatAudioMessageBody)
@@ -352,7 +373,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
         }
     }
     
-    func downloadMessageAttachment(message: MessageEntity) {
+    @objc open func downloadMessageAttachment(message: MessageEntity) {
         for handler in self.handlers.allObjects {
             handler.onMessageAttachmentLoading(loading: true)
         }
@@ -380,7 +401,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
         })
     }
     
-    func cacheImage(message: ChatMessage) {
+    @objc open func cacheImage(message: ChatMessage) {
         if let body = (message.body as? ChatImageMessageBody) {
             do {
                 let data = try Data(contentsOf: URL(fileURLWithPath: body.localPath))
@@ -399,7 +420,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
         }
     }
     
-    func cacheFrame(attachMessage: ChatMessage) {
+    @objc open func cacheFrame(attachMessage: ChatMessage) {
         if let body = attachMessage.body as? ChatVideoMessageBody {
             if let path = body.localPath {
                 if var thumbnailLocalPath = path.components(separatedBy: ".").first,let type = path.components(separatedBy: ".").last {
@@ -430,10 +451,18 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
     }
     
     public func onMessageAvatarLongPressed(profile: EaseProfileProtocol) {
+        self.onMessageAvatarLongPressed(profile: profile)
+    }
+    
+    @objc open func messageAvatarLongPressed(profile: EaseProfileProtocol) {
         
     }
     
     public func onInputBoxEventsOccur(action type: MessageInputBarActionType, attributeText: NSAttributedString?) {
+        self.processInputEvents(action: type, attributeText: attributeText)
+    }
+    
+    @objc open func processInputEvents(action type: MessageInputBarActionType, attributeText: NSAttributedString?) {
         switch type {
         case .send:
             if let attribute = attributeText {
@@ -447,7 +476,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
         }
     }
     
-    func willSendMessage(attributeText: NSAttributedString) {
+    @objc open func willSendMessage(attributeText: NSAttributedString) {
         var mentionIds = [String]()
         let text = attributeText.toString()
         var extensionInfo = Dictionary<String,Any>()
@@ -477,6 +506,16 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
 
 extension MessageListViewModel: ChatResponseListener {
     public func onMessageDidReceived(message: ChatMessage) {
+        self.messageDidReceived(message: message)
+    }
+    
+    /**
+     Handles the received message and performs necessary actions based on the message type.
+     
+     - Parameters:
+         - message: The received ChatMessage object.
+     */
+    @objc open func messageDidReceived(message: ChatMessage) {
         if message.conversationId == self.to {
             let entity = message
             entity.direction = .receive
@@ -495,24 +534,67 @@ extension MessageListViewModel: ChatResponseListener {
     }
     
     public func onMessageDidRecalled(recallInfo: RecallInfo) {
+        self.messageDidRecalled(recallInfo: recallInfo)
+    }
+    
+    /**
+     Handles the event when a message is recalled.
+     
+     - Parameters:
+        - recallInfo: The recall information containing the recalled message.
+     */
+    @objc open func messageDidRecalled(recallInfo: RecallInfo) {
         if recallInfo.recallMessage.conversationId == self.to {
             self.recallAction(message: recallInfo.recallMessage)
         }
     }
     
     public func onMessageDidEdited(message: ChatMessage) {
+        self.messageDidEdited(message: message)
+    }
+    
+    /**
+     Notifies the view model that a message has been edited.
+     
+     - Parameters:
+        - message: The edited message.
+     */
+    @objc open func messageDidEdited(message: ChatMessage) {
         if message.conversationId == self.to {
             self.driver?.updateMessageAttachmentStatus(message: message)
         }
     }
     
     public func onMessageStatusDidChanged(message: ChatMessage, status: ChatMessageStatus, error: ChatError?) {
+        self.messageStatusChanged(message: message, status: status, error: error)
+    }
+    
+    /**
+     Notifies the message list view model when the status of a chat message has changed.
+     
+     - Parameters:
+        - message: The chat message whose status has changed.
+        - status: The new status of the chat message.
+        - error: An optional error associated with the status change.
+     */
+    @objc open func messageStatusChanged(message: ChatMessage, status: ChatMessageStatus, error: ChatError?) {
         if message.conversationId == self.to {
             self.driver?.updateMessageStatus(message: message, status: status)
         }
     }
     
     public func onMessageAttachmentStatusChanged(message: ChatMessage, error: ChatError?) {
+        self.messageAttachmentStatusChanged(message: message, error: error)
+    }
+    
+    /**
+     Handles the change in attachment status of a chat message.
+     
+     - Parameters:
+        - message: The chat message whose attachment status has changed.
+        - error: An optional ChatError object indicating any error that occurred during the attachment status change.
+     */
+    @objc open func messageAttachmentStatusChanged(message: ChatMessage, error: ChatError?) {
         if message.conversationId == self.to {
             if error == nil {
                 self.driver?.updateMessageAttachmentStatus(message: message)

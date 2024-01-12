@@ -10,8 +10,12 @@ import UIKit
 @objc open class CombineMessageCell: MessageCell {
 
     public private(set) lazy var content: UIView = {
-        UIView(frame: .zero).backgroundColor(.clear).tag(bubbleTag)
+        self.createContent()
     }()
+    
+    @objc open func createContent() -> UIView {
+        UIView(frame: .zero).backgroundColor(.clear).tag(bubbleTag)
+    }
     
     @objc required public init(towards: BubbleTowards,reuseIdentifier: String) {
         super.init(towards: towards, reuseIdentifier: reuseIdentifier)
@@ -27,7 +31,7 @@ import UIKit
         fatalError("init(coder:) has not been implemented")
     }
     
-    public override func refresh(entity: MessageEntity) {
+    open override func refresh(entity: MessageEntity) {
         super.refresh(entity: entity)
         let frame = Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame:self.bubbleMultiCorners.frame
         let size = frame.size
@@ -39,7 +43,7 @@ import UIKit
         }
     }
     
-    public override func switchTheme(style: ThemeStyle) {
+    open override func switchTheme(style: ThemeStyle) {
         super.switchTheme(style: style)
     }
 

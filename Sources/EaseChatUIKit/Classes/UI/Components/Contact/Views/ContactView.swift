@@ -90,7 +90,7 @@ import UIKit
     }
     
     public private(set) lazy var header: ContactListHeader = {
-        ContactListHeader(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: CGFloat(54*(self.headerStyle == .contact ? Appearance.contact.listExtensionActions.count:0))), style: .plain).backgroundColor(.clear)
+        ContactListHeader(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: CGFloat(54*(self.headerStyle == .contact ? Appearance.contact.listHeaderExtensionActions.count:0))), style: .plain).backgroundColor(.clear)
     }()
     
     public private(set) lazy var empty: EmptyStateView = {
@@ -107,7 +107,7 @@ import UIKit
     }()
     
     public private(set) lazy var indexIndicator: SectionIndexList = {
-        SectionIndexList(frame: CGRect(x: self.frame.width-16, y: self.header.frame.height+20, width: 16, height: CGFloat(Appearance.contact.listExtensionActions.count)*Appearance.contact.rowHeight+20), style: .plain).backgroundColor(.clear)
+        SectionIndexList(frame: CGRect(x: self.frame.width-16, y: self.header.frame.height+20, width: 16, height: CGFloat(Appearance.contact.listHeaderExtensionActions.count)*Appearance.contact.rowHeight+20), style: .plain).backgroundColor(.clear)
     }()
 
     internal override init(frame: CGRect) {
@@ -204,6 +204,10 @@ extension ContactView: UITableViewDelegate,UITableViewDataSource {
         }
     }
     
+    public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        
+    }
+    
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if let indexPath = self.contactList.indexPathForRow(at: scrollView.contentOffset) {
             if !self.selectIndex {
@@ -271,7 +275,7 @@ extension ContactView: IContactListDriver {
     
     
     public func refreshHeader(info: ContactListHeaderItemProtocol) {
-        for item in Appearance.contact.listExtensionActions {
+        for item in Appearance.contact.listHeaderExtensionActions {
             if item.featureIdentify == info.featureIdentify {
                 item.showBadge = info.showBadge
                 item.showNumber = info.showNumber

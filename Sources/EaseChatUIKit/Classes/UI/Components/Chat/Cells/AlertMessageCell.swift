@@ -44,7 +44,7 @@ import UIKit
         self.content.frame = CGRect(x: 16, y: 32, width: ScreenWidth-32, height: 16)
     }
     
-    public override func refresh(entity: MessageEntity) {
+    open override func refresh(entity: MessageEntity) {
         self.content.attributedText = entity.content
         self.time.text = entity.message.showDate
     }

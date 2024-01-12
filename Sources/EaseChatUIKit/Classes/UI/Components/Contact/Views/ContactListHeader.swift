@@ -24,7 +24,7 @@ import UIKit
     }
     
     @objc public func refresh() {
-        for item in Appearance.contact.listExtensionActions {
+        for item in Appearance.contact.listHeaderExtensionActions {
             if item.featureIdentify == "NewFriendRequest" {
                 item.showBadge = !self.newFriends.isEmpty
                 item.showNumber = !self.newFriends.isEmpty
@@ -37,14 +37,14 @@ import UIKit
 
 extension ContactListHeader: UITableViewDelegate,UITableViewDataSource {
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        Appearance.contact.listExtensionActions.count
+        Appearance.contact.listHeaderExtensionActions.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ContactListHeaderCell") as? ContactListHeaderCell else { return ContactListHeaderCell(style: .default, reuseIdentifier: "ContactListHeaderCell") }
         cell.accessoryType = .disclosureIndicator
         cell.selectionStyle = .none
-        if let item = Appearance.contact.listExtensionActions[safe: indexPath.row] {
+        if let item = Appearance.contact.listHeaderExtensionActions[safe: indexPath.row] {
             cell.refresh(item: item)
         }
         return cell
@@ -52,8 +52,8 @@ extension ContactListHeader: UITableViewDelegate,UITableViewDataSource {
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if let item = Appearance.contact.listExtensionActions[safe: indexPath.row] {
-            Appearance.contact.listExtensionActions[safe: indexPath.row]?.actionClosure?(item)
+        if let item = Appearance.contact.listHeaderExtensionActions[safe: indexPath.row] {
+            Appearance.contact.listHeaderExtensionActions[safe: indexPath.row]?.actionClosure?(item)
         }
     }
 }

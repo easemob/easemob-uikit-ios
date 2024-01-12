@@ -13,19 +13,23 @@ import UIKit
     
     private let contactService = ContactServiceImplement()
     
-    private lazy var datas: [NewContactRequest] = {
+    public private(set) lazy var datas: [NewContactRequest] = {
         self.fillDatas()
     }()
     
     public private(set) lazy var navigation: EaseChatNavigationBar = {
-        EaseChatNavigationBar( showLeftItem: true, textAlignment: .left, hiddenAvatar: true)
+        self.createNavigation()
     }()
+    
+    @objc open func createNavigation() -> EaseChatNavigationBar {
+        EaseChatNavigationBar( showLeftItem: true, textAlignment: .left, hiddenAvatar: true)
+    }
     
     public private(set) lazy var requestList: UITableView = {
         UITableView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height), style: .plain).tableFooterView(UIView()).delegate(self).dataSource(self).rowHeight(Appearance.contact.rowHeight).backgroundColor(.clear)
     }()
     
-    private lazy var empty: EmptyStateView = {
+    public private(set) lazy var empty: EmptyStateView = {
         EmptyStateView(frame: CGRect(x: 0, y: 0, width: self.requestList.frame.width, height: self.requestList.frame.height),emptyImage: UIImage(named: "empty",in: .chatBundle, with: nil), onRetry: {
             
         }).backgroundColor(.clear)
@@ -54,14 +58,14 @@ import UIKit
         self.switchTheme(style: Theme.style)
     }
     
-    private func navigationClick(type: EaseChatNavigationBarClickEvent,indexPath: IndexPath?) {
+    @objc open func navigationClick(type: EaseChatNavigationBarClickEvent,indexPath: IndexPath?) {
         switch type {
         case .back: self.pop()
         default: break
         }
     }
     
-    private func pop() {
+    @objc open func pop() {
         if self.navigationController != nil {
             self.navigationController?.popViewController(animated: true)
         } else {
@@ -69,7 +73,7 @@ import UIKit
         }
     }
     
-    private func fillDatas() -> [NewContactRequest] {
+    @objc open func fillDatas() -> [NewContactRequest] {
         self.newFriends.map {
             let request = NewContactRequest()
             request.userId = $0.key
@@ -86,7 +90,11 @@ extension NewContactRequestController: UITableViewDelegate,UITableViewDataSource
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cell = tableView.dequeueReusableCell(withIdentifier: "NewContactRequestCell") as? NewContactRequestCell
+        self.cellForRowAt(indexPath: indexPath)
+    }
+    
+    @objc open func cellForRowAt(indexPath: IndexPath) -> UITableViewCell {
+        var cell = self.requestList.dequeueReusableCell(withIdentifier: "NewContactRequestCell") as? NewContactRequestCell
         if cell == nil {
             cell = NewContactRequestCell(style: .default, reuseIdentifier: "NewContactRequestCell")
         }
@@ -102,7 +110,19 @@ extension NewContactRequestController: UITableViewDelegate,UITableViewDataSource
         return cell ?? NewContactRequestCell()
     }
     
-    private func agreeFriendRequest(userId: String) {
+    /**
+     Agrees to a friend request from a user.
+
+     - Parameters:
+         - userId: The ID of the user who sent the friend request.
+
+     This method sends a request to the contact service to agree to the friend request from the specified user. If the request is successful, the user is added as a new friend and a chat conversation is created. The conversation includes a custom message with a greeting.
+
+     - Note: This method assumes that the `contactService` property is already initialized.
+
+     - Parameter userId: The ID of the user who sent the friend request.
+     */
+    @objc open func agreeFriendRequest(userId: String) {
         self.contactService.agreeFriendRequest(from: userId) { error, userId in
             if error != nil,error?.code == .userAlreadyLoginAnother {
                 consoleLogInfo("agreeFriendRequest error: \(error?.errorDescription ?? "")", type: .error)
@@ -124,7 +144,7 @@ extension NewContactRequestController: UITableViewDelegate,UITableViewDataSource
 
 
 extension NewContactRequestController: ThemeSwitchProtocol {
-    public func switchTheme(style: ThemeStyle) {
+    open func switchTheme(style: ThemeStyle) {
         self.view.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
     }
 }

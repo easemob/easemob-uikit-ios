@@ -119,9 +119,9 @@ extension SearchConversationsController: UITableViewDelegate,UITableViewDataSour
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ConversationSearchResultCell, reuseIdentifier: "ConversationSearchCell")
+        var cell = tableView.dequeueReusableCell(withIdentifier: "ConversationSearchCell") as? ConversationSearchCell
         if cell == nil {
-            cell = ComponentsRegister.shared.ConversationSearchResultCell.init(style: .default, reuseIdentifier: "ConversationSearchCell")
+            cell = ConversationSearchCell(style: .default, reuseIdentifier: "ConversationSearchCell")
         }
         if self.active {
             if let info = self.searchResults[safe: indexPath.row] {

@@ -10,12 +10,20 @@ import UIKit
 @objc open class VideoMessageCell: MessageCell {
 
     public private(set) lazy var content: ImageView = {
-        ImageView(frame: .zero).tag(bubbleTag).cornerRadius(Appearance.chat.imageMessageCorner)
+        self.createContent()
     }()
     
+    @objc open func createContent() -> ImageView {
+        ImageView(frame: .zero).tag(bubbleTag).cornerRadius(Appearance.chat.imageMessageCorner)
+    }
+    
     public private(set) lazy var play: UIImageView = {
-        UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 64, height: 64))).image(UIImage(named: "video_message_play", in: .chatBundle, with: nil)).contentMode(.scaleAspectFit)
+        self.createPlay()
     }()
+    
+    @objc open func createPlay() -> UIImageView {
+        UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 64, height: 64))).image(UIImage(named: "video_message_play", in: .chatBundle, with: nil)).contentMode(.scaleAspectFit)
+    }
 
     @objc required public init(towards: BubbleTowards,reuseIdentifier: String) {
         super.init(towards: towards, reuseIdentifier: reuseIdentifier)
@@ -31,7 +39,7 @@ import UIKit
         fatalError("init(coder:) has not been implemented")
     }
     
-    public override func refresh(entity: MessageEntity) {
+    open override func refresh(entity: MessageEntity) {
         super.refresh(entity: entity)
         self.content.frame = CGRect(x: Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame.minX:self.bubbleMultiCorners.frame.minX, y: Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame.minY:self.bubbleMultiCorners.frame.minY, width: entity.bubbleSize.width, height: entity.bubbleSize.height)
         self.play.center = CGPoint(x: entity.bubbleSize.width/2.0, y: entity.bubbleSize.height/2.0)
@@ -65,7 +73,7 @@ import UIKit
         
     }
     
-    public override func switchTheme(style: ThemeStyle) {
+    open override func switchTheme(style: ThemeStyle) {
         super.switchTheme(style: style)
         self.content.backgroundColor = style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor9
         self.content.layerProperties(style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor9, 1)

@@ -50,7 +50,8 @@ import UIKit
     /// Bind UI driver and service
     /// - Parameters:
     ///   - driver: The object of conform``IContactListDriver``.
-    public func bind(driver: IContactListDriver) {
+    @objc(bindWithDriver:)
+    open func bind(driver: IContactListDriver) {
         self.driver = driver
         self.service?.unbindContactEventListener(listener: self)
         self.service?.bindContactEventListener(listener: self)
@@ -72,7 +73,7 @@ import UIKit
         self.service?.unregisterEmergencyListener(listener: listener)
     }
     
-    @objc public func loadAllContacts() {
+    @objc open func loadAllContacts() {
         self.service?.contacts(completion: { [weak self] error, contacts in
             if error == nil {
                 self?.driver?.refreshList(infos: self?.filterContacts(contacts: contacts) ?? [])
@@ -83,7 +84,7 @@ import UIKit
         })
     }
     
-    private func filterContacts(contacts: [Contact]) -> [EaseProfileProtocol] {
+    @objc open func filterContacts(contacts: [Contact]) -> [EaseProfileProtocol] {
         var users = [Contact]()
         if self.ignoreContacts.isEmpty {
             users.append(contentsOf: contacts)
@@ -107,48 +108,66 @@ import UIKit
 
 extension ContactViewModel: ContactEventsResponse {
     public func friendRequestDidAgree(by userId: String) {
+        self.processFriendDidAgree(userId: userId)
+    }
+    
+    @objc open func processFriendDidAgree(userId: String) {
         let profile = EaseProfile()
         profile.id = userId
         self.driver?.appendThenRefresh(info: profile)
     }
     
     public func friendRequestDidDecline(by userId: String) {
+        self.processFriendRequestDidDecline(userId: userId)
+    }
+    
+    @objc open func processFriendRequestDidDecline(userId: String) {
         
     }
     
     public func friendshipDidRemove(by userId: String) {
+        self.processFriendshipDidRemove(userId: userId)
+    }
+    
+    @objc open func processFriendshipDidRemove(userId: String) {
         let profile = EaseProfile()
         profile.id = userId
         self.driver?.remove(info: profile)
     }
     
     public func friendshipDidAddSuccessful(by userId: String) {
-        self.newFriends.removeValue(forKey: userId)
-        self.addContact()
+        self.processFriendshipDidAddSuccessful(userId: userId)
+    }
+    
+    @objc open func processFriendshipDidAddSuccessful(userId: String) {
+        self.addContact(userId: userId)
     }
     
     public func friendRequestDidReceive(by userId: String) {
+        self.processFriendRequestDidReceive(userId: userId)
+    }
+    
+    @objc open func processFriendRequestDidReceive(userId: String) {
         self.newFriends[userId] = Date().timeIntervalSince1970
-        if let index = Appearance.contact.listExtensionActions.firstIndex(where: { $0.featureIdentify == "NewFriendRequest" }) {
-            let item = Appearance.contact.listExtensionActions[index]
+        if let index = Appearance.contact.listHeaderExtensionActions.firstIndex(where: { $0.featureIdentify == "NewFriendRequest" }) {
+            let item = Appearance.contact.listHeaderExtensionActions[index]
             item.showBadge = true
             item.numberCount = UInt(self.newFriends.count)
             self.driver?.refreshHeader(info: item)
         }
     }
-    
-    
 }
 
 extension ContactViewModel: MultiDeviceListener {
     
     public func onContactsEventDidChanged(event: MultiDeviceEvent, userId: String, extension info: String) {
+        self.contactEventDidChanged(event: event, userId: userId, extension: info)
+    }
+    
+    @objc open func contactEventDidChanged(event: MultiDeviceEvent, userId: String, extension info: String) {
         switch event {
         case .contactAccept:
-            if self.newFriends.count > 0 {
-                self.newFriends.removeValue(forKey: userId)
-            }
-            self.addContact()
+            self.addContact(userId: userId)
         case .contactRemove:
             let profile = EaseProfile()
             profile.id = userId
@@ -158,8 +177,11 @@ extension ContactViewModel: MultiDeviceListener {
         }
     }
     
-    @objc private func addContact() {
-        if let item = Appearance.contact.listExtensionActions.first(where: { $0.featureIdentify == "NewFriendRequest" }) {
+    @objc open func addContact(userId: String) {
+        if self.newFriends.count > 0,let _ = self.newFriends[userId] {
+            self.newFriends.removeValue(forKey: userId)
+        }
+        if let item = Appearance.contact.listHeaderExtensionActions.first(where: { $0.featureIdentify == "NewFriendRequest" }) {
             if item.numberCount > 1 {
                 item.numberCount -= 1
             }

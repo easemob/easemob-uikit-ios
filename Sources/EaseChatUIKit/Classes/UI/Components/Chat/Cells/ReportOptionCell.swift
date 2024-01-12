@@ -44,14 +44,14 @@ import UIKit
     /// - Parameters:
     ///   - select: Whether select or not.
     ///   - title: title
-    @objc public func refresh(select: Bool ,title: String) {
+    @objc open func refresh(select: Bool ,title: String) {
         self.stateView.image(select ? self.selectImage:self.normalImage)
         self.content.text = title
     }
 }
 
 extension ReportOptionCell: ThemeSwitchProtocol {
-    public func switchTheme(style: ThemeStyle) {
+    open func switchTheme(style: ThemeStyle) {
         self.content.textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
         self.selectImage = style == .dark ? self.selectImage?.withTintColor(UIColor.theme.primaryColor6, renderingMode: .automatic):self.selectImage
         self.normalImage = style == .dark ? self.normalImage?.withTintColor(UIColor.theme.neutralColor8, renderingMode: .automatic):self.normalImage

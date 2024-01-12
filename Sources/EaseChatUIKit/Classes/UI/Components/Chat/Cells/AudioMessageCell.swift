@@ -9,11 +9,15 @@ import UIKit
 
 @objc open class AudioMessageCell: MessageCell {
     
-    public private(set) lazy var content: AudioMessageView = {
-        AudioMessageView(frame: .zero, towards: self.towards).backgroundColor(.clear).tag(bubbleTag)
+    public private(set) lazy var content: UIView = {
+        self.createContent()
     }()
     
-    lazy var redDot: UIView = {
+    @objc open func createContent() -> UIView {
+        AudioMessageView(frame: .zero, towards: self.towards).backgroundColor(.clear).tag(bubbleTag)
+    }
+    
+    public private(set) lazy var redDot: UIView = {
         UIView(frame: CGRect(x: 0, y: 0, width: 8, height: 8)).cornerRadius(4)
     }()
     
@@ -32,7 +36,7 @@ import UIKit
         fatalError("init(coder:) has not been implemented")
     }
     
-    public override func refresh(entity: MessageEntity) {
+    open override func refresh(entity: MessageEntity) {
         super.refresh(entity: entity)
         let frame = Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame:self.bubbleMultiCorners.frame
         let size = frame.size
@@ -43,10 +47,10 @@ import UIKit
         } else {
             self.redDot.isHidden = true
         }
-        self.content.refresh(entity: entity)
+        (self.content as? AudioMessageView)?.refresh(entity: entity)
     }
     
-    public override func switchTheme(style: ThemeStyle) {
+    open override func switchTheme(style: ThemeStyle) {
         super.switchTheme(style: style)
         self.redDot.backgroundColor = style == .dark ? UIColor.theme.errorColor6:UIColor.theme.errorColor5
     }

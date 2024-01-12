@@ -4,28 +4,52 @@ import UIKit
 @objc open class ConversationListCell: UITableViewCell {
 
     public private(set) lazy var avatar: ImageView = {
-        ImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-50)/2.0, width: 50, height: 50))
+        self.createAvatar()
     }()
+    
+    @objc open func createAvatar() -> ImageView {
+        ImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-50)/2.0, width: 50, height: 50))
+    }
     
     public private(set) lazy var nickName: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX+4, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 16)).isUserInteractionEnabled(false).backgroundColor(.clear)
+        self.createNickName()
     }()
+    
+    @objc open func createNickName() -> UIButton {
+        UIButton(type: .custom).frame(CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX+4, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 16)).isUserInteractionEnabled(false).backgroundColor(.clear)
+    }
     
     public private(set) lazy var date: UILabel = {
-        UILabel(frame: CGRect(x: self.contentView.frame.width-66, y: self.nickName.frame.minY+2, width: 50, height: 16)).font(UIFont.theme.bodySmall).textColor(UIColor.theme.neutralColor5).backgroundColor(.clear)
+        self.createDate()
     }()
+    
+    @objc open func createDate() -> UILabel {
+        UILabel(frame: CGRect(x: self.contentView.frame.width-66, y: self.nickName.frame.minY+2, width: 50, height: 16)).font(UIFont.theme.bodySmall).textColor(UIColor.theme.neutralColor5).backgroundColor(.clear)
+    }
     
     public private(set) lazy var content: UILabel = {
-        UILabel(frame: CGRect(x: self.avatar.frame.maxX+12, y: self.nickName.frame.maxY+2, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 16)).backgroundColor(.clear)
+        self.createContent()
     }()
+    
+    @objc open func createContent() -> UILabel {
+        UILabel(frame: CGRect(x: self.avatar.frame.maxX+12, y: self.nickName.frame.maxY+2, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 16)).backgroundColor(.clear)
+    }
     
     public private(set) lazy var badge: UILabel = {
-        UILabel(frame: CGRect(x: self.contentView.frame.width-48, y: self.nickName.frame.maxY+5, width: 32, height: 18)).cornerRadius(.large).backgroundColor(UIColor.theme.primaryColor5).textColor(UIColor.theme.neutralColor98).font(UIFont.theme.bodySmall).textAlignment(.center)
+        self.createBadge()
     }()
     
+    @objc open func createBadge() -> UILabel {
+        UILabel(frame: CGRect(x: self.contentView.frame.width-48, y: self.nickName.frame.maxY+5, width: 32, height: 18)).cornerRadius(.large).backgroundColor(UIColor.theme.primaryColor5).textColor(UIColor.theme.neutralColor98).font(UIFont.theme.bodySmall).textAlignment(.center)
+    }
+    
     public private(set) lazy var dot: UIView = {
-        UIView(frame: CGRect(x: self.contentView.frame.width-28, y: self.nickName.frame.maxY+10, width: 8, height: 8)).cornerRadius(.large).backgroundColor(UIColor.theme.primaryColor5)
+        self.createDot()
     }()
+    
+    @objc open func createDot() -> UIView {
+        UIView(frame: CGRect(x: self.contentView.frame.width-28, y: self.nickName.frame.maxY+10, width: 8, height: 8)).cornerRadius(.large).backgroundColor(UIColor.theme.primaryColor5)
+    }
     
     @objc required public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -52,7 +76,7 @@ import UIKit
     }
     
     @objc(refreshWithInfo:)
-    public func refresh(info: ConversationInfo) {
+    open func refresh(info: ConversationInfo) {
         var contentColor = UIColor.clear
         if info.pinned {
             contentColor = Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
@@ -104,7 +128,7 @@ extension ConversationListCell: ThemeSwitchProtocol {
 }
 
 @objcMembers open class ConversationInfo:NSObject, EaseProfileProtocol {
-    public func toJsonObject() -> Dictionary<String, Any>? {
+    open func toJsonObject() -> Dictionary<String, Any>? {
         [:]
     }
     
@@ -150,6 +174,10 @@ extension ConversationListCell: ThemeSwitchProtocol {
     }
     
     public lazy var showContent: NSAttributedString = {
+        self.contentAttribute()
+    }()
+    
+    @objc open func contentAttribute() -> NSAttributedString {
         guard let message = self.lastMessage else { return NSAttributedString() }
         if message.body.type == .text {
             guard let content = self.convertMessage(message: message).content else { return NSAttributedString() }
@@ -184,9 +212,9 @@ extension ConversationListCell: ThemeSwitchProtocol {
             showText.addAttribute(.font, value: UIFont.theme.bodyMedium, range: NSRange(location: 0, length: showText.length))
             return showText
         }
-    }()
+    }
     
-    public func convertMessage(message: ChatMessage) -> MessageEntity {
+    open func convertMessage(message: ChatMessage) -> MessageEntity {
         let entity = ComponentsRegister.shared.MessageRenderEntity.init()
         entity.state = self.convertStatus(message: message)
         entity.message = message
@@ -199,7 +227,7 @@ extension ConversationListCell: ThemeSwitchProtocol {
         return entity
     }
     
-    public func convertStatus(message: ChatMessage) -> ChatMessageStatus {
+    open func convertStatus(message: ChatMessage) -> ChatMessageStatus {
         switch message.status {
         case .succeed:
             return .succeed

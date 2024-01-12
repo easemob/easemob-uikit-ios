@@ -213,16 +213,6 @@ import UIKit
         }
     }
     
-    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if let indexPath = self.messageList.indexPathForRow(at: scrollView.contentOffset) {
-            for listener in self.eventHandlers.allObjects {
-                if let entity = self.messages[safe: indexPath.row] {
-                    listener.onMessageVisible(entity: entity)
-                }
-            }
-        }
-    }
-    
 }
 
 extension MessageListView: UITableViewDelegate,UITableViewDataSource {
@@ -253,13 +243,9 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if let indexPaths = self.messageList.indexPathsForVisibleRows {
-            for listener in self.eventHandlers.allObjects {
-                for indexPath in indexPaths {
-                    if let entity = self.messages[safe: indexPath.row] {
-                        listener.onMessageVisible(entity: entity)
-                    }
-                }
+        for listener in self.eventHandlers.allObjects {
+            if let entity = self.messages[safe: indexPath.row] {
+                listener.onMessageVisible(entity: entity)
             }
         }
     }
@@ -327,8 +313,9 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                         return cell
                     default:
                         var cell: MessageCell?
-                        for identifier in ComponentsRegister.shared.customIdentifiers {
-                            cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatCustomMessageCell, reuseIdentifier: identifier)
+                        for Class in ComponentsRegister.shared.customCellClasses {
+                            let identifier = String(describing: Class.self)
+                            cell = tableView.dequeueReusableCell(with: Class, reuseIdentifier: identifier)
                             if cell == nil {
                                 cell = ComponentsRegister.shared.ChatCustomMessageCell.init(towards: towards, reuseIdentifier: identifier)
                             }
@@ -341,10 +328,16 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                     return nil
                 }
             default:
-                var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatCustomMessageCell, reuseIdentifier: "EaseChatUIKit.ChatCustomMessageCell")
-                if cell == nil {
-                    cell = ComponentsRegister.shared.ChatCustomMessageCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatCustomMessageCell")
+                var cell: MessageCell?
+                for Class in ComponentsRegister.shared.customCellClasses {
+                    let identifier = String(describing: Class.self)
+                    cell = tableView.dequeueReusableCell(with: Class, reuseIdentifier: identifier)
+                    if cell == nil {
+                        cell = ComponentsRegister.shared.ChatCustomMessageCell.init(towards: towards, reuseIdentifier: identifier)
+                    }
+                    break
                 }
+                
                 return cell
             }
         } else {

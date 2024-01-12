@@ -7,6 +7,7 @@
 
 import UIKit
 
+
 @objc public enum AlertStyle: UInt {
     case small
     case large
@@ -55,11 +56,6 @@ import UIKit
     /// The placeholder image of the avatar image view of ``MessageCell``.
     public static var avatarPlaceHolder: UIImage? = UIImage(named: "default_avatar", in: .chatBundle, with: nil)
     
-    /// The row height of the member cell.
-    public static var participantsRowHeight: CGFloat = 62
-    
-    /// The number of chat room members that you expect to get on each page.
-    public static var participantsPageSize: UInt = 10
     
     /// Conversation Component
     public static var conversation = Appearance.Conversation()
@@ -80,9 +76,6 @@ import UIKit
         
         /// Menu items that appear after swiping right in a conversation.You can choose to have just some of the features or all of them.``UIContextualActionType``
         public var swipeRightActions: [UIContextualActionType] = [.more,.read]
-        
-        /// Rounded corners settings for all avatars.``CornerRadius``
-        public var avatarRadius: CornerRadius = .large
         
         /// Single chat default place holder of avatar.
         public var singlePlaceHolder = UIImage(named: "single", in: .chatBundle, with: nil)
@@ -113,19 +106,19 @@ import UIKit
     
     @objcMembers final public class Chat: NSObject {
         
-        /// The height limit of the input box in ``ChatInputBar``.
+        /// The height limit of the input box in ``MessageInputBar``.
         public var maxInputHeight: CGFloat = 88
         
-        /// The placeholder text in ``ChatInputBar``.
+        /// The placeholder text in ``MessageInputBar``.
         public var inputPlaceHolder = "Aa"
         
-        /// The corner radius of ``ChatInputBar``.
+        /// The corner radius of ``MessageInputBar``.
         public var inputBarCorner: CornerRadius = .medium
         
-        /// Message bubble display style.``MessageCell.BubbleDisplayStyle``
+        /// Message bubble display style.``BubbleDisplayStyle``
         public var bubbleStyle: MessageCell.BubbleDisplayStyle = .withArrow
         
-        /// Message content display style.You can use these four styles to combine a style array you want. Bubbles are all provided by default, except for picture messages and video messages.``MessageCell.ContentDisplayStyle``
+        /// Message content display style.You can use these four styles to combine a style array you want. Bubbles are all provided by default, except for picture messages and video messages.``ContentDisplayStyle``
         public var contentStyle: [MessageCell.ContentDisplayStyle] = [.withReply,.withAvatar,.withNickName,.withDateAndTime]
                 
         /// ActionSheet data source of the message being long pressed.``ActionSheetItemProtocol``
@@ -222,7 +215,7 @@ import UIKit
         public var headerRowHeight = CGFloat(54)
         
         /// The header items of the contact list.
-        public var listExtensionActions: [ContactListHeaderItemProtocol] = [
+        public var listHeaderExtensionActions: [ContactListHeaderItemProtocol] = [
             ContactListHeaderItem(featureIdentify: "NewFriendRequest", featureName: "New Request", featureIcon: nil),
             ContactListHeaderItem(featureIdentify: "GroupChats", featureName: "Joined Groups", featureIcon: nil)
         ]

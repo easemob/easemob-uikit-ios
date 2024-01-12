@@ -3,6 +3,7 @@ import MobileCoreServices
 import QuickLook
 import AVFoundation
 
+/// An enumeration representing different types of chats.
 @objc public enum ChatType: UInt {
     case chat
     case group
@@ -19,19 +20,45 @@ import AVFoundation
     public private(set) var profile: EaseProfileProtocol = EaseProfile()
     
     public private(set) lazy var navigation: EaseChatNavigationBar = {
-         EaseChatNavigationBar(showLeftItem: true,rightImages: [UIImage(named: "audio_call", in: .chatBundle, with: nil)!,UIImage(named: "video_call", in: .chatBundle, with: nil)!]).backgroundColor(.clear)
+        self.createNavigation()
     }()
+        
+    /// Creates a navigation bar for the MessageListController.
+    /// - Returns: An instance of EaseChatNavigationBar.
+    @objc open func createNavigation() -> EaseChatNavigationBar {
+        EaseChatNavigationBar(showLeftItem: true,rightImages: [UIImage(named: "audio_call", in: .chatBundle, with: nil)!,UIImage(named: "video_call", in: .chatBundle, with: nil)!]).backgroundColor(.clear)
+    }
     
     public private(set) lazy var messageContainer: MessageListView = {
         MessageListView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: ScreenHeight-NavigationHeight), mention: self.chatType == .group)
     }()
     
     public private(set) lazy var loadingView: LoadingView = {
-        LoadingView(frame: self.view.bounds)
+        self.createLoading()
     }()
     
-    public private(set) lazy var viewModel: MessageListViewModel = { MessageListViewModel(conversationId: self.profile.id, type: self.chatType) }()
+    /**
+     Creates a loading view.
+     
+     - Returns: A `LoadingView` instance.
+     */
+    @objc open func createLoading() -> LoadingView {
+        LoadingView(frame: self.view.bounds)
+    }
     
+    public private(set) lazy var viewModel: MessageListViewModel = { ComponentsRegister.shared.MessagesViewModel.init(conversationId: self.profile.id, type: self.chatType) }()
+    
+    /**
+     Initializes a new instance of the `MessageListController` class with the specified conversation ID and chat type.
+     
+     - Parameters:
+         - conversationId: The ID of the conversation.
+         - chatType: The type of chat. Default value is `.chat`.
+     
+     This initializer sets the `profile` property based on the conversation ID. If the conversation ID is found in the conversations cache, the profile is set to the corresponding information. Otherwise, the profile ID is set to the conversation ID.
+     
+     The `chatType` parameter determines the type of chat, which can be `.group`, `.thread`, or `.chat`. If the chat type is not one of these options, it defaults to `.chatroom`.
+     */
     @objc(initWithConversationId:chatType:)
     public required init(conversationId: String,chatType: ChatType = .chat) {
         if let info = EaseChatUIKitContext.shared?.conversationsCache?[conversationId] {
@@ -87,21 +114,42 @@ import AVFoundation
         self.switchTheme(style: Theme.style)
         self.view.addSubview(self.loadingView)
     }
+    
+    deinit {
+        EaseChatUIKitContext.shared?.cleanCache(type: .chat)
+    }
 }
 
 extension MessageListController {
     
-    private func navigationClick(type: EaseChatNavigationBarClickEvent,indexPath: IndexPath?) {
+    /**
+     Handles the navigation bar click events.
+     
+     - Parameters:
+        - type: The type of navigation bar click event.
+        - indexPath: The index path associated with the event (optional).
+     */
+    @objc open func navigationClick(type: EaseChatNavigationBarClickEvent, indexPath: IndexPath?) {
         switch type {
         case .back: self.pop()
-        case .avatar,.title: self.viewDetail()
+        case .avatar, .title: self.viewDetail()
         case .rightItems: self.rightItemsAction(indexPath: indexPath)
         default:
             break
         }
     }
     
-    private func viewDetail() {
+    /**
+     This method is called to view the detail of a chat message.
+     It determines the type of chat (individual or group) and presents the appropriate view controller accordingly.
+     If the previous view controller in the navigation stack is either `GroupInfoViewController` or `ContactInfoViewController`, it pops the current view controller.
+     If the chat type is individual, it presents the `ContactInfoController` with the given profile.
+     If the chat type is group, it presents the `GroupInfoController` with the given group ID and updates the navigation title with the group name.
+     If there is no previous view controller in the navigation stack, it checks if the presenting view controller is either `GroupInfoViewController` or `ContactInfoViewController` and dismisses it.
+     If the chat type is individual, it presents the `ContactInfoController` with the given profile.
+     If the chat type is group, it presents the `GroupInfoController` with the given group ID and updates the navigation title with the group name.
+     */
+    @objc open func viewDetail() {
         if let count = self.navigationController?.viewControllers.count {
             if let previous = self.navigationController?.viewControllers[safe: count - 2] {
                 if previous is GroupInfoViewController || previous is ContactInfoViewController {
@@ -158,7 +206,7 @@ extension MessageListController {
         
     }
     
-    private func rightItemsAction(indexPath: IndexPath?) {
+    @objc open func rightItemsAction(indexPath: IndexPath?) {
 //        switch indexPath?.row {
 //        case <#pattern#>:
 //            <#code#>
@@ -167,7 +215,7 @@ extension MessageListController {
 //        }
     }
     
-    private func pop() {
+    @objc open func pop() {
         if self.navigationController != nil {
             self.navigationController?.popViewController(animated: true)
         } else {
@@ -187,7 +235,15 @@ extension MessageListController: MessageListDriverEventsListener {
     }
     
     
-    private func filterMessageActions(message: ChatMessage) -> [ActionSheetItemProtocol] {
+    /**
+     Filters the available message actions based on the provided `ChatMessage`.
+
+     - Parameters:
+         - message: The `ChatMessage` object to filter the actions for.
+
+     - Returns: An array of `ActionSheetItemProtocol` representing the filtered message actions.
+     */
+    @objc open func filterMessageActions(message: ChatMessage) -> [ActionSheetItemProtocol] {
         var messageActions = Appearance.chat.messageLongPressedActions
         if message.body.type != .text {
             messageActions.removeAll { $0.tag == "Copy" }
@@ -213,12 +269,29 @@ extension MessageListController: MessageListDriverEventsListener {
     }
     
     public func onMessageBubbleLongPressed(message: ChatMessage) {
+        self.showMessageLongPressedDialog(message: message)
+    }
+    
+    /**
+     Shows a long-pressed dialog for a given chat message.
+     
+     - Parameters:
+        - message: The chat message for which the dialog is shown.
+     */
+    @objc open func showMessageLongPressedDialog(message: ChatMessage) {
         DialogManager.shared.showMessageActions(actions: self.filterMessageActions(message: message)) { [weak self] item in
             self?.processMessage(item: item, message: message)
         }
     }
     
-    private func processMessage(item: ActionSheetItemProtocol,message: ChatMessage) {
+    /**
+     Processes a chat message based on the selected action sheet item.
+     
+     - Parameters:
+         - item: The selected action sheet item.
+         - message: The chat message to be processed.
+     */
+    @objc open func processMessage(item: ActionSheetItemProtocol,message: ChatMessage) {
         UIViewController.currentController?.dismiss(animated: true)
         switch item.tag {
         case "Copy":
@@ -239,7 +312,13 @@ extension MessageListController: MessageListDriverEventsListener {
         }
     }
     
-    private func editAction(message: ChatMessage) {
+    /**
+        Opens the message editor for editing a chat message.
+     
+        - Parameters:
+            - message: The chat message to be edited.
+    */
+    @objc open func editAction(message: ChatMessage) {
         if let body = message.body as? ChatTextMessageBody {
             let editor = MessageEditor(content: body.text) { text in
                 self.viewModel.processMessage(operation: .edit, message: message, edit: text)
@@ -249,13 +328,17 @@ extension MessageListController: MessageListDriverEventsListener {
         }
     }
     
-    private func reportAction(message: ChatMessage) {
+    @objc open func reportAction(message: ChatMessage) {
         DialogManager.shared.showReportDialog(message: message) { error in
             
         }
     }
     
     public func onMessageAttachmentLoading(loading: Bool) {
+        self.messageAttachmentLoading(loading: loading)
+    }
+    
+    @objc open func messageAttachmentLoading(loading: Bool) {
         if loading {
             self.loadingView.startAnimating()
         } else {
@@ -264,7 +347,16 @@ extension MessageListController: MessageListDriverEventsListener {
     }
     
     public func onMessageBubbleClicked(message: ChatMessage) {
-
+        self.messageBubbleClicked(message: message)
+    }
+    
+    /**
+     Handles the click event on a message bubble.
+     
+     - Parameters:
+        - message: The ChatMessage object representing the clicked message.
+     */
+    @objc open func messageBubbleClicked(message: ChatMessage) {
         switch message.body.type {
         case .file,.video,.image:
             if let body = message.body as? ChatFileMessageBody {
@@ -280,7 +372,13 @@ extension MessageListController: MessageListDriverEventsListener {
         }
     }
     
-    public func viewContact(body: ChatCustomMessageBody) {
+    /**
+     Opens the contact view for the given custom message body.
+     
+     - Parameters:
+        - body: The custom message body containing contact information.
+     */
+    @objc open func viewContact(body: ChatCustomMessageBody) {
         var userId = body.customExt?["userId"] as? String
         if userId == nil {
             userId = body.customExt?["uid"] as? String
@@ -298,6 +396,16 @@ extension MessageListController: MessageListDriverEventsListener {
     }
     
     public func onMessageAvatarClicked(user: EaseProfileProtocol) {
+        self.messageAvatarClick(user: user)
+    }
+    
+    /**
+     Handles the click event on the message avatar.
+     
+     - Parameters:
+        - user: The user profile associated with the clicked avatar.
+     */
+    @objc open func messageAvatarClick(user: EaseProfileProtocol) {
         if user.id == EaseChatUIKitContext.shared?.currentUserId ?? "" {
             return
         }
@@ -315,7 +423,15 @@ extension MessageListController: MessageListDriverEventsListener {
         }
     }
     
-    private func audioDialog() {
+    /**
+     Opens the audio dialog for recording and sending voice messages.
+     
+     This method stops any currently playing audio, presents a custom audio recording view, and sends the recorded audio message using the view model's `sendMessage` method.
+     
+     - Note: The audio recording view is an instance of `MessageAudioRecordView` and is presented as a custom dialog using `DialogManager.shared.showCustomDialog`.
+     - Note: The recorded audio message is sent as a text message with the file path of the recorded audio and the duration of the recording as extension information.
+     */
+    @objc open func audioDialog() {
         AudioTools.shared.stopPlaying()
         let audioView = MessageAudioRecordView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 200)) { [weak self] url, duration in
             UIViewController.currentController?.dismiss(animated: true)
@@ -327,7 +443,13 @@ extension MessageListController: MessageListDriverEventsListener {
         DialogManager.shared.showCustomDialog(customView: audioView,dismiss: false)
     }
     
-    private func mentionAction() {
+    /**
+     Handles the action of mentioning a user in the chat.
+     
+     This method presents a view controller that allows the user to select a participant to mention in the chat.
+     The selected participant's profile ID is used to update the mention IDs in the view model.
+     */
+    @objc open func mentionAction() {
         let vc = ComponentsRegister.shared.GroupParticipantController.init(groupId: self.profile.id, operation: .mention)
         vc.mentionClosure = { [weak self] in
             self?.viewModel.updateMentionIds(profile: $0, type: .add)
@@ -335,13 +457,16 @@ extension MessageListController: MessageListDriverEventsListener {
         self.present(vc, animated: true)
     }
     
-    private func attachmentDialog() {
+    /**
+     Opens an attachment dialog to allow the user to select an action.
+     */
+    @objc open func attachmentDialog() {
         DialogManager.shared.showActions(actions: Appearance.chat.inputExtendActions) { [weak self] item in
             self?.handleAttachmentAction(item: item)
         }
     }
     
-    private func handleAttachmentAction(item: ActionSheetItemProtocol) {
+    @objc open func handleAttachmentAction(item: ActionSheetItemProtocol) {
         switch item.tag {
         case "File": self.selectFile()
         case "Photo": self.selectPhoto()
@@ -352,7 +477,12 @@ extension MessageListController: MessageListDriverEventsListener {
         }
     }
     
-    private func selectPhoto() {
+    /**
+     Opens the photo library and allows the user to select a photo.
+     
+     - Note: This method checks if the photo library is available on the device. If it is not available, an alert is displayed to the user.
+     */
+    @objc open func selectPhoto() {
         guard UIImagePickerController.isSourceTypeAvailable(.photoLibrary) else {
             DialogManager.shared.showAlert(title: "permissions disable".chat.localize, content: "photo_disable".chat.localize, showCancel: false, showConfirm: true) { _ in
                 
@@ -365,7 +495,7 @@ extension MessageListController: MessageListDriverEventsListener {
         self.present(imagePickerController, animated: true, completion: nil)
     }
     
-    private func openCamera() {
+    @objc open func openCamera() {
         guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
             DialogManager.shared.showAlert(title: "permissions disable".chat.localize, content: "camera_disable".chat.localize, showCancel: false, showConfirm: true) { _ in
                 
@@ -380,14 +510,29 @@ extension MessageListController: MessageListDriverEventsListener {
         self.present(imagePicker, animated: true, completion: nil)
     }
     
-    private func selectFile() {
+    /**
+     Opens a document picker to allow the user to select a file.
+     
+     The document picker supports various file types including content, text, source code, images, PDFs, Keynote files, Word documents, Excel spreadsheets, PowerPoint presentations, and generic data files.
+     
+     - Note: The selected file will be handled by the `UIDocumentPickerDelegate` methods implemented in the `MessageListController`.
+     */
+    @objc open func selectFile() {
         let documentPicker = UIDocumentPickerViewController(documentTypes: ["public.content", "public.text", "public.source-code", "public.image", "public.jpeg", "public.png", "com.adobe.pdf", "com.apple.keynote.key", "com.microsoft.word.doc", "com.microsoft.excel.xls", "com.microsoft.powerpoint.ppt","public.data"], in: .open)
         documentPicker.delegate = self
         documentPicker.modalPresentationStyle = .fullScreen
         self.present(documentPicker, animated: true, completion: nil)
     }
     
-    private func selectContact() {
+    /**
+     Selects a contact and shares their information.
+
+     - Parameters:
+         - None
+
+     - Returns: None
+     */
+    @objc open func selectContact() {
         let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .shareContact,provider: nil)
         vc.confirmClosure = { profiles in
             vc.dismiss(animated: true) {
@@ -402,7 +547,7 @@ extension MessageListController: MessageListDriverEventsListener {
         self.present(vc, animated: true)
     }
     
-    private func openFile() {
+    @objc open func openFile() {
         let previewController = QLPreviewController()
         previewController.dataSource = self
         self.navigationController?.pushViewController(previewController, animated: true)
@@ -413,6 +558,17 @@ extension MessageListController: MessageListDriverEventsListener {
 extension MessageListController:UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        self.processImagePickerData(info: info)
+        picker.dismiss(animated: true, completion: nil)
+    }
+    
+    /**
+     Processes the data received from the image picker.
+     
+     - Parameters:
+         - info: A dictionary containing the information about the selected media.
+     */
+    @objc open func processImagePickerData(info: [UIImagePickerController.InfoKey : Any]) {
         let mediaType = info[UIImagePickerController.InfoKey.mediaType] as? String
         if mediaType == kUTTypeMovie as String {
             guard let videoURL = info[.mediaURL] as? URL else { return }
@@ -426,7 +582,7 @@ extension MessageListController:UIImagePickerControllerDelegate, UINavigationCon
                     consoleLogInfo("write video error:\(error.localizedDescription)", type: .error)
                 }
             }
-            let duration = AVURLAsset(url: fileURL).duration.value 
+            let duration = AVURLAsset(url: fileURL).duration.value
             self.viewModel.sendMessage(text: fileURL.path, type: .video,extensionInfo: ["duration":duration])
         } else {
             if let imageURL = info[.imageURL] as? URL {
@@ -441,7 +597,6 @@ extension MessageListController:UIImagePickerControllerDelegate, UINavigationCon
                 self.viewModel.sendMessage(text: fileURL.path, type: .image)
             }
         }
-        picker.dismiss(animated: true, completion: nil)
     }
 
     public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -452,6 +607,11 @@ extension MessageListController:UIImagePickerControllerDelegate, UINavigationCon
 extension MessageListController: UIDocumentPickerDelegate {
     
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        self.documentPickerOpenFile(controller: controller,urls: urls)
+        
+    }
+    
+    @objc open func documentPickerOpenFile(controller: UIDocumentPickerViewController,urls: [URL]) {
         if controller.documentPickerMode == UIDocumentPickerMode.open {
             guard let selectedFileURL = urls.first else {
                 return
@@ -471,7 +631,6 @@ extension MessageListController: UIDocumentPickerDelegate {
                 }
             }
         }
-        
     }
     
     public func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
