@@ -33,7 +33,7 @@ TODO: Add long description of the pod here.
   s.xcconfig = {'ENABLE_BITCODE' => 'NO'}
   
   
-  s.source_files = [ 'Sources/EaseChatUIKit/Classes/Service/**/*.{h,swift}' ]
+  s.source_files = [ 'Sources/EaseChatUIKit/Classes/**/*.{h,swift}' ]
   s.resources = ['Sources/EaseChatUIKit/Classes/UI/**/*.bundle']
   s.dependency 'HyphenateChat'
   s.static_framework = true
@@ -41,7 +41,7 @@ TODO: Add long description of the pod here.
   s.swift_version = '5.0'
   s.prefix_header_contents = '
   # if __has_include (<EaseChatUIKit/EaseChatUIKit-Bridge.h>)
-  #import <EaseChatUIKit/EaseChatUIKit-Bridge.h> 
+  #import <EaseChatUIKit/EaseChatUIKit-Bridge.h>
   # else
   #import "EaseChatUIKit-Bridge.h"
   # endif
@@ -51,9 +51,9 @@ TODO: Add long description of the pod here.
   s.preserve_paths =  ['Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*.a','Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/vo-amrwbenc/lib/*.a']
   
 
-  s.vendored_libraries = ['Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*.a','Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/vo-amrwbenc/lib/*.a'] 
+  s.vendored_libraries = ['Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*.a','Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/vo-amrwbenc/lib/*.a']
 
-  s.xcconfig = { 'LIBRARY_SEARCH_PATHS' => '$(PODS_ROOT)/Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*' } # 
+  s.xcconfig = { 'LIBRARY_SEARCH_PATHS' => '$(PODS_ROOT)/Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*' } #
 
   s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
   s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }

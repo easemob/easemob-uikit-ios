@@ -27,6 +27,7 @@ public typealias ChatImageMessageBody = EMImageMessageBody
 public typealias ChatVideoMessageBody = EMVideoMessageBody
 public typealias ChatAudioMessageBody = EMVoiceMessageBody
 public typealias ChatFileMessageBody = EMFileMessageBody
+public typealias ChatCombineMessageBody = AgoraChatCombineMessageBody
 public typealias ChatMessageAttachmentStatus = EMDownloadStatus
 public typealias ChatLocationMessageBody = EMLocationMessageBody
 public typealias ChatCustomMessageBody = EMCustomMessageBody
@@ -102,6 +103,3 @@ public typealias SilentModeParam = AgoraChatSilentModeParam
 public typealias Contact = AgoraChatContact
 public typealias UserInfoType = AgoraChatUserInfoType
 #endif
-
-
-
