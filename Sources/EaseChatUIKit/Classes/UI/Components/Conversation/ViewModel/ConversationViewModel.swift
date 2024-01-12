@@ -30,7 +30,7 @@ import AudioToolbox
     public required init(providerOC: EaseProfileProviderOC?) {
         self.provider_OC = providerOC
         super.init()
-        NotificationCenter.default.addObserver(self, selector: #selector(loadExistLocalDataIfEmptyFetchServer), name: NSNotification.Name("New Friend Chat"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(loadExistLocalDataIfEmptyFetchServer), name: Notification.Name("New Friend Chat"), object: nil)
         NotificationCenter.default.addObserver(forName: Notification.Name("EaseUIKit_do_not_disturb_changed"), object: nil, queue: .main) { [weak self] notify in
             if let userInfo = notify.userInfo {
                 if let id = userInfo["id"] as? String {
@@ -49,7 +49,7 @@ import AudioToolbox
     public required init(provider: EaseProfileProvider?) {
         self.provider = provider
         super.init()
-        NotificationCenter.default.addObserver(self, selector: #selector(loadExistLocalDataIfEmptyFetchServer), name: NSNotification.Name("New Friend Chat"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(loadExistLocalDataIfEmptyFetchServer), name: Notification.Name("New Friend Chat"), object: nil)
         NotificationCenter.default.addObserver(forName: Notification.Name("EaseUIKit_do_not_disturb_changed"), object: nil, queue: .main) { [weak self] notify in
             if let userInfo = notify.userInfo {
                 if let id = userInfo["id"] as? String {

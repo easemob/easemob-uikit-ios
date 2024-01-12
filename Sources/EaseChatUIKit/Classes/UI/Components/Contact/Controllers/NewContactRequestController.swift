@@ -132,7 +132,7 @@ extension NewContactRequestController: UITableViewDelegate,UITableViewDataSource
                 let ext = ["something":("You have added".chat.localize+" "+userId+" "+"to say hello".chat.localize)]
                 let message = ChatMessage(conversationID: userId, body: ChatCustomMessageBody(event: EaseChatUIKit_alert_message, customExt: nil), ext: ext)
                 conversation?.insert(message, error: nil)
-                NotificationCenter.default.post(name: NSNotification.Name("New Friend Chat"), object: nil)
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "New Friend Chat") , object: nil, userInfo: nil)
                 self.datas.removeAll()
                 self.datas = self.fillDatas()
                 self.datas.sort { $0.time > $1.time }

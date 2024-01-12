@@ -50,6 +50,7 @@ import UIKit
         self.textLabel?.textColor = UIColor.theme.neutralColor1
         self.contentView.addSubview(self.badge)
 //        self.accessoryView = self.badge
+        Theme.registerSwitchThemeViews(view: self)
     }
     
     open override func layoutSubviews() {
@@ -78,6 +79,15 @@ import UIKit
     }
     
 }
+
+extension ContactListHeaderCell: ThemeSwitchProtocol {
+
+    @objc open func switchTheme(style: ThemeStyle) {
+        self.badge.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
+        self.textLabel?.textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
+    }
+}
+
 
 public typealias ContactListItemActionClosure = ((ContactListHeaderItemProtocol) -> Void)
 

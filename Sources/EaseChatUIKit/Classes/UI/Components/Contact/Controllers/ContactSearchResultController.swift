@@ -140,7 +140,8 @@ extension ContactSearchResultController: UISearchResultsUpdating,UISearchControl
         self.searchKeyWord = searchController.searchBar.text?.lowercased() ?? ""
         if let searchText = searchController.searchBar.text?.lowercased() {
             self.searchResults = self.rawDatas.filter({ user in
-                (user.nickname.lowercased() as NSString).range(of: searchText).location != NSNotFound && ((user.nickname.lowercased() as NSString).range(of: searchText).length >= 0 || (user.id.lowercased() as NSString).range(of: searchText).length >= 0)
+                let showName = user.nickname.isEmpty ? user.id:user.nickname
+                return (showName.lowercased() as NSString).range(of: searchText).location != NSNotFound && (showName.lowercased() as NSString).range(of: searchText).length >= 0
             })
         }
         self.tableView.reloadData()

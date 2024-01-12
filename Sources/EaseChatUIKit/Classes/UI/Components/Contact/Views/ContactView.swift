@@ -122,7 +122,9 @@ import UIKit
     public required init(frame: CGRect,headerStyle: ContactListHeaderStyle) {
         self.headerStyle = headerStyle
         super.init(frame: frame)
-        self.contactList.tableHeaderView(headerStyle == .contact ? self.header:nil)
+        if Appearance.contact.listHeaderExtensionActions.count > 0 {
+            self.contactList.tableHeaderView(headerStyle == .contact ? self.header:nil)
+        }
         self.contactList.keyboardDismissMode = .onDrag
         self.addSubViews([self.contactList,self.indexIndicator])
         Theme.registerSwitchThemeViews(view: self)

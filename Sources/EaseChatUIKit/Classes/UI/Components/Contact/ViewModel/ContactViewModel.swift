@@ -28,7 +28,7 @@ import UIKit
         self.provider_OC = providerOC
         self.ignoreContacts = ignoreIds
         super.init()
-        NotificationCenter.default.addObserver(self, selector: #selector(addContact), name: NSNotification.Name("New Friend Chat"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(loadAllContacts), name: Notification.Name("New Friend Chat"), object: nil)
     }
     
     /// ``ContactViewModel`` init method.
@@ -38,7 +38,7 @@ import UIKit
         self.provider = provider
         self.ignoreContacts = ignoreIds
         super.init()
-        NotificationCenter.default.addObserver(self, selector: #selector(addContact), name: NSNotification.Name("New Friend Chat"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(loadAllContacts), name: Notification.Name("New Friend Chat"), object: nil)
     }
     
     public private(set) weak var driver: IContactListDriver?
