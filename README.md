@@ -122,7 +122,7 @@ python3 -m http.server 8080
 
 ## 1.Appearance 
 
-![Appearance](./Documentation/Appearance.md). 
+[Appearance](./Documentation/Appearance.md). 
 
 即加载UI前的所有可改动的配置项。包含公共配置以及三类业务功能配置
 - 公共配置  包含自定义皮肤的色相值配置、Alert、ActionSheet、默认头像等。
@@ -132,7 +132,7 @@ python3 -m http.server 8080
 
 ## 2.ComponentRegister 
 
-![ComponentRegister](./Documentation/ComponentRegister.md). 
+[ComponentRegister](./Documentation/ComponentRegister.md). 
 
 即可继承进行自定义定制的 UI 组件。
 
@@ -140,7 +140,7 @@ python3 -m http.server 8080
 
 ## 3.ComponentViewsActionHooker
 
-![ComponentViewsActionHooker](./Documentation/ComponentViewsActionHooker.md). 所有可拦截的点击事件
+[ComponentViewsActionHooker](./Documentation/ComponentViewsActionHooker.md). 所有可拦截的点击事件
 
 # 快速开始
 
