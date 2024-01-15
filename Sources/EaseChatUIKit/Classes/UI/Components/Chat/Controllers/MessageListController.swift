@@ -300,7 +300,6 @@ extension MessageListController: MessageListDriverEventsListener {
          - message: The chat message to be processed.
      */
     @objc open func processMessage(item: ActionSheetItemProtocol,message: ChatMessage) {
-        UIViewController.currentController?.dismiss(animated: true)
         switch item.tag {
         case "Copy":
             self.viewModel.processMessage(operation: .copy, message: message, edit: "")

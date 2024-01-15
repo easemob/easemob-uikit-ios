@@ -17,9 +17,10 @@ import UIKit
     @objc public func showReportDialog(message: ChatMessage,errorClosure: @escaping (ChatError?)->Void) {
         var vc = PageContainersDialogController()
         let report = ComponentsRegister
-            .shared.ReportViewController.init(message: message) {
-                vc.dismiss(animated: true)
-                errorClosure($0)
+            .shared.ReportViewController.init(message: message) { error in
+                vc.dismiss(animated: true) {
+                    errorClosure(error)
+                }
             }
         vc = PageContainersDialogController(pageTitles: ["barrage_long_press_menu_report".chat.localize], childControllers: [report], constraintsSize: Appearance.pageContainerConstraintsSize)
         
@@ -33,7 +34,9 @@ import UIKit
     ///   - action: Callback upon a click of a message operation.
     @objc public func showMessageActions(actions: [ActionSheetItemProtocol],action: @escaping (ActionSheetItemProtocol) -> Void) {
         let actionSheet = ActionSheet(items: actions) { item in
-            action(item)
+            UIViewController.currentController?.dismiss(animated: true) {
+                action(item)
+            }
         }.cornerRadius(.medium, [.topLeft,.topRight], .clear, 0)
         actionSheet.frame = CGRect(x: 0, y: 0, width: actionSheet.frame.width, height: actionSheet.frame.height)
         let vc = DialogContainerViewController(custom: actionSheet,constraintsSize: actionSheet.frame.size)
@@ -49,8 +52,9 @@ import UIKit
     ///   - action: Callback upon a click .
     @objc public func showActions(actions: [ActionSheetItemProtocol],action: @escaping (ActionSheetItemProtocol) -> Void) {
         let actionSheet = ActionSheet(items: actions) { item in
-            UIViewController.currentController?.dismiss(animated: true)
-            action(item)
+            UIViewController.currentController?.dismiss(animated: true) {
+                action(item)
+            }
         }.cornerRadius(.medium, [.topLeft,.topRight], .clear, 0)
         let vc = DialogContainerViewController(custom: actionSheet,constraintsSize: actionSheet.frame.size)
         actionSheet.frame = CGRect(x: 0, y: 0, width: actionSheet.frame.width, height: actionSheet.frame.height)
