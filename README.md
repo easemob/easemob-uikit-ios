@@ -140,7 +140,7 @@ python3 -m http.server 8080
 
 ## 3.ComponentViewsActionHooker
 
-[ComponentViewsActionHooker](./Documentation/ComponentViewsActionHooker.md). 所有可拦截的点击事件
+[ComponentViewsActionHooker](./Documentation/ComponentsActionEventsRegister.md). 所有可拦截的点击事件
 
 # 快速开始
 
