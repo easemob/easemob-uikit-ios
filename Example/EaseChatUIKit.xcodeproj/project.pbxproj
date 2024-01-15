@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		0500149B2B2AA725000DA9CE /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0500149A2B2AA725000DA9CE /* LoginViewController.swift */; };
 		0500149F2B2AAA7E000DA9CE /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0500149E2B2AAA7E000DA9CE /* MainViewController.swift */; };
-		0565FBAF2B4D123700F75C4A /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0565FBAE2B4D123700F75C4A /* README.md */; };
 		0565FBB12B4D127700F75C4A /* CustomConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0565FBB02B4D127700F75C4A /* CustomConversationViewController.swift */; };
+		0575E8EE2B54C29A00166BF1 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0575E8ED2B54C29A00166BF1 /* README.md */; };
 		0598E6992B366F5D0079BF47 /* HueSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0598E6982B366F5D0079BF47 /* HueSettingViewController.swift */; };
 		05BF34412B2C2F29004639CE /* OptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BF34402B2C2F29004639CE /* OptionsViewController.swift */; };
 		0FD976A5382D36AF6B70D22C /* Pods_EaseChatUIKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93876C90F7ED383C7B3B2838 /* Pods_EaseChatUIKit_Example.framework */; };
@@ -24,8 +24,8 @@
 /* Begin PBXFileReference section */
 		0500149A2B2AA725000DA9CE /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		0500149E2B2AAA7E000DA9CE /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
-		0565FBAE2B4D123700F75C4A /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = "../../../Documents/Desktop/chatuikit-ios/README.md"; sourceTree = "<group>"; };
 		0565FBB02B4D127700F75C4A /* CustomConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomConversationViewController.swift; sourceTree = "<group>"; };
+		0575E8ED2B54C29A00166BF1 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		057CC2ED2B396191008E8AD8 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		057CC2EE2B396191008E8AD8 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		0598E6982B366F5D0079BF47 /* HueSettingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HueSettingViewController.swift; sourceTree = "<group>"; };
@@ -110,7 +110,7 @@
 			isa = PBXGroup;
 			children = (
 				78F4175E82DA4A6D855DE068 /* EaseChatUIKit.podspec */,
-				0565FBAE2B4D123700F75C4A /* README.md */,
+				0575E8ED2B54C29A00166BF1 /* README.md */,
 				5BD01E2EA5ABF01A40AF9C88 /* LICENSE */,
 			);
 			name = "Podspec Metadata";
@@ -204,7 +204,7 @@
 			files = (
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
-				0565FBAF2B4D123700F75C4A /* README.md in Resources */,
+				0575E8EE2B54C29A00166BF1 /* README.md in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -242,12 +242,12 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-EaseChatUIKit_Example/Pods-EaseChatUIKit_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/KakaJSON/KakaJSON.framework",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/Agora_Chat_iOS/AgoraChat.framework/AgoraChat",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/HyphenateChat/HyphenateChat.framework/HyphenateChat",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KakaJSON.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AgoraChat.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HyphenateChat.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
