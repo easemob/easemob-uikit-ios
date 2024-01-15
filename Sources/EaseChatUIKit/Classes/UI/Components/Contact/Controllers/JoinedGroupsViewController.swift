@@ -152,6 +152,7 @@ extension JoinedGroupsViewController: UITableViewDelegate,UITableViewDataSource 
         let vc = ComponentsRegister.shared.GroupInfoController.init(group: group) { [weak self] groupId, name in
             self?.refreshGroup(groupId: groupId, name: name)
         }
+        vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
     }
     
