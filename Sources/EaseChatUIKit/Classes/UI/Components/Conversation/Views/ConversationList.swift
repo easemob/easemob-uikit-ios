@@ -284,7 +284,9 @@ extension ConversationList: IConversationListDriver {
         if let index = self.datas.firstIndex(where: { $0.id == info.id }) {
             self.datas[safe: index]?.unreadCount = 0
             if self.indexPathsForVisibleRows?.contains(where: { $0.row == index }) ?? false {
+                self.beginUpdates()
                 self.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+                self.endUpdates()
             }
         }
     }
