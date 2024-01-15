@@ -33,7 +33,7 @@ public extension UIViewController {
     }
     
     func presentViewController(_ viewController: PresentationViewController, animated: Bool = true) {
-        dismiss(animated: false)
+//        dismiss(animated: false)
         viewController.modalPresentationStyle = .custom
         viewController.transitioningDelegate = self
         present(viewController, animated: animated, completion: nil)

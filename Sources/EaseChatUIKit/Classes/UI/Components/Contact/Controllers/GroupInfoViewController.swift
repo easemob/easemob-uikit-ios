@@ -446,8 +446,12 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
      Cleans the history messages of the group.
      */
     @objc open func cleanHistoryMessages() {
-        ChatClient.shared().chatManager?.getConversationWithConvId(self.chatGroup.groupId)?.deleteAllMessages(nil)
-        NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_clean_history_messages"), object: self.chatGroup.groupId)
+        DialogManager.shared.showAlert(title: "", content: "group_details_button_clearchathistory".chat.localize, showCancel: true, showConfirm: true) { [weak self] _ in
+            guard let `self` = self else { return }
+            ChatClient.shared().chatManager?.getConversationWithConvId(self.chatGroup.groupId)?.deleteAllMessages(nil)
+            NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_clean_history_messages"), object: self.chatGroup.groupId)
+        }
+        
     }
     
     /**

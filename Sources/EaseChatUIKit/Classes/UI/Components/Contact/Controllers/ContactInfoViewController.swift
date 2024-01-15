@@ -380,11 +380,14 @@ extension ContactInfoViewController: UITableViewDelegate,UITableViewDataSource {
     /// Called when a row is selected in the table view.
     /// - Parameter indexPath: The index path of the selected row.
     @objc open func didSelectRow(indexPath: IndexPath) {
-        DialogManager.shared.showAlert(title: "", content: "group_details_button_clearchathistory".chat.localize, showCancel: true, showConfirm: true) { [weak self] _ in
-            guard let `self` = self else { return }
-            ChatClient.shared().chatManager?.getConversationWithConvId(self.profile.id)?.deleteAllMessages(nil)
-            NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_clean_history_messages"), object: self.profile.id)
+        if let info = self.datas[safe: indexPath.row],info.title == "contact_details_button_clearchathistory".chat.localize {
+            DialogManager.shared.showAlert(title: "", content: "group_details_button_clearchathistory".chat.localize, showCancel: true, showConfirm: true) { [weak self] _ in
+                guard let `self` = self else { return }
+                ChatClient.shared().chatManager?.getConversationWithConvId(self.profile.id)?.deleteAllMessages(nil)
+                NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_clean_history_messages"), object: self.profile.id)
+            }
         }
+        
     }
     
     /**
