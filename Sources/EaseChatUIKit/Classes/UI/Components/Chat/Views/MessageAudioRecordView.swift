@@ -147,6 +147,12 @@ import UIKit
     
     private func startRecord() {
         if !MediaConvertor.checkRecordPermission() {
+            MediaConvertor.requestRecordPermission { success in
+                self.recordCount = 0
+                self.buildTimer()
+                self.recordTitle.text = "Recording".chat.localize
+                AudioTools.shared.startRecording()
+            }
             return
         }
         self.recordCount = 0
