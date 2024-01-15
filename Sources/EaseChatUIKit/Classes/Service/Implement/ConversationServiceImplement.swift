@@ -37,9 +37,9 @@ import UIKit
 extension ConversationServiceImplement: ConversationService {
     public func loadIfNotExistCreate(conversationId: String) -> ChatConversation? {
         if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(conversationId) {
-            return ChatClient.shared().chatManager?.getConversation(conversationId, type: conversation.type, createIfNotExist: true)
+            return conversation
         }
-        return nil
+        return ChatClient.shared().chatManager?.getConversation(conversationId, type: conversation.type, createIfNotExist: true)
     }
     
     
