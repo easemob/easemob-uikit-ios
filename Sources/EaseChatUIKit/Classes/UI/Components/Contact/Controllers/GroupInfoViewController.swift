@@ -93,7 +93,7 @@ import UIKit
     }
     
     public private(set) lazy var menuList: UITableView = {
-        UITableView(frame: CGRect(x: 0, y: NavigationHeight, width: self.view.frame.width, height: self.view.frame.height), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).rowHeight(54).tableHeaderView(self.header).sectionHeaderHeight(30).backgroundColor(.clear)
+        UITableView(frame: CGRect(x: 0, y: NavigationHeight, width: self.view.frame.width, height: self.view.frame.height), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).rowHeight(54).tableHeaderView(self.header).backgroundColor(.clear)
     }()
     
     /// A closure that is executed when the group name is changed.
@@ -383,6 +383,10 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
 
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         self.datas[safe: section]?.count ?? 0
+    }
+    
+    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        section <= 0 ? 30:0
     }
     
     public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
