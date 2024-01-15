@@ -319,7 +319,7 @@ extension GroupParticipantsController: UITableViewDelegate,UITableViewDataSource
             case .normal:
                 let vc = ComponentsRegister.shared.ContactInfoController.init(profile: profile)
                 vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                ControllerStack.toDestination(vc: vc)
             case .mention,.transferOwner:
                 self.mentionClosure?(profile)
                 self.pop()

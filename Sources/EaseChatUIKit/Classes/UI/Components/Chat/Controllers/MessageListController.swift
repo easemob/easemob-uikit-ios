@@ -164,20 +164,20 @@ extension MessageListController {
                             self?.navigation.title = name
                         }
                         vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                        ControllerStack.toDestination(vc: vc)
                     }
                 }
             } else {
                 if self.chatType == .chat {
                     let vc = ComponentsRegister.shared.ContactInfoController.init(profile: self.profile)
                     vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                    ControllerStack.toDestination(vc: vc)
                 } else {
                     let vc = ComponentsRegister.shared.GroupInfoController.init(group: self.profile.id) { [weak self] id, name in
                         self?.navigation.title = name
                     }
                     vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                    ControllerStack.toDestination(vc: vc)
                 }
             }
         } else {
@@ -188,26 +188,26 @@ extension MessageListController {
                     if self.chatType == .chat {
                         let vc = ComponentsRegister.shared.ContactInfoController.init(profile: self.profile)
                         vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                        ControllerStack.toDestination(vc: vc)
                     } else {
                         let vc = ComponentsRegister.shared.GroupInfoController.init(group: self.profile.id) { [weak self] id, name in
                             self?.navigation.title = name
                         }
                         vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                        ControllerStack.toDestination(vc: vc)
                     }
                 }
             } else {
                 if self.chatType == .chat {
                     let vc = ComponentsRegister.shared.ContactInfoController.init(profile: self.profile)
                     vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                    ControllerStack.toDestination(vc: vc)
                 } else {
                     let vc = ComponentsRegister.shared.GroupInfoController.init(group: self.profile.id) { [weak self] id, name in
                         self?.navigation.title = name
                     }
                     vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                    ControllerStack.toDestination(vc: vc)
                 }
             }
         }

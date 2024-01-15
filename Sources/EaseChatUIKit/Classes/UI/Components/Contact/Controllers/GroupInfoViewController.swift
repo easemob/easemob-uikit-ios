@@ -240,16 +240,22 @@ import UIKit
             if self.navigationController?.viewControllers[safe: count - 2] is MessageListController {
                 if let root = self.navigationController?.viewControllers[safe: count - 3] {
                     self.navigationController?.popToViewController(root, animated: true)
-                    ControllerStack.toDestination(vc: ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group))
+                    let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group)
+                    vc.modalPresentationStyle = .fullScreen
+                    ControllerStack.toDestination(vc: vc)
                 }
             } else {
-                ControllerStack.toDestination(vc: ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group))
+                let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group)
+                vc.modalPresentationStyle = .fullScreen
+                ControllerStack.toDestination(vc: vc)
             }
         } else {
             if let presentingVC = self.presentingViewController {
                 if presentingVC is MessageListController {
                     presentingVC.dismiss(animated: false) {
-                        UIViewController.currentController?.present(ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group), animated: true)
+                        let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group)
+                        vc.modalPresentationStyle = .fullScreen
+                        UIViewController.currentController?.present(vc, animated: true)
                     }
                 } else {
                     let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group)
@@ -258,6 +264,7 @@ import UIKit
                 }
             } else {
                 let desiredViewController = ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group)
+                desiredViewController.modalPresentationStyle = .fullScreen
                 ControllerStack.toDestination(vc: desiredViewController)
             }
             
