@@ -25,11 +25,11 @@ public extension UIViewController {
                 }
             }
             if let presented = vc.presentedViewController {
-                var vc: UIViewController?
-                while presented.presentedViewController != nil {
-                    vc = presented.presentedViewController
+                var vc: UIViewController? = presented
+                while vc?.presentedViewController != nil {
+                    vc = vc?.presentedViewController
                 }
-                return vc ?? presented
+                return vc
             }
             return vc
         }
