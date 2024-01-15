@@ -24,6 +24,9 @@ public extension UIViewController {
                     return tab.selectedViewController
                 }
             }
+            if let presented = vc.presentedViewController {
+                return presented
+            }
             return vc
         }
         return nil

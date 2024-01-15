@@ -30,7 +30,7 @@ import AVFoundation
     }
     
     public private(set) lazy var messageContainer: MessageListView = {
-        MessageListView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: ScreenHeight-NavigationHeight), mention: self.chatType == .group)
+        MessageListView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight), mention: self.chatType == .group)
     }()
     
     public private(set) lazy var loadingView: LoadingView = {

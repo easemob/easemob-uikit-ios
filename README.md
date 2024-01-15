@@ -178,13 +178,20 @@ class AppDelegate：UIResponder，UIApplicationDelegate {
 ``` Swift
 public final class YourAppUser: NSObject, EaseProfileProtocol {
 
-    public func toJsonObject() -> Dictionary<String, Any>? {
+        public func toJsonObject() -> Dictionary<String, Any>? {
         ["ease_chat_uikit_info":["nickname":self.nickname,"avatarURL":self.avatarURL,"userId":self.id]]
     }
-
-    public var userId: String = <#T##String#>
-
-    public var nickname: String = "Jack"
+    
+    
+    public var id: String = ""
+        
+    public var nickname: String = ""
+        
+    public var selected: Bool = false
+    
+    public override func setValue(_ value: Any?, forUndefinedKey key: String) {
+        
+    }
 
     public var avatarURL: String = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/sample_avatar/sample_avatar_1.png"
 
@@ -224,13 +231,20 @@ let error = EaseChatUIKitClient.shared.setup(appkey: "Your appkey",
 ```Swift
 public final class YourAppUser: NSObject, EaseProfileProtocol {
 
-    public func toJsonObject() -> Dictionary<String, Any>? {
+            public func toJsonObject() -> Dictionary<String, Any>? {
         ["ease_chat_uikit_info":["nickname":self.nickname,"avatarURL":self.avatarURL,"userId":self.id]]
     }
-
-    public var userId: String = <#T##String#>
-
-    public var nickname: String = "Jack"
+    
+    
+    public var id: String = ""
+        
+    public var nickname: String = ""
+        
+    public var selected: Bool = false
+    
+    public override func setValue(_ value: Any?, forUndefinedKey key: String) {
+        
+    }
 
     public var avatarURL: String = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/sample_avatar/sample_avatar_1.png"
 
