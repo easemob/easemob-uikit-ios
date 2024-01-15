@@ -203,6 +203,8 @@ import UIKit
         /// New message tone audio path
         var newMessageSoundPath = "/System/Library/Audio/UISounds/sms-received1.caf"
         
+        var groupParticipantsLimitCount = 1000
+        
     }
     
     /// Contact Module

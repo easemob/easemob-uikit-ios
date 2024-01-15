@@ -108,7 +108,7 @@ import UIKit
     }()
     
     public private(set) lazy var rightItem: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: ScreenWidth-130, y: self.frame.height-34, width: 118, height: 28)).font(UIFont.theme.labelMedium).tag(3).backgroundColor(.clear).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: ScreenWidth-150, y: self.frame.height-34, width: 138, height: 28)).font(UIFont.theme.labelMedium).tag(3).backgroundColor(.clear).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside)
     }()
 
     internal override init(frame: CGRect) {

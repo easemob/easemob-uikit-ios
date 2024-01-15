@@ -130,7 +130,6 @@ import UIKit
     @objc open func toChat(indexPath: IndexPath, info: ConversationInfo) {
         let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: info.id, chatType: info.type == .chat ? .chat:.group)
         vc.modalPresentationStyle = .fullScreen
-        vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
     }
     
@@ -147,7 +146,7 @@ import UIKit
         }
         if let vc = search {
             vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+            ControllerStack.toDestination(vc: vc)
         }
     }
     
@@ -201,7 +200,7 @@ import UIKit
         if let info = self.conversationList.datas.first(where: { $0.id == profile.id }) {
             self.toChat(indexPath: IndexPath(row: 0, section: 0), info: info)
         } else {
-            self.createChat(profile: profile, info: "")
+            self.createChat(profile: profile, type: .chat, info: "")
         }
     }
     
@@ -212,10 +211,11 @@ import UIKit
         - profile: The profile of the user to create the chat with.
         - info: Additional information about the chat.
      */
-    @objc open func createChat(profile: EaseProfileProtocol, info: String) {
-        if let info = self.viewModel?.loadIfNotExistCreate(profile: profile, text: info) {
+    @objc open func createChat(profile: EaseProfileProtocol, type: ChatConversationType, info: String) {
+        if let info = self.viewModel?.loadIfNotExistCreate(profile: profile, type: type, text: info) {
             let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: info.id , chatType: info.type == .chat ? .chat:.group)
-            self.navigationController?.pushViewController(vc, animated: true)
+            vc.modalPresentationStyle = .fullScreen
+            ControllerStack.toDestination(vc: vc)
         }
     }
     
@@ -268,14 +268,14 @@ import UIKit
         }
         let option = ChatGroupOption()
         option.isInviteNeedConfirm = false
-        option.maxUsers = 1000
+        option.maxUsers = Appearance.chat.groupParticipantsLimitCount
         option.style = .privateMemberCanInvite
         ChatClient.shared().groupManager?.createGroup(withSubject: name, description: "", invitees: ids, message: nil, setting: option, completion: { [weak self] group, error in
             if error == nil,let group = group {
                 let profile = EaseProfile()
                 profile.id = group.groupId
                 profile.nickname = group.groupName
-                self?.createChat(profile: profile,info: name)
+                self?.createChat(profile: profile, type: .groupChat,info: name)
             } else {
                 consoleLogInfo("create group error:\(error?.errorDescription ?? "")", type: .error)
             }

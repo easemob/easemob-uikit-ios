@@ -18,6 +18,8 @@ import UIKit
     
     private let service: GroupService = GroupServiceImplement()
     
+    private let conversationService = ConversationServiceImplement()
+    
     /**
      A private array of `ActionSheetItem` objects representing the owner options in the group info view controller.
      Each `ActionSheetItem` contains a title, type, and tag.
@@ -93,7 +95,7 @@ import UIKit
     }
     
     public private(set) lazy var menuList: UITableView = {
-        UITableView(frame: CGRect(x: 0, y: NavigationHeight, width: self.view.frame.width, height: self.view.frame.height), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).rowHeight(54).tableHeaderView(self.header).sectionHeaderHeight(30).backgroundColor(.clear)
+        UITableView(frame: CGRect(x: 0, y: NavigationHeight, width: self.view.frame.width, height: self.view.frame.height), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).rowHeight(54).tableHeaderView(self.header).backgroundColor(.clear)
     }()
     
     /// A closure that is executed when the group name is changed.
@@ -240,16 +242,22 @@ import UIKit
             if self.navigationController?.viewControllers[safe: count - 2] is MessageListController {
                 if let root = self.navigationController?.viewControllers[safe: count - 3] {
                     self.navigationController?.popToViewController(root, animated: true)
-                    ControllerStack.toDestination(vc: ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group))
+                    let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group)
+                    vc.modalPresentationStyle = .fullScreen
+                    ControllerStack.toDestination(vc: vc)
                 }
             } else {
-                ControllerStack.toDestination(vc: ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group))
+                let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group)
+                vc.modalPresentationStyle = .fullScreen
+                ControllerStack.toDestination(vc: vc)
             }
         } else {
             if let presentingVC = self.presentingViewController {
                 if presentingVC is MessageListController {
                     presentingVC.dismiss(animated: false) {
-                        UIViewController.currentController?.present(ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group), animated: true)
+                        let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group)
+                        vc.modalPresentationStyle = .fullScreen
+                        UIViewController.currentController?.present(vc, animated: true)
                     }
                 } else {
                     let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group)
@@ -258,6 +266,7 @@ import UIKit
                 }
             } else {
                 let desiredViewController = ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group)
+                desiredViewController.modalPresentationStyle = .fullScreen
                 ControllerStack.toDestination(vc: desiredViewController)
             }
             
@@ -378,6 +387,10 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
         self.datas[safe: section]?.count ?? 0
     }
     
+    public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        section <= 0 ? 30:0
+    }
+    
     public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         section <= 0 ? UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 30)).backgroundColor(Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95):nil
     }
@@ -448,8 +461,12 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
      Cleans the history messages of the group.
      */
     @objc open func cleanHistoryMessages() {
-        ChatClient.shared().chatManager?.getConversationWithConvId(self.chatGroup.groupId)?.deleteAllMessages(nil)
-        NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_clean_history_messages"), object: self.chatGroup.groupId)
+        DialogManager.shared.showAlert(title: "", content: "group_details_button_clearchathistory".chat.localize, showCancel: true, showConfirm: true) { [weak self] _ in
+            guard let `self` = self else { return }
+            ChatClient.shared().chatManager?.getConversationWithConvId(self.chatGroup.groupId)?.deleteAllMessages(nil)
+            NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_clean_history_messages"), object: self.chatGroup.groupId)
+        }
+        
     }
     
     /**
@@ -504,12 +521,37 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
     */
     @objc open func switchChanged(isOn: Bool, indexPath: IndexPath) {
         if let name = self.datas[safe: indexPath.section]?[safe: indexPath.row]?.title {
-            self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.chatGroup.groupId] = isOn ? 1:0
-            if name == "contact_details_switch_donotdisturb".chat.localize {
-                NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseUIKit_do_not_disturb_changed"), object: nil, userInfo: ["id": self.chatGroup.groupId ?? "", "value": isOn])
+            if isOn {
+                self.conversationService.setSilentMode(conversationId: self.chatGroup.groupId) { [weak self] result, error in
+                    guard let `self` = self else { return }
+                    if error == nil {
+                        self.processSilentMode(name: name, isOn: isOn)
+                    } else {
+                        consoleLogInfo("ContactInfoViewController set silent mode error:\(error?.errorDescription ?? "")", type: .error)
+                    
+                    }
+                }
+            } else {
+                self.conversationService.clearSilentMode(conversationId: self.chatGroup.groupId) { [weak self] result, error in
+                    guard let `self` = self else { return }
+                    if error == nil {
+                        self.processSilentMode(name: name, isOn: isOn)
+                    } else {
+                        consoleLogInfo("ContactInfoViewController clear silent mode error:\(error?.errorDescription ?? "")", type: .error)
+                    }
+                }
             }
         }
     }
+    
+    @objc open func processSilentMode(name: String,isOn: Bool) {
+        self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.chatGroup.groupId] = isOn ? 1:0
+        if name == "contact_details_switch_donotdisturb".chat.localize,let groupId = self.chatGroup.groupId {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseUIKit_do_not_disturb_changed"), object: nil,userInfo: ["id":groupId,"value":isOn])
+        }
+    }
+    
+    
 }
 
 extension GroupInfoViewController: ThemeSwitchProtocol {

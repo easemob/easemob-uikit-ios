@@ -171,5 +171,16 @@ final class MediaConvertor: NSObject {
 //        print("Frames Per Packet: \(audioFormat.streamDescription.pointee.mFramesPerPacket)")
 //    }
 
+    //检测录音权限
+    static func checkRecordPermission() -> Bool {
+        var permission = false
+        let session = AVAudioSession.sharedInstance()
+        if #available(iOS 14.0, *) {
+            permission = session.recordPermission == .granted
+        } else {
+            permission = session.recordPermission == .granted
+        }
+        return permission
+    }
     
 }

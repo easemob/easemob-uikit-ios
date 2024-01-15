@@ -132,7 +132,7 @@ python3 -m http.server 8080
 
 ## 2.ComponentRegister 
 
-[ComponentRegister](./Documentation/ComponentRegister.md). 
+[ComponentRegister](./Documentation/ComponentsRegister.md). 
 
 即可继承进行自定义定制的 UI 组件。
 
@@ -140,7 +140,7 @@ python3 -m http.server 8080
 
 ## 3.ComponentViewsActionHooker
 
-[ComponentViewsActionHooker](./Documentation/ComponentViewsActionHooker.md). 所有可拦截的点击事件
+[ComponentViewsActionHooker](./Documentation/ComponentsActionEventsRegister.md). 所有可拦截的点击事件
 
 # 快速开始
 
@@ -152,6 +152,15 @@ python3 -m http.server 8080
 * Organization Identifier 设为 您的identifier。
 * User Interface 选择 Storyboard。
 * Language 选择 你的常用开发语言。
+* 添加权限 在项目 `info.plist` 中添加相关权限：
+
+Add related privileges in the `info.plist` project:
+
+```
+Privacy - Photo Library Usage Description //相册权限    Album privileges.
+Privacy - Microphone Usage Description //麦克风权限     Microphone privileges.
+Privacy - Camera Usage Description //相机权限    Camera privileges.
+```
 
 ### 第一步：初始化EaseChatUIKit
 
@@ -168,7 +177,7 @@ class AppDelegate：UIResponder，UIApplicationDelegate {
          // 需要传入App Key。
          // 获取App Key，请访问
          // https://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E8%8E%B7%E5%8F%96%E7%8E%AF%E4%BF%A1%E5%8D%B3%E6%97%B6%E9%80%9A%E8%AE%AF-im-%E7%9A%84%E4%BF%A1%E6%81%AF
-         let error = EaseChatUIKitClient.shared.setup（appKey: "Appkey"）
+         let error = EaseChatUIKitClient.shared.setup(appKey: "Appkey")
      }
 }
 ```
@@ -178,13 +187,20 @@ class AppDelegate：UIResponder，UIApplicationDelegate {
 ``` Swift
 public final class YourAppUser: NSObject, EaseProfileProtocol {
 
-    public func toJsonObject() -> Dictionary<String, Any>? {
+        public func toJsonObject() -> Dictionary<String, Any>? {
         ["ease_chat_uikit_info":["nickname":self.nickname,"avatarURL":self.avatarURL,"userId":self.id]]
     }
-
-    public var userId: String = <#T##String#>
-
-    public var nickname: String = "Jack"
+    
+    
+    public var id: String = ""
+        
+    public var nickname: String = ""
+        
+    public var selected: Bool = false
+    
+    public override func setValue(_ value: Any?, forUndefinedKey key: String) {
+        
+    }
 
     public var avatarURL: String = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/sample_avatar/sample_avatar_1.png"
 
@@ -216,10 +232,8 @@ public final class YourAppUser: NSObject, EaseProfileProtocol {
 ## 1.初始化单群聊UIKit
 相比于上面快速开始的单群聊UIKit初始化这里多了ChatOptions的参数，主要是对SDK中是否打印log以及是否自动登录，是否默认使用用户属性的开关配置。
 ```Swift
-let error = EaseChatUIKitClient.shared.setup(
-    with: "Your appkey",
-    option: EaseChatUIKitInitialOptions.ChatOptions()
-)
+let error = EaseChatUIKitClient.shared.setup(appkey: "Your appkey",
+    option: EaseChatUIKitInitialOptions.ChatOptions())
 ```
 
 ## 2.登录
@@ -227,13 +241,20 @@ let error = EaseChatUIKitClient.shared.setup(
 ```Swift
 public final class YourAppUser: NSObject, EaseProfileProtocol {
 
-    public func toJsonObject() -> Dictionary<String, Any>? {
+            public func toJsonObject() -> Dictionary<String, Any>? {
         ["ease_chat_uikit_info":["nickname":self.nickname,"avatarURL":self.avatarURL,"userId":self.id]]
     }
-
-    public var userId: String = <#T##String#>
-
-    public var nickname: String = "Jack"
+    
+    
+    public var id: String = ""
+        
+    public var nickname: String = ""
+        
+    public var selected: Bool = false
+    
+    public override func setValue(_ value: Any?, forUndefinedKey key: String) {
+        
+    }
 
     public var avatarURL: String = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/sample_avatar/sample_avatar_1.png"
 

@@ -80,7 +80,10 @@ import UIKit
 
 extension SearchHeaderBar: UITextFieldDelegate {
     public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        self.textChanged?(textField.text ?? "")
+        if !string.isEmpty,var text = textField.text {
+            let changed = (text as NSString).replacingCharacters(in: range, with: string)
+            self.textChanged?(changed)
+        }
         return true
     }
     

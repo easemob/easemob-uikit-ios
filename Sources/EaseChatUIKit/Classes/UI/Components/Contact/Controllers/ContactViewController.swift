@@ -186,7 +186,7 @@ import UIKit
         }
         if let vc = vc {
             vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+            ControllerStack.toDestination(vc: vc)
         }
     }
     
@@ -253,7 +253,7 @@ import UIKit
                 self?.viewModel?.loadAllContacts()
             }
             vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+            ControllerStack.toDestination(vc: vc)
         case .shareContact:
             self.confirmClosure?([profile])
         case .addGroupParticipant,.newGroup:

@@ -51,6 +51,7 @@ import UIKit
         self.contentView.addSubview(self.badge)
 //        self.accessoryView = self.badge
         Theme.registerSwitchThemeViews(view: self)
+        self.switchTheme(style: Theme.style)
     }
     
     open override func layoutSubviews() {

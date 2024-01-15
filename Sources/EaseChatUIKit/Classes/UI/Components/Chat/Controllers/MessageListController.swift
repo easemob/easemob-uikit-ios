@@ -30,14 +30,8 @@ import AVFoundation
     }
     
     public private(set) lazy var messageContainer: MessageListView = {
-        self.createMessageContainer()
-    }()
-    
-    @objc open func createMessageContainer() -> MessageListView {
         MessageListView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight), mention: self.chatType == .group)
-    }
-    
-    
+    }()
     
     public private(set) lazy var loadingView: LoadingView = {
         self.createLoading()
@@ -170,20 +164,20 @@ extension MessageListController {
                             self?.navigation.title = name
                         }
                         vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                        ControllerStack.toDestination(vc: vc)
                     }
                 }
             } else {
                 if self.chatType == .chat {
                     let vc = ComponentsRegister.shared.ContactInfoController.init(profile: self.profile)
                     vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                    ControllerStack.toDestination(vc: vc)
                 } else {
                     let vc = ComponentsRegister.shared.GroupInfoController.init(group: self.profile.id) { [weak self] id, name in
                         self?.navigation.title = name
                     }
                     vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                    ControllerStack.toDestination(vc: vc)
                 }
             }
         } else {
@@ -194,26 +188,26 @@ extension MessageListController {
                     if self.chatType == .chat {
                         let vc = ComponentsRegister.shared.ContactInfoController.init(profile: self.profile)
                         vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                        ControllerStack.toDestination(vc: vc)
                     } else {
                         let vc = ComponentsRegister.shared.GroupInfoController.init(group: self.profile.id) { [weak self] id, name in
                             self?.navigation.title = name
                         }
                         vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                        ControllerStack.toDestination(vc: vc)
                     }
                 }
             } else {
                 if self.chatType == .chat {
                     let vc = ComponentsRegister.shared.ContactInfoController.init(profile: self.profile)
                     vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                    ControllerStack.toDestination(vc: vc)
                 } else {
                     let vc = ComponentsRegister.shared.GroupInfoController.init(group: self.profile.id) { [weak self] id, name in
                         self?.navigation.title = name
                     }
                     vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                    ControllerStack.toDestination(vc: vc)
                 }
             }
         }
@@ -306,7 +300,6 @@ extension MessageListController: MessageListDriverEventsListener {
          - message: The chat message to be processed.
      */
     @objc open func processMessage(item: ActionSheetItemProtocol,message: ChatMessage) {
-        UIViewController.currentController?.dismiss(animated: true)
         switch item.tag {
         case "Copy":
             self.viewModel.processMessage(operation: .copy, message: message, edit: "")
@@ -605,10 +598,21 @@ extension MessageListController:UIImagePickerControllerDelegate, UINavigationCon
                 let fileName = imageURL.lastPathComponent
                 let fileURL = URL(fileURLWithPath: MediaConvertor.filePath()+"/\(fileName)")
                 do {
-                    let image = UIImage(contentsOfFile: fileURL.path)?.fixOrientation()
+                    let image = UIImage(contentsOfFile: imageURL.path)
                     try image?.jpegData(compressionQuality: 1)?.write(to: fileURL)
                 } catch {
-                    consoleLogInfo("write fixOrientation image error:\(error.localizedDescription)", type: .error)
+                    consoleLogInfo("write image error:\(error.localizedDescription)", type: .error)
+                }
+                self.viewModel.sendMessage(text: fileURL.path, type: .image)
+            } else {
+                guard let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else { return }
+                let correctImage = image.fixOrientation()
+                let fileName = "\(Date().timeIntervalSince1970).jpeg"
+                let fileURL = URL(fileURLWithPath: MediaConvertor.filePath()+"/\(fileName)")
+                do {
+                    try image.jpegData(compressionQuality: 1)?.write(to: fileURL)
+                } catch {
+                    consoleLogInfo("write camera fixOrientation image error:\(error.localizedDescription)", type: .error)
                 }
                 self.viewModel.sendMessage(text: fileURL.path, type: .image)
             }

@@ -180,6 +180,7 @@ extension ContactSearchResultController: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         self.searchController.searchBar.backgroundColor(style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98)
         self.searchController.searchBar.barStyle = style == .dark ? .black:.default
+        self.searchController.searchBar.searchTextField.textColor = style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
         self.tableView.backgroundColor(style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98)
         self.tableView.reloadData()
     }

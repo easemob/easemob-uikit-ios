@@ -37,7 +37,9 @@ public extension UIViewController {
     }
     
     func presentViewController(_ viewController: PresentationViewController, animated: Bool = true) {
-        //        dismiss(animated: false)
+        if UIViewController.currentController is DialogContainerViewController || UIViewController.currentController is AlertViewController || UIViewController.currentController is PageContainersDialogController {
+            dismiss(animated: false)
+        }
         viewController.modalPresentationStyle = .custom
         viewController.transitioningDelegate = self
         present(viewController, animated: animated, completion: nil)

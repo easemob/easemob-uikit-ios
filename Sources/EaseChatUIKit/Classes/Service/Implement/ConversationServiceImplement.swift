@@ -35,11 +35,11 @@ import UIKit
 }
 
 extension ConversationServiceImplement: ConversationService {
-    public func loadIfNotExistCreate(conversationId: String) -> ChatConversation? {
+    public func loadIfNotExistCreate(conversationId: String,type: ChatConversationType) -> ChatConversation? {
         if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(conversationId) {
-            return ChatClient.shared().chatManager?.getConversation(conversationId, type: conversation.type, createIfNotExist: true)
+            return conversation
         }
-        return nil
+        return ChatClient.shared().chatManager?.getConversation(conversationId, type: type, createIfNotExist: true)
     }
     
     
@@ -202,7 +202,6 @@ extension ConversationServiceImplement: ConversationService {
     public func markAllMessagesAsRead(conversationId: String) {
         let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(conversationId)
         conversation?.markAllMessages(asRead: nil)
-        ChatClient.shared().chatManager?.ackConversationRead(conversationId)
     }
     
     public func bindConversationEventsListener(listener: ConversationServiceListener) {

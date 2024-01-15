@@ -24,6 +24,8 @@ import UIKit
     
     public let service = ContactServiceImplement()
     
+    public let conversationService = ConversationServiceImplement()
+    
     public private(set) var profile: EaseProfileProtocol = EaseProfile()
     
     @objc public var removeContact: (() -> Void)?
@@ -380,11 +382,14 @@ extension ContactInfoViewController: UITableViewDelegate,UITableViewDataSource {
     /// Called when a row is selected in the table view.
     /// - Parameter indexPath: The index path of the selected row.
     @objc open func didSelectRow(indexPath: IndexPath) {
-        DialogManager.shared.showAlert(title: "", content: "group_details_button_clearchathistory".chat.localize, showCancel: true, showConfirm: true) { [weak self] _ in
-            guard let `self` = self else { return }
-            ChatClient.shared().chatManager?.getConversationWithConvId(self.profile.id)?.deleteAllMessages(nil)
-            NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_clean_history_messages"), object: self.profile.id)
+        if let info = self.datas[safe: indexPath.row],info.title == "contact_details_button_clearchathistory".chat.localize {
+            DialogManager.shared.showAlert(title: "", content: "group_details_button_clearchathistory".chat.localize, showCancel: true, showConfirm: true) { [weak self] _ in
+                guard let `self` = self else { return }
+                ChatClient.shared().chatManager?.getConversationWithConvId(self.profile.id)?.deleteAllMessages(nil)
+                NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_clean_history_messages"), object: self.profile.id)
+            }
         }
+        
     }
     
     /**
@@ -396,10 +401,35 @@ extension ContactInfoViewController: UITableViewDelegate,UITableViewDataSource {
     */
     @objc open func switchChanged(isOn: Bool, indexPath: IndexPath) {
         if let name = self.datas[safe: indexPath.row]?.title {
-            self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] = isOn ? 1:0
-            if name == "contact_details_switch_donotdisturb".chat.localize {
-                NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseUIKit_do_not_disturb_changed"), object: nil,userInfo: ["id":self.profile.id,"value":isOn])
+            if isOn {
+                self.conversationService.setSilentMode(conversationId: self.profile.id) { [weak self] result, error in
+                    guard let `self` = self else { return }
+                    if error == nil {
+                        self.processSilentMode(name: name, isOn: isOn)
+                    } else {
+                        consoleLogInfo("ContactInfoViewController set silent mode error:\(error?.errorDescription ?? "")", type: .error)
+                    
+                    }
+                }
+            } else {
+                self.conversationService.clearSilentMode(conversationId: self.profile.id) { [weak self] result, error in
+                    guard let `self` = self else { return }
+                    if error == nil {
+                        self.processSilentMode(name: name, isOn: isOn)
+                    } else {
+                        consoleLogInfo("ContactInfoViewController clear silent mode error:\(error?.errorDescription ?? "")", type: .error)
+                    }
+                }
             }
+            
+            
+        }
+    }
+    
+    @objc open func processSilentMode(name: String,isOn: Bool) {
+        self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] = isOn ? 1:0
+        if name == "contact_details_switch_donotdisturb".chat.localize {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseUIKit_do_not_disturb_changed"), object: nil,userInfo: ["id":self.profile.id,"value":isOn])
         }
     }
 }
