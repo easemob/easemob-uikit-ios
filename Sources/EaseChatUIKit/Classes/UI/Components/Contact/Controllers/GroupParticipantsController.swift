@@ -185,6 +185,7 @@ import UIKit
                 }
             }
         }
+        vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
     }
 
@@ -317,7 +318,8 @@ extension GroupParticipantsController: UITableViewDelegate,UITableViewDataSource
             switch self.operation {
             case .normal:
                 let vc = ComponentsRegister.shared.ContactInfoController.init(profile: profile)
-                ControllerStack.toDestination(vc: vc)
+                vc.modalPresentationStyle = .fullScreen
+        ControllerStack.toDestination(vc: vc)
             case .mention,.transferOwner:
                 self.mentionClosure?(profile)
                 self.pop()

@@ -163,23 +163,27 @@ extension MessageListController {
                 } else {
                     if self.chatType == .chat {
                         let vc = ComponentsRegister.shared.ContactInfoController.init(profile: self.profile)
-                        ControllerStack.toDestination(vc: vc)
+                        vc.modalPresentationStyle = .fullScreen
+        ControllerStack.toDestination(vc: vc)
                     } else {
                         let vc = ComponentsRegister.shared.GroupInfoController.init(group: self.profile.id) { [weak self] id, name in
                             self?.navigation.title = name
                         }
-                        ControllerStack.toDestination(vc: vc)
+                        vc.modalPresentationStyle = .fullScreen
+        ControllerStack.toDestination(vc: vc)
                     }
                 }
             } else {
                 if self.chatType == .chat {
                     let vc = ComponentsRegister.shared.ContactInfoController.init(profile: self.profile)
-                    ControllerStack.toDestination(vc: vc)
+                    vc.modalPresentationStyle = .fullScreen
+        ControllerStack.toDestination(vc: vc)
                 } else {
                     let vc = ComponentsRegister.shared.GroupInfoController.init(group: self.profile.id) { [weak self] id, name in
                         self?.navigation.title = name
                     }
-                    ControllerStack.toDestination(vc: vc)
+                    vc.modalPresentationStyle = .fullScreen
+        ControllerStack.toDestination(vc: vc)
                 }
             }
         } else {
@@ -189,23 +193,27 @@ extension MessageListController {
                 } else {
                     if self.chatType == .chat {
                         let vc = ComponentsRegister.shared.ContactInfoController.init(profile: self.profile)
-                        ControllerStack.toDestination(vc: vc)
+                        vc.modalPresentationStyle = .fullScreen
+        ControllerStack.toDestination(vc: vc)
                     } else {
                         let vc = ComponentsRegister.shared.GroupInfoController.init(group: self.profile.id) { [weak self] id, name in
                             self?.navigation.title = name
                         }
-                        ControllerStack.toDestination(vc: vc)
+                        vc.modalPresentationStyle = .fullScreen
+        ControllerStack.toDestination(vc: vc)
                     }
                 }
             } else {
                 if self.chatType == .chat {
                     let vc = ComponentsRegister.shared.ContactInfoController.init(profile: self.profile)
-                    ControllerStack.toDestination(vc: vc)
+                    vc.modalPresentationStyle = .fullScreen
+        ControllerStack.toDestination(vc: vc)
                 } else {
                     let vc = ComponentsRegister.shared.GroupInfoController.init(group: self.profile.id) { [weak self] id, name in
                         self?.navigation.title = name
                     }
-                    ControllerStack.toDestination(vc: vc)
+                    vc.modalPresentationStyle = .fullScreen
+        ControllerStack.toDestination(vc: vc)
                 }
             }
         }
@@ -397,7 +405,8 @@ extension MessageListController: MessageListDriverEventsListener {
             profile.nickname = nickname ?? profile.id
             profile.avatarURL = avatarURL ?? ""
             let vc = ComponentsRegister.shared.ContactInfoController.init(profile: profile)
-            ControllerStack.toDestination(vc: vc)
+            vc.modalPresentationStyle = .fullScreen
+        ControllerStack.toDestination(vc: vc)
         }
     }
     
@@ -416,6 +425,7 @@ extension MessageListController: MessageListDriverEventsListener {
             return
         }
         let vc = ComponentsRegister.shared.ContactInfoController.init(profile: user)
+        vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
     }
     

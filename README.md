@@ -204,6 +204,7 @@ public final class YourAppUser: NSObject, EaseProfileProtocol {
         // 在Console中创建一个新用户，将这个用id复制后传入下面构造方法参数中，跳转页面即可。
         let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: <#刚创建用户的id#>, chatType: .chat)
         //或者push或者present都可
+        vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
 
 ```
@@ -342,6 +343,7 @@ extension YourViewController: EaseProfileProvider {
         let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: <#刚创建用户的id#>, chatType: .chat)
         //继承注册后的自定义类还可以调用ViewModel的registerEventsListener方法监听相关事件
         //或者push或者present都可
+        vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
 ```
 
@@ -364,6 +366,7 @@ EaseChatUIKitClient.shared.unregisterUserEventsListener(self)
         Appearance.chat.contentStyle = [.withReply,.withAvatar,.withNickName,.withDateAndTime]
         // 创建ChatroomView，传入布局参数、底部工具栏扩展按钮模型协议数组等参数。
         let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: <#刚创建用户的id#>, chatType: .chat)
+        vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
 ```
 

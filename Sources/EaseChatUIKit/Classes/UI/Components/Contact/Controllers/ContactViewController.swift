@@ -185,7 +185,8 @@ import UIKit
             self?.viewContact(profile: item)
         }
         if let vc = vc {
-            ControllerStack.toDestination(vc: vc)
+            vc.modalPresentationStyle = .fullScreen
+        ControllerStack.toDestination(vc: vc)
         }
     }
     
@@ -251,7 +252,8 @@ import UIKit
             vc.removeContact = { [weak self] in
                 self?.viewModel?.loadAllContacts()
             }
-            ControllerStack.toDestination(vc: vc)
+            vc.modalPresentationStyle = .fullScreen
+        ControllerStack.toDestination(vc: vc)
         case .shareContact:
             self.confirmClosure?([profile])
         case .addGroupParticipant,.newGroup:
@@ -272,12 +274,14 @@ import UIKit
      */
     @objc open func viewNewFriendRequest() {
         let vc = ComponentsRegister.shared.NewFriendRequestController.init()
+        vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
     }
     
     /// Opens the view for displaying joined groups.
     @objc open func viewJoinedGroups() {
         let vc = ComponentsRegister.shared.JoinedGroupsController.init()
+        vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
     }
     

@@ -329,6 +329,7 @@ import UIKit
         vc.mentionClosure = { [weak self] in
             self?.transferConfirm(profile: $0)
         }
+        vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
     }
     
@@ -439,6 +440,7 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
     /// Opens the view to display the participants of the chat group.
     @objc open func viewParticipants() {
         let vc = ComponentsRegister.shared.GroupParticipantController.init(groupId: self.chatGroup.groupId)
+        vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
     }
     
@@ -472,6 +474,7 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
         }
         
         // Push the edit view controller to the navigation stack
+        vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
     }
     

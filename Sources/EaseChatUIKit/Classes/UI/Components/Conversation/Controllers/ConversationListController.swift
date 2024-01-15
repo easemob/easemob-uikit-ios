@@ -129,6 +129,8 @@ import UIKit
      */
     @objc open func toChat(indexPath: IndexPath, info: ConversationInfo) {
         let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: info.id, chatType: info.type == .chat ? .chat:.group)
+        vc.modalPresentationStyle = .fullScreen
+        vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
     }
     
@@ -144,7 +146,8 @@ import UIKit
             self.toChat(indexPath: IndexPath(), info: $0)
         }
         if let vc = search {
-            ControllerStack.toDestination(vc: vc)
+            vc.modalPresentationStyle = .fullScreen
+        ControllerStack.toDestination(vc: vc)
         }
     }
     
