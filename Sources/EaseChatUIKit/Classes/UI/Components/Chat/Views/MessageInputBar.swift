@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// The types of actions that can be triggered by the input bar.
 @objc public enum MessageInputBarActionType: UInt {
     case send
     case audio
