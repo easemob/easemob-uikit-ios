@@ -67,15 +67,17 @@ import UIKit
                     self.play.isHidden = false
                 } else {
                     self.play.isHidden = true
-                    if let thumbnailRemotePath = body.thumbnailRemotePath,FileManager.default.fileExists(atPath: thumbnailRemotePath) {
-                        self.content.image = UIImage(contentsOfFile: thumbnailRemotePath)
+                    if let thumbnailLocalPath = body.thumbnailLocalPath,FileManager.default.fileExists(atPath: thumbnailLocalPath) {
+                        self.content.image = UIImage(contentsOfFile: thumbnailLocalPath)
                         self.play.isHidden = false
                     } else {
-                        self.content.image(with: thumbnailRemotePath, placeHolder: Appearance.chat.videoPlaceHolder) { [weak self] image in
-                            if image != nil {
-                                self?.play.isHidden = false
-                            } else {
-                                self?.play.isHidden = true
+                        if let thumbnailRemotePath = body.thumbnailRemotePath {
+                            self.content.image(with: thumbnailRemotePath, placeHolder: Appearance.chat.videoPlaceHolder) { [weak self] image in
+                                if image != nil {
+                                    self?.play.isHidden = false
+                                } else {
+                                    self?.play.isHidden = true
+                                }
                             }
                         }
                     }
