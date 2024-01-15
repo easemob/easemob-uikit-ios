@@ -24,13 +24,20 @@ public extension UIViewController {
                     return tab.selectedViewController
                 }
             }
+            if let presented = vc.presentedViewController {
+                var presentedVC: UIViewController? = presented
+                while presentedVC?.presentedViewController != nil {
+                    presentedVC = presentedVC?.presentedViewController
+                }
+                return presentedVC
+            }
             return vc
         }
         return nil
     }
     
     func presentViewController(_ viewController: PresentationViewController, animated: Bool = true) {
-        dismiss(animated: false)
+        //        dismiss(animated: false)
         viewController.modalPresentationStyle = .custom
         viewController.transitioningDelegate = self
         present(viewController, animated: animated, completion: nil)

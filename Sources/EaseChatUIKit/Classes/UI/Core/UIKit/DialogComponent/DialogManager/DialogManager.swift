@@ -7,6 +7,7 @@
 
 import UIKit
 
+
 @objc final public class DialogManager: NSObject {
     
     public static let shared = DialogManager()
@@ -23,7 +24,7 @@ import UIKit
             }
         vc = PageContainersDialogController(pageTitles: ["barrage_long_press_menu_report".chat.localize], childControllers: [report], constraintsSize: Appearance.pageContainerConstraintsSize)
         
-        UIViewController.currentController?.presentingViewController?.presentViewController(vc)
+        UIViewController.currentController?.presentViewController(vc)
     }
     
     /// Shows message operations.
@@ -37,10 +38,8 @@ import UIKit
         }.cornerRadius(.medium, [.topLeft,.topRight], .clear, 0)
         actionSheet.frame = CGRect(x: 0, y: 0, width: actionSheet.frame.width, height: actionSheet.frame.height)
         let vc = DialogContainerViewController(custom: actionSheet,constraintsSize: actionSheet.frame.size)
-        let current = UIViewController.currentController?.presentingViewController
-        if current == nil {
-            UIViewController.currentController?.presentViewController(vc)
-        } else {
+        let current = UIViewController.currentController
+        if current != nil {
             current?.presentViewController(vc)
         }
     }
@@ -56,20 +55,16 @@ import UIKit
         }.cornerRadius(.medium, [.topLeft,.topRight], .clear, 0)
         let vc = DialogContainerViewController(custom: actionSheet,constraintsSize: actionSheet.frame.size)
         actionSheet.frame = CGRect(x: 0, y: 0, width: actionSheet.frame.width, height: actionSheet.frame.height)
-        let current = UIViewController.currentController?.presentingViewController
-        if current == nil {
-            UIViewController.currentController?.presentViewController(vc)
-        } else {
+        let current = UIViewController.currentController
+        if current != nil {
             current?.presentViewController(vc)
         }
     }
     
     @objc public func showCustomDialog(customView: UIView,dismiss: Bool = true) {
         let vc = DialogContainerViewController(custom: customView,constraintsSize: customView.frame.size,canPanDismiss: dismiss)
-        let current = UIViewController.currentController?.presentingViewController
-        if current == nil {
-            UIViewController.currentController?.presentViewController(vc)
-        } else {
+        let current = UIViewController.currentController
+        if current != nil {
             current?.presentViewController(vc)
         }
     }
@@ -98,10 +93,8 @@ import UIKit
             }.rightButton(title: "Confirm".chat.localize).rightButtonRadius(cornerRadius: Appearance.alertStyle == .small ? .extraSmall:.large)
         }
         let alertVC = AlertViewController(custom: alert,size: size, customPosition: showTextFiled)
-        let vc = UIViewController.currentController?.presentingViewController
-        if vc == nil {
-            UIViewController.currentController?.presentViewController(alertVC)
-        } else {
+        let vc = UIViewController.currentController
+        if vc != nil {
             vc?.presentViewController(alertVC)
         }
     }
