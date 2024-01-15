@@ -317,6 +317,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
     @objc open func conversationDidSelected(indexPath: IndexPath, info: ConversationInfo) {
         self.chatId = info.id
         self.service?.markAllMessagesAsRead(conversationId: info.id)
+        ChatClient.shared().chatManager?.ackConversationRead(info.id)
         self.driver?.swipeMenuOperation(info: info, type: .read)
         self.toChat?(indexPath,info)
     }
