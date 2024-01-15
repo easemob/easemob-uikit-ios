@@ -35,11 +35,11 @@ import UIKit
 }
 
 extension ConversationServiceImplement: ConversationService {
-    public func loadIfNotExistCreate(conversationId: String) -> ChatConversation? {
+    public func loadIfNotExistCreate(conversationId: String,type: ChatConversationType) -> ChatConversation? {
         if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(conversationId) {
             return conversation
         }
-        return ChatClient.shared().chatManager?.getConversation(conversationId, type: conversation.type, createIfNotExist: true)
+        return ChatClient.shared().chatManager?.getConversation(conversationId, type: type, createIfNotExist: true)
     }
     
     

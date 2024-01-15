@@ -116,9 +116,9 @@ import AudioToolbox
     ///   - profile: ``EaseProfileProtocol``
     ///   - text: Welcome message.
     /// - Returns: ``ConversationInfo`` object.
-    @objc(loadIfNotExistCreateWithProfile:text:)
-    open func loadIfNotExistCreate(profile: EaseProfileProtocol,text: String) -> ConversationInfo? {
-        if let conversation = self.service?.loadIfNotExistCreate(conversationId: profile.id) {
+    @objc(loadIfNotExistCreateWithProfile:type:text:)
+    open func loadIfNotExistCreate(profile: EaseProfileProtocol,type: ChatConversationType,text: String) -> ConversationInfo? {
+        if let conversation = self.service?.loadIfNotExistCreate(conversationId: profile.id,type: type) {
             if let info = self.mapper(objects: [conversation]).first,!info.id.isEmpty {
                 if conversation.type == .groupChat {
                     let content = "Group".chat.localize + " [\(text)] " + "has been created.".chat.localize

@@ -84,7 +84,7 @@ import Foundation
     /// - Parameters:
     ///   - conversationId: The ID of the conversation.
     ///   - type: The ``ChatConversationType`` of the conversation.
-    func loadIfNotExistCreate(conversationId: String) -> ChatConversation?
+    func loadIfNotExistCreate(conversationId: String,type: ChatConversationType) -> ChatConversation?
 }
 
 @objc public protocol ConversationServiceListener: NSObjectProtocol {
