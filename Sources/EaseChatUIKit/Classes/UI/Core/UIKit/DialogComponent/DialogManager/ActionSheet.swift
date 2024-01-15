@@ -126,6 +126,7 @@ extension ActionSheet: ThemeSwitchProtocol {
         self.cancel.setTitleColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, for: .normal)
         self.indicator.backgroundColor(style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor8)
         self.menuList.tableFooterView?.backgroundColor(style == .dark ? UIColor.theme.neutralColor0:UIColor.theme.neutralColor95)
+        self.menuList.backgroundColor(style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98)
         self.menuList.separatorColor(style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9)
         self.menuList.reloadData()
     }
