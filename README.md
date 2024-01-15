@@ -168,7 +168,7 @@ class AppDelegate：UIResponder，UIApplicationDelegate {
          // 需要传入App Key。
          // 获取App Key，请访问
          // https://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E8%8E%B7%E5%8F%96%E7%8E%AF%E4%BF%A1%E5%8D%B3%E6%97%B6%E9%80%9A%E8%AE%AF-im-%E7%9A%84%E4%BF%A1%E6%81%AF
-         let error = EaseChatUIKitClient.shared.setup（appKey: "Appkey"）
+         let error = EaseChatUIKitClient.shared.setup(appKey: "Appkey")
      }
 }
 ```
@@ -215,10 +215,8 @@ public final class YourAppUser: NSObject, EaseProfileProtocol {
 ## 1.初始化单群聊UIKit
 相比于上面快速开始的单群聊UIKit初始化这里多了ChatOptions的参数，主要是对SDK中是否打印log以及是否自动登录，是否默认使用用户属性的开关配置。
 ```Swift
-let error = EaseChatUIKitClient.shared.setup(
-    with: "Your appkey",
-    option: EaseChatUIKitInitialOptions.ChatOptions()
-)
+let error = EaseChatUIKitClient.shared.setup(appkey: "Your appkey",
+    option: EaseChatUIKitInitialOptions.ChatOptions())
 ```
 
 ## 2.登录
