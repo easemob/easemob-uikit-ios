@@ -57,6 +57,7 @@ import UIKit
     @objc public required init(conversationId: String,type: ChatType) {
         self.to = conversationId
         self.chatService = ChatServiceImplement(to: conversationId)
+        self.chatType = type
         super.init()
         self.chatService?.bindChatEventsListener(listener: self)
     }
