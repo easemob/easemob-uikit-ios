@@ -255,6 +255,7 @@ extension ConversationServiceImplement: ConversationService {
         objects.map {
             let conversation = ComponentsRegister.shared.Conversation.init()
             conversation.id = $0.conversationId
+            conversation.nickname = EaseChatUIKitContext.shared?.conversationsCache?[$0.conversationId]?.nickname ?? ""
             conversation.unreadCount = UInt($0.unreadMessagesCount)
             conversation.lastMessage = $0.latestMessage
             conversation.type = EaseProfileProviderType(rawValue: UInt($0.type.rawValue)) ?? .chat
