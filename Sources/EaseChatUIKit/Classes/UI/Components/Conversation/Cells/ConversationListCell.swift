@@ -32,7 +32,7 @@ import UIKit
     }()
     
     @objc open func createContent() -> UILabel {
-        UILabel(frame: CGRect(x: self.avatar.frame.maxX+12, y: self.nickName.frame.maxY+2, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 16)).backgroundColor(.clear)
+        UILabel(frame: CGRect(x: self.avatar.frame.maxX+12, y: self.nickName.frame.maxY+2, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 20)).backgroundColor(.clear)
     }
     
     public private(set) lazy var badge: UILabel = {

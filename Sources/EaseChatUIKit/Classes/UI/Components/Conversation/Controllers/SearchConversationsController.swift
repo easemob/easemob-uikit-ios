@@ -82,6 +82,7 @@ import UIKit
         self.view.backgroundColor = UIColor.theme.neutralColor98
         self.view.addSubViews([self.searchHeader,self.searchList])
         Theme.registerSwitchThemeViews(view: self)
+        self.switchTheme(style: Theme.style)
         self.searchHeader.textChanged = { [weak self] in
             guard let `self` = self else { return }
             self.searchText = $0.lowercased()

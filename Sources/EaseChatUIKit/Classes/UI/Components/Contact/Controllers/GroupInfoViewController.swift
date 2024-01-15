@@ -18,6 +18,8 @@ import UIKit
     
     private let service: GroupService = GroupServiceImplement()
     
+    private let conversationService = ConversationServiceImplement()
+    
     /**
      A private array of `ActionSheetItem` objects representing the owner options in the group info view controller.
      Each `ActionSheetItem` contains a title, type, and tag.
@@ -519,12 +521,37 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
     */
     @objc open func switchChanged(isOn: Bool, indexPath: IndexPath) {
         if let name = self.datas[safe: indexPath.section]?[safe: indexPath.row]?.title {
-            self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.chatGroup.groupId] = isOn ? 1:0
-            if name == "contact_details_switch_donotdisturb".chat.localize {
-                NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseUIKit_do_not_disturb_changed"), object: nil, userInfo: ["id": self.chatGroup.groupId ?? "", "value": isOn])
+            if isOn {
+                self.conversationService.setSilentMode(conversationId: self.chatGroup.groupId) { [weak self] result, error in
+                    guard let `self` = self else { return }
+                    if error == nil {
+                        self.processSilentMode(name: name, isOn: isOn)
+                    } else {
+                        consoleLogInfo("ContactInfoViewController set silent mode error:\(error?.errorDescription ?? "")", type: .error)
+                    
+                    }
+                }
+            } else {
+                self.conversationService.clearSilentMode(conversationId: self.chatGroup.groupId) { [weak self] result, error in
+                    guard let `self` = self else { return }
+                    if error == nil {
+                        self.processSilentMode(name: name, isOn: isOn)
+                    } else {
+                        consoleLogInfo("ContactInfoViewController clear silent mode error:\(error?.errorDescription ?? "")", type: .error)
+                    }
+                }
             }
         }
     }
+    
+    @objc open func processSilentMode(name: String,isOn: Bool) {
+        self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.chatGroup.groupId] = isOn ? 1:0
+        if name == "contact_details_switch_donotdisturb".chat.localize,let groupId = self.chatGroup.groupId {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseUIKit_do_not_disturb_changed"), object: nil,userInfo: ["id":groupId,"value":isOn])
+        }
+    }
+    
+    
 }
 
 extension GroupInfoViewController: ThemeSwitchProtocol {

@@ -24,6 +24,8 @@ import UIKit
     
     public let service = ContactServiceImplement()
     
+    public let conversationService = ConversationServiceImplement()
+    
     public private(set) var profile: EaseProfileProtocol = EaseProfile()
     
     @objc public var removeContact: (() -> Void)?
@@ -399,10 +401,35 @@ extension ContactInfoViewController: UITableViewDelegate,UITableViewDataSource {
     */
     @objc open func switchChanged(isOn: Bool, indexPath: IndexPath) {
         if let name = self.datas[safe: indexPath.row]?.title {
-            self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] = isOn ? 1:0
-            if name == "contact_details_switch_donotdisturb".chat.localize {
-                NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseUIKit_do_not_disturb_changed"), object: nil,userInfo: ["id":self.profile.id,"value":isOn])
+            if isOn {
+                self.conversationService.setSilentMode(conversationId: self.profile.id) { [weak self] result, error in
+                    guard let `self` = self else { return }
+                    if error == nil {
+                        self.processSilentMode(name: name, isOn: isOn)
+                    } else {
+                        consoleLogInfo("ContactInfoViewController set silent mode error:\(error?.errorDescription ?? "")", type: .error)
+                    
+                    }
+                }
+            } else {
+                self.conversationService.clearSilentMode(conversationId: self.profile.id) { [weak self] result, error in
+                    guard let `self` = self else { return }
+                    if error == nil {
+                        self.processSilentMode(name: name, isOn: isOn)
+                    } else {
+                        consoleLogInfo("ContactInfoViewController clear silent mode error:\(error?.errorDescription ?? "")", type: .error)
+                    }
+                }
             }
+            
+            
+        }
+    }
+    
+    @objc open func processSilentMode(name: String,isOn: Bool) {
+        self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] = isOn ? 1:0
+        if name == "contact_details_switch_donotdisturb".chat.localize {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseUIKit_do_not_disturb_changed"), object: nil,userInfo: ["id":self.profile.id,"value":isOn])
         }
     }
 }

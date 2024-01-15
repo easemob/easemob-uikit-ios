@@ -146,6 +146,9 @@ import UIKit
     }
     
     private func startRecord() {
+        if !MediaConvertor.checkRecordPermission() {
+            return
+        }
         self.recordCount = 0
         self.buildTimer()
         self.recordTitle.text = "Recording".chat.localize
