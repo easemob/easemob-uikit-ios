@@ -29,7 +29,7 @@ public extension UIViewController {
                 while presented.presentedViewController != nil {
                     vc = presented.presentedViewController
                 }
-                return vc
+                return vc ?? presented
             }
             return vc
         }
