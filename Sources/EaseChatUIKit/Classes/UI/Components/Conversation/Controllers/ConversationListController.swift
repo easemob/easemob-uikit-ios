@@ -214,7 +214,8 @@ import UIKit
     @objc open func createChat(profile: EaseProfileProtocol, info: String) {
         if let info = self.viewModel?.loadIfNotExistCreate(profile: profile, text: info) {
             let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: info.id , chatType: info.type == .chat ? .chat:.group)
-            self.navigationController?.pushViewController(vc, animated: true)
+            vc.modalPresentationStyle = .fullScreen
+            ControllerStack.toDestination(vc: vc)
         }
     }
     
