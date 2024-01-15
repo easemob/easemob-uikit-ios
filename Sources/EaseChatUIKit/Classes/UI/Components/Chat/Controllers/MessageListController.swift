@@ -599,10 +599,21 @@ extension MessageListController:UIImagePickerControllerDelegate, UINavigationCon
                 let fileName = imageURL.lastPathComponent
                 let fileURL = URL(fileURLWithPath: MediaConvertor.filePath()+"/\(fileName)")
                 do {
-                    let image = UIImage(contentsOfFile: imageURL.path)?.fixOrientation()
+                    let image = UIImage(contentsOfFile: imageURL.path)
                     try image?.jpegData(compressionQuality: 1)?.write(to: fileURL)
                 } catch {
-                    consoleLogInfo("write fixOrientation image error:\(error.localizedDescription)", type: .error)
+                    consoleLogInfo("write image error:\(error.localizedDescription)", type: .error)
+                }
+                self.viewModel.sendMessage(text: fileURL.path, type: .image)
+            } else {
+                guard let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else { return }
+                let correctImage = image.fixOrientation()
+                let fileName = "\(Date().timeIntervalSince1970).jpeg"
+                let fileURL = URL(fileURLWithPath: MediaConvertor.filePath()+"/\(fileName)")
+                do {
+                    try image.jpegData(compressionQuality: 1)?.write(to: fileURL)
+                } catch {
+                    consoleLogInfo("write camera fixOrientation image error:\(error.localizedDescription)", type: .error)
                 }
                 self.viewModel.sendMessage(text: fileURL.path, type: .image)
             }
