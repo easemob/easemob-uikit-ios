@@ -132,7 +132,7 @@ python3 -m http.server 8080
 
 ## 2.ComponentRegister 
 
-[ComponentRegister](./Documentation/ComponentRegister.md). 
+[ComponentRegister](./Documentation/ComponentsRegister.md). 
 
 即可继承进行自定义定制的 UI 组件。
 
