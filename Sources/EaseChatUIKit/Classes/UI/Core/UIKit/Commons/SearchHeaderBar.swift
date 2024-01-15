@@ -83,6 +83,8 @@ extension SearchHeaderBar: UITextFieldDelegate {
         if !string.isEmpty,var text = textField.text {
             let changed = (text as NSString).replacingCharacters(in: range, with: string)
             self.textChanged?(changed)
+        } else {
+            self.textChanged?("")
         }
         return true
     }
