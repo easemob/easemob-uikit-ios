@@ -152,6 +152,15 @@ python3 -m http.server 8080
 * Organization Identifier 设为 您的identifier。
 * User Interface 选择 Storyboard。
 * Language 选择 你的常用开发语言。
+* 添加权限 在项目 `info.plist` 中添加相关权限：
+
+Add related privileges in the `info.plist` project:
+
+```
+Privacy - Photo Library Usage Description //相册权限    Album privileges.
+Privacy - Microphone Usage Description //麦克风权限     Microphone privileges.
+Privacy - Camera Usage Description //相机权限    Camera privileges.
+```
 
 ### 第一步：初始化EaseChatUIKit
 
