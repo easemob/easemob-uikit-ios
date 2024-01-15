@@ -62,7 +62,7 @@ import UIKit
                     }
                 }
             } else {
-                if let path = body.thumbnailLocalPath,!path.isEmpty {
+                if let path = body.thumbnailLocalPath,!path.isEmpty,FileManager.default.fileExists(atPath: path) {
                     self.content.image = UIImage(contentsOfFile: path)
                     self.play.isHidden = false
                 } else {
