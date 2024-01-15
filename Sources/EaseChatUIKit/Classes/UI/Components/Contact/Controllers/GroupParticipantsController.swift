@@ -222,7 +222,9 @@ import UIKit
                     self.cursor = result?.cursor ?? ""
                     self.participantsList.reloadData()
                     self.recursiveCount -= 1
-                    self.fetchParticipants()
+                    if self.participants.count < Appearance.chat.groupParticipantsLimitCount {
+                        self.fetchParticipants()
+                    }
                 } else {
                     consoleLogInfo("GroupParticipantsController fetch error:\(error?.errorDescription ?? "")", type: .error)
                 }

@@ -268,7 +268,7 @@ import UIKit
         }
         let option = ChatGroupOption()
         option.isInviteNeedConfirm = false
-        option.maxUsers = 1000
+        option.maxUsers = Appearance.chat.groupParticipantsLimitCount
         option.style = .privateMemberCanInvite
         ChatClient.shared().groupManager?.createGroup(withSubject: name, description: "", invitees: ids, message: nil, setting: option, completion: { [weak self] group, error in
             if error == nil,let group = group {
