@@ -252,10 +252,12 @@ import UIKit
         } else {
             if let presentingVC = self.presentingViewController {
                 if presentingVC is MessageListController {
-                    presentingVC.dismiss(animated: false) {
-                        let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.profile.id)
-                        vc.modalPresentationStyle = .fullScreen
-                        UIViewController.currentController?.present(vc, animated: true)
+                    self.dismiss(animated: false) {
+                        presentingVC.dismiss(animated: false) {
+                            let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.profile.id)
+                            vc.modalPresentationStyle = .fullScreen
+                            UIViewController.currentController?.present(vc, animated: true)
+                        }
                     }
                 } else {
                     let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.profile.id)
