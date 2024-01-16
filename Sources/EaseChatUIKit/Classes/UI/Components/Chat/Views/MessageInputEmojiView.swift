@@ -33,17 +33,16 @@ import UIKit
     }()
 
     public lazy var deleteEmoji: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.frame.width - 92, y: self.frame.height - 56, width: 36, height: 36)).addTargetFor(self, action: #selector(deleteAction), for: .touchUpInside).isEnabled(false).isUserInteractionEnabled(false).cornerRadius(.large).backgroundColor(.clear)
+        UIButton(type: .custom).frame(CGRect(x: self.frame.width - 92, y: self.frame.height - 56, width: 36, height: 36)).addTargetFor(self, action: #selector(deleteAction), for: .touchUpInside).isEnabled(true).cornerRadius(.large).backgroundColor(.clear)
     }()
     
     public lazy var sendEmoji: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.frame.width - 48, y: self.frame.height - 56, width: 36, height: 36)).addTargetFor(self, action: #selector(sendAction), for: .touchUpInside).isEnabled(false).isUserInteractionEnabled(false).cornerRadius(.large).backgroundColor(.clear)
+        UIButton(type: .custom).frame(CGRect(x: self.frame.width - 48, y: self.frame.height - 56, width: 36, height: 36)).addTargetFor(self, action: #selector(sendAction), for: .touchUpInside).isEnabled(true).cornerRadius(.large).backgroundColor(.clear)
     }()
 
     @objc required override public init(frame: CGRect) {
         super.init(frame: frame)
         self.addSubViews([self.emojiList, self.deleteEmoji, self.sendEmoji,self.separaLine])
-        self.deleteEmoji.setImage(UIImage(named: "delete_emoji_light", in: .chatBundle, with: nil), for: .normal)
         
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
@@ -84,9 +83,9 @@ extension MessageInputEmojiView: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         self.deleteEmoji.setImage(UIImage(named: style == .dark ? "delete_emoji_dark":"delete_emoji_light", in: .chatBundle, with: nil), for: .normal)
         if style == .dark {
-            self.sendEmoji.setImage(UIImage(named: "airplane", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor5), for: .normal)
+            self.sendEmoji.setImage(UIImage(named: "airplane", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor6), for: .normal)
         } else {
-            self.sendEmoji.setImage(UIImage(named: "airplane", in: .chatBundle, with: nil), for: .normal)
+            self.sendEmoji.setImage(UIImage(named: "airplane", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor5), for: .normal)
         }
     }
 }
