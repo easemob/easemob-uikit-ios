@@ -254,10 +254,12 @@ import UIKit
         } else {
             if let presentingVC = self.presentingViewController {
                 if presentingVC is MessageListController {
-                    presentingVC.dismiss(animated: false) {
-                        let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group)
-                        vc.modalPresentationStyle = .fullScreen
-                        UIViewController.currentController?.present(vc, animated: true)
+                    self.dismiss(animated: false) {
+                        presentingVC.dismiss(animated: false) {
+                            let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group)
+                            vc.modalPresentationStyle = .fullScreen
+                            UIViewController.currentController?.present(vc, animated: true)
+                        }
                     }
                 } else {
                     let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.chatGroup.groupId,chatType: .group)
@@ -312,7 +314,6 @@ import UIKit
     
     /**
      Disbands the group.
-     
      This method shows an alert to confirm the disbanding of the group. If the user confirms, it calls the `disband` method of the `service` object to disband the group. After successful disbanding, it posts a notification with the group ID and pops the current view controller from the navigation stack. If there is an error during the disbanding process, it logs the error message.
      */
     @objc open func disband() {
