@@ -349,6 +349,7 @@ extension MessageInputBar: UITextViewDelegate {
             self.frame = CGRect(x: 0, y: self.rawFrame.minY, width: self.frame.width, height: self.rawFrame.height)
         }
         self.rightView.isSelected = false
+        self.emoji?.isHidden = true
     }
     
     /// Raise input bar

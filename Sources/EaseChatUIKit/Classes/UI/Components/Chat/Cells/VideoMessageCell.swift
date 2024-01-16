@@ -62,11 +62,25 @@ import UIKit
                     }
                 }
             } else {
-                if let path = body.thumbnailLocalPath,!path.isEmpty {
+                if let path = body.thumbnailLocalPath,!path.isEmpty,FileManager.default.fileExists(atPath: path) {
                     self.content.image = UIImage(contentsOfFile: path)
                     self.play.isHidden = false
                 } else {
                     self.play.isHidden = true
+                    if let thumbnailLocalPath = body.thumbnailLocalPath,FileManager.default.fileExists(atPath: thumbnailLocalPath) {
+                        self.content.image = UIImage(contentsOfFile: thumbnailLocalPath)
+                        self.play.isHidden = false
+                    } else {
+                        if let thumbnailRemotePath = body.thumbnailRemotePath {
+                            self.content.image(with: thumbnailRemotePath, placeHolder: Appearance.chat.videoPlaceHolder) { [weak self] image in
+                                if image != nil {
+                                    self?.play.isHidden = false
+                                } else {
+                                    self?.play.isHidden = true
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

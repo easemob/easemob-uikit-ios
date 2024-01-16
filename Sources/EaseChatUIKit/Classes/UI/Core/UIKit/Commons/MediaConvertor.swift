@@ -175,12 +175,31 @@ final class MediaConvertor: NSObject {
     static func checkRecordPermission() -> Bool {
         var permission = false
         let session = AVAudioSession.sharedInstance()
-        if #available(iOS 14.0, *) {
-            permission = session.recordPermission == .granted
+        if #available(iOS 17.0, *) {
+            permission = AVAudioApplication.shared.recordPermission == .granted
         } else {
             permission = session.recordPermission == .granted
         }
         return permission
+    }
+    
+    //请求录音权限
+    static func requestRecordPermission(completion: @escaping (Bool) -> Void) {
+        let session = AVAudioSession.sharedInstance()
+        if #available(iOS 17.0, *) {
+            AVAudioApplication.requestRecordPermission { (granted) in
+                DispatchQueue.main.async {
+                    completion(granted)
+                }
+            }
+
+        } else {
+            session.requestRecordPermission { (granted) in
+                DispatchQueue.main.async {
+                    completion(granted)
+                }
+            }
+        }
     }
     
 }

@@ -240,16 +240,22 @@ import UIKit
             if let previousViewController = self.navigationController?.viewControllers[safe: count - 2] as? MessageListController {
                 if let root = self.navigationController?.viewControllers[safe: count - 3] {
                     self.navigationController?.popToViewController(root, animated: true)
-                    ControllerStack.toDestination(vc: ComponentsRegister.shared.MessageViewController.init(conversationId: self.profile.id))
+                    let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.profile.id)
+                    vc.modalPresentationStyle = .fullScreen
+                    ControllerStack.toDestination(vc: vc)
                 }
             } else {
-                ControllerStack.toDestination(vc: ComponentsRegister.shared.MessageViewController.init(conversationId: self.profile.id))
+                let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.profile.id)
+                vc.modalPresentationStyle = .fullScreen
+                ControllerStack.toDestination(vc: vc)
             }
         } else {
             if let presentingVC = self.presentingViewController {
                 if presentingVC is MessageListController {
                     presentingVC.dismiss(animated: false) {
-                        UIViewController.currentController?.present(ComponentsRegister.shared.MessageViewController.init(conversationId: self.profile.id), animated: true)
+                        let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.profile.id)
+                        vc.modalPresentationStyle = .fullScreen
+                        UIViewController.currentController?.present(vc, animated: true)
                     }
                 } else {
                     let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.profile.id)
@@ -258,6 +264,7 @@ import UIKit
                 }
             } else {
                 let desiredViewController = ComponentsRegister.shared.MessageViewController.init(conversationId: self.profile.id)
+                desiredViewController.modalPresentationStyle = .fullScreen
                 ControllerStack.toDestination(vc: desiredViewController)
             }
             

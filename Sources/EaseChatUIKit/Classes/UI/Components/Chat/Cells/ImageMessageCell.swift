@@ -41,8 +41,14 @@ import UIKit
                     self.content.image(with: body.thumbnailRemotePath, placeHolder: Appearance.chat.imagePlaceHolder)
                 }
             } else {
-                if let path = body.localPath,!path.isEmpty {
+                if let path = body.localPath,!path.isEmpty,FileManager.default.fileExists(atPath: path) {
                     self.content.image = UIImage(contentsOfFile: path)
+                } else {
+                    if let url = body.thumbnailLocalPath,!url.isEmpty,FileManager.default.fileExists(atPath: url) {
+                        self.content.image = UIImage(contentsOfFile: url)
+                    } else {
+                        self.content.image(with: body.thumbnailRemotePath, placeHolder: Appearance.chat.imagePlaceHolder)
+                    }
                 }
             }
         }

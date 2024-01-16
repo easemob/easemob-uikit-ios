@@ -147,8 +147,17 @@ import UIKit
     
     private func startRecord() {
         if !MediaConvertor.checkRecordPermission() {
+            MediaConvertor.requestRecordPermission { [weak self] success in
+                if success {
+                    self?.accessPassRecord()
+                }
+            }
             return
         }
+        self.accessPassRecord()
+    }
+    
+    private func accessPassRecord() {
         self.recordCount = 0
         self.buildTimer()
         self.recordTitle.text = "Recording".chat.localize
