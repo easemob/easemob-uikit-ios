@@ -275,9 +275,9 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
     }
     
     open func updateReplySize() -> CGSize {
-        if let attributeContent = self.convertToReply(),let attributeTitle = self.replyTitle,attributeContent.length > 0 {
+        if let attributeContent = self.convertToReply(),attributeContent.length > 0 {
             let label = UILabel().numberOfLines(2).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
-            label.attributedText = attributeTitle.length > attributeContent.length ? attributeTitle:attributeContent
+            label.attributedText = attributeContent
             if self.message.quoteMessage!.body.type == .image || self.message.quoteMessage!.body.type == .video {
                 let size = label.sizeThatFits(CGSize(width: limitBubbleWidth, height: 36))
                 return CGSize(width: size.width+78, height: 36+16)
