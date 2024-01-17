@@ -275,15 +275,17 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
     }
     
     open func updateReplySize() -> CGSize {
-        if let attributeContent = self.convertToReply(),attributeContent.length > 0 {
-            let label = UILabel().numberOfLines(2).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
-            label.attributedText = attributeContent
+        if let attributeContent = self.convertToReply(),let attributeTitle = self.replyTitle,attributeContent.length > 0 {
+            let labelTitle = UILabel().numberOfLines(1).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
+            let labelContent = UILabel().numberOfLines(2).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
+            labelTitle.attributedText = attributeTitle
+            labelContent.attributedText = attributeContent
+            let titleSize = labelTitle.sizeThatFits(CGSize(width: limitBubbleWidth, height: 16))
+            let contentSize = labelContent.sizeThatFits(CGSize(width: limitBubbleWidth, height: 36))
             if self.message.quoteMessage!.body.type == .image || self.message.quoteMessage!.body.type == .video {
-                let size = label.sizeThatFits(CGSize(width: limitBubbleWidth, height: 36))
-                return CGSize(width: size.width+78, height: 36+16)
+                return CGSize(width: (titleSize.width > contentSize.width ? titleSize.width:contentSize.width)+78, height: 36+16)
             } else {
-                let size = label.sizeThatFits(CGSize(width: limitBubbleWidth, height: 36))
-                return CGSize(width: size.width+24, height: size.height+34)
+                return CGSize(width: (titleSize.width > contentSize.width ? titleSize.width:contentSize.width)+24, height: contentSize.height+34)
             }
         }
         return .zero
