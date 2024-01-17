@@ -372,6 +372,9 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
             if ComponentViewsActionHooker.shared.chat.replyClicked != nil {
                 ComponentViewsActionHooker.shared.chat.replyClicked?(entity)
             } else {
+                if entity.state == .failure || entity.state == .sending {
+                    return
+                }
                 if let highlightIndex = self.messages.firstIndex(where: { $0.message.messageId == entity.message.quoteMessage?.messageId ?? "" }) {
                     self.messageList.scrollToRow(at: IndexPath(row: highlightIndex, section: 0), at: .middle, animated: true)
                     if let cell = self.messageList.cellForRow(at: IndexPath(row: highlightIndex, section: 0)) {
