@@ -67,17 +67,21 @@ import UIKit
     }
     
     private func constructReplyContent(message: ChatMessage,replyTo: String) -> NSAttributedString {
-        let showName = message.user?.nickname ?? message.from
         let reply = NSMutableAttributedString()
         if let icon = message.replyIcon?.withTintColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5) {
             reply.append(NSAttributedString {
                 ImageAttachment(icon, bounds: CGRect(x: 0, y: -3.5, width: 16, height: 16))
             })
         }
-        reply.append(NSAttributedString {
-            AttributedText("  "+message.showType).font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5)
-            AttributedText(message.showContent).font(Font.theme.bodySmall).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5)
-        })
+        if message.body.type == .text {
+            reply.append(NSAttributedString {
+                AttributedText(message.showContent).font(Font.theme.bodySmall).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5)
+            })
+        } else {
+            reply.append(NSAttributedString {
+                AttributedText("  "+message.showType).font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5)
+            })
+        }
         return reply
     }
     

@@ -44,6 +44,7 @@ import Foundation
         let option = EaseChatUIKitOptions.ChatOptions(appkey: appKey)
         option.enableConsoleLog = true
         option.isAutoLogin = false
+        option.deleteMessagesOnLeaveGroup = false
         return ChatClient.shared().initializeSDK(with: option)
     }
     

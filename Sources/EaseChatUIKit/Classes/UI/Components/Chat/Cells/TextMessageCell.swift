@@ -9,6 +9,14 @@ import UIKit
 
 @objc open class TextMessageCell: MessageCell {
     
+    public var receiveStateColor: UIColor {
+        Theme.style  == .dark ? UIColor.theme.neutralSpecialColor7:UIColor.theme.neutralSpecialColor5
+    }
+    
+    public var sendStateColor: UIColor {
+        Theme.style  == .dark ? UIColor.theme.primaryColor3:UIColor.theme.primaryColor9
+    }
+    
     public private(set) lazy var content: UILabel = {
         self.createContent()
     }()
@@ -46,7 +54,7 @@ import UIKit
         if entity.message.edited {
             self.edit.isHidden = false
             self.edit.frame = CGRect(x: 12, y: self.content.frame.maxY, width: entity.bubbleSize.width-24, height: 14)
-            self.edit.textColor = entity.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor
+            self.edit.textColor = entity.message.direction == .send ? self.sendStateColor:self.receiveStateColor
             self.edit.text = "Edited".chat.localize
         } else {
             self.edit.isHidden = true
