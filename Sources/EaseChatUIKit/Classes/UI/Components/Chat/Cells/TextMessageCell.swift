@@ -25,23 +25,43 @@ import UIKit
         UILabel(frame: .zero).backgroundColor(.clear).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping).numberOfLines(0)
     }
     
-    public private(set) lazy var edit: UILabel = {
+    public private(set) lazy var edit: UIButton = {
         self.createEditSymbol()
     }()
     
-    @objc open func createEditSymbol() -> UILabel {
-        UILabel(frame: .zero).backgroundColor(.clear).numberOfLines(1).textAlignment(.right).font(UIFont.theme.bodyExtraSmall)
+    @objc open func createEditSymbol() -> UIButton {
+        UIButton(type: .custom).frame(.zero).backgroundColor(.clear).font(UIFont.theme.labelSmall)
+    }
+    
+    public private(set) lazy var separatorLine: UIView = {
+        UIView(frame: .zero)
+    }()
+    
+    public private(set) lazy var translation: UILabel = {
+        self.createTranslation()
+    }()
+    
+    @objc open func createTranslation() -> UILabel {
+        UILabel(frame: .zero).backgroundColor(.clear).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping).numberOfLines(0)
+    }
+    
+    public private(set) lazy var translateSymbol: UIButton = {
+        self.createTranslateSymbol()
+    }()
+    
+    @objc open func createTranslateSymbol() -> UIButton {
+        UIButton(type: .custom).frame(.zero).backgroundColor(.clear).font(UIFont.theme.labelSmall)
     }
     
     @objc required public init(towards: BubbleTowards,reuseIdentifier: String) {
         super.init(towards: towards, reuseIdentifier: reuseIdentifier)
         if Appearance.chat.bubbleStyle == .withArrow {
-            self.bubbleWithArrow.addSubview(self.content)
-            self.bubbleWithArrow.addSubview(self.edit)
+            self.bubbleWithArrow.addSubViews([self.content,self.edit,self.separatorLine,self.translation,self.translateSymbol])
         } else {
-            self.bubbleMultiCorners.addSubview(self.content)
-            self.bubbleWithArrow.addSubview(self.edit)
+            self.bubbleMultiCorners.addSubViews([self.content,self.edit,self.separatorLine,self.translation,self.translateSymbol])
         }
+        self.edit.contentHorizontalAlignment = .right
+        self.translateSymbol.contentHorizontalAlignment = .right
     }
     
     required public init?(coder: NSCoder) {
@@ -50,16 +70,44 @@ import UIKit
     
     public override func refresh(entity: MessageEntity) {
         super.refresh(entity: entity)
-        self.content.frame = CGRect(x: 12, y: 5, width: entity.bubbleSize.width-24, height: entity.message.edited ? entity.bubbleSize.height-21:entity.bubbleSize.height)
+        let translationSize = entity.translationSize()
+        self.content.frame = CGRect(x: 12, y: 8, width: entity.bubbleSize.width-24, height: (entity.message.edited ? entity.bubbleSize.height-21:entity.bubbleSize.height)-(translationSize.height > 0 ? (38+translationSize.height):0))
+        let stateColor: UIColor = entity.message.direction == .send ? self.sendStateColor:self.receiveStateColor
+        self.edit.setTitleColor(stateColor, for: .normal)
+        self.translateSymbol.setTitleColor(stateColor, for: .normal)
+        if entity.message.direction == .send {
+            self.separatorLine.backgroundColor(Theme.style == .dark ? UIColor.theme.primaryColor9:UIColor.theme.primaryColor8)
+        } else {
+            self.separatorLine.backgroundColor(Theme.style == .dark ? UIColor.theme.neutralSpecialColor7:UIColor.theme.neutralSpecialColor8)
+        }
         if entity.message.edited {
             self.edit.isHidden = false
-            self.edit.frame = CGRect(x: 12, y: self.content.frame.maxY, width: entity.bubbleSize.width-24, height: 14)
-            self.edit.textColor = entity.message.direction == .send ? self.sendStateColor:self.receiveStateColor
-            self.edit.text = "Edited".chat.localize
+            self.edit.frame = CGRect(x: 12, y: self.content.frame.maxY, width: entity.bubbleSize.width-24, height: 16)
+            let image = UIImage(named: "text_message_edited", in: .chatBundle, with: nil)
+            self.edit.image(image?.withTintColor(stateColor), .normal)
+            self.edit.setTitle("Edited".chat.localize, for: .normal)
         } else {
             self.edit.isHidden = true
+            self.edit.frame = .zero
+        }
+        
+        if entity.showTranslation {
+            self.separatorLine.isHidden = false
+            self.translation.isHidden = false
+            self.translateSymbol.isHidden = false
+            self.separatorLine.frame = CGRect(x: 12, y: self.content.frame.maxY+24, width: entity.bubbleSize.width-24, height: 0.5)
+            self.translation.frame = CGRect(x: 12, y: self.separatorLine.frame.maxY+8, width: entity.bubbleSize.width-24, height: translationSize.height)
+            self.translateSymbol.frame = CGRect(x: 12, y: self.translation.frame.maxY+4, width: entity.bubbleSize.width-24, height: 16)
+            self.translateSymbol.setTitle("Translated".chat.localize, for: .normal)
+            let image = UIImage(named: "text_message_translated", in: .chatBundle, with: nil)
+            self.translateSymbol.image(image?.withTintColor(stateColor), .normal)
+        } else {
+            self.separatorLine.isHidden = true
+            self.translation.isHidden = true
+            self.translateSymbol.isHidden = true
         }
         self.content.attributedText = entity.content
+        self.translation.attributedText = entity.translation
     }
-
+    
 }

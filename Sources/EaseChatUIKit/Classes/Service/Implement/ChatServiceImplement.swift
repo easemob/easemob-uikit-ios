@@ -135,6 +135,12 @@ extension ChatServiceImplement: ChatService {
             completion(error,messages ?? [])
         })
     }
+    
+    public func translateMessage(message: ChatMessage, completion: @escaping (ChatError?, ChatMessage?) -> Void) {
+        ChatClient.shared().chatManager?.translate(message, targetLanguages: [Appearance.chat.targetLanguage.rawValue], completion: { message,error in
+            completion(error,message)
+        })
+    }
 }
 
 extension ChatServiceImplement: ChatEventsListener {

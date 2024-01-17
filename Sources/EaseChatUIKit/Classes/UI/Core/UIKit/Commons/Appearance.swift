@@ -128,11 +128,16 @@ import UIKit
             ActionSheetItem(title: "barrage_long_press_menu_reply".chat.localize, type: .normal,tag: "Reply",image: UIImage(named: "message_action_reply", in: .chatBundle, with: nil)),
             ActionSheetItem(title: "barrage_long_press_menu_delete".chat.localize, type: .normal,tag: "Delete",image: UIImage(named: "message_action_delete", in: .chatBundle, with: nil)),
             ActionSheetItem(title: "barrage_long_press_menu_recall".chat.localize, type: .normal,tag: "Recall",image: UIImage(named: "message_action_recall", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "barrage_long_press_menu_report".chat.localize, type: .normal,tag: "Report",image: UIImage(named: "message_action_report", in: .chatBundle, with: nil))
+            ActionSheetItem(title: "barrage_long_press_menu_report".chat.localize, type: .normal,tag: "Report",image: UIImage(named: "message_action_report", in: .chatBundle, with: nil)),
+            ActionSheetItem(title: "barrage_long_press_menu_translate".chat.localize, type: .normal,tag: "Translate",image: UIImage(named: "message_action_translation", in: .chatBundle, with: nil)),
+            ActionSheetItem(title: "barrage_long_press_menu_show_original_text".chat.localize, type: .normal,tag: "OriginalText",image: UIImage(named: "message_action_translation", in: .chatBundle, with: nil)),
+            ActionSheetItem(title: "barrage_long_press_menu_multi_select".chat.localize, type: .normal,tag: "MultiSelect",image: UIImage(named: "message_action_multi_select", in: .chatBundle, with: nil)),
+            ActionSheetItem(title: "barrage_long_press_menu_topic".chat.localize, type: .normal,tag: "Topic",image: UIImage(named: "message_action_topic", in: .chatBundle, with: nil)),
+            ActionSheetItem(title: "barrage_long_press_menu_forward".chat.localize, type: .normal,tag: "Forward",image: UIImage(named: "message_action_forward", in: .chatBundle, with: nil)),
         ]
         
 //        /// The mirror type of the language code of LanguageType.``LanguageType``
-//        public var targetLanguage: LanguageType = .English
+        public var targetLanguage: LanguageType = .English
         
         /// The label for message reporting types.
         public var reportSelectionTags: [String] = ["tag1","tag2","tag3","tag4","tag5","tag6","tag7","tag8","tag9"]
@@ -187,6 +192,13 @@ import UIKit
         
         /// The color of the sender of the text message.
         public var sendTextColor = Theme.style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
+        
+        
+        /// The color of the recipient of the text message.
+        public var receiveTranslationColor = Theme.style == .light ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor5
+        
+        /// The color of the sender of the text message.
+        public var sendTranslationColor = Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
         
         /// The corner of the image message.
         public var imageMessageCorner = CGFloat(4)

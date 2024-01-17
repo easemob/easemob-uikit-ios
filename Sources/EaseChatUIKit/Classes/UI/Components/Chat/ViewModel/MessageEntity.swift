@@ -27,6 +27,8 @@ public var extraCustomSize = CGSize(width: limitBubbleWidth, height: 36)
 public let limitImageHeight = CGFloat((300/844)*ScreenHeight)
 public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
 
+public let translationKey = "EaseChatUIKit_force_show_translation"
+
 @objcMembers open class MessageEntity: NSObject {
     
     required public override init() {
@@ -34,6 +36,21 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
     }
     
     public var message: ChatMessage = ChatMessage()
+    
+    /// Whether message show translations or not.
+    public var showTranslation: Bool {
+        set {
+            if !newValue {
+                self.message.ext?.removeValue(forKey: translationKey)
+            } else {
+                self.message.ext?[translationKey] = newValue
+                ChatClient.shared().chatManager?.update(self.message)
+            }
+        }
+        get {
+            (self.message.ext?[translationKey] as? Bool) ?? false
+        }
+    }
         
     /// /// Message state.
     public var state: ChatMessageStatus = .sending
@@ -89,6 +106,11 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
         self.convertTextAttribute()
     }()
     
+    /// Text message show translation
+    public private(set) lazy var translation: NSAttributedString? = {
+        self.convertTextTranslationAttribute()
+    }()
+    
     /// Reply title in bubble on current message.
     public private(set) lazy var replyTitle: NSAttributedString? = {
         self.convertReplyTitle()
@@ -127,14 +149,19 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
         let label = UILabel().numberOfLines(0).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
         label.attributedText = self.convertTextAttribute()
         let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-24, height: 9999))
-        return CGSize(width: size.width+24, height: size.height+14+(self.message.edited ? 19:0))
+        let translateSize = self.translationSize()
+        return CGSize(width: size.width+24, height: size.height+14+(self.message.edited ? 24:0)+(self.showTranslation ? (translateSize.height > 0 ? (18+translateSize.height):0):0))
     }
     
-    open func translationHeight() -> CGFloat {
-        if var height = self.message.translation?.chat.sizeWithText(font: UIFont.theme.bodyLarge, size: CGSize(width: limitBubbleWidth-24, height: 9999)).height {
-            return height+16
+    open func translationSize() -> CGSize {
+        if self.showTranslation {
+            let label = UILabel().numberOfLines(0).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
+            label.attributedText = self.convertTextTranslationAttribute()
+            let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-24, height: 9999))
+            return CGSize(width: size.width+24, height: size.height)
+        } else {
+            return .zero
         }
-        return 0
     }
     
     open func thumbnailSize(video: Bool) -> CGSize {
@@ -272,6 +299,34 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
             }
         }
         return text
+    }
+    
+    open func convertTextTranslationAttribute() -> NSAttributedString? {
+        var text = NSMutableAttributedString()
+        if self.message.body.type != .text {
+            text.append(NSAttributedString {
+                AttributedText(self.message.showType).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTranslationColor:Appearance.chat.receiveTranslationColor).font(UIFont.theme.bodyLarge)
+            })
+            return text
+        } else {
+            var result = self.message.translation ?? self.message.showType
+            for (key,value) in ChatEmojiConvertor.shared.oldEmojis {
+                result = result.replacingOccurrences(of: key, with: value)
+            }
+            text.append(NSAttributedString {
+                AttributedText(result).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTranslationColor:Appearance.chat.receiveTranslationColor).font(UIFont.theme.bodyLarge)
+            })
+            let string = text.string as NSString
+            for symbol in ChatEmojiConvertor.shared.emojis {
+                if string.range(of: symbol).location != NSNotFound {
+                    let ranges = text.string.chat.rangesOfString(symbol)
+                    text = ChatEmojiConvertor.shared.convertEmoji(input: text, ranges: ranges, symbol: symbol)
+                    text.addAttribute(.font, value: UIFont.theme.bodyLarge, range: NSMakeRange(0, text.length))
+                    text.addAttribute(.foregroundColor, value: self.message.direction == .send ? Appearance.chat.sendTranslationColor:Appearance.chat.receiveTranslationColor, range: NSMakeRange(0, text.length))
+                }
+            }
+            return text
+        }
     }
     
     open func updateReplySize() -> CGSize {

@@ -244,31 +244,38 @@ extension MessageListController: MessageListDriverEventsListener {
     
     
     /**
-     Filters the available message actions based on the provided `ChatMessage`.
+     Filters the available message actions based on the provided `MessageEntity`.
 
      - Parameters:
-         - message: The `ChatMessage` object to filter the actions for.
+         - message: The `MessageEntity` object to filter the actions for.
 
      - Returns: An array of `ActionSheetItemProtocol` representing the filtered message actions.
      */
-    @objc open func filterMessageActions(message: ChatMessage) -> [ActionSheetItemProtocol] {
+    @objc open func filterMessageActions(message: MessageEntity) -> [ActionSheetItemProtocol] {
         var messageActions = Appearance.chat.messageLongPressedActions
-        if message.body.type != .text {
+        if message.message.body.type != .text {
             messageActions.removeAll { $0.tag == "Copy" }
             messageActions.removeAll { $0.tag == "Edit" }
+            messageActions.removeAll { $0.tag == "Translate" }
+            messageActions.removeAll { $0.tag == "OriginalText" }
         } else {
-            if message.direction != .send {
+            if message.message.direction != .send {
                 messageActions.removeAll { $0.tag == "Edit" }
             } else {
-                if message.status != .succeed {
+                if message.message.status != .succeed {
                     messageActions.removeAll { $0.tag == "Edit" }
                 }
             }
+            if message.showTranslation {
+                messageActions.removeAll { $0.tag == "Translate" }
+            } else {
+                messageActions.removeAll { $0.tag == "OriginalText" }
+            }
         }
-        if message.direction != .send {
+        if message.message.direction != .send {
             messageActions.removeAll { $0.tag == "Recall" }
         } else {
-            let duration = UInt(abs(Double(Date().timeIntervalSince1970) - Double(message.timestamp/1000)))
+            let duration = UInt(abs(Double(Date().timeIntervalSince1970) - Double(message.message.timestamp/1000)))
             if duration > Appearance.chat.recallExpiredTime {
                 messageActions.removeAll { $0.tag == "Recall" }
             }
@@ -276,7 +283,7 @@ extension MessageListController: MessageListDriverEventsListener {
         return messageActions
     }
     
-    public func onMessageBubbleLongPressed(message: ChatMessage) {
+    public func onMessageBubbleLongPressed(message: MessageEntity) {
         self.showMessageLongPressedDialog(message: message)
     }
     
@@ -286,9 +293,9 @@ extension MessageListController: MessageListDriverEventsListener {
      - Parameters:
         - message: The chat message for which the dialog is shown.
      */
-    @objc open func showMessageLongPressedDialog(message: ChatMessage) {
+    @objc open func showMessageLongPressedDialog(message: MessageEntity) {
         DialogManager.shared.showMessageActions(actions: self.filterMessageActions(message: message)) { [weak self] item in
-            self?.processMessage(item: item, message: message)
+            self?.processMessage(item: item, message: message.message)
         }
     }
     
@@ -309,6 +316,10 @@ extension MessageListController: MessageListDriverEventsListener {
             self.viewModel.processMessage(operation: .reply, message: message)
         case "Recall":
             self.viewModel.processMessage(operation: .recall, message: message)
+        case "Translate":
+            self.viewModel.processMessage(operation: .translate, message: message)
+        case "OriginalText":
+            self.viewModel.processMessage(operation: .originalText, message: message)
         case "Delete":
             self.viewModel.processMessage(operation: .delete, message: message)
         case "Report":
@@ -353,7 +364,7 @@ extension MessageListController: MessageListDriverEventsListener {
         }
     }
     
-    public func onMessageBubbleClicked(message: ChatMessage) {
+    public func onMessageBubbleClicked(message: MessageEntity) {
         self.messageBubbleClicked(message: message)
     }
     
@@ -363,15 +374,15 @@ extension MessageListController: MessageListDriverEventsListener {
      - Parameters:
         - message: The ChatMessage object representing the clicked message.
      */
-    @objc open func messageBubbleClicked(message: ChatMessage) {
-        switch message.body.type {
+    @objc open func messageBubbleClicked(message: MessageEntity) {
+        switch message.message.body.type {
         case .file,.video,.image:
-            if let body = message.body as? ChatFileMessageBody {
+            if let body = message.message.body as? ChatFileMessageBody {
                 self.filePath = body.localPath ?? ""
             }
             self.openFile()
         case .custom:
-            if let body = message.body as? ChatCustomMessageBody {
+            if let body = message.message.body as? ChatCustomMessageBody {
                 self.viewContact(body: body)
             }
         default:

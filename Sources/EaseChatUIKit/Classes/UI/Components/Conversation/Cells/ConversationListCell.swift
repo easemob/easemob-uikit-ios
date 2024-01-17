@@ -218,6 +218,7 @@ extension ConversationListCell: ThemeSwitchProtocol {
         let entity = ComponentsRegister.shared.MessageRenderEntity.init()
         entity.state = self.convertStatus(message: message)
         entity.message = message
+        _ = entity.showTranslation
         _ = entity.content
         _ = entity.replyTitle
         _ = entity.replyContent

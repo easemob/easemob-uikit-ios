@@ -30,6 +30,10 @@
 "barrage_long_press_menu_recall" = "Recall";
 "barrage_long_press_menu_reply" = "Reply";
 "barrage_long_press_menu_report" = "Report";
+"barrage_long_press_menu_forward" = "Forward";
+"barrage_long_press_menu_show_original_text" = "Original Text";
+"barrage_long_press_menu_multi_select" = "MultiSelect";
+"barrage_long_press_menu_topic" = "Create Thread";
 "barrage_long_press_menu_cancel" = "Cancel";
 "barrage_long_press_menu_edit" = "Edit";
 "barrage_long_press_menu_copy" = "Copy";
@@ -41,6 +45,8 @@
 "Sent" = "Sent";
 "Editing" = "Editing";
 "Edited" = "Edited";
+"Translated" = "Translated";
+"Translated" = "Translated";
 "Mentioned" = "Mentioned";
 "recalled a message" = "recalled a message";
 "violation_reason_1" = "Unwelcome commercial content or spam";

@@ -79,6 +79,13 @@ let EaseChatUIKit_user_card_message = "userCard"
     ///   - completion: Request a callback, returning an array of message objects if successful, or an error if failed
     func searchMessage(keyword: String,pageSize: UInt,userId: String,completion: @escaping (ChatError?,[ChatMessage]) -> Void)
     
+    /// Translate the message text.
+    /// - Parameters:
+    ///   - message: ``ChatMessage``
+    ///   - completion: Request a callback, returning an array of message objects if successful, or an error if failed
+    func translateMessage(message: ChatMessage,completion: @escaping (ChatError?,ChatMessage?) -> Void)
+    
+    
 }
 
 @objc public protocol ChatResponseListener: NSObjectProtocol {

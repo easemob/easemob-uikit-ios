@@ -6,6 +6,11 @@ import UIKit
     case reply
     case delete
     case recall
+    case translate
+    case originalText
+    case forward
+    case multiSelect
+    case createTopic
 }
 
 @objc public protocol MessageListViewActionEventsDelegate: NSObjectProtocol {
@@ -156,6 +161,7 @@ import UIKit
         self.messageList.refreshControl?.addTarget(self, action: #selector(pullRefresh), for: .valueChanged)
         self.replyBar.isHidden = true
         self.inputBarEvents()
+        Theme.registerSwitchThemeViews(view: self)
         self.inputBar.axisYChanged = { [weak self] value in
             guard let `self` = self else { return }
             DispatchQueue.main.async {
@@ -212,6 +218,15 @@ import UIKit
             handler.onMessageListPullRefresh()
         }
     }
+    
+    
+}
+
+extension MessageListView: ThemeSwitchProtocol {
+    public func switchTheme(style: ThemeStyle) {
+        self.messageList.reloadData()
+    }
+    
     
 }
 
@@ -526,6 +541,7 @@ extension MessageListView: IMessageListViewDriver {
     
     
     public func updateMessageStatus(message: ChatMessage, status: ChatMessageStatus) {
+        self.replyId = ""
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages[safe: index]?.state = status
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
@@ -586,10 +602,51 @@ extension MessageListView: IMessageListViewDriver {
         case .reply: self.replyAction(message)
         case .delete: self.deleteAction(message)
         case .recall: self.recallAction(message)
+        case .translate: self.translateAction(message)
+        case .originalText: self.showOriginalTextAction(message)
         default:
             break
         }
     }
+    
+    private func showOriginalTextAction(_ message: ChatMessage) {
+        if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
+            self.messages.remove(at: index)
+            let entity = ComponentsRegister.shared.MessageRenderEntity.init()
+            entity.state = self.convertStatus(message: message)
+            entity.message = message
+            entity.showTranslation = false
+            _ = entity.content
+            _ = entity.replyTitle
+            _ = entity.replyContent
+            _ = entity.bubbleSize
+            _ = entity.height
+            _ = entity.replySize
+            self.messages.insert(entity, at: index)
+            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+        }
+    }
+    
+    
+    
+    private func translateAction(_ message: ChatMessage) {
+        if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
+            self.messages.remove(at: index)
+            let entity = ComponentsRegister.shared.MessageRenderEntity.init()
+            entity.state = self.convertStatus(message: message)
+            entity.message = message
+            entity.showTranslation = true
+            _ = entity.content
+            _ = entity.replyTitle
+            _ = entity.replyContent
+            _ = entity.bubbleSize
+            _ = entity.height
+            _ = entity.replySize
+            self.messages.insert(entity, at: index)
+            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+        }
+    }
+    
     
     private func copyAction(_ message: ChatMessage) {
         if let body = message.body as? ChatTextMessageBody {

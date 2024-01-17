@@ -17,9 +17,9 @@ import UIKit
     
     func onMessageAvatarClicked(user: EaseProfileProtocol)
     
-    func onMessageBubbleClicked(message: ChatMessage)
+    func onMessageBubbleClicked(message: MessageEntity)
     
-    func onMessageBubbleLongPressed(message: ChatMessage)
+    func onMessageBubbleLongPressed(message: MessageEntity)
     
     /// When you click a attachment message,we'll download the attachment,the method also called.
     /// - Parameter loading: Whether downloaded or not.
@@ -230,7 +230,26 @@ import UIKit
         case .reply: self.replyMessage(message: message)
         case .recall: self.recallMessage(message: message)
         case .delete: self.deleteMessage(message: message)
+        case .translate: self.translateMessage(message: message)
+        case .originalText: self.showOriginalText(message: message)
+        default: break
         }
+    }
+    
+    @objc open func translateMessage(message: ChatMessage) {
+        if message.translation == nil {
+            self.chatService?.translateMessage(message: message, completion: { error, message in
+                if error == nil,let raw = message {
+                    self.driver?.processMessage(operation: .translate, message: raw)
+                }
+            })
+        } else {
+            self.driver?.processMessage(operation: .translate, message: message)
+        }
+    }
+    
+    @objc open func showOriginalText(message: ChatMessage) {
+        self.driver?.processMessage(operation: .originalText, message: message)
     }
     
     @objc open func editMessage(message: ChatMessage,content: String = "") {
@@ -326,7 +345,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
             } else {
                 if bodyType != .voice {
                     for handler in self.handlers.allObjects {
-                        handler.onMessageBubbleClicked(message: message.message)
+                        handler.onMessageBubbleClicked(message: message)
                     }
                 } else {
                     self.audioMessagePlay(message: message)
@@ -334,7 +353,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
             }
         } else {
             for handler in self.handlers.allObjects {
-                handler.onMessageBubbleClicked(message: message.message)
+                handler.onMessageBubbleClicked(message: message)
             }
         }
     }
@@ -393,8 +412,9 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
                 if message.message.body.type == .image {
                     self.cacheImage(message: message.message)
                 }
+                message.message = attachment
                 for handler in self.handlers.allObjects {
-                    handler.onMessageBubbleClicked(message: message.message)
+                    handler.onMessageBubbleClicked(message: message)
                 }
             } else {
                 consoleLogInfo("onMessageReplyClicked download error:\(error?.errorDescription ?? "")", type: .error)
@@ -441,7 +461,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
     
     public func onMessageContentLongPressed(message: MessageEntity) {
         for handler in self.handlers.allObjects {
-            handler.onMessageBubbleLongPressed(message: message.message)
+            handler.onMessageBubbleLongPressed(message: message)
         }
     }
     

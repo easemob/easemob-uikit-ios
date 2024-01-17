@@ -30,6 +30,10 @@
 "barrage_long_press_menu_recall" = "撤回";
 "barrage_long_press_menu_reply" = "回复";
 "barrage_long_press_menu_report" = "举报";
+"barrage_long_press_menu_show_original_text" = "显示原文";
+"barrage_long_press_menu_multi_select" = "多选";
+"barrage_long_press_menu_topic" = "创建话题";
+"barrage_long_press_menu_forward" = "转发";
 "barrage_long_press_menu_cancel" = "取消";
 "barrage_long_press_menu_edit" = "编辑";
 "barrage_long_press_menu_copy" = "复制";
@@ -38,6 +42,7 @@
 "Confirm" = "确定";
 "Editing" = "编辑中";
 "Edited" = "已编辑";
+"Translated" = "已翻译";
 "Mentioned" = "有人@你";
 "recalled a message" = "撤回了一条消息";
 
