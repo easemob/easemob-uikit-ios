@@ -466,6 +466,7 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     public func refreshMessages(messages: [ChatMessage]) {
+        self.replyId = ""
         self.messageList.refreshControl?.endRefreshing()
         self.messages = messages.map({
             self.convertMessage(message: $0)
@@ -480,6 +481,7 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     public func updateAudioMessageStatus(message: ChatMessage, play: Bool) {
+        self.replyId = ""
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             var indexPaths = [IndexPath]()
             indexPaths.append(IndexPath(row: index, section: 0))
@@ -497,6 +499,7 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     public func updateMessageAttachmentStatus(message: ChatMessage) {
+        self.replyId = ""
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
         }
@@ -556,6 +559,7 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     public func showMessage(message: ChatMessage) {
+        self.replyId = ""
         if message.direction == .send {
             self.replyBar.isHidden = true
         }
