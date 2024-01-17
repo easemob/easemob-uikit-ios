@@ -15,13 +15,13 @@ public extension UIViewController {
     static var currentController: UIViewController? {
         if let vc = UIApplication.shared.chat.keyWindow?.rootViewController {
             if let nav = vc as? UINavigationController {
-                return nav.visibleViewController
+                return nav.visibleViewController?.presentedViewController ?? nav.visibleViewController
             }
             if let tab = vc as? UITabBarController {
                 if let nav = tab.selectedViewController as? UINavigationController {
-                    return nav.visibleViewController
+                    return nav.visibleViewController?.presentedViewController ?? nav.visibleViewController
                 } else {
-                    return tab.selectedViewController
+                    return tab.selectedViewController?.presentedViewController ?? tab.selectedViewController
                 }
             }
             if let presented = vc.presentedViewController {
