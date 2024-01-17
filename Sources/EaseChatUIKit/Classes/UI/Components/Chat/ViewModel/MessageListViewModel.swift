@@ -519,7 +519,7 @@ extension MessageListViewModel: ChatResponseListener {
     @objc open func messageDidReceived(message: ChatMessage) {
         if message.conversationId == self.to {
             let entity = message
-            entity.direction = .receive
+            entity.direction = message.direction
             let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)
             conversation?.markMessageAsRead(withId: message.messageId, error: nil)
             if conversation?.type ?? .chat == .chat {
