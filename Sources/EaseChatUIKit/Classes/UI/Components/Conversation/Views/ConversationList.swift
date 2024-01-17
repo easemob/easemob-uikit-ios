@@ -261,7 +261,7 @@ extension ConversationList: IConversationListDriver {
         switch type {
         case .read: self.read(info: info)
         case .mute: self.mute(info: info)
-        case .unmute: self.mute(info: info)
+        case .unmute: self.unmute(info: info)
         case .delete: self.delete(info: info)
         default: break
         }
