@@ -102,6 +102,12 @@ import UIKit
     ///   - message: ``ChatMessage``
     ///   - play: play or stop
     func updateAudioMessageStatus(message: ChatMessage,play: Bool)
+        
+    /// Chat thread of the group message on changed.
+    /// - Parameter entity: ``ChatMessage``
+    func updateGroupMessageChatThreadChanged(message: ChatMessage)
+    
+    func reloadCell(message: ChatMessage)
 }
 
 
@@ -460,6 +466,31 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
 }
 
 extension MessageListView: IMessageListViewDriver {
+    
+    public func reloadCell(message: ChatMessage) {
+        self.replyId = ""
+        if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
+            if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }) {
+                self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
+                self.messageList.reloadRows(at: [indexPath], with: .automatic)
+            }
+        }
+    }
+    
+    
+    public func updateGroupMessageChatThreadChanged(message: ChatMessage) {
+        self.replyId = ""
+        if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
+            if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }),let entity = self.messages[safe: index] {
+                entity.topicContent = nil
+                entity.topicContent = entity.convertTopicContent()
+                if let cell = self.messageList.cellForRow(at: indexPath) as? MessageCell {
+                    cell.topicView.refresh(entity: entity)
+                }
+            }
+        }
+    }
+    
     public var replyMessageId: String {
         self.replyId
     }
@@ -552,12 +583,13 @@ extension MessageListView: IMessageListViewDriver {
         let entity = ComponentsRegister.shared.MessageRenderEntity.init()
         entity.state = self.convertStatus(message: message)
         entity.message = message
-        _ = entity.content
         _ = entity.replyTitle
         _ = entity.replyContent
+        _ = entity.content
+        entity.topicContent = entity.convertTopicContent()
+        _ = entity.replySize
         _ = entity.bubbleSize
         _ = entity.height
-        _ = entity.replySize
         return entity
     }
     
@@ -611,7 +643,6 @@ extension MessageListView: IMessageListViewDriver {
     
     private func showOriginalTextAction(_ message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
-            self.messages.remove(at: index)
             let entity = ComponentsRegister.shared.MessageRenderEntity.init()
             entity.state = self.convertStatus(message: message)
             entity.message = message
@@ -622,7 +653,7 @@ extension MessageListView: IMessageListViewDriver {
             _ = entity.bubbleSize
             _ = entity.height
             _ = entity.replySize
-            self.messages.insert(entity, at: index)
+            self.messages.replaceSubrange(index...index, with: [entity])
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
         }
     }
@@ -631,7 +662,6 @@ extension MessageListView: IMessageListViewDriver {
     
     private func translateAction(_ message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
-            self.messages.remove(at: index)
             let entity = ComponentsRegister.shared.MessageRenderEntity.init()
             entity.state = self.convertStatus(message: message)
             entity.message = message
@@ -642,7 +672,7 @@ extension MessageListView: IMessageListViewDriver {
             _ = entity.bubbleSize
             _ = entity.height
             _ = entity.replySize
-            self.messages.insert(entity, at: index)
+            self.messages.replaceSubrange(index...index, with: [entity])
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
         }
     }
@@ -657,8 +687,7 @@ extension MessageListView: IMessageListViewDriver {
     
     private func editAction(_ message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
-            self.messages.remove(at: index)
-            self.messages.insert(self.convertMessage(message: message), at: index)
+            self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
         }
     }
@@ -678,9 +707,10 @@ extension MessageListView: IMessageListViewDriver {
     
     private func recallAction(_ message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.timestamp == message.timestamp }) {
-            self.messages.remove(at: index)
-            self.messages.insert(self.convertMessage(message: message), at: index)
+            self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
         }
     }
+    
+    
 }

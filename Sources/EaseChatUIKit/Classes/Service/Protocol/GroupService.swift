@@ -23,6 +23,15 @@ import Foundation
     /// Unbind group event changed listener
     /// - Parameter listener: ``GroupServiceListener``
     func unbindGroupEventsListener(listener: GroupServiceListener)
+    
+    /// Bind group chat thread events listener.
+    /// - Parameter listener: ``GroupChatThreadEventListener``
+    func bindGroupChatThreadEventListener(listener: GroupChatThreadEventListener)
+    
+    /// Unbind group chat thread event listener
+    /// - Parameter listener: ``GroupChatThreadEventListener``
+    func unbindGroupChatThreadEventListener(listener: GroupChatThreadEventListener)
+    
     //MARK: - Create&List
     
     /// Create a group.
@@ -208,69 +217,69 @@ import Foundation
     ///   - groupName: Name of the group.
     ///   - userId: ID of the inviter.
     ///   - invitation: Invitation extension.
-    func onReceivedNewGroupInvitation(groupId: String,groupName: String,userId: String,invitation: String)
+    @objc optional func onReceivedNewGroupInvitation(groupId: String,groupName: String,userId: String,invitation: String)
     
     /// Accepted invitation of the group.
     /// - Parameters:
     ///   - groupId: ID of the group.
     ///   - userId: ID of the user.
-    func onInviterAcceptedInvitationOfGroup(groupId: String,userId: String)
+    @objc optional func onInviterAcceptedInvitationOfGroup(groupId: String,userId: String)
     
     /// When a group invitation is rejected
     /// - Parameters:
     ///   - groupId: ID of the group.
     ///   - userId: ID of the user.
     ///   - reason: Reason for rejection.
-    func onInviterDeclinedInvitationOfGroup(groupId: String,userId: String,reason: String)
+    @objc optional func onInviterDeclinedInvitationOfGroup(groupId: String,userId: String,reason: String)
     
     /// The current user is added to the group.
     /// - Parameters:
     ///   - groupId: ID of the group.
     ///   - invitation: Invitation extension.
-    func onCurrentUserJoinedGroup(groupId: String,invitation: String)
+    @objc optional func onCurrentUserJoinedGroup(groupId: String,invitation: String)
     
     /// Current user is removed.
     /// - Parameters:
     ///   - groupId: ID of the group.
     ///   - reason: Reason for removed.
-    func onCurrentUserLeft(groupId: String,reason: GroupLeaveReason)
+    @objc optional func onCurrentUserLeft(groupId: String,reason: GroupLeaveReason)
     
     /// Received new group invitation
     /// - Parameters:
     ///   - groupId: ID of the group.
     ///   - userId: ID of the inviter.
     ///   - reason: reason
-    func onReceivedNewGroupApplication(groupId: String,userId: String,reason: String)
+    @objc optional func onReceivedNewGroupApplication(groupId: String,userId: String,reason: String)
     
     /// Application to join the group was rejected
     /// - Parameters:
     ///   - groupId: ID of the group.
     ///   - reason: Reason for rejection.
-    func onGroupJoinApplicationDeclined(groupId: String,reason: String)
+    @objc optional func onGroupJoinApplicationDeclined(groupId: String,reason: String)
     
     /// The application to join the group was approved.
     /// - Parameters:
     ///   - groupId: ID of the group.
-    func onGroupJoinApplicationApproved(groupId: String)
+    @objc optional func onGroupJoinApplicationApproved(groupId: String)
     
     /// The group owner of the current group has changed.
     /// - Parameters:
     ///   - groupId: ID of the group.
     ///   - ownerId: ID of the group owner.
     ///   - userId: ID of the user.
-    func onGroupOwnerUpdated(groupId: String,ownerId: String,userId: String)
+    @objc optional func onGroupOwnerUpdated(groupId: String,ownerId: String,userId: String)
     
     /// When some user joined group.
     /// - Parameters:
     ///   - groupId: ID of the group.
     ///   - userId: ID of the user.
-    func onUserJoinedGroup(groupId: String,userId: String)
+    @objc optional func onUserJoinedGroup(groupId: String,userId: String)
     
     /// When some user left group.
     /// - Parameters:
     ///   - groupId: ID of the group.
     ///   - userId: ID of the user.
-    func onUserLeaveGroup(groupId: String,userId: String)
+    @objc optional func onUserLeaveGroup(groupId: String,userId: String)
     
     /// When attributes changed of some group member.
     /// - Parameters:
@@ -278,6 +287,23 @@ import Foundation
     ///   - userId: ID of the user.
     ///   - operatorId: ID of the opeartor.
     ///   - attributes: Changed user attribute dictionary。
-    func onAttributesChangedOfGroupMember(groupId: String,userId: String,operatorId: String,attributes: Dictionary<String,String>)
+    @objc optional func onAttributesChangedOfGroupMember(groupId: String,userId: String,operatorId: String,attributes: Dictionary<String,String>)
+    
+}
+
+@objc public enum GroupChatThreadEventType: UInt {
+    case created
+    case updated
+    case destroyed
+    case userKicked
+}
+
+@objc public protocol GroupChatThreadEventListener: NSObjectProtocol {
+    
+    /// Some event occur on group chat thread.
+    /// - Parameters:
+    ///   - type: ``GroupChatThreadEventType``
+    ///   - event: ``GroupChatThreadEvent``
+    func onGroupChatThreadEventOccur(type: GroupChatThreadEventType,event: GroupChatThreadEvent)
     
 }

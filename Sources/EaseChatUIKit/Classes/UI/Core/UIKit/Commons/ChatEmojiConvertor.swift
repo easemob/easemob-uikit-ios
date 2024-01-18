@@ -88,14 +88,14 @@ import Foundation
      
      - Returns: A new attributed string with the specified ranges replaced with emoji images.
      */
-    @objc public func convertEmoji(input: NSMutableAttributedString, ranges: [NSRange], symbol: String) -> NSMutableAttributedString {
+    @objc public func convertEmoji(input: NSMutableAttributedString, ranges: [NSRange], symbol: String, imageBounds: CGRect) -> NSMutableAttributedString {
         let text = NSMutableAttributedString(attributedString: input)
         for range in ranges.reversed() {
             if range.location != NSNotFound, range.length != NSNotFound {
                 let value = self.emojiMap.isEmpty ? UIImage(named: symbol, in: .chatBundle, with: nil):self.emojiMap[symbol]
                 let attachment = NSTextAttachment()
                 attachment.image = value
-                attachment.bounds = CGRect(x: 0, y: -4.5, width: 20, height: 20)
+                attachment.bounds = imageBounds
                 text.replaceCharacters(in: range, with: NSAttributedString(attachment: attachment))
             }
         }

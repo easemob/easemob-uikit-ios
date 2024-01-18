@@ -57,6 +57,8 @@ public typealias SilentModeResult = EMSilentModeResult
 public typealias SilentModeParam = EMSilentModeParam
 public typealias Contact = EMContact
 public typealias UserInfoType = EMUserInfoType
+public typealias GroupChatThreadListener = EMThreadManagerDelegate
+public typealias GroupChatThreadEvent = EMChatThreadEvent
 
 #elseif canImport(AgoraChat)
 import AgoraChat
@@ -102,6 +104,8 @@ public typealias SilentModeResult = AgoraChatSilentModeResult
 public typealias SilentModeParam = AgoraChatSilentModeParam
 public typealias Contact = AgoraChatContact
 public typealias UserInfoType = AgoraChatUserInfoType
+public typealias GroupChatThreadListener = AgoraChatThreadManagerDelegate
+public typealias GroupChatThreadEvent = EMChatThreadEvent
 #endif
 
 

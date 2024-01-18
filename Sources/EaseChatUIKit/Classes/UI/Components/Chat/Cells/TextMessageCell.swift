@@ -71,7 +71,7 @@ import UIKit
     public override func refresh(entity: MessageEntity) {
         super.refresh(entity: entity)
         let translationSize = entity.translationSize()
-        self.content.frame = CGRect(x: 12, y: 8, width: entity.bubbleSize.width-24, height: (entity.message.edited ? entity.bubbleSize.height-21:entity.bubbleSize.height)-(translationSize.height > 0 ? (38+translationSize.height):0))
+        self.content.frame = CGRect(x: 12, y: 6, width: entity.bubbleSize.width-24, height: (entity.message.edited ? entity.bubbleSize.height-21:entity.bubbleSize.height)-(translationSize.height > 0 ? (38+translationSize.height):0))
         let stateColor: UIColor = entity.message.direction == .send ? self.sendStateColor:self.receiveStateColor
         self.edit.setTitleColor(stateColor, for: .normal)
         self.translateSymbol.setTitleColor(stateColor, for: .normal)
@@ -91,7 +91,7 @@ import UIKit
             self.edit.frame = .zero
         }
         
-        if entity.showTranslation {
+        if entity.showTranslation,Appearance.chat.enableTranslation {
             self.separatorLine.isHidden = false
             self.translation.isHidden = false
             self.translateSymbol.isHidden = false

@@ -25,9 +25,14 @@ public var limitBubbleWidth = CGFloat(ScreenWidth*(3/5.0))
 public var extraCustomSize = CGSize(width: limitBubbleWidth, height: 36)
 
 public let limitImageHeight = CGFloat((300/844)*ScreenHeight)
+
 public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
 
 public let translationKey = "EaseChatUIKit_force_show_translation"
+
+public let topicHeight = CGFloat(58)
+
+public let reactionHeight = CGFloat(30)
 
 @objcMembers open class MessageEntity: NSObject {
     
@@ -97,8 +102,20 @@ public let translationKey = "EaseChatUIKit_force_show_translation"
         if let body = self.message.body as? ChatCustomMessageBody,body.event == EaseChatUIKit_alert_message {
             return self.bubbleSize.height
         } else {
-            return 8+(Appearance.chat.contentStyle.contains(.withNickName) ? 28:2)+(Appearance.chat.contentStyle.contains(.withReply) ? self.replySize.height:2)+self.bubbleSize.height+(Appearance.chat.contentStyle.contains(.withDateAndTime) ? 24:8)
+            return 8+(Appearance.chat.contentStyle.contains(.withNickName) ? 28:2)+(Appearance.chat.contentStyle.contains(.withReply) ? self.replySize.height:2)+self.bubbleSize.height+(Appearance.chat.contentStyle.contains(.withDateAndTime) ? 24:8)+self.topicContentHeight()+self.reactionContentHeight()
         }
+    }
+    
+    open func topicContentHeight() -> CGFloat {
+        let realHeight = self.message.chatThread != nil ? topicHeight:CGFloat(0)
+        let topic_height = Appearance.chat.contentStyle.contains(.withMessageTopic) ? realHeight:0
+        return topic_height
+    }
+    
+    open func reactionContentHeight() -> CGFloat {
+        let realHeight = (self.message.reactionList?.count ?? 0) > 0 ? reactionHeight:CGFloat(0)
+        let reaction_height = (Appearance.chat.contentStyle.contains(.withMessageReaction) ? realHeight:CGFloat(0))
+        return reaction_height
     }
     
     /// Text message show content.
@@ -106,9 +123,17 @@ public let translationKey = "EaseChatUIKit_force_show_translation"
         self.convertTextAttribute()
     }()
     
+    public lazy var topicContent: NSAttributedString? = {
+        self.convertTopicContent()
+    }()
+    
     /// Text message show translation
     public private(set) lazy var translation: NSAttributedString? = {
-        self.convertTextTranslationAttribute()
+        if Appearance.chat.enableTranslation {
+            return self.convertTextTranslationAttribute()
+        } else {
+            return nil
+        }
     }()
     
     /// Reply title in bubble on current message.
@@ -149,7 +174,7 @@ public let translationKey = "EaseChatUIKit_force_show_translation"
         let label = UILabel().numberOfLines(0).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
         label.attributedText = self.convertTextAttribute()
         let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-24, height: 9999))
-        let translateSize = self.translationSize()
+        let translateSize = Appearance.chat.enableTranslation ? self.translationSize():.zero
         return CGSize(width: size.width+24, height: size.height+14+(self.message.edited ? 24:0)+(self.showTranslation ? (translateSize.height > 0 ? (18+translateSize.height):0):0))
     }
     
@@ -245,7 +270,7 @@ public let translationKey = "EaseChatUIKit_force_show_translation"
     /// Converts the message text into an attributed string, including the user's nickname, message text, and emojis.
     open func convertTextAttribute() -> NSAttributedString? {
         var text = NSMutableAttributedString()
-        if self.message.body.type != .text || self.message.body.type != .custom {
+        if self.message.body.type != .text, self.message.body.type != .custom {
             text.append(NSAttributedString {
                 AttributedText(self.message.showType).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(UIFont.theme.bodyLarge)
             })
@@ -292,13 +317,47 @@ public let translationKey = "EaseChatUIKit_force_show_translation"
             for symbol in ChatEmojiConvertor.shared.emojis {
                 if string.range(of: symbol).location != NSNotFound {
                     let ranges = text.string.chat.rangesOfString(symbol)
-                    text = ChatEmojiConvertor.shared.convertEmoji(input: text, ranges: ranges, symbol: symbol)
+                    text = ChatEmojiConvertor.shared.convertEmoji(input: text, ranges: ranges, symbol: symbol,imageBounds: CGRect(x: 0, y: -4, width: 18, height: 18))
                     text.addAttribute(.font, value: UIFont.theme.bodyLarge, range: NSMakeRange(0, text.length))
                     text.addAttribute(.foregroundColor, value: self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor, range: NSMakeRange(0, text.length))
                 }
             }
         }
         return text
+    }
+    
+    open func convertTopicContent() -> NSAttributedString? {
+        guard let topicMessage = self.message.chatThread?.lastMessage else {
+            return nil
+        }
+        var text = NSMutableAttributedString()
+        let nickname = topicMessage.user?.nickname ?? topicMessage.from
+        
+        if topicMessage.body.type != .text {
+            text.append(NSAttributedString {
+                AttributedText(nickname+":"+topicMessage.showType).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.labelSmall)
+            })
+            return text
+        } else {
+            var result = nickname+":"+topicMessage.showType
+            for (key,value) in ChatEmojiConvertor.shared.oldEmojis {
+                result = result.replacingOccurrences(of: key, with: value)
+            }
+            text.append(NSAttributedString {
+                AttributedText(result).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.labelSmall)
+            })
+            let string = text.string as NSString
+            for symbol in ChatEmojiConvertor.shared.emojis {
+                if string.range(of: symbol).location != NSNotFound {
+                    let ranges = text.string.chat.rangesOfString(symbol)
+                    text = ChatEmojiConvertor.shared.convertEmoji(input: text, ranges: ranges, symbol: symbol,imageBounds: CGRect(x: 0, y: -2, width: 14, height: 14))
+                    text.addAttribute(.font, value: UIFont.theme.labelSmall, range: NSMakeRange(0, text.length))
+                    text.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5, range: NSMakeRange(0, text.length))
+                }
+            }
+        }
+        return text
+    
     }
     
     open func convertTextTranslationAttribute() -> NSAttributedString? {
@@ -320,7 +379,7 @@ public let translationKey = "EaseChatUIKit_force_show_translation"
             for symbol in ChatEmojiConvertor.shared.emojis {
                 if string.range(of: symbol).location != NSNotFound {
                     let ranges = text.string.chat.rangesOfString(symbol)
-                    text = ChatEmojiConvertor.shared.convertEmoji(input: text, ranges: ranges, symbol: symbol)
+                    text = ChatEmojiConvertor.shared.convertEmoji(input: text, ranges: ranges, symbol: symbol, imageBounds: CGRect(x: 0, y: -4, width: 18, height: 18))
                     text.addAttribute(.font, value: UIFont.theme.bodyLarge, range: NSMakeRange(0, text.length))
                     text.addAttribute(.foregroundColor, value: self.message.direction == .send ? Appearance.chat.sendTranslationColor:Appearance.chat.receiveTranslationColor, range: NSMakeRange(0, text.length))
                 }
@@ -353,7 +412,7 @@ public let translationKey = "EaseChatUIKit_force_show_translation"
                 let reply = NSMutableAttributedString()
                 if let icon = quoteMessage.replyIcon?.withTintColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5) {
                     reply.append(NSAttributedString {
-                        ImageAttachment(icon, bounds: CGRect(x: 0, y: -3.5, width: 18, height: 18))
+                        ImageAttachment(icon, bounds: CGRect(x: 0, y: -4, width: 18, height: 18))
                     })
                 }
                 switch quoteMessage.body.type {

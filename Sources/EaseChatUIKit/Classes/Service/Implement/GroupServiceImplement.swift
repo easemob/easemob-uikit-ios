@@ -8,20 +8,40 @@
 import UIKit
 
 @objc public class GroupServiceImplement: NSObject {
+    
     private var responseDelegates: NSHashTable<GroupServiceListener> = NSHashTable<GroupServiceListener>.weakObjects()
+    
+    private var threadDelegates: NSHashTable<GroupChatThreadEventListener> = NSHashTable<GroupChatThreadEventListener>.weakObjects()
     
     
     public override init() {
         super.init()
         ChatClient.shared().groupManager?.add(self, delegateQueue: .main)
+        if Appearance.chat.contentStyle.contains(.withMessageTopic) {
+            ChatClient.shared().threadManager?.add(self, delegateQueue: .main)
+        }
     }
     
     deinit {
         ChatClient.shared().groupManager?.removeDelegate(self)
+        ChatClient.shared().threadManager?.remove(self)
     }
 }
 
 extension GroupServiceImplement: GroupService {
+    public func bindGroupChatThreadEventListener(listener: GroupChatThreadEventListener) {
+        if self.threadDelegates.contains(listener) {
+            return
+        }
+        self.threadDelegates.add(listener)
+    }
+    
+    public func unbindGroupChatThreadEventListener(listener: GroupChatThreadEventListener) {
+        if self.threadDelegates.contains(listener) {
+            self.threadDelegates.remove(listener)
+        }
+    }
+    
     
     public func fetchGroupInfo(groupId: String, completion: @escaping (ChatGroup?, ChatError?) -> Void) {
         ChatClient.shared().groupManager?.getGroupSpecificationFromServer(withId: groupId, completion: { group, error in
@@ -195,73 +215,100 @@ extension GroupServiceImplement: GroupService {
 extension GroupServiceImplement: GroupEventsListener {
     public func groupInvitationDidReceive(_ aGroupId: String, groupName aGroupName: String, inviter aInviter: String, message aMessage: String?) {
         for listener in self.responseDelegates.allObjects {
-            listener.onReceivedNewGroupInvitation(groupId: aGroupId, groupName: aGroupName, userId: aInviter, invitation: aMessage ?? "")
+            listener.onReceivedNewGroupInvitation?(groupId: aGroupId, groupName: aGroupName, userId: aInviter, invitation: aMessage ?? "")
         }
     }
     
     public func groupInvitationDidAccept(_ aGroup: ChatGroup, invitee aInvitee: String) {
         for listener in self.responseDelegates.allObjects {
-            listener.onInviterAcceptedInvitationOfGroup(groupId: aGroup.groupId, userId: aInvitee)
+            listener.onInviterAcceptedInvitationOfGroup?(groupId: aGroup.groupId, userId: aInvitee)
         }
     }
     
     public func groupInvitationDidDecline(_ aGroup: ChatGroup, invitee aInvitee: String, reason aReason: String?) {
         for listener in self.responseDelegates.allObjects {
-            listener.onInviterDeclinedInvitationOfGroup(groupId: aGroup.groupId, userId: aInvitee, reason: aReason ?? "")
+            listener.onInviterDeclinedInvitationOfGroup?(groupId: aGroup.groupId, userId: aInvitee, reason: aReason ?? "")
         }
     }
     
     public func didJoin(_ aGroup: ChatGroup, inviter aInviter: String, message aMessage: String?) {
         for listener in self.responseDelegates.allObjects {
-            listener.onCurrentUserJoinedGroup(groupId: aGroup.groupId, invitation: aMessage ?? "")
+            listener.onCurrentUserJoinedGroup?(groupId: aGroup.groupId, invitation: aMessage ?? "")
         }
     }
     
     public func didLeave(_ aGroup: ChatGroup, reason aReason: GroupLeaveReason) {
         for listener in self.responseDelegates.allObjects {
-            listener.onCurrentUserLeft(groupId: aGroup.groupId, reason: aReason)
+            listener.onCurrentUserLeft?(groupId: aGroup.groupId, reason: aReason)
         }
     }
     
     public func joinGroupRequestDidDecline(_ aGroupId: String, reason aReason: String?) {
         for listener in self.responseDelegates.allObjects {
-            listener.onGroupJoinApplicationDeclined(groupId: aGroupId, reason: aReason ?? "")
+            listener.onGroupJoinApplicationDeclined?(groupId: aGroupId, reason: aReason ?? "")
         }
     }
     
     public func joinGroupRequestDidReceive(_ aGroup: ChatGroup, user aUsername: String, reason aReason: String?) {
         for listener in self.responseDelegates.allObjects {
-            listener.onReceivedNewGroupApplication(groupId: aGroup.groupId, userId: aUsername, reason: aReason ?? "")
+            listener.onReceivedNewGroupApplication?(groupId: aGroup.groupId, userId: aUsername, reason: aReason ?? "")
         }
     }
     
     public func joinGroupRequestDidApprove(_ aGroup: ChatGroup) {
         for listener in self.responseDelegates.allObjects {
-            listener.onGroupJoinApplicationApproved(groupId: aGroup.groupId)
+            listener.onGroupJoinApplicationApproved?(groupId: aGroup.groupId)
         }
     }
     
     public func groupOwnerDidUpdate(_ aGroup: ChatGroup, newOwner aNewOwner: String, oldOwner aOldOwner: String) {
         for listener in self.responseDelegates.allObjects {
-            listener.onGroupOwnerUpdated(groupId: aGroup.groupId, ownerId: aNewOwner, userId: aOldOwner)
+            listener.onGroupOwnerUpdated?(groupId: aGroup.groupId, ownerId: aNewOwner, userId: aOldOwner)
         }
     }
     
     public func userDidJoin(_ aGroup: ChatGroup, user aUsername: String) {
         for listener in self.responseDelegates.allObjects {
-            listener.onUserJoinedGroup(groupId: aGroup.groupId, userId: aUsername)
+            listener.onUserJoinedGroup?(groupId: aGroup.groupId, userId: aUsername)
         }
     }
     
     public func userDidLeave(_ aGroup: ChatGroup, user aUsername: String) {
         for listener in self.responseDelegates.allObjects {
-            listener.onUserLeaveGroup(groupId: aGroup.groupId, userId: aUsername)
+            listener.onUserLeaveGroup?(groupId: aGroup.groupId, userId: aUsername)
         }
     }
     
     public func onAttributesChangedOfGroupMember(_ groupId: String, userId: String, attributes: [String : String]? = nil, operatorId: String) {
         for listener in self.responseDelegates.allObjects {
-            listener.onAttributesChangedOfGroupMember(groupId: groupId, userId: userId, operatorId: operatorId, attributes: attributes ?? [:])
+            listener.onAttributesChangedOfGroupMember?(groupId: groupId, userId: userId, operatorId: operatorId, attributes: attributes ?? [:])
+        }
+    }
+}
+
+extension GroupServiceImplement: GroupChatThreadListener {
+    
+    public func onChatThreadCreate(_ event: GroupChatThreadEvent) {
+        for listener in self.threadDelegates.allObjects {
+            listener.onGroupChatThreadEventOccur(type: .created, event: event)
+        }
+    }
+    
+    public func onChatThreadUpdate(_ event: GroupChatThreadEvent) {
+        for listener in self.threadDelegates.allObjects {
+            listener.onGroupChatThreadEventOccur(type: .updated, event: event)
+        }
+    }
+    
+    public func onChatThreadDestroy(_ event: GroupChatThreadEvent) {
+        for listener in self.threadDelegates.allObjects {
+            listener.onGroupChatThreadEventOccur(type: .destroyed, event: event)
+        }
+    }
+    
+    public func onUserKickOutOfChatThread(_ event: GroupChatThreadEvent) {
+        for listener in self.threadDelegates.allObjects {
+            listener.onGroupChatThreadEventOccur(type: .userKicked, event: event)
         }
     }
 }

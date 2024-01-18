@@ -266,11 +266,22 @@ extension MessageListController: MessageListDriverEventsListener {
                     messageActions.removeAll { $0.tag == "Edit" }
                 }
             }
-            if message.showTranslation {
-                messageActions.removeAll { $0.tag == "Translate" }
+            if Appearance.chat.enableTranslation {
+                if message.showTranslation {
+                    messageActions.removeAll { $0.tag == "Translate" }
+                } else {
+                    messageActions.removeAll { $0.tag == "OriginalText" }
+                }
             } else {
+                messageActions.removeAll { $0.tag == "Translate" }
                 messageActions.removeAll { $0.tag == "OriginalText" }
             }
+        }
+        if !Appearance.chat.contentStyle.contains(.withReply) {
+            messageActions.removeAll { $0.tag == "Reply" }
+        }
+        if !Appearance.chat.contentStyle.contains(.withMessageTopic) {
+            messageActions.removeAll { $0.tag == "Topic" }
         }
         if message.message.direction != .send {
             messageActions.removeAll { $0.tag == "Recall" }

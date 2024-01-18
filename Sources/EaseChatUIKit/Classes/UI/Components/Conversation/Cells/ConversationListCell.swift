@@ -180,26 +180,43 @@ extension ConversationListCell: ThemeSwitchProtocol {
     
     @objc open func contentAttribute() -> NSAttributedString {
         guard let message = self.lastMessage else { return NSAttributedString() }
+        var text = NSMutableAttributedString()
         if message.body.type == .text {
-            guard let content = self.convertMessage(message: message).content else { return NSAttributedString() }
+            var result = message.showType
+            for (key,value) in ChatEmojiConvertor.shared.oldEmojis {
+                result = result.replacingOccurrences(of: key, with: value)
+            }
+            text.append(NSAttributedString {
+                AttributedText(result).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.bodyLarge)
+            })
+            let string = text.string as NSString
+            for symbol in ChatEmojiConvertor.shared.emojis {
+                if string.range(of: symbol).location != NSNotFound {
+                    let ranges = text.string.chat.rangesOfString(symbol)
+                    text = ChatEmojiConvertor.shared.convertEmoji(input: text, ranges: ranges, symbol: symbol,imageBounds: CGRect(x: 0, y: -3, width: 16, height: 16))
+                    text.addAttribute(.font, value: UIFont.theme.bodyLarge, range: NSMakeRange(0, text.length))
+                    text.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5, range: NSMakeRange(0, text.length))
+                }
+            }
             if self.mentioned {
                 let from = self.lastMessage?.from ?? ""
-                let text = "Mentioned".chat.localize
+                let mentionText = "Mentioned".chat.localize
                 let showText = NSMutableAttributedString {
-                    AttributedText("[\(text)] ").foregroundColor(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).font(Font.theme.bodyMedium)
+                    AttributedText("[\(mentionText)] ").foregroundColor(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).font(Font.theme.bodyMedium)
                     AttributedText((message.user?.nickname ?? from) + ": ").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5)
                 }
-                let show = NSMutableAttributedString(attributedString: content)
+                
+                let show = NSMutableAttributedString(attributedString: text)
                 show.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5, range: NSRange(location: 0, length: show.length))
                 show.addAttribute(.font, value: UIFont.theme.bodyMedium, range: NSRange(location: 0, length: show.length))
                 showText.append(show)
                 return showText
             } else {
-                let from = self.lastMessage?.from ?? ""
+                let from = message.from
                 let showText = NSMutableAttributedString {
                     AttributedText((message.user?.nickname ?? from) + ": ").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5)
                 }
-                showText.append(content)
+                showText.append(text)
                 showText.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor6, range: NSRange(location: 0, length: showText.length))
                 showText.addAttribute(.font, value: UIFont.theme.bodyMedium, range: NSRange(location: 0, length: showText.length))
                 return showText

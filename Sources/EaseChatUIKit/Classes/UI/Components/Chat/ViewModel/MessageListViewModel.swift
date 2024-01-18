@@ -60,6 +60,10 @@ import UIKit
         self.chatType = type
         super.init()
         self.chatService?.bindChatEventsListener(listener: self)
+        self.groupService?.bindGroupEventsListener(listener: self)
+        if Appearance.chat.contentStyle.contains(.withMessageTopic) {
+            self.groupService?.bindGroupChatThreadEventListener(listener: self)
+        }
     }
     
     /// Bind ``IMessageListViewDriver``
@@ -632,4 +636,55 @@ extension MessageListViewModel: ChatResponseListener {
     }
     
     
+}
+
+extension MessageListViewModel: GroupServiceListener {
+    
+    
+    public func onCurrentUserLeft(groupId: String, reason: GroupLeaveReason) {
+        switch reason {
+        case .destroyed:
+            ""
+        case .beRemoved:
+            ""
+        default: break
+            
+        }
+    }
+    
+    
+    public func onGroupOwnerUpdated(groupId: String, ownerId: String, userId: String) {
+        
+    }
+    
+    public func onUserJoinedGroup(groupId: String, userId: String) {
+        
+    }
+    
+    public func onUserLeaveGroup(groupId: String, userId: String) {
+        
+    }
+        
+}
+
+
+extension MessageListViewModel: GroupChatThreadEventListener {
+    
+    public func onGroupChatThreadEventOccur(type: GroupChatThreadEventType, event: GroupChatThreadEvent) {
+        if self.to == event.chatThread.parentId {
+            switch type {
+            case .created,.destroyed:
+                if let message = ChatClient.shared().chatManager?.getMessageWithMessageId(event.chatThread.messageId) {
+                    self.driver?.reloadCell(message: message)
+                }
+            case .updated:
+                if let message = ChatClient.shared().chatManager?.getMessageWithMessageId(event.chatThread.messageId) {
+                    self.driver?.updateGroupMessageChatThreadChanged(message: message)
+                }
+            default:
+                break
+            }
+        }
+    }
+
 }
