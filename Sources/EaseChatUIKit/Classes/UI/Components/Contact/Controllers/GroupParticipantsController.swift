@@ -163,7 +163,6 @@ import UIKit
                     } else {
                         consoleLogInfo("Add participants  error:\(error?.errorDescription ?? "")", type: .error)
                     }
-                    vc.navigationController?.popViewController(animated: true)
                 })
         }
         self.navigationController?.pushViewController(vc, animated: true)
