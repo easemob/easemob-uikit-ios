@@ -307,7 +307,6 @@ extension ConversationServiceImplement: ChatEventsListener {
         guard let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(message.conversationId) else {
             return
         }
-        self.markAllMessagesAsRead(conversationId: conversation.conversationId)
         if conversation.ext == nil {
             conversation.ext = [:]
         }
