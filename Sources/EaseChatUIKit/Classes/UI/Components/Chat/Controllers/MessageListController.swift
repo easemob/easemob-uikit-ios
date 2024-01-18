@@ -265,6 +265,9 @@ extension MessageListController: MessageListDriverEventsListener {
                 }
             }
         }
+        if !Appearance.chat.contentStyle.contains(.withReply) {
+            messageActions.removeAll { $0.tag == "Reply" }
+        }
         if message.direction != .send {
             messageActions.removeAll { $0.tag == "Recall" }
         } else {
