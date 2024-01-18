@@ -172,7 +172,10 @@ import UIKit
     @objc open func toRemove() {
         let vc = ComponentsRegister.shared.RemoveGroupParticipantController.init(group: self.chatGroup, profiles: self.participants.filter({ $0.id != self.chatGroup.owner })) { [weak self] userIds in
             guard let `self` = self else { return }
-            consoleLogInfo("toRemove userIds:\(userIds)", type: .debug)
+            for userId in userIds {
+                self.participants.removeAll(where: { $0.id == userId })
+            }
+            self.participantsList.reloadData()
         }
         vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
