@@ -679,6 +679,12 @@ extension MessageListViewModel: GroupChatThreadEventListener {
                 if let message = ChatClient.shared().chatManager?.getMessageWithMessageId(event.chatThread.messageId) {
                     self.driver?.reloadCell(message: message)
                 }
+                if type == .created {
+                    let topicName = event.chatThread?.threadName ?? ""
+                    if let alertMessage = self.constructMessage(text: "[\(event.chatThread?.owner ?? "")] \("Create".chat.localize) \(topicName)", type: .alert,extensionInfo: ["threadId":event.chatThread.threadId ?? "","threadName":topicName]) {
+                        self.driver?.showMessage(message: alertMessage)
+                    }
+                }
             case .updated:
                 if let message = ChatClient.shared().chatManager?.getMessageWithMessageId(event.chatThread.messageId) {
                     self.driver?.updateGroupMessageChatThreadChanged(message: message)

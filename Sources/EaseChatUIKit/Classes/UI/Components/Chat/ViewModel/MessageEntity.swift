@@ -286,6 +286,11 @@ public let reactionHeight = CGFloat(30)
                     text.append(NSAttributedString {
                         AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall)
                     })
+                    
+                    if let threadName = self.message.ext?["threadName"] as? String {
+                        let range = something.chat.rangeOfString(threadName)
+                        text.addAttribute(NSAttributedString.Key.foregroundColor, value: Theme.style == .dark ? Color.theme.primaryColor6:Color.theme.primaryColor5, range: range)
+                    }
                 }
             default:
                 text.append(NSAttributedString {

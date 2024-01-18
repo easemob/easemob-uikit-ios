@@ -70,16 +70,16 @@ extension MessageTopicView: ThemeSwitchProtocol {
     
     public func switchTheme(style: ThemeStyle) {
         let textColor = style == .dark ? UIColor.theme.neutralColor9:UIColor.theme.neutralColor3
-        let image = UIImage(named: "message_topic", in: .chatBundle, with: nil)
+        var image = UIImage(named: "message_topic", in: .chatBundle, with: nil)
         if style == .light {
-            image?.withTintColor(textColor)
+            image = image?.withTintColor(textColor)
         }
         self.icon.image = image
         self.title.textColor = textColor
         self.messageCount.textColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5
-        let indicatorImage = UIImage(named: "topic_indicator", in: .chatBundle, with: nil)
+        var indicatorImage = UIImage(named: "topic_indicator", in: .chatBundle, with: nil)
         if style == .light {
-            indicatorImage?.withTintColor(UIColor.theme.primaryColor5)
+            indicatorImage = indicatorImage?.withTintColor(UIColor.theme.primaryColor5)
         }
         self.indicator.image = indicatorImage
     }
