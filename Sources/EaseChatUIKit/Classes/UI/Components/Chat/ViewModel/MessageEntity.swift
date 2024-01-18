@@ -218,7 +218,7 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
     /// Converts the message text into an attributed string, including the user's nickname, message text, and emojis.
     open func convertTextAttribute() -> NSAttributedString? {
         var text = NSMutableAttributedString()
-        if self.message.body.type != .text || self.message.body.type != .custom {
+        if self.message.body.type != .text, self.message.body.type != .custom {
             text.append(NSAttributedString {
                 AttributedText(self.message.showType).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(UIFont.theme.bodyLarge)
             })
