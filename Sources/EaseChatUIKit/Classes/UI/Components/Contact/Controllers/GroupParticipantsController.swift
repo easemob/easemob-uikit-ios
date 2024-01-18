@@ -170,20 +170,8 @@ import UIKit
     }
     
     @objc open func toRemove() {
-        let vc = ComponentsRegister.shared.RemoveGroupParticipantController.init(group: self.chatGroup, profiles: self.participants.filter({ $0.id != self.chatGroup.owner })) { [weak self] userIds in
-            guard let `self` = self else { return }
-            self.service.remove(userIds: userIds, from: self.chatGroup.groupId) { [weak self] group, error in
-                if error == nil {
-                    for id in userIds {
-                        if let index = self?.participants.firstIndex(where: { $0.id == id }) {
-                            self?.participants.remove(at: index)
-                            self?.participantsList.reloadData()
-                        }
-                    }
-                } else {
-                    consoleLogInfo("remove participants error:\(error?.errorDescription ?? "")", type: .error)
-                }
-            }
+        let vc = ComponentsRegister.shared.RemoveGroupParticipantController.init(group: self.chatGroup, profiles: self.participants.filter({ $0.id != self.chatGroup.owner })) { userIds in
+            consoleLogInfo("toRemove userIds:\(userIds)", type: .debug)
         }
         vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
