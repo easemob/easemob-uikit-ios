@@ -154,9 +154,8 @@ import UIKit
         let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .addGroupParticipant,provider: nil,ignoreIds: self.ignoreContacts())
         vc.confirmClosure = { [weak self] users in
             guard let `self` = self else { return }
-            vc.navigationController?.popViewController(animated: true)
             self.service
-                .invite(userIds: [users.first?.id ?? ""], to: self.chatGroup.groupId, message: "", completion: { [weak self] group, error in
+                .invite(userIds: users.map({ $0.id }), to: self.chatGroup.groupId, message: "", completion: { [weak self] group, error in
                     if error == nil {
                         self?.participants.append(contentsOf: users)
                         self?.participantsList.reloadData()
@@ -164,6 +163,7 @@ import UIKit
                     } else {
                         consoleLogInfo("Add participants  error:\(error?.errorDescription ?? "")", type: .error)
                     }
+                    vc.navigationController?.popViewController(animated: true)
                 })
         }
         self.navigationController?.pushViewController(vc, animated: true)
@@ -177,7 +177,7 @@ import UIKit
                     for id in userIds {
                         if let index = self?.participants.firstIndex(where: { $0.id == id }) {
                             self?.participants.remove(at: index)
-                            self?.participantsList.deleteRows(at: [IndexPath(row: index, section: 0)], with: .fade)
+                            self?.participantsList.reloadData()
                         }
                     }
                 } else {

@@ -201,5 +201,11 @@ extension ChatServiceImplement: ChatEventsListener {
             }
         }
     }
+    
+    public func onMessageContentChanged(_ message: ChatMessage, operatorId: String, operationTime: UInt) {
+        for listener in self.responseDelegates.allObjects {
+            listener.onMessageDidEdited(message: message)
+        }
+    }
 }
 

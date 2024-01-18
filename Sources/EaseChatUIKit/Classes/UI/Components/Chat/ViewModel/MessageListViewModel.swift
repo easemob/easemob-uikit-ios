@@ -575,7 +575,9 @@ extension MessageListViewModel: ChatResponseListener {
     }
     
     public func onMessageDidEdited(message: ChatMessage) {
-        self.messageDidEdited(message: message)
+        if message.conversationId == self.to {
+            self.messageDidEdited(message: message)
+        }
     }
     
     /**

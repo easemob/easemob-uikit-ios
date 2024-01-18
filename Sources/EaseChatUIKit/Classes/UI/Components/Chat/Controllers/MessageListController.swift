@@ -283,7 +283,7 @@ extension MessageListController: MessageListDriverEventsListener {
         if !Appearance.chat.contentStyle.contains(.withMessageTopic) {
             messageActions.removeAll { $0.tag == "Topic" }
         }
-        if message.message.direction != .send {
+        if message.direction != .send {
             messageActions.removeAll { $0.tag == "Recall" }
         } else {
             let duration = UInt(abs(Double(Date().timeIntervalSince1970) - Double(message.message.timestamp/1000)))
