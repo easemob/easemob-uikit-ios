@@ -345,11 +345,12 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
 
 //MARK: - ConversationServiceListener
 extension ConversationViewModel: ConversationServiceListener {
-    public func onConversationLastMessageUpdate(message: ChatMessage, info: ConversationInfo) {
-        self.conversationLastMessageUpdate(message: message, info: info)
+    public func onConversationLastMessageUpdate(message: ChatMessage, info: ConversationInfo, recall: Bool) {
+        self.conversationLastMessageUpdate(message: message, info: info, recall: recall)
     }
     
-    @objc open func conversationLastMessageUpdate(message: ChatMessage, info: ConversationInfo) {
+    @objc open func conversationLastMessageUpdate(message: ChatMessage, info: ConversationInfo,recall: Bool) {
+        self.insertRecallAlert(message: message, info: info, recall: recall)
         if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
             let items = self.mapper(objects: infos)
             var count = UInt(0)
@@ -361,6 +362,17 @@ extension ConversationViewModel: ConversationServiceListener {
             if !info.doNotDisturb,EaseChatUIKitClient.shared.option.option_chat.soundOnReceivedNewMessage,UIApplication.shared.applicationState == .active,self.chatId != info.id {
                 self.playNewMessageSound()
             }
+        }
+    }
+    
+    @objc open func insertRecallAlert(message: ChatMessage, info: ConversationInfo,recall: Bool) {
+        if self.chatId != message.conversationId,recall {
+            let alertMessage = ChatMessage(conversationID: message.conversationId, body: ChatCustomMessageBody(event: EaseChatUIKit_alert_message, customExt: nil), ext: ["something":"recalled a message".chat.localize])
+            alertMessage.timestamp = message.timestamp
+            alertMessage.localTime = message.localTime
+            alertMessage.from = message.from
+            ChatClient.shared().chatManager?.getConversationWithConvId(message.conversationId)?.insert(alertMessage, error: nil)
+
         }
     }
     

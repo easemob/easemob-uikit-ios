@@ -51,7 +51,7 @@ import UIKit
     /// Creates and returns a navigation bar for the GroupParticipantsController.
     /// - Returns: An instance of EaseChatNavigationBar.
     @objc open func createNavigation() -> EaseChatNavigationBar {
-        EaseChatNavigationBar(frame: self.operation != .normal ? CGRect(x: 0, y: 0, width: ScreenWidth, height: 44):CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: true, textAlignment: .left, rightImages:  self.rightImages ,hiddenAvatar: true).backgroundColor(.clear)
+        EaseChatNavigationBar(frame: (self.operation != .normal && self.navigationController == nil) ? CGRect(x: 0, y: 0, width: ScreenWidth, height: 44):CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: true, textAlignment: .left, rightImages:  self.rightImages ,hiddenAvatar: true).backgroundColor(.clear)
     }
     
     private var rightImages: [UIImage] {

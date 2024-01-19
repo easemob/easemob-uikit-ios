@@ -436,7 +436,14 @@ extension ContactInfoViewController: UITableViewDelegate,UITableViewDataSource {
     }
     
     @objc open func processSilentMode(name: String,isOn: Bool) {
-        self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] = isOn ? 1:0
+        let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
+        var conversationMap = self.muteMap[currentUser]
+        if conversationMap != nil {
+            conversationMap?[self.profile.id] = isOn ? 1:0
+        } else {
+            conversationMap = [self.profile.id:(isOn ? 1:0)]
+        }
+        self.muteMap[currentUser] = conversationMap
         if name == "contact_details_switch_donotdisturb".chat.localize {
             NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseUIKit_do_not_disturb_changed"), object: nil,userInfo: ["id":self.profile.id,"value":isOn])
         }

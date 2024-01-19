@@ -101,7 +101,8 @@ import Foundation
     /// - Parameters:
     ///   - message: ``ChatMessage``
     ///   - info: ``ConversationInfo``
-    func onConversationLastMessageUpdate(message: ChatMessage,info: ConversationInfo)
+    ///   - recall: Whether recall the message.
+    func onConversationLastMessageUpdate(message: ChatMessage,info: ConversationInfo, recall: Bool)
 }
 
 @objc public enum ConversationEmergencyType: UInt8 {
@@ -128,7 +129,8 @@ import Foundation
     /// - Parameters:
     ///   - message: ``ChatMessage``
     ///   - info: ``ConversationInfo``
-    func onConversationLastMessageUpdate(message: ChatMessage,info: ConversationInfo)
+    ///   - recall: Whether recall the message.
+    func onConversationLastMessageUpdate(message: ChatMessage,info: ConversationInfo,recall: Bool)
     
     /// You'll receive the result on some conversation last message update.
     /// - Parameter unreadCount: Total unread count.

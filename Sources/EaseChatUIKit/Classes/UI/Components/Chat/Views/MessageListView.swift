@@ -254,7 +254,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
         if let message = self.messages[safe: indexPath.row]?.message {
             let towards: BubbleTowards = message.direction.rawValue == 0 ? .right:.left
             switch message.body.type {
-            case .text:
+            case .text,.combine,.location:
                 var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatTextMessageCell, reuseIdentifier: "EaseChatUIKit.ChatTextMessageCell")
                 if cell == nil {
                     cell = ComponentsRegister.shared.ChatTextMessageCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatTextMessageCell")
@@ -284,18 +284,18 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                     cell = ComponentsRegister.shared.ChatFileMessageCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatFileMessageCell")
                 }
                 return cell
-            case .combine:
-                var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatLocationCell, reuseIdentifier: "EaseChatUIKit.ChatLocationCell")
-                if cell == nil {
-                    cell = ComponentsRegister.shared.ChatLocationCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatLocationCell")
-                }
-                return cell
-            case .location:
-                var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatCombineCell, reuseIdentifier: "EaseChatUIKit.ChatCombineCell")
-                if cell == nil {
-                    cell = ComponentsRegister.shared.ChatCombineCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatCombineCell")
-                }
-                return cell
+//            case .combine:
+//                var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatLocationCell, reuseIdentifier: "EaseChatUIKit.ChatLocationCell")
+//                if cell == nil {
+//                    cell = ComponentsRegister.shared.ChatLocationCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatLocationCell")
+//                }
+//                return cell
+//            case .location:
+//                var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatCombineCell, reuseIdentifier: "EaseChatUIKit.ChatCombineCell")
+//                if cell == nil {
+//                    cell = ComponentsRegister.shared.ChatCombineCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatCombineCell")
+//                }
+//                return cell
             case .custom:
                 if let body = message.body as? ChatCustomMessageBody {
                     switch body.event {

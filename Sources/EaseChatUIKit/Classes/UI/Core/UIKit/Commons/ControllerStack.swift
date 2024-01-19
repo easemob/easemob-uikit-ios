@@ -23,6 +23,9 @@ import UIKit
                 return
             } else {
                 if current != nil {
+                    if current?.modalPresentationStyle == .fullScreen {
+                        vc.modalPresentationStyle = .fullScreen
+                    }
                     current?.present(vc, animated: true)
                 }
                 return
