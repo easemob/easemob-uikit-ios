@@ -34,6 +34,7 @@
 "barrage_long_press_menu_show_original_text" = "Original Text";
 "barrage_long_press_menu_multi_select" = "MultiSelect";
 "barrage_long_press_menu_topic" = "Create Thread";
+"Topic" = "Thread";
 "barrage_long_press_menu_cancel" = "Cancel";
 "barrage_long_press_menu_edit" = "Edit";
 "barrage_long_press_menu_copy" = "Copy";

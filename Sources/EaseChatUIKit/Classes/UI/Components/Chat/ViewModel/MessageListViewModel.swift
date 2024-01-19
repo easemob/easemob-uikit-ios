@@ -681,7 +681,7 @@ extension MessageListViewModel: GroupChatThreadEventListener {
                 }
                 if type == .created {
                     let topicName = event.chatThread?.threadName ?? ""
-                    if let alertMessage = self.constructMessage(text: "[\(event.chatThread?.owner ?? "")] \("Create".chat.localize) \(topicName)", type: .alert,extensionInfo: ["threadId":event.chatThread.threadId ?? "","threadName":topicName]) {
+                    if let alertMessage = self.constructMessage(text: "[\(event.chatThread?.owner ?? "")] \("Create".chat.localize) \("Topic".chat.localize): \(topicName)", type: .alert,extensionInfo: ["threadId":event.chatThread.threadId ?? "","threadName":topicName]) {
                         self.driver?.showMessage(message: alertMessage)
                     }
                 }
