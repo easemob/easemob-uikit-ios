@@ -90,35 +90,33 @@ extension MainViewController: EaseProfileProvider {
                 if type == .chat {
                     group.addTask {
                         var resultProfiles: [EaseChatUIKit.EaseProfileProtocol] = []
-                        let result = await ChatClient.shared().userInfoManager?.fetchUserInfo(byId: profileIds, type: [NSNumber(integerLiteral: UserInfoType.avatarURL.rawValue),NSNumber(integerLiteral: UserInfoType.nickName.rawValue)])
-                        if result?.1 != nil {
-                            return resultProfiles
-                        } else {
-                            let userInfoMap = result?.0 ?? [:]
-                            for (key, value) in userInfoMap {
+                        let result = await self.requestUserInfos(profileIds: profileIds)
+                        if let infos = result {
+                            for info in infos {
                                 let profile = EaseProfile()
-                                profile.id = key
-                                profile.nickname = value.nickname ?? ""
-                                profile.avatarURL = value.avatarUrl ?? ""
+                                profile.id = info.id
+                                profile.nickname = info.nickname
+                                profile.avatarURL = info.avatarURL
                                 resultProfiles.append(profile)
                             }
-                            return resultProfiles
                         }
+                        return resultProfiles
                     }
                 } else {
                     group.addTask {
                         var resultProfiles: [EaseChatUIKit.EaseProfileProtocol] = []
-                        let result = await ChatClient.shared().groupManager?.groupSpecificationFromServer(withId: profileIds.first ?? "")
-                        if result?.1 != nil {
-                            return resultProfiles
-                        } else {
-                            let group = result?.0
-                            let profile = EaseProfile()
-                            profile.id = profileIds.first ?? ""
-                            profile.nickname = group?.groupName ?? ""
-                            resultProfiles.append(profile)
-                            return resultProfiles
+                        //根据profileIds去请求每个群的昵称头像并且 map塞进resultProfiles中返回
+                        let result = await self.requestGroupsInfo(groupIds: profileIds)
+                        if let groups = result {
+                            for group in groups {
+                                let profile = EaseProfile()
+                                profile.id = group.id
+                                profile.nickname = group.nickname
+                                profile.avatarURL = group.avatarURL
+                                resultProfiles.append(profile)
+                            }
                         }
+                        return resultProfiles
                     }
                 }
             }
@@ -130,5 +128,13 @@ extension MainViewController: EaseProfileProvider {
         }
 
         
+    }
+    
+    private func requestUserInfos(profileIds: [String]) async -> [EaseProfileProtocol]? {
+        return []
+    }
+    
+    private func requestGroupsInfo(groupIds: [String]) async -> [EaseProfileProtocol]? {
+        return []
     }
 }

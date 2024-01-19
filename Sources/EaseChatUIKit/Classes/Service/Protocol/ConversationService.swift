@@ -26,8 +26,7 @@ import Foundation
     func unregisterEmergencyListener(listener: ConversationEmergencyListener)
     
     /// Get all conversations from database.
-    /// - Returns: Array of the ``ChatConversation`` object.
-    func loadExistConversations(completion: @escaping ([ConversationInfo],ChatError?) -> Void)
+    func loadExistConversations()
     
     /// Get the session where the server is set to silent state
     /// - Parameters:

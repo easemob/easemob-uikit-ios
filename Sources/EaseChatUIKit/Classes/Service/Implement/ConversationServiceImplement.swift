@@ -44,28 +44,21 @@ extension ConversationServiceImplement: ConversationService {
     
     
     
-    public func loadExistConversations(completion: @escaping ([ConversationInfo],ChatError?) -> Void) {
+    public func loadExistConversations() {
         let items = ChatClient.shared().chatManager?.getAllConversations(true) ?? []
         let userId = ChatClient.shared().currentUsername ?? ""
         if items.count <= 0,!(self.loadFinished[userId] ?? false) {
-            self.fetchPinnedConversations(cursor: "", pageSize: self.pageSize) { [weak self] result, error in
-                guard let `self` = self else { return  }
-                if error == nil {
-                    if let list = result?.list,list.isEmpty {
-                        self.fetchAllConversations { [weak self] result1, error1 in
-                            if error1 == nil {
-                                if let list1 = result1?.list,!list1.isEmpty {
-                                    completion(list1,nil)
-                                } else {
-                                    completion([],nil)
-                                }
-                            } else {
-                                completion([],error1)
-                            }
-                        }
-                    } else {
+            let taskGroup = DispatchGroup()
+            let queue1 = DispatchQueue(label: "conversations.pin")
+            let queue2 = DispatchQueue(label: "conversations")
+
+            taskGroup.enter()
+            queue1.async {
+                self.fetchPinnedConversations(cursor: "", pageSize: self.pageSize) { [weak self] result, error in
+                    guard let `self` = self else { return  }
+                    if error == nil {
                         self.fetchSilentMode(conversationIds: result?.list?.map({ $0.id }) ?? []) { [weak self] resultSilent, silentError in
-                            guard let `self` = self else { return  }
+                            guard let `self` = self else { return }
                             if silentError == nil {
                                 if let list = result?.list {
                                     for item in list {
@@ -80,21 +73,43 @@ extension ConversationServiceImplement: ConversationService {
                                             self.muteMap[currentUser] = conversationMap
                                         }
                                     }
-                                    completion(list,silentError)
+                                    self.handleResult(error: error, type: .loadAllMessageFirstLoadUIKit)
                                 }
                             } else {
-                                completion([],silentError)
+                                self.handleResult(error: error, type: .fetchSilent)
                             }
+                            taskGroup.leave()
                         }
+                        
+                    } else {
+                        self.handleResult(error: error, type: .loadAllMessageFirstLoadUIKit)
+                        taskGroup.leave()
                     }
-                    self.handleResult(error: error, type: .loadAllMessageFirstLoadUIKit)
-                } else {
-                    self.handleResult(error: error, type: .loadAllMessageFirstLoadUIKit)
-                    completion([],error)
                 }
             }
+
+            taskGroup.enter()
+            queue2.async {
+                self.fetchAllConversations {  _, _ in
+                    taskGroup.leave()
+                }
+                
+            }
+
+            taskGroup.notify(queue: .main) {
+                if let conversations = ChatClient.shared().chatManager?.getAllConversations(true) {
+                    for listener in self.responseDelegates.allObjects {
+                        listener.onChatConversationListDidChanged(list: self.mapper(objects: conversations))
+                    }
+                }
+            }
+
         } else {
-            completion(self.mapper(objects: items),nil)
+            if let conversations = ChatClient.shared().chatManager?.getAllConversations(true) {
+                for listener in self.responseDelegates.allObjects {
+                    listener.onChatConversationListDidChanged(list: self.mapper(objects: conversations))
+                }
+            }
         }
     }
     
@@ -139,34 +154,61 @@ extension ConversationServiceImplement: ConversationService {
     
     public func fetchAllConversations(completion: ((CursorResult<ConversationInfo>?,ChatError?) -> Void)?) {
         ChatClient.shared().chatManager?.getConversationsFromServer(withCursor: self.cursor, pageSize: self.pageSize, completion: { [weak self] result, error in
-            if (result?.cursor ?? "").isEmpty {
+            if error == nil {
                 self?.cursor = result?.cursor ?? ""
-                self?.loadFinished[ChatClient.shared().currentUsername ?? ""] = true
-                completion?(CursorResult(list: self?.mapper(objects: result?.list ?? []), andCursor: self?.cursor ?? ""),error)
-                return
-            }
-            if error == nil,let list = result?.list {
-                if (self?.cursor ?? "").isEmpty {
-                    self?.fetchSilentMode(conversationIds: list.map({ $0.conversationId }), completion: { resultSilent, silentError in
-                        if silentError == nil {
-                            for item in list {
-                                if let silentMode = resultSilent?[item.conversationId]?.remindType {
-                                    let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
-                                    var conversationMap = self?.muteMap[currentUser]
-                                    if conversationMap != nil {
-                                        conversationMap?[item.conversationId] = silentMode.rawValue
-                                    } else {
-                                        conversationMap = [item.conversationId:silentMode.rawValue]
+                if (result?.cursor ?? "").isEmpty {
+                    guard let `self` = self else { return }
+                    self.loadFinished[ChatClient.shared().currentUsername ?? ""] = true
+                    if let list = result?.list {
+                        self.fetchSilentMode(conversationIds: list.map({ $0.conversationId }), completion: { [weak self] resultSilent, silentError in
+                            if silentError == nil {
+                                for item in list {
+                                    if let silentMode = resultSilent?[item.conversationId]?.remindType {
+                                        let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
+                                        var conversationMap = self?.muteMap[currentUser]
+                                        if conversationMap != nil {
+                                            conversationMap?[item.conversationId] = silentMode.rawValue
+                                        } else {
+                                            conversationMap = [item.conversationId:silentMode.rawValue]
+                                        }
+                                        self?.muteMap[currentUser] = conversationMap
                                     }
-                                    self?.muteMap[currentUser] = conversationMap
                                 }
                             }
-                        }
-                        completion?(CursorResult(list: self?.mapper(objects: list), andCursor: self?.cursor ?? ""),silentError)
-                        self?.fetchAllConversations(completion: nil)
-                    })
+                            completion?(CursorResult(list: self?.mapper(objects: list), andCursor: result?.cursor ?? ""),silentError)
+                        })
+                    } else {
+                        completion?(nil,nil)
+                    }
+                    return
                 } else {
-                    self?.fetchAllConversations(completion: nil)
+                    let list = result?.list ?? []
+                    let size = self?.pageSize ?? 50
+                    if list.count >= size {
+                        self?.fetchSilentMode(conversationIds: list.map({ $0.conversationId }), completion: { resultSilent, silentError in
+                            if silentError == nil {
+                                for item in list {
+                                    if let silentMode = resultSilent?[item.conversationId]?.remindType {
+                                        let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
+                                        var conversationMap = self?.muteMap[currentUser]
+                                        if conversationMap != nil {
+                                            conversationMap?[item.conversationId] = silentMode.rawValue
+                                        } else {
+                                            conversationMap = [item.conversationId:silentMode.rawValue]
+                                        }
+                                        self?.muteMap[currentUser] = conversationMap
+                                    }
+                                }
+                            }
+                            completion?(CursorResult(list: self?.mapper(objects: list), andCursor: result?.cursor ?? ""),silentError)
+                            self?.fetchAllConversations(completion: nil)
+                        })
+                    } else {
+                        guard let `self` = self else { return }
+                        for listener in self.responseDelegates.allObjects {
+                            listener.onChatConversationListDidChanged(list: [])
+                        }
+                    }
                 }
             } else {
                 completion?(nil,error)
