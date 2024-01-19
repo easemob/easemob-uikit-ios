@@ -86,7 +86,6 @@ extension ConversationServiceImplement: ConversationService {
                                 completion([],silentError)
                             }
                         }
-                        
                     }
                     self.handleResult(error: error, type: .loadAllMessageFirstLoadUIKit)
                 } else {
@@ -143,7 +142,7 @@ extension ConversationServiceImplement: ConversationService {
             if (result?.cursor ?? "").isEmpty {
                 self?.cursor = result?.cursor ?? ""
                 self?.loadFinished[ChatClient.shared().currentUsername ?? ""] = true
-                completion?(CursorResult(list: self?.mapper(objects: ChatClient.shared().chatManager?.getAllConversations(true) ?? []), andCursor: self?.cursor ?? ""),error)
+                completion?(CursorResult(list: self?.mapper(objects: result?.list ?? []), andCursor: self?.cursor ?? ""),error)
                 return
             }
             if error == nil,let list = result?.list {
@@ -292,14 +291,19 @@ extension ConversationServiceImplement: ChatEventsListener {
         for info in aRecallMessagesInfo {
             if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(info.recallMessage.conversationId) {
                 if let recallMessage = ChatClient.shared().chatManager?.getMessageWithMessageId(info.recallMessage.messageId) {
-                    self.notifyHandler(message: recallMessage, local: true, recall: true)
+                    let alertMessage = ChatMessage(conversationID: recallMessage.conversationId, body: ChatCustomMessageBody(event: EaseChatUIKit_alert_message, customExt: nil), ext: ["something":"recalled a message".chat.localize])
+                    alertMessage.timestamp = recallMessage.timestamp
+                    alertMessage.localTime = recallMessage.localTime
+                    alertMessage.from = info.recallBy
+                    conversation.insert(alertMessage, error: nil)
+                    self.notifyHandler(message: alertMessage, local: true)
                 }
             }
             
         }
     }
     
-    private func notifyHandler(message: ChatMessage,local: Bool,recall: Bool = false) {
+    private func notifyHandler(message: ChatMessage,local: Bool) {
         guard let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(message.conversationId) else {
             return
         }
@@ -312,12 +316,12 @@ extension ConversationServiceImplement: ChatEventsListener {
         let list = self.mapper(objects: [conversation])
         for listener in self.responseDelegates.allObjects {
             if let info = list.first {
-                listener.onConversationLastMessageUpdate(message: message, info: info, recall: recall)
+                listener.onConversationLastMessageUpdate(message: message, info: info)
             }
         }
         for handler in self.eventsNotifiers.allObjects {
             if let info = list.first {
-                handler.onConversationLastMessageUpdate(message: message, info: info,recall: recall)
+                handler.onConversationLastMessageUpdate(message: message, info: info)
             }
         }
     }

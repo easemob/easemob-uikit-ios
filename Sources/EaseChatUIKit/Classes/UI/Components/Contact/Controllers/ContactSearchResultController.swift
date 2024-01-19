@@ -46,8 +46,7 @@ import UIKit
     /// - Parameters:
     ///   - headerStyle: ``ContactListHeaderStyle``
     ///   - action: Select row callback.
-    @objc public required init(headerStyle: ContactListHeaderStyle = .contact,datas: [EaseProfileProtocol],action: @escaping (EaseProfileProtocol) -> Void) {
-        self.rawDatas = datas
+    @objc public required init(headerStyle: ContactListHeaderStyle = .contact,action: @escaping (EaseProfileProtocol) -> Void) {
         self.headerStyle = headerStyle
         self.selectClosure = action
         super.init(nibName: nil, bundle: nil)
@@ -72,17 +71,26 @@ import UIKit
         super.viewDidLoad()
         self.tableView.tableFooterView(UIView()).rowHeight(Appearance.contact.rowHeight).tableHeaderView(self.searchController.searchBar)
         self.tableView.keyboardDismissMode = .onDrag
+        self.loadAllContacts()
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
     }
     
-    
-    @objc open func pop() {
-        if self.navigationController != nil {
-            self.navigationController?.popViewController(animated: true)
-        } else {
-            self.dismiss(animated: true)
-        }
+    @objc public func loadAllContacts() {
+        self.service.contacts(completion: { [weak self] error, contacts in
+            if error == nil {
+                let infos = contacts.map({
+                    let profile = EaseProfile()
+                    profile.id = $0.userId
+                    return profile
+                })
+                self?.rawDatas.removeAll()
+                self?.searchResults.removeAll()
+                self?.rawDatas = infos
+            } else {
+                consoleLogInfo("ContactSearchResultController loadAllContacts error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        })
     }
 
     // MARK: - Table view data source
@@ -120,9 +128,6 @@ import UIKit
         if let item = self.searchResults[safe: indexPath.row] {
             item.selected = !item.selected
             self.selectClosure?(item)
-            if self.headerStyle == .shareContact {
-                self.pop()
-            }
         }
         self.tableView.reloadData()
     }
@@ -151,7 +156,7 @@ extension ContactSearchResultController: UISearchResultsUpdating,UISearchControl
     }
     
     public func willDismissSearchController(_ searchController: UISearchController) {
-        self.pop()
+        
     }
     
     public func didDismissSearchController(_ searchController: UISearchController) {

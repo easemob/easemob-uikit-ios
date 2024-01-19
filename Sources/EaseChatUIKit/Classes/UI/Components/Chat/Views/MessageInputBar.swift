@@ -281,12 +281,7 @@ extension MessageInputBar: UITextViewDelegate {
         self.rightView.isSelected = !self.rightView.isSelected
         self.actionClosure?(self.rightView.isSelected ? .emojiKeyboard:.textKeyboard,nil)
         if self.rightView.isSelected {
-            if self.inputField.isFirstResponder {
-                self.inputField.resignFirstResponder()
-            } else {
-                self.inputField.becomeFirstResponder()
-                self.inputField.resignFirstResponder()
-            }
+            self.inputField.resignFirstResponder()
         } else {
             self.inputField.becomeFirstResponder()
         }

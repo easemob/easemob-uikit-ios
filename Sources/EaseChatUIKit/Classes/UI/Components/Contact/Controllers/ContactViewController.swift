@@ -19,7 +19,7 @@ import UIKit
      */
     @objc open func createNavigation() -> EaseChatNavigationBar {
         if self.style == .newGroup || self.style == .addGroupParticipant || self.style == .shareContact {
-            return EaseChatNavigationBar(frame: (self.style == .newGroup || self.style == .newChat || self.style == .shareContact) ? CGRect(x: 0, y: 0, width: ScreenWidth, height: 44):CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: .left,rightTitle: "").backgroundColor(.clear)
+            return EaseChatNavigationBar(frame: (self.style == .newGroup || self.style == .newChat) ? CGRect(x: 0, y: 0, width: ScreenWidth, height: 44):CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: .left,rightTitle: "").backgroundColor(.clear)
         } else {
             return EaseChatNavigationBar(frame: (self.style == .newGroup || self.style == .newChat) ? CGRect(x: 0, y: 0, width: ScreenWidth, height: 44):CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: self.style != .contact, rightImages: self.style == .newChat ? []:[UIImage(named: "person_add", in: .chatBundle, with: nil)!],hiddenAvatar: self.style == .contact ? false:true).backgroundColor(.clear)
         }
@@ -180,11 +180,12 @@ import UIKit
     */
     @objc open func searchAction() {
         var vc: ContactSearchResultController?
-        let profiles = self.contactList.rawData.filter { $0.selected == false }
-        vc = ContactSearchResultController(headerStyle: self.style,datas: profiles) { [weak self] item in
+        vc = ContactSearchResultController(headerStyle: self.style) { [weak self] item in
+            vc?.navigationController?.popViewController(animated: false)
             self?.viewContact(profile: item)
         }
         if let vc = vc {
+            vc.modalPresentationStyle = .fullScreen
             ControllerStack.toDestination(vc: vc)
         }
     }
@@ -263,8 +264,6 @@ import UIKit
                 title += "(\(count))"
             }
             self.navigation.rightItem.setTitle(title, for: .normal)
-            self.contactList.rawData.first { $0.id == profile.id }?.selected = profile.selected
-            self.contactList.refreshList(infos: self.contactList.rawData)
         default:
             break
         }
