@@ -100,14 +100,7 @@ import AudioToolbox
     
     /// Load all sessions that exist locally. If they do not exist, load them from the server.
     @objc open func loadExistLocalDataIfEmptyFetchServer() {
-        self.service?.loadExistConversations(completion: { [weak self] result, error in
-            if error == nil {
-                self?.driver?.refreshList(infos: result)
-            } else {
-                self?.driver?.occurError()
-                consoleLogInfo("loadExistOtherwiseFetchServer error:\(error?.errorDescription ?? "")", type: .error)
-            }
-        })
+        self.service?.loadExistConversations()
     }
     
     
@@ -376,7 +369,9 @@ extension ConversationViewModel: ConversationServiceListener {
     
     
     public func onChatConversationListDidChanged(list: [ConversationInfo]) {
-        consoleLogInfo("onChatConversationListDidChanged", type: .debug)
+        if let conversations = ChatClient.shared().chatManager?.getAllConversations(true) {
+            self.driver?.refreshList(infos: self.mapper(objects: conversations))
+        }
     }
     
     public func onConversationMessageAlreadyReadOnOtherDevice(info: ConversationInfo) {
