@@ -177,6 +177,9 @@ let message_bubble_space = CGFloat(5)
         if Appearance.chat.contentStyle.contains(.withMessageTopic) {
             self.contentView.addSubview(self.topicView)
         }
+        if Appearance.chat.contentStyle.contains(.withMessageReaction) {
+            self.contentView.addSubview(self.reactionView)
+        }
         if Appearance.chat.contentStyle.contains(.withDateAndTime) {
             self.contentView.addSubview(self.messageDate)
         }
@@ -316,7 +319,12 @@ let message_bubble_space = CGFloat(5)
             }
             self.status.isHidden = true
             self.status.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+entity.bubbleSize.width+4:12+entity.bubbleSize.width+4, y: entity.height - 8 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - 20 - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageReaction }) ? reactionHeight:0) - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageTopic }) ? (self.topicView.isHidden ? 0:topicHeight):0), width: 20, height: 20)
-            self.topicView.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+12:12, y: (Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame.maxY:self.bubbleMultiCorners.frame.maxY)+2, width: limitBubbleWidth, height: topicHeight-2)
+            if Appearance.chat.contentStyle.contains(.withMessageTopic) {
+                self.topicView.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+12:12, y: (Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame.maxY:self.bubbleMultiCorners.frame.maxY)+2, width: limitBubbleWidth, height: topicHeight-2)
+            }
+            if Appearance.chat.contentStyle.contains(.withMessageReaction) {
+                self.reactionView.frame = CGRect(x: Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame.minX:self.bubbleMultiCorners.frame.minX, y: entity.height-(Appearance.chat.contentStyle.contains(.withDateAndTime) ? 16:2)-(Appearance.chat.contentStyle.contains(.withMessageReaction) ? reactionHeight:2), width: limitBubbleWidth, height: reactionHeight)
+            }
         } else {
             self.status.isHidden = false
             self.avatar.frame = CGRect(x: ScreenWidth-40, y: entity.height - 8 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - 28 - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageReaction }) ? topicHeight:0), width: 28, height: 28)
@@ -338,7 +346,12 @@ let message_bubble_space = CGFloat(5)
             }
             self.status.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.minX-entity.bubbleSize.width-12-20-4:ScreenWidth-entity.bubbleSize.width-12-20-4, y: entity.height - 8 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - 20 - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageReaction }) ? reactionHeight:0) - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageTopic }) ? (self.topicView.isHidden ? 0:topicHeight):0), width: 20, height: 20)
             self.replyContent.cornerRadius(Appearance.chat.imageMessageCorner)
-            self.topicView.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? (self.avatar.frame.minX-limitBubbleWidth):(ScreenWidth-limitBubbleWidth-12), y: (Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame.maxY:self.bubbleMultiCorners.frame.maxY)+2, width: limitImageWidth, height: topicHeight)
+            if Appearance.chat.contentStyle.contains(.withMessageTopic) {
+                self.topicView.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? (self.avatar.frame.minX-limitBubbleWidth):(ScreenWidth-limitBubbleWidth-12), y: (Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame.maxY:self.bubbleMultiCorners.frame.maxY)+2, width: limitImageWidth, height: topicHeight)
+            }
+            if Appearance.chat.contentStyle.contains(.withMessageReaction) {
+                self.reactionView.frame = CGRect(x: (Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame.maxX:self.bubbleMultiCorners.frame.maxX)-limitBubbleWidth, y: entity.height-(Appearance.chat.contentStyle.contains(.withDateAndTime) ? 16:2)-(Appearance.chat.contentStyle.contains(.withMessageReaction) ? reactionHeight:2), width: limitBubbleWidth, height: reactionHeight)
+            }
         }
     }
     

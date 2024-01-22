@@ -76,7 +76,57 @@ import Foundation
         "[:-]": "🙄"
     ]
     
-    
+    @objc let reactionEmojis: [String:String] = [
+        "emoji_1":"😀",
+        "emoji_2":"😟",
+        "emoji_3":"😍",
+        "emoji_4":"😳",
+        "emoji_5":"😎",
+        "emoji_6":"😭",
+        "emoji_7":"☺️",
+        "emoji_8":"🤐",
+        "emoji_9":"😴",
+        "emoji_10":"😥",
+        "emoji_11":"😝",
+        "emoji_12":"😡",
+        "emoji_13":"😜",
+        "emoji_14":"😁",
+        "emoji_15":"🤔",
+        "emoji_16":"☹️",
+        "emoji_17":"😓",
+        "emoji_18":"😫",
+        "emoji_19":"🤢",
+        "emoji_20":"😵",
+        "emoji_21":"😊",
+        "emoji_22":"🙄",
+        "emoji_23":"😠",
+        "emoji_24":"😪",
+        "emoji_25":"🤥",
+        "emoji_26":"😁",
+        "emoji_27":"🤡",
+        "emoji_28":"🤤",
+        "emoji_29":"😱",
+        "emoji_30":"🤧",
+        "emoji_31":"😐",
+        "emoji_32":"😬",
+        "emoji_33":"😯",
+        "emoji_34":"😧",
+        "emoji_35":"🤑",
+        "emoji_36":"😂",
+        "emoji_37":"🤗",
+        "emoji_38":"👏",
+        "emoji_39":"🤝",
+        "emoji_40":"👍",
+        "emoji_41":"👎",
+        "emoji_42":"👌",
+        "emoji_43":"❤️",
+        "emoji_44":"💔",
+        "emoji_45":"💣",
+        "emoji_46":"💩",
+        "emoji_47":"🌹",
+        "emoji_48":"🙏",
+        "emoji_49":"🎉"
+    ]
     
     /**
      Converts the specified ranges of the input attributed string to emoji images using the provided symbol and returns the resulting attributed string.
