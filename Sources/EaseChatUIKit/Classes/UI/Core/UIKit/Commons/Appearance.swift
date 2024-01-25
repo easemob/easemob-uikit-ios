@@ -118,10 +118,10 @@ import UIKit
     public var inputBarCorner: CornerRadius = .medium
     
     /// Message bubble display style.``BubbleDisplayStyle``
-    public var bubbleStyle: MessageCell.BubbleDisplayStyle = .withArrow
+    public var bubbleStyle: MessageBubbleDisplayStyle = .withArrow
     
     /// Message content display style.You can use these four styles to combine a style array you want. Bubbles are all provided by default, except for picture messages and video messages.``ContentDisplayStyle``
-    public var contentStyle: [MessageCell.ContentDisplayStyle] = [.withReply,.withAvatar,.withNickName,.withDateAndTime,.withMessageTopic]
+    public var contentStyle: [MessageContentDisplayStyle] = [.withReply,.withAvatar,.withNickName,.withDateAndTime,.withMessageTopic,.withMessageReaction]
             
     /// ActionSheet data source of the message being long pressed.``ActionSheetItemProtocol``
     public var messageLongPressedActions: [ActionSheetItemProtocol] = [

@@ -11,6 +11,8 @@ import UIKit
     
     public private(set) var datas: [MessageReaction] = []
     
+    public var reactionClosure: ((MessageReaction?) -> Void)?
+    
     public private(set) lazy var reactionMenus: UICollectionView = {
         let flow = UICollectionViewFlowLayout()
         flow.scrollDirection = .horizontal
@@ -26,39 +28,20 @@ import UIKit
         self.addSubViews([self.reactionMenus,self.moreReaction])
         self.reactionMenus.isScrollEnabled = false
         self.reactionMenus.bounces = false
+        Theme.registerSwitchThemeViews(view: self)
+        self.switchTheme(style: Theme.style)
     }
     
     @objc func moreAction() {
-        
-    }
-    
-    @objc open func reactionMenuWidth(reactions: [MessageReaction]) -> CGFloat {
-        var width = 0
-        for reaction in reactions {
-            width += Int(reaction.reactionWidth)
-        }
-        if reactions.count > 0 {
-            width += (reactions.count-1)*4
-        }
-        return CGFloat(width)
+        self.reactionClosure?(nil)
     }
     
     @objc open func refresh(entity: MessageEntity) {
         if let reactions = entity.message.reactionList {
-            if self.frame.width < limitBubbleWidth {
-                let reactionWidth = self.reactionMenuWidth(reactions: reactions)
-                if entity.message.direction == .send {
-                    self.reactionMenus.frame = CGRect(x: self.frame.width-reactionWidth-30, y: 0, width: reactionWidth, height: self.frame.height)
-                } else {
-                    self.reactionMenus.frame = CGRect(x: 0, y: 0, width: reactionWidth, height: self.frame.height)
-                }
-                self.moreReaction.frame = CGRect(x: self.reactionMenus.frame.maxY, y: 2, width: 24, height: 24)
-            } else {
-                self.reactionMenus.frame = CGRect(x: 0, y: 0, width: self.frame.width-30, height: self.frame.height)
-                self.moreReaction.frame = CGRect(x: self.frame.width-30, y: 2, width: 24, height: 24)
-            }
+            self.reactionMenus.frame = CGRect(x: 0, y: 0, width: self.frame.width-30, height: self.frame.height)
+            self.moreReaction.frame = CGRect(x: self.frame.width-24, y: 3, width: 24, height: 24)
             self.datas.removeAll()
-            self.datas.append(contentsOf: reactions)
+            self.datas.append(contentsOf: reactions.prefix(entity.visibleReactionToIndex+1))
             self.reactionMenus.reloadData()
         } else {
             self.frame = .zero
@@ -93,7 +76,7 @@ extension MessageReactionView: UICollectionViewDelegate, UICollectionViewDataSou
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        var cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EaseChatUIKit.MessageReactionCell", for: indexPath) as? MessageReactionCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EaseChatUIKit.MessageReactionCell", for: indexPath) as? MessageReactionCell
         if let reaction = self.datas[safe: indexPath.row] {
             cell?.refresh(reaction: reaction)
         }
@@ -101,11 +84,19 @@ extension MessageReactionView: UICollectionViewDelegate, UICollectionViewDataSou
     }
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
+        self.reactionClosure?(self.datas[safe: indexPath.row])
     }
     
 }
 
+extension MessageReactionView: ThemeSwitchProtocol {
+    
+    open func switchTheme(style: ThemeStyle) {
+        self.moreReaction.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
+        self.reactionMenus.reloadData()
+    }
+    
+}
 
 
 @objcMembers open class MessageReactionCell: UICollectionViewCell {
@@ -125,6 +116,13 @@ extension MessageReactionView: UICollectionViewDelegate, UICollectionViewDataSou
     
     @objc open func refresh(reaction: MessageReaction) {
         self.content.attributedText = reaction.reactionAttribute
+        if reaction.isAddedBySelf {
+            self.content.layer.borderColor = Theme.style == .dark ? UIColor.theme.primaryColor6.cgColor:UIColor.theme.primaryColor5.cgColor
+            self.content.backgroundColor = Theme.style == .dark ? UIColor.theme.primaryColor1:UIColor.theme.primaryColor95
+        } else {
+            self.content.layer.borderColor = UIColor.clear.cgColor
+            self.content.backgroundColor = Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
+        }
     }
     
     required public init?(coder: NSCoder) {
@@ -133,6 +131,7 @@ extension MessageReactionView: UICollectionViewDelegate, UICollectionViewDataSou
 
     
 }
+
 
 extension MessageReaction {
     
@@ -150,10 +149,22 @@ extension MessageReaction {
     
     @objc open func convertReactionAttribute() -> NSAttributedString? {
         if let content = self.reaction {
-            let attribute = NSMutableAttributedString {
-                AttributedText(" ").font(Font.theme.labelSmall)
-                ImageAttachment(UIImage(named: content, in: .chatBundle, with: nil), bounds: CGRect(x: 0, y: -6.5, width: 24, height: 24))
-                AttributedText(" \(self.count)").font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
+            let symbol = ChatEmojiConvertor.shared.reactionEmojis[content] ?? content
+            let image = ChatEmojiConvertor.shared.emojiReactionMap.isEmpty ? UIImage(named: symbol, in: .chatBundle, with: nil):ChatEmojiConvertor.shared.emojiReactionMap[symbol]
+            
+            var attribute = NSMutableAttributedString()
+            if image == nil {
+                attribute  = NSMutableAttributedString {
+                    AttributedText(" ").font(Font.theme.labelSmall)
+                    AttributedText("\(content)").font(.systemFont(ofSize: 24))
+                    AttributedText(" \(self.count)").font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
+                }
+            } else {
+                attribute = NSMutableAttributedString {
+                    AttributedText(" ").font(Font.theme.labelSmall)
+                    ImageAttachment(image, bounds: CGRect(x: 0, y: -6.5, width: 24, height: 24))
+                    AttributedText(" \(self.count)").font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
+                }
             }
             return attribute
         }

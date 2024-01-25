@@ -17,6 +17,7 @@ import Foundation
     case read
 }
 
+
 let EaseChatUIKit_alert_message = "chatUIKit_alert_message"
 
 let EaseChatUIKit_user_card_message = "userCard"
@@ -84,6 +85,13 @@ let EaseChatUIKit_user_card_message = "userCard"
     ///   - message: ``ChatMessage``
     ///   - completion: Request a callback, returning an array of message objects if successful, or an error if failed
     func translateMessage(message: ChatMessage,completion: @escaping (ChatError?,ChatMessage?) -> Void)
+    
+    /// Operation reaction api.
+    /// - Parameters:
+    ///   - reaction: ``MessageReaction``
+    ///   - message: ``ChatMessage``
+    ///   - completion: Callback, returns error whether successful error is `nil`, or error occur.
+    func reaction(reaction: MessageReaction, message: ChatMessage, completion: @escaping (ChatError?) -> Void)
     
     
 }

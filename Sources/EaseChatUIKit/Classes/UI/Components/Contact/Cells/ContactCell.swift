@@ -60,7 +60,7 @@ import UIKit
         self.avatar.image(with: profile.avatarURL, placeHolder: Appearance.avatarPlaceHolder)
         self.nickName.text = profile.nickname.isEmpty ? profile.id:profile.nickname
         if self.display == .withCheckBox,let item = profile as? EaseProfile {
-            self.checkbox.image = UIImage(named: item.selected ? "select":"unselect", in: .chatBundle, compatibleWith: nil)
+            self.checkbox.image = UIImage(named: item.selected ? "select":"unselect", in: .chatBundle, with: nil)
         }
     }
     
@@ -69,7 +69,7 @@ import UIKit
         self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: nickName)
         self.avatar.image(with: profile.avatarURL, placeHolder: Appearance.conversation.singlePlaceHolder)
         if self.display == .withCheckBox,let item = profile as? EaseProfile {
-            self.checkbox.image = UIImage(named: item.selected ? "select":"unselect", in: .chatBundle, compatibleWith: nil)
+            self.checkbox.image = UIImage(named: item.selected ? "select":"unselect", in: .chatBundle, with: nil)
         }
     }
     

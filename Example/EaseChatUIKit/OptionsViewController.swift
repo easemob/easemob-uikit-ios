@@ -44,7 +44,7 @@ class OptionsViewController: UIViewController {
     }
     
     @IBAction func switchBubble(_ sender: UISegmentedControl) {
-        Appearance.chat.bubbleStyle = MessageCell.BubbleDisplayStyle(rawValue: UInt(sender.selectedSegmentIndex)) ?? .withArrow
+        Appearance.chat.bubbleStyle = MessageBubbleDisplayStyle(rawValue: UInt(sender.selectedSegmentIndex)) ?? .withArrow
     }
     
     @IBAction func switchAvatar(_ sender: UISegmentedControl) {

@@ -34,6 +34,8 @@ public let topicHeight = CGFloat(58)
 
 public let reactionHeight = CGFloat(30)
 
+public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar) ? ScreenWidth-48*2:40
+
 @objcMembers open class MessageEntity: NSObject {
     
     required public override init() {
@@ -41,6 +43,8 @@ public let reactionHeight = CGFloat(30)
     }
     
     public var message: ChatMessage = ChatMessage()
+    
+    public var visibleReactionToIndex = 0
     
     /// Whether message show translations or not.
     public var showTranslation: Bool {
@@ -62,6 +66,8 @@ public let reactionHeight = CGFloat(30)
     
     /// Whether audio message playing or not.
     public var playing = false
+    
+    public var selected = false
     
     /// Message status image.
     public var stateImage: UIImage? {
@@ -104,6 +110,30 @@ public let reactionHeight = CGFloat(30)
         } else {
             return 8+(Appearance.chat.contentStyle.contains(.withNickName) ? 28:2)+(Appearance.chat.contentStyle.contains(.withReply) ? self.replySize.height:2)+self.bubbleSize.height+(Appearance.chat.contentStyle.contains(.withDateAndTime) ? 24:8)+self.topicContentHeight()+self.reactionContentHeight()
         }
+    }
+    
+    open func reactionMenuWidth() -> CGFloat {
+        if !Appearance.chat.contentStyle.contains(.withMessageReaction) {
+            return 0
+        }
+        if let reactions = self.message.reactionList {
+            if reactions.count > 0 {
+                var width = CGFloat(0)
+                for (index,reaction) in reactions.enumerated() {
+                    let newWidth = width + CGFloat(reaction.reactionWidth+(index > 0 ? 4:0))
+                    if newWidth < reactionMaxWidth - 30 {
+                        width = newWidth
+                        self.visibleReactionToIndex = index
+                    } else {
+                        self.visibleReactionToIndex = index
+                        return width
+                    }
+                }
+                return width
+            }
+            return 0;
+        }
+        return 0;
     }
     
     open func topicContentHeight() -> CGFloat {

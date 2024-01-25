@@ -24,6 +24,21 @@ import UIKit
 }
 
 extension ChatServiceImplement: ChatService {
+    
+    public func reaction(reaction: MessageReaction, message: ChatMessage, completion: @escaping (ChatError?) -> Void) {
+        if let emoji = reaction.reaction {
+            if !reaction.isAddedBySelf {
+                ChatClient.shared().chatManager?.addReaction(emoji, toMessage: message.messageId, completion: { error in
+                    completion(error)
+                })
+            } else {
+                ChatClient.shared().chatManager?.removeReaction(emoji, fromMessage: message.messageId, completion: { error in
+                    completion(error)
+                })
+            }
+        }
+    }
+    
     public func edit(messageId: String, text: String, completion: @escaping (ChatError?, ChatMessage?) -> Void) {
         let rawMessage = ChatClient.shared().chatManager?.getMessageWithMessageId(messageId)
         let body = ChatTextMessageBody(text: text)

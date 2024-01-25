@@ -1,7 +1,9 @@
 import UIKit
 
-
-/// When you
+/**
+    The `ConversationListController` class implements a view controller that displays a list of conversations.
+    It inherits from `UIViewController`.
+ */
 @objc open class ConversationListController: UIViewController {
     
     public private(set) lazy var navigation: EaseChatNavigationBar = {

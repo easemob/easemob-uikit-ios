@@ -8,7 +8,6 @@ import AVFoundation
     case chat
     case group
     case chatroom
-    case thread
 }
 
 @objcMembers open class MessageListController: UIViewController {
@@ -57,7 +56,7 @@ import AVFoundation
      
      This initializer sets the `profile` property based on the conversation ID. If the conversation ID is found in the conversations cache, the profile is set to the corresponding information. Otherwise, the profile ID is set to the conversation ID.
      
-     The `chatType` parameter determines the type of chat, which can be `.group`, `.thread`, or `.chat`. If the chat type is not one of these options, it defaults to `.chatroom`.
+     The `chatType` parameter determines the type of chat, which can be `.group` or `.chat`. If the chat type is not one of these options, it defaults to `.chatroom`.
      */
     @objc(initWithConversationId:chatType:)
     public required init(conversationId: String,chatType: ChatType = .chat) {
@@ -67,7 +66,7 @@ import AVFoundation
             self.profile.id = conversationId
         }
         switch chatType {
-        case .group,.thread:
+        case .group:
             self.chatType = .group
         case .chat:
             self.chatType = .chat

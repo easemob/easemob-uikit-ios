@@ -50,6 +50,17 @@ import UIKit
     /// Message visible on scroll in screen
     /// - Parameter entity: ``MessageEntity``
     func onMessageVisible(entity: MessageEntity)
+    
+    /// Message topic view clicked.
+    /// - Parameter entity: ``MessageEntity``
+    func onMessageTopicClicked(entity: MessageEntity)
+    
+    /// Message reaction&`...` clicked.
+    /// - Parameters:
+    ///   - reaction: ``MessageReaction`` object,if nil is `...` clicked.
+    ///   - entity: ``MessageEntity``
+    func onMessageReactionClicked(reaction: MessageReaction?,entity: MessageEntity)
+    
 }
 
 @objc public protocol IMessageListViewDriver: NSObjectProtocol {
@@ -107,7 +118,13 @@ import UIKit
     /// - Parameter entity: ``ChatMessage``
     func updateGroupMessageChatThreadChanged(message: ChatMessage)
     
-    func reloadCell(message: ChatMessage)
+    /// Reload topic content
+    /// - Parameter message: ``ChatMessage``
+    func reloadTopic(message: ChatMessage)
+    
+    /// Reload reaction content.
+    /// - Parameter message: ``ChatMessage``
+    func reloadReaction(message: ChatMessage)
 }
 
 
@@ -134,6 +151,20 @@ import UIKit
     
     public private(set) var canMention = false
     
+    public var editMode = false {
+        didSet {
+            DispatchQueue.main.async {
+                self.editBottomBar.isHidden = !self.editMode
+                if self.editMode {
+                    self.bringSubviewToFront(self.editBottomBar)
+                } else {
+                    self.sendSubviewToBack(self.editBottomBar)
+                }
+                self.messageList.reloadData()
+            }
+        }
+    }
+    
     private var replyId = ""
     
     public private(set) lazy var messageList: UITableView = {
@@ -144,6 +175,10 @@ import UIKit
         MessageInputBar(frame: CGRect(x: 0, y: self.frame.height-52-BottomBarHeight, width: self.frame.width, height: 52), text: "", placeHolder: "Aa")
     }()
     
+    public private(set) lazy var editBottomBar: MessageMultiSelectedBottomBar = {
+        MessageMultiSelectedBottomBar(frame: CGRect(x: 0, y: self.frame.height-52-BottomBarHeight, width: self.frame.width, height: 52))
+    }()
+        
     public private(set) lazy var replyBar: MessageInputReplyView = {
         MessageInputReplyView(frame: CGRect(x: 0, y: self.inputBar.frame.minY-52, width: self.frame.width, height: 53))
     }()
@@ -153,16 +188,21 @@ import UIKit
         super.init(frame: frame)
     }
     
+    /// Init method
+    /// - Parameters:
+    ///   - frame: ``CGRect``
+    ///   - mention: Whether to enable the mention function of UI.
     @objc required public init(frame: CGRect,mention: Bool) {
         super.init(frame: frame)
         self.canMention = mention
         self.messageList.keyboardDismissMode = .onDrag
         self.messageList.allowsSelection = false
         if Appearance.chat.contentStyle.contains(.withReply) {
-            self.addSubViews([self.messageList,self.inputBar,self.replyBar])
+            self.addSubViews([self.messageList,self.inputBar,self.replyBar,self.editBottomBar])
         } else {
-            self.addSubViews([self.messageList,self.inputBar])
+            self.addSubViews([self.messageList,self.inputBar,self.editBottomBar])
         }
+        self.editBottomBar.isHidden = true
         self.messageList.refreshControl = UIRefreshControl()
         self.messageList.refreshControl?.addTarget(self, action: #selector(pullRefresh), for: .valueChanged)
         self.replyBar.isHidden = true
@@ -251,6 +291,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = self.registerMessageCell(tableView: tableView, indexPath: indexPath)
         if let info = self.messages[safe: indexPath.row] {
+            cell?.editMode = self.editMode
             cell?.refresh(entity: info)
         }
         cell?.clickAction = { [weak self] in
@@ -258,6 +299,9 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
         }
         cell?.longPressAction = { [weak self] in
             self?.handleLongPressed(area: $0, entity: $1)
+        }
+        cell?.reactionClicked = { [weak self] in
+            self?.processReactionEmojiClick(reaction: $0, entity: $1)
         }
         cell?.selectionStyle = .none
         return cell ?? MessageCell()
@@ -427,10 +471,24 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                     handler.onFailureMessageRetrySend(entity: entity)
                 }
             }
+        case .topic:
+            for handler in self.eventHandlers.allObjects {
+                handler.onMessageTopicClicked(entity: entity)
+            }
+        case .reaction:
+            for handler in self.eventHandlers.allObjects {
+                handler.onMessageReactionClicked(reaction: nil, entity: entity)
+            }
         }
         
     }
     
+    private func processReactionEmojiClick(reaction: MessageReaction?,entity: MessageEntity) {
+        for handler in self.eventHandlers.allObjects {
+            handler.onMessageReactionClicked(reaction: reaction, entity: entity)
+        }
+    }
+        
     private func handleLongPressed(area: MessageCellClickArea,entity: MessageEntity) {
         if area == .bubble {
             if ComponentViewsActionHooker.shared.chat.bubbleLongPressed != nil {
@@ -466,9 +524,34 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
 }
 
 extension MessageListView: IMessageListViewDriver {
+    public func reloadReaction(message: ChatMessage) {
+        if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
+            if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }) {
+                let entity = self.convertMessage(message: message)
+                let reactionWidth = entity.reactionMenuWidth()
+                if reactionWidth < reactionMaxWidth-30 {
+                    if let reactions = message.reactionList {
+                        if reactions.count > entity.visibleReactionToIndex+1 || reactions.count <= 0 {
+                            self.messages.replaceSubrange(index...index, with: [entity])
+                            self.messageList.reloadRows(at: [indexPath], with: .automatic)
+                        } else {
+                            if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
+                                if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }),let entity = self.messages[safe: index] {
+                                    if let cell = self.messageList.cellForRow(at: indexPath) as? MessageCell {
+                                        cell.updateAxis(entity: entity)
+                                        cell.reactionView.refresh(entity: entity)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     
-    public func reloadCell(message: ChatMessage) {
-        self.replyId = ""
+    
+    public func reloadTopic(message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }) {
                 self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
@@ -479,7 +562,6 @@ extension MessageListView: IMessageListViewDriver {
     
     
     public func updateGroupMessageChatThreadChanged(message: ChatMessage) {
-        self.replyId = ""
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }),let entity = self.messages[safe: index] {
                 entity.topicContent = nil
@@ -515,7 +597,6 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     public func refreshMessages(messages: [ChatMessage]) {
-        self.replyId = ""
         self.messageList.refreshControl?.endRefreshing()
         self.messages = messages.map({
             self.convertMessage(message: $0)
@@ -530,7 +611,6 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     public func updateAudioMessageStatus(message: ChatMessage, play: Bool) {
-        self.replyId = ""
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             var indexPaths = [IndexPath]()
             indexPaths.append(IndexPath(row: index, section: 0))
@@ -548,7 +628,6 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     public func updateMessageAttachmentStatus(message: ChatMessage) {
-        self.replyId = ""
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
         }
@@ -572,7 +651,6 @@ extension MessageListView: IMessageListViewDriver {
     
     
     public func updateMessageStatus(message: ChatMessage, status: ChatMessageStatus) {
-        self.replyId = ""
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages[safe: index]?.state = status
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
@@ -610,7 +688,9 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     public func showMessage(message: ChatMessage) {
-        self.replyId = ""
+        if message.direction == .send {
+            self.replyId = ""
+        }
         if message.direction == .send {
             self.replyBar.isHidden = true
         }
@@ -627,7 +707,9 @@ extension MessageListView: IMessageListViewDriver {
     
     public func processMessage(operation: MessageOperation,message: ChatMessage) {
         self.replyBar.isHidden = true
-        self.replyId = ""
+        if message.direction == .send {
+            self.replyId = ""
+        }
         switch operation {
         case .copy: self.copyAction(message)
         case .edit: self.editAction(message)

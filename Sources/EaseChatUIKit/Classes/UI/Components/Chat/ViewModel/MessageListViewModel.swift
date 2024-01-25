@@ -200,7 +200,7 @@ import UIKit
         switch self.chatType {
         case .chat:
             chatMessage.chatType = .chat
-        case .group,.thread:
+        case .group:
             chatMessage.chatType = .groupChat
         case .chatroom:
             chatMessage.chatType = .chatRoom
@@ -300,6 +300,35 @@ import UIKit
 }
 
 extension MessageListViewModel: MessageListViewActionEventsDelegate {
+    
+    public func onMessageTopicClicked(entity: MessageEntity) {
+        self.messageTopicClicked(entity: entity)
+    }
+    
+    @objc open func messageTopicClicked(entity: MessageEntity) {
+        
+    }
+    
+    public func onMessageReactionClicked(reaction: MessageReaction?, entity: MessageEntity) {
+        self.messageReactionClicked(reaction: reaction, entity: entity)
+    }
+    
+    @objc open func messageReactionClicked(reaction: MessageReaction?, entity: MessageEntity) {
+        if reaction == nil {
+            //show reactions userlist
+        } else {
+            guard let reaction = reaction else { return }
+            self.chatService?.reaction(reaction: reaction, message: entity.message, completion: { error in
+                if error == nil {
+                    self.driver?.reloadReaction(message: entity.message)
+                } else {
+                    consoleLogInfo("reaction error:\(error?.errorDescription ?? "")", type: .error)
+                }
+            })
+        }
+    }
+    
+    
     public func onMessageVisible(entity: MessageEntity) {
         self.messageVisibleMark(entity: entity)
     }
@@ -632,12 +661,22 @@ extension MessageListViewModel: ChatResponseListener {
     }
     
     public func onMessageReactionChanged(changes: [MessageReactionChange]) {
-        if changes.first?.conversationId ?? "" == self.to {
-            
-        }
+        self.messageReactionChanged(changes: changes)
     }
     
-    
+    @objc open func messageReactionChanged(changes: [MessageReactionChange]) {
+        var messageIds = Set<String>()
+        for change in changes {
+            if let messageId = change.messageId,change.conversationId == self.to {
+                messageIds.insert(messageId)
+            }
+        }
+        for messageId in messageIds {
+            if let message = ChatClient.shared().chatManager?.getMessageWithMessageId(messageId) {
+                self.driver?.reloadReaction(message: message)
+            }
+        }
+    }
 }
 
 extension MessageListViewModel: GroupServiceListener {
@@ -677,7 +716,7 @@ extension MessageListViewModel: GroupChatThreadEventListener {
             switch type {
             case .created,.destroyed:
                 if let message = ChatClient.shared().chatManager?.getMessageWithMessageId(event.chatThread.messageId) {
-                    self.driver?.reloadCell(message: message)
+                    self.driver?.reloadTopic(message: message)
                 }
                 if type == .created {
                     let topicName = event.chatThread?.threadName ?? ""
