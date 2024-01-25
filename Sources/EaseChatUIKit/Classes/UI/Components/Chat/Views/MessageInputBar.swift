@@ -30,11 +30,25 @@ import UIKit
         }
     }
     
+    public var textViewFirstResponder: ((Bool) -> Void)?
+    
+    
     public private(set) var audioImage = UIImage(named: "audio", in: .chatBundle, with: nil)
     
     public private(set) var attachmentImage = UIImage(named: "attachment", in: .chatBundle, with: nil)
     
-    private var typingAttributes: [NSAttributedString.Key : Any] = [.foregroundColor:Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1,.font:UIFont.theme.bodyLarge]
+    private var style: NSParagraphStyle {
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.lineHeightMultiple = 1.15
+        return paragraph
+    }
+    
+    private var typingAttributesText: [NSAttributedString.Key : Any] {
+        set {}
+        get {
+            [.foregroundColor:Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1,.font:UIFont.theme.bodyLarge,.paragraphStyle: self.style]
+        }
+    }
         
     /// The height of the keyboard.
     public private(set) var keyboardHeight = CGFloat(0)
@@ -96,6 +110,7 @@ import UIKit
         self.rightView.setImage(UIImage(named: "emojiKeyboard", in: Bundle.chatBundle, with: nil)?.withTintColor(UIColor.theme.neutralColor3), for: .normal)
         self.rightView.setImage(UIImage(named: "textKeyboard", in: Bundle.chatBundle, with: nil)?.withTintColor(UIColor.theme.neutralColor3), for: .selected)
         self.inputField.returnKeyType = .send
+        self.inputField.typingAttributes = self.typingAttributesText
         self.inputField.contentInsetAdjustmentBehavior = .never
         self.inputField.cornerRadius(Appearance.chat.inputBarCorner)
         self.inputField.placeHolder = Appearance.chat.inputPlaceHolder.chat.localize
@@ -169,10 +184,10 @@ extension MessageInputBar: UITextViewDelegate {
                     }
                     return !mention
                 }
-                if self.typingAttributes.isEmpty,!textView.typingAttributes.isEmpty {
-                    self.typingAttributes = textView.typingAttributes
+                if self.typingAttributesText.isEmpty,!textView.typingAttributes.isEmpty {
+                    self.typingAttributesText = textView.typingAttributes
                 }
-                textView.typingAttributes = self.typingAttributes
+                textView.typingAttributes = self.typingAttributesText
                 self.updateHeight()
             }
             return true
@@ -207,6 +222,15 @@ extension MessageInputBar: UITextViewDelegate {
         }
     }
     
+    public func textViewDidBeginEditing(_ textView: UITextView) {
+        self.rightView.isSelected = false
+    }
+    
+    public func textViewDidEndEditing(_ textView: UITextView) {
+        if let emojiView = self.emoji {
+            self.textViewFirstResponder?(!emojiView.isHidden)
+        }
+    }
     
     /// Update subviews height on text input content changed.
     private func updateHeight() {
@@ -281,10 +305,15 @@ extension MessageInputBar: UITextViewDelegate {
         self.rightView.isSelected = !self.rightView.isSelected
         self.actionClosure?(self.rightView.isSelected ? .emojiKeyboard:.textKeyboard,nil)
         if self.rightView.isSelected {
+            if !self.inputField.isFirstResponder {
+                self.inputField.becomeFirstResponder()
+            }
+            self.rightView.isSelected = true
             self.inputField.resignFirstResponder()
         } else {
             self.inputField.becomeFirstResponder()
         }
+        self.textViewFirstResponder?(true)
     }
     
     @objc private func keyboardWillShow(notification: Notification) {
@@ -297,6 +326,7 @@ extension MessageInputBar: UITextViewDelegate {
         UIView.animate(withDuration: duration!) {
             self.frame = CGRect(x: 0, y: ScreenHeight - NavigationHeight - self.rawFrame.height - frame!.height, width: self.frame.width, height: self.rawFrame.height)
         }
+        self.textViewFirstResponder?(true)
         self.updateHeight()
     }
     
@@ -304,7 +334,12 @@ extension MessageInputBar: UITextViewDelegate {
         let frame = notification.chat.keyboardEndFrame
         let duration = notification.chat.keyboardAnimationDuration
         self.hiddenDuration = duration ?? 0
-        self.keyboardHeight = frame!.height
+//        self.keyboardHeight = frame!.height
+        self.showEmojiKeyboard()
+        self.textViewFirstResponder?(true)
+    }
+    
+    @objc open func showEmojiKeyboard() {
         if self.rightView.isSelected {
             self.frame = CGRect(x: 0, y: self.frame.origin.y, width: self.frame.width, height: self.keyboardHeight + self.rawFrame.height)
             if self.emoji == nil{
@@ -338,7 +373,7 @@ extension MessageInputBar: UITextViewDelegate {
             self.frame = CGRect(x: 0, y: self.frame.origin.y, width: self.frame.width, height: self.rawFrame.height)
         }
         
-        UIView.animate(withDuration: duration!) {
+        UIView.animate(withDuration: self.hiddenDuration) {
             self.emoji?.isHidden = !self.rightView.isSelected
         }
     }
@@ -350,6 +385,7 @@ extension MessageInputBar: UITextViewDelegate {
         }
         self.rightView.isSelected = false
         self.emoji?.isHidden = true
+        self.textViewFirstResponder?(false)
     }
     
     /// Raise input bar

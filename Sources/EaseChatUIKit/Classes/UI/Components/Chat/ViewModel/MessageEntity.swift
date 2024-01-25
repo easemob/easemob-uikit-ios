@@ -461,7 +461,7 @@ extension ChatMessage {
             if conversation.type == .groupChat {
                 if let ext = self.ext, let atList = ext["em_at_list"] {
                     if let atListString = atList as? String {
-                        if atListString == "All" {
+                        if atListString.lowercased() == "All".lowercased() {
                             return "All"
                         }
                     } else if let atListArray = atList as? [String] {

@@ -41,7 +41,12 @@ import UIKit
         self.fileSize.frame = CGRect(x: self.content.frame.minX, y: self.content.frame.maxY, width: self.content.frame.width, height: 18)
         self.fileIcon.cornerRadius(.extraSmall)
         self.switchTheme(style: Theme.style)
-        self.content.textColor = self.towards == .right ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor
+        if self.towards == .right {
+            self.content.textColor = Theme.style == .light ? UIColor.theme.neutralColor95:UIColor.theme.neutralColor2
+        } else {
+            self.content.textColor = Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5
+        
+        }
         self.content.text = entity.message.showContent
         if let body = entity.message.body as? ChatFileMessageBody {
             self.fileSize.text = "\(self.formatFileSize(Int(body.fileLength)))"

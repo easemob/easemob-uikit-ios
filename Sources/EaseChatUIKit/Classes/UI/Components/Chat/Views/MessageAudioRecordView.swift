@@ -162,6 +162,8 @@ import UIKit
         self.buildTimer()
         self.recordTitle.text = "Recording".chat.localize
         AudioTools.shared.startRecording()
+        self.recordIcon.setImage(nil, for: .normal)
+        self.recordIcon.setTitle("0s", for: .normal)
     }
     
     private func stopRecord() {
@@ -240,9 +242,7 @@ extension MessageAudioRecordView: ThemeSwitchProtocol {
         self.recordIcon.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
         self.send.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
         self.trash.backgroundColor(style == .light ? UIColor.theme.neutralColor9:UIColor.theme.neutralColor2)
-        if style == .dark {
-            self.trashIcon?.withTintColor(UIColor.theme.neutralColor7)
-        }
+        self.trashIcon?.withTintColor(style == .dark ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor5)
         self.trash.setImage(self.trashIcon, for: .normal)
     }
     

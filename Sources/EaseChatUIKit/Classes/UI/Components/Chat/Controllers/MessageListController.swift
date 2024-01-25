@@ -103,7 +103,7 @@ import AVFoundation
         self.view.backgroundColor = UIColor.theme.neutralColor98
         self.navigation.subtitle = "online"
         self.navigation.title = self.profile.nickname.isEmpty ? self.profile.id:self.profile.nickname
-        self.view.addSubViews([self.navigation,self.messageContainer])
+        self.view.addSubViews([self.messageContainer,self.navigation])
         self.navigation.clickClosure = { [weak self] in
             self?.navigationClick(type: $0, indexPath: $1)
         }
@@ -334,7 +334,7 @@ extension MessageListController: MessageListDriverEventsListener {
                 self.viewModel.processMessage(operation: .edit, message: message, edit: text)
                 UIViewController.currentController?.dismiss(animated: true)
             }
-            DialogManager.shared.showCustomDialog(customView: editor,dismiss: true)
+            DialogManager.shared.showCustomDialog(customView: editor)
         }
     }
     
@@ -678,6 +678,7 @@ extension MessageListController: QLPreviewControllerDataSource {
 extension MessageListController: ThemeSwitchProtocol {
     
     public func switchTheme(style: ThemeStyle) {
+        self.navigation.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
         self.view.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
         var images = [UIImage(named: "audio_call", in: .chatBundle, with: nil)!,UIImage(named: "video_call", in: .chatBundle, with: nil)!]
         if style == .light {

@@ -55,7 +55,7 @@ import UIKit
         self.addSubview(self.imageContainer)
         self.imageContainer.translatesAutoresizingMaskIntoConstraints = false
         self.imageContainer.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-        self.imageContainer.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        self.imageContainer.centerYAnchor.constraint(equalTo: centerYAnchor,constant: -NavigationHeight).isActive = true
         self.imageContainer.widthAnchor.constraint(equalToConstant: 107).isActive = true
         self.imageContainer.heightAnchor.constraint(equalToConstant: 107).isActive = true
         

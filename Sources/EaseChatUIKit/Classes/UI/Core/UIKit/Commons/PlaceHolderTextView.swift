@@ -72,7 +72,7 @@ import UIKit
         }
         var newRect = rect
         let size = self.placeHolder.chat.sizeWithText(font: self.font ?? UIFont.theme.bodyLarge, size: rect.size)
-        newRect.size.width = size.width-20
+        newRect.size.width = size.width+20
         newRect.size.height = size.height
         newRect.origin.x = self.contentInset.left
         newRect.origin.y = (rect.height-size.height)/2.0

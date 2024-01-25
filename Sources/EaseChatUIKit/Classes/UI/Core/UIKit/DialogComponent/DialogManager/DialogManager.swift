@@ -65,7 +65,7 @@ import UIKit
     }
     
     @objc public func showCustomDialog(customView: UIView,dismiss: Bool = true) {
-        let vc = DialogContainerViewController(custom: customView,constraintsSize: customView.frame.size,canPanDismiss: dismiss)
+        let vc = DialogContainerViewController(custom: customView,constraintsSize: customView.frame.size)
         let current = UIViewController.currentController
         if current != nil {
             current?.presentViewController(vc)

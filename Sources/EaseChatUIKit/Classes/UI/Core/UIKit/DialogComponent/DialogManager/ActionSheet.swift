@@ -101,6 +101,7 @@ import UIKit
                 }
             }
         }
+        self.menuList.bounces = false
         self.actionClosure = action
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
@@ -149,6 +150,7 @@ extension ActionSheet: UITableViewDelegate,UITableViewDataSource {
         cell?.textLabel?.font = .systemFont(ofSize: 16, weight: .regular)
         cell?.textLabel?.textAlignment = item.image == nil ? .center:.left
         cell?.imageView?.image = Theme.style == .dark ? item.image?.withTintColor(UIColor.theme.primaryColor6):item.image?.withTintColor(UIColor.theme.primaryColor5)
+        cell?.imageView?.contentMode = .scaleAspectFit
         cell?.textLabel?.numberOfLines = 2
         cell?.textLabel?.backgroundColor = .clear
         if Theme.style == .light {

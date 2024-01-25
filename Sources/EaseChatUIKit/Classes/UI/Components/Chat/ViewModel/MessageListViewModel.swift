@@ -346,7 +346,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
         if let duration = body?.duration {
             if duration > 0 {
                 if message.playing {
-                    if let path = body?.localPath {
+                    if let path = body?.localPath,FileManager.default.fileExists(atPath: path) {
                         if AudioTools.canPlay(url: URL(fileURLWithPath: path)) {
                             AudioTools.shared.stopPlaying()
                             self.driver?.updateAudioMessageStatus(message: message.message, play: message.playing)
@@ -372,6 +372,8 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
                 }
             }
         }
+        
+        ChatClient.shared().chatManager?.update(message.message)
     }
     
     @objc open func downloadMessageAttachment(message: MessageEntity) {

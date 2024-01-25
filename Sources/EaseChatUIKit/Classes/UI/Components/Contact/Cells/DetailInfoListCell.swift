@@ -62,7 +62,7 @@ import UIKit
         self.switchMenu.isHidden = !info.withSwitch
         self.titleLabel.text = info.title
         self.detailLabel.text = info.detail
-        self.accessoryType = info.withSwitch ? .none:.disclosureIndicator
+        
         self.switchMenu.isOn = info.switchValue
     }
     

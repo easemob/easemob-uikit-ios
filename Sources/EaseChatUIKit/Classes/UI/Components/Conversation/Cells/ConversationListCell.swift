@@ -108,8 +108,14 @@ import UIKit
         } else {
             self.badge.isHidden = info.unreadCount <= 0
             self.dot.isHidden = true
-            let badgeWidth = CGFloat(info.unreadCount > 9 ? 32:18)
-            self.badge.frame = CGRect(x: self.date.frame.maxX-badgeWidth, y: self.nickName.frame.maxY+5, width: badgeWidth, height: 18)
+            var badgeWidth = 18
+            if info.unreadCount > 9 {
+                badgeWidth = 24
+                if info.unreadCount > 99 {
+                    badgeWidth = 32
+                }
+            }
+            self.badge.frame = CGRect(x: Int(self.date.frame.maxX)-badgeWidth, y: Int(self.nickName.frame.maxY)+5, width: badgeWidth, height: 18)
         }
     }
     
@@ -187,7 +193,7 @@ extension ConversationListCell: ThemeSwitchProtocol {
                 let text = "Mentioned".chat.localize
                 let showText = NSMutableAttributedString {
                     AttributedText("[\(text)] ").foregroundColor(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).font(Font.theme.bodyMedium)
-                    AttributedText((message.user?.nickname ?? from) + ": ").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5)
+                    AttributedText((message.user?.nickname ?? from) + ": ").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(Font.theme.bodyMedium)
                 }
                 let show = NSMutableAttributedString(attributedString: content)
                 show.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5, range: NSRange(location: 0, length: show.length))
@@ -197,7 +203,7 @@ extension ConversationListCell: ThemeSwitchProtocol {
             } else {
                 let from = self.lastMessage?.from ?? ""
                 let showText = NSMutableAttributedString {
-                    AttributedText((message.user?.nickname ?? from) + ": ").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5)
+                    AttributedText((message.user?.nickname ?? from) + ": ").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(Font.theme.bodyMedium)
                 }
                 showText.append(content)
                 showText.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor6, range: NSRange(location: 0, length: showText.length))

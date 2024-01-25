@@ -42,7 +42,7 @@ import UIKit
     open override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        
+        self.contentEditor.contentInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
         self.contentEditor.placeHolderColor = Theme.style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor6
         let content = self.titleForHeader()
         self.contentEditor.placeHolder = "Please input".chat.localize
@@ -91,6 +91,7 @@ import UIKit
     }
     
     private func save() {
+        self.view.endEditing(true)
         guard let text = self.contentEditor.text  else { return }
         if text.count > self.textLimit() {
             self.showToast(toast: "Reach content character limit.".chat.localize)

@@ -86,6 +86,9 @@ extension ContactListHeaderCell: ThemeSwitchProtocol {
     @objc open func switchTheme(style: ThemeStyle) {
         self.badge.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
         self.textLabel?.textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
+        self.accessoryView?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor5
+        self.accessoryView?.subviews.first?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor5
+    
     }
 }
 
@@ -93,6 +96,7 @@ extension ContactListHeaderCell: ThemeSwitchProtocol {
 public typealias ContactListItemActionClosure = ((ContactListHeaderItemProtocol) -> Void)
 
 @objc final public class ContactListHeaderItem: NSObject,ContactListHeaderItemProtocol {
+    
     public var numberCount: UInt = 0
     
     public var featureIdentify: String = ""
