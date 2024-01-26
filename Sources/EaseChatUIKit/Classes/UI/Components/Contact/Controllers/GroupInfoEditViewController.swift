@@ -55,6 +55,7 @@ import UIKit
         self.view.addSubViews([self.navigation,self.contentEditor])
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
+        self.contentEditor.becomeFirstResponder()
     }
     
     private func titleForHeader() -> String {

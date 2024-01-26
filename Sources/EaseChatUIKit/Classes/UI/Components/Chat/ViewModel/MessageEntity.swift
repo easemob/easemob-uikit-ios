@@ -127,7 +127,12 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
         let label = UILabel().numberOfLines(0).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
         label.attributedText = self.convertTextAttribute()
         let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-24, height: 9999))
-        return CGSize(width: size.width+24, height: size.height+14+(self.message.edited ? 19:0))
+        var width = size.width+24
+        if width < 36 {
+            width = 36
+        }
+        let height = size.height+14+(self.message.edited ? 19:0)
+        return CGSize(width: width, height: height)
     }
     
     open func translationHeight() -> CGFloat {
@@ -423,7 +428,7 @@ extension ChatMessage {
         case .custom:
             if let body = self.body as? ChatCustomMessageBody {
                 if body.event == EaseChatUIKit_user_card_message {
-                    return UIImage(named: "reply_card", in: .chatBundle, with: nil)
+                    return UIImage(named: "reply_contact", in: .chatBundle, with: nil)
                 }
             }
             return nil

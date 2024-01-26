@@ -445,7 +445,7 @@ extension MessageListController: MessageListDriverEventsListener {
      */
     @objc open func audioDialog() {
         AudioTools.shared.stopPlaying()
-        let audioView = MessageAudioRecordView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 200)) { [weak self] url, duration in
+        let audioView = MessageAudioRecordView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 200+BottomBarHeight)) { [weak self] url, duration in
             UIViewController.currentController?.dismiss(animated: true)
             self?.viewModel.sendMessage(text: url.path, type: .voice, extensionInfo: ["duration":duration])
         } trashClosure: {

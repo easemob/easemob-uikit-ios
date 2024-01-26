@@ -339,7 +339,9 @@ import UIKit
         vc.mentionClosure = { [weak self] in
             self?.transferConfirm(profile: $0)
         }
-        vc.modalPresentationStyle = .fullScreen
+        if vc.presentingViewController != nil {
+            vc.modalPresentationStyle = .fullScreen
+        }
         ControllerStack.toDestination(vc: vc)
     }
     

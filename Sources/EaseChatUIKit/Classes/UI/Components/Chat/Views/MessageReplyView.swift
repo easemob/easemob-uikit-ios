@@ -13,6 +13,7 @@ import UIKit
     private var replyAudioImage = UIImage(named: "reply_audio", in: .chatBundle, with: nil)
     private var replyVideoImage = UIImage(named: "reply_video", in: .chatBundle, with: nil)
     private var replyFileImage = UIImage(named: "reply_file", in: .chatBundle, with: nil)
+    private var replyContactImage = UIImage(named: "reply_contact", in: .chatBundle, with: nil)
     
     
     public private(set) lazy var replyUser: UILabel = {
@@ -85,6 +86,16 @@ import UIKit
         switch message.body.type {
         case .image: return self.replyPhotoImage
         case .video: return self.replyVideoImage
+        case .file: return  self.replyFileImage
+        case .voice: return self.replyAudioImage
+        case .custom:
+            if let body = message.body as? ChatCustomMessageBody {
+                if body.event == EaseChatUIKit_user_card_message {
+                    return self.replyContactImage
+                }
+            }
+            return nil
+        
         default:
             return nil
         }

@@ -40,6 +40,14 @@ import UIKit
     public private(set) lazy var badge: UILabel = {
         UILabel(frame: CGRect(x: ScreenWidth-70, y: self.contentView.frame.height/2.0-9, width: 32, height: 18)).cornerRadius(.large).font(UIFont.theme.bodySmall)
     }()
+    
+    public private(set) lazy var separatorLine: UIView = {
+        self.createSeparatorLine()
+    }()
+    
+    @objc open func createSeparatorLine() -> UIView {
+        UIView(frame: CGRect(x: 16, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-16, height: 0.5))
+    }
         
     public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -49,6 +57,7 @@ import UIKit
         self.textLabel?.font = UIFont.theme.labelMedium
         self.textLabel?.textColor = UIColor.theme.neutralColor1
         self.contentView.addSubview(self.badge)
+        self.contentView.addSubview(self.separatorLine)
 //        self.accessoryView = self.badge
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
@@ -56,6 +65,7 @@ import UIKit
     
     open override func layoutSubviews() {
         super.layoutSubviews()
+        self.separatorLine.frame = CGRect(x: 16, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width, height: 0.5)
     }
     
     /// Refresh cell on needed.
@@ -88,7 +98,8 @@ extension ContactListHeaderCell: ThemeSwitchProtocol {
         self.textLabel?.textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
         self.accessoryView?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor5
         self.accessoryView?.subviews.first?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor5
-    
+        
+        self.separatorLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
     }
 }
 

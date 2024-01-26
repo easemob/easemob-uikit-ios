@@ -216,7 +216,8 @@ let message_bubble_space = CGFloat(5)
     private func addRotation() {
         let rotationAnimation = CABasicAnimation(keyPath: "transform.rotation.z")
         rotationAnimation.toValue = NSNumber(value: Double.pi * 2)
-        rotationAnimation.duration = 999
+        rotationAnimation.duration = 1
+        rotationAnimation.repeatCount = 999
         rotationAnimation.isRemovedOnCompletion = false
         rotationAnimation.fillMode = CAMediaTimingFillMode.forwards
         

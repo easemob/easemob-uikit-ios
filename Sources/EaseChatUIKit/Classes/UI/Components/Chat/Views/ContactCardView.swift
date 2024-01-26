@@ -46,7 +46,7 @@ import UIKit
         self.avatar.frame = CGRect(x: 12, y: 12, width: 44, height: 44)
         self.nickName.frame = CGRect(x: self.avatar.frame.maxX+12, y: 12, width: self.frame.width - 80, height: 44)
         self.divideLine.frame = CGRect(x: 12, y: self.avatar.frame.maxY+12.5, width: self.frame.width-24, height: 0.5)
-        self.alert.frame = CGRect(x: 12, y: self.divideLine.frame.maxY+6, width: 150, height: 12)
+        self.alert.frame = CGRect(x: 12, y: self.frame.height-18, width: 150, height: 12)
         if let body = entity.message.body as? ChatCustomMessageBody {
             if let avatarURL = body.customExt?["avatar"] as? String {
                 if avatarURL.isEmpty {

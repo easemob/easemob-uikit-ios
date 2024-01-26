@@ -51,7 +51,7 @@ import UIKit
     /// Creates and returns a navigation bar for the GroupParticipantsController.
     /// - Returns: An instance of EaseChatNavigationBar.
     @objc open func createNavigation() -> EaseChatNavigationBar {
-        EaseChatNavigationBar(frame: self.operation != .normal ? CGRect(x: 0, y: 0, width: ScreenWidth, height: 44):CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: true, textAlignment: .left, rightImages:  self.rightImages ,hiddenAvatar: true).backgroundColor(.clear)
+        EaseChatNavigationBar(frame: self.operation == .mention ? CGRect(x: 0, y: 0, width: ScreenWidth, height: 44):CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: true, textAlignment: .left, rightImages:  self.rightImages ,hiddenAvatar: true).backgroundColor(.clear)
     }
     
     private var rightImages: [UIImage] {
@@ -60,7 +60,7 @@ import UIKit
     }
     
     public private(set) lazy var participantsList: UITableView = {
-        UITableView(frame: CGRect(x: 0, y: self.navigation.frame.height, width: self.view.frame.width, height: self.view.frame.height-self.navigation.frame.height), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).rowHeight(60).backgroundColor(.clear)
+        UITableView(frame: CGRect(x: 0, y: self.navigation.frame.height, width: self.view.frame.width, height: self.view.frame.height-self.navigation.frame.height), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).rowHeight(60).backgroundColor(.clear).separatorStyle(.none)
     }()
     
     /**
@@ -90,8 +90,7 @@ import UIKit
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         self.view.backgroundColor = UIColor.theme.neutralColor98
-        
-        self.navigation.title = "group_details_button_members".chat.localize
+        self.setupTitle()
         self.view.addSubViews([self.navigation,self.participantsList])
         // Do any additional setup after loading the view.
         //click of the navigation
@@ -103,6 +102,23 @@ import UIKit
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
     }
+    
+    private func setupTitle() {
+        var text = ""
+        switch self.operation {
+        case .normal:
+            text = "group_details_button_members".chat.localize
+        case .mention:
+            text = "group_mention_title".chat.localize
+        case .transferOwner:
+            text = "group_details_extend_button_transfer".chat.localize
+        }
+        if self.participants.count > 0 {
+            text += "(\(self.participants.count))"
+        }
+        self.navigation.title = text
+    }
+    
     
     /**
      Handles the navigation bar click events.
@@ -218,12 +234,15 @@ import UIKit
                 } else {
                     consoleLogInfo("GroupParticipantsController fetch error:\(error?.errorDescription ?? "")", type: .error)
                 }
+                
+                self.setupTitle()
             }
         } else {
             if self.operation == .mention {
                 let profile = EaseProfile()
                 profile.id = "All"
                 profile.nickname = "All"
+                profile.avatarURL = "all"
                 self.participants.insert(profile, at: 0)
             }
             self.participantsList.reloadData()

@@ -12,7 +12,7 @@ import UIKit
     public private(set) var towards = BubbleTowards.left
 
     public private(set) lazy var content: UILabel = {
-        UILabel(frame: CGRect(x: self.towards == .left ? 12:self.frame.width-12-20-12, y: 5, width: self.frame.width - self.frame.height - 16 - 16 - 12, height: 24)).backgroundColor(.clear).numberOfLines(1).font(UIFont.theme.labelLarge)
+        UILabel(frame: CGRect(x: self.towards == .left ? 12:self.frame.width-12-20-12, y: 5, width: self.frame.width - self.frame.height - 16 - 16 - 12, height: 24)).backgroundColor(.clear).numberOfLines(1).font(UIFont.theme.labelLarge).lineBreakMode(.byTruncatingMiddle)
     }()
     
     public private(set) lazy var fileSize: UILabel = {

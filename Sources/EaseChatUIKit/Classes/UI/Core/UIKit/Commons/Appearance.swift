@@ -94,7 +94,7 @@ import UIKit
     /// Shown menus on ``ConversationListController`` right item clicked.
     public var listMoreActions: [ActionSheetItemProtocol] = [
         ActionSheetItem(title: "new_chat_button_click_menu_selectcontacts".chat.localize, type: .normal, tag: "SelectContacts", image: UIImage(named: "chatWith", in: .chatBundle, with: nil)),
-        ActionSheetItem(title: "new_chat_button_click_menu_addcontacts".chat.localize, type: .normal, tag: "AddContact", image: UIImage(named: "person_add", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor5)),
+        ActionSheetItem(title: "new_chat_button_click_menu_addcontacts".chat.localize, type: .normal, tag: "AddContact", image: UIImage(named: "person_add_fill", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor5)),
         ActionSheetItem(title: "new_chat_button_click_menu_creategroup".chat.localize, type: .normal, tag: "CreateGroup", image: UIImage(named: "create_group", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor5))
     ]
 }
@@ -218,7 +218,7 @@ import UIKit
     ]
     
     /// The contact info header extension items.
-    public var detailExtensionActionItems: [ContactListHeaderItemProtocol] = [ContactListHeaderItem(featureIdentify: "Chat", featureName: "Chat", featureIcon: UIImage(named: "chatTo", in: .chatBundle, with: nil))]
+    public var detailExtensionActionItems: [ContactListHeaderItemProtocol] = [ContactListHeaderItem(featureIdentify: "Chat", featureName: "Chat".chat.localize, featureIcon: UIImage(named: "chatTo", in: .chatBundle, with: nil))]
     
     /// ActionSheet menu configuration items after clicking more buttons in a single session side sliding menu.
     /// How to use?

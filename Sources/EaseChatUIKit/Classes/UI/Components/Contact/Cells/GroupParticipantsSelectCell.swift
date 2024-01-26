@@ -48,6 +48,7 @@ import UIKit
         self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: nickName)
         self.avatar.image(with: profile.avatarURL, placeHolder: Appearance.avatarPlaceHolder)
         self.checkbox.image = UIImage(named: profile.selected ? "select":"unselect", in: .chatBundle, compatibleWith: nil)
+        self.separatorLine.backgroundColor = Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
     }
     
     func highlightKeywords(keyword: String, in string: String) -> NSAttributedString {

@@ -634,6 +634,7 @@ extension MessageListView: IMessageListViewDriver {
         self.replyBar.isHidden = false
         self.replyBar.refresh(message: message)
         self.replyId = message.messageId
+        self.inputBar.show()
     }
     
     private func deleteAction(_ message: ChatMessage) {

@@ -79,7 +79,7 @@ import UIKit
     }()
     
     public private(set) lazy var inputField: PlaceHolderTextView = {
-        PlaceHolderTextView(frame: CGRect(x: 54, y: 8, width: self.frame.width-161, height: 36)).delegate(self).font(UIFont.theme.bodyLarge).backgroundColor(.clear).backgroundColor(UIColor.theme.neutralColor95).delegate(self)
+        PlaceHolderTextView(frame: CGRect(x: 50, y: 8, width: self.frame.width-142, height: 36)).delegate(self).font(UIFont.theme.bodyLarge).backgroundColor(.clear).backgroundColor(UIColor.theme.neutralColor95).delegate(self)
     }()
     
     public private(set) lazy var attachment: UIButton = {
@@ -242,10 +242,10 @@ extension MessageInputBar: UITextViewDelegate {
             
             if textHeight > Appearance.chat.maxInputHeight {
                 self.frame = CGRect(x: 0, y: ScreenHeight - NavigationHeight - (Appearance.chat.maxInputHeight+16) - self.keyboardHeight, width: self.frame.width, height: Appearance.chat.maxInputHeight+16)
-                self.inputField.frame = CGRect(x: 54, y: 8, width: self.frame.width-161, height: Appearance.chat.maxInputHeight)
+                self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: Appearance.chat.maxInputHeight)
             } else {
                 self.frame = CGRect(x: 0, y: ScreenHeight - NavigationHeight - self.rawHeight - self.keyboardHeight, width: self.frame.width, height: self.rawHeight)
-                self.inputField.frame = CGRect(x: 54, y: 8, width: self.frame.width-161, height: self.rawTextHeight)
+                self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: self.rawTextHeight)
             }
             
             self.audio.frame = CGRect(x: 12, y: self.inputField.frame.maxY-32, width: 30, height: 30)
@@ -283,7 +283,7 @@ extension MessageInputBar: UITextViewDelegate {
     private func recoverInputState() {
         self.rawHeight = self.rawFrame.height
         self.rawTextHeight = self.rawHeight-16
-        self.inputField.frame = CGRect(x: 54, y: 8, width: self.frame.width-161, height: 36)
+        self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: 36)
         self.audio.frame = CGRect(x: 12, y: self.inputField.frame.maxY-32, width: 30, height: 30)
         self.rightView.frame = CGRect(x: self.frame.width-84, y: self.inputField.frame.maxY-32, width: 30, height: 30)
         self.attachment.frame = CGRect(x: self.frame.width - 42, y: self.inputField.frame.maxY-32, width: 30, height: 30)

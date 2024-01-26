@@ -41,6 +41,7 @@
 "Mentioned" = "有人@你";
 "recalled a message" = "撤回了一条消息";
 
+"Chat" = "发消息";
 
 "participant_list_title" = "成员列表";
 
@@ -91,6 +92,7 @@
 "group_details_button_description" = "群描述";
 "group_details_button_announcement" = "群公告";
 "group_details_extend_button_transfer" = "转移群主";
+"group_mention_title" = "@提及";
 "group_details_extend_button_disband" = "解散群组";
 "group_details_extend_button_disband_alert_title" = "解散群组";
 "group_details_extend_button_disband_alert_subtitle" = "解散群会删除所有成员";

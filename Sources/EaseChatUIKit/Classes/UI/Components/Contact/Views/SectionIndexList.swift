@@ -85,7 +85,7 @@ extension SectionIndexList: UITableViewDelegate,UITableViewDataSource {
         cell?.contentView.backgroundColor = indexPath.row == self.selectIndex ? self.selectedColor:.clear
         cell?.contentView.cornerRadius(8)
         cell?.textLabel?.backgroundColor = .clear
-        cell?.textLabel?.font = UIFont.theme.bodyExtraSmall
+        cell?.textLabel?.font = UIFont.theme.labelExtraSmall
         cell?.selectionStyle = .none
         if self.selectIndex != indexPath.row {
             cell?.textLabel?.textColor = Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5
