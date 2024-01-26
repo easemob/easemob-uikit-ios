@@ -48,7 +48,7 @@ import UIKit
     private var chatClosure: ((ConversationInfo) -> Void)?
     
     public private(set) lazy var searchHeader: SearchHeaderBar = {
-        SearchHeaderBar(frame: CGRect(x: 0, y: StatusBarHeight+10, width: ScreenWidth, height: 44), displayStyle: .withBack).backgroundColor(.clear)
+        SearchHeaderBar(frame: CGRect(x: 0, y: StatusBarHeight+10, width: ScreenWidth, height: 44), displayStyle: .other).backgroundColor(.clear)
     }()
     
     public private(set) lazy var searchList: UITableView = {
@@ -81,6 +81,7 @@ import UIKit
         // Do any additional setup after loading the view.
         self.view.backgroundColor = UIColor.theme.neutralColor98
         self.view.addSubViews([self.searchHeader,self.searchList])
+        self.searchList.keyboardDismissMode = .onDrag
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
         self.searchHeader.textChanged = { [weak self] in
@@ -96,10 +97,11 @@ import UIKit
             self?.active = false
             self?.searchText = ""
             self?.searchList.reloadData()
-            if $0 == .back {
+            if $0 == .cancel {
                 self?.pop()
             }
         }
+        self.searchHeader.searchField.becomeFirstResponder()
     }
     
 
@@ -155,5 +157,6 @@ extension SearchConversationsController: UITableViewDelegate,UITableViewDataSour
 extension SearchConversationsController: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         self.view.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
+        self.searchList.reloadData()
     }
 }

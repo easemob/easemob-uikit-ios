@@ -27,10 +27,11 @@ public final class PresentationController: UIPresentationController {
         let backgroundView = UIView(frame: containerbounds)
         backgroundView.backgroundColor = UIColor.theme.barrageLightColor2
         backgroundView.alpha = 0.0
-        if component.canTapBGDismiss {
+        backgroundView.isUserInteractionEnabled = true
+//        if component.canTapBGDismiss {
             let tapGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundViewDidTapped))
             backgroundView.addGestureRecognizer(tapGesture)
-        }
+//        }
         return backgroundView
     }()
 

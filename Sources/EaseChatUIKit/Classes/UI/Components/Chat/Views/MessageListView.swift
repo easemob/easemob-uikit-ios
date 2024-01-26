@@ -170,6 +170,8 @@ import UIKit
     public private(set) lazy var messageList: UITableView = {
         UITableView(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-52), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).separatorStyle(.none).backgroundColor(.clear)
     }()
+    
+    private var oldFrame = CGRect.zero
         
     public private(set) lazy var inputBar: MessageInputBar = {
         MessageInputBar(frame: CGRect(x: 0, y: self.frame.height-52-BottomBarHeight, width: self.frame.width, height: 52), text: "", placeHolder: "Aa")
@@ -194,6 +196,7 @@ import UIKit
     ///   - mention: Whether to enable the mention function of UI.
     @objc required public init(frame: CGRect,mention: Bool) {
         super.init(frame: frame)
+        self.oldFrame = frame
         self.canMention = mention
         self.messageList.keyboardDismissMode = .onDrag
         self.messageList.allowsSelection = false
@@ -211,8 +214,20 @@ import UIKit
         self.inputBar.axisYChanged = { [weak self] value in
             guard let `self` = self else { return }
             DispatchQueue.main.async {
-                UIView.animate(withDuration: 0.25) {
-                    self.replyBar.frame = CGRect(x: 0, y: value-52, width: self.frame.width, height: 53)
+                UIView.animate(withDuration: 0.22) {
+                    self.replyBar.frame = CGRect(x: 0, y: self.inputBar.frame.minY-52, width: self.frame.width, height: 53)
+                }
+            }
+        }
+        
+        self.inputBar.textViewFirstResponder = { [weak self] firstResponder in
+            guard let `self` = self else { return }
+            UIView.animate(withDuration: 0.22) {
+                let oldFrame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-52)
+                if firstResponder,self.messageList.frame.minY <= 0 {
+                    self.messageList.frame = CGRect(x: 0, y: -self.inputBar.keyboardHeight, width: self.messageList.frame.width, height: self.messageList.frame.height)
+                } else {
+                    self.messageList.frame = oldFrame
                 }
             }
         }
@@ -461,6 +476,14 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
             if ComponentViewsActionHooker.shared.chat.bubbleClicked != nil {
                 ComponentViewsActionHooker.shared.chat.bubbleClicked?(entity)
             } else {
+                if entity.message.body.type == .voice {
+                    for message in self.messages {
+                        message.playing = false
+                    }
+                    if let visibleIndexPaths = self.messageList.indexPathsForVisibleRows {
+                        self.messageList.reloadRows(at: visibleIndexPaths, with: .automatic)
+                    }
+                }
                 for handler in self.eventHandlers.allObjects {
                     handler.onMessageContentClicked(message: entity)
                 }
@@ -629,7 +652,7 @@ extension MessageListView: IMessageListViewDriver {
     
     public func updateMessageAttachmentStatus(message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
-            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .fade)
         }
     }
     
@@ -653,7 +676,7 @@ extension MessageListView: IMessageListViewDriver {
     public func updateMessageStatus(message: ChatMessage, status: ChatMessageStatus) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages[safe: index]?.state = status
-            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .fade)
         }
     }
     
@@ -763,6 +786,7 @@ extension MessageListView: IMessageListViewDriver {
     private func copyAction(_ message: ChatMessage) {
         if let body = message.body as? ChatTextMessageBody {
             UIPasteboard.general.string = body.text
+            UIViewController.currentController?.showToast(toast: "Copied".chat.localize)
         }
     }
     
@@ -778,12 +802,13 @@ extension MessageListView: IMessageListViewDriver {
         self.replyBar.isHidden = false
         self.replyBar.refresh(message: message)
         self.replyId = message.messageId
+        self.inputBar.show()
     }
     
     private func deleteAction(_ message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages.remove(at: index)
-            self.messageList.deleteRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.messageList.deleteRows(at: [IndexPath(row: index, section: 0)], with: .fade)
         }
     }
     

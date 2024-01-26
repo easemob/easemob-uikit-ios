@@ -50,7 +50,7 @@ extension UIViewController {
     ///   - content: ``String`` value.
     ///   - duration: ``TimeInterval``.How long show
     public func showToast(toast content: String, duration: TimeInterval = 2.0, delay: TimeInterval = 0.0) {
-        let toastView = UIVisualEffectView(effect: UIBlurEffect(style: .light)).cornerRadius(.medium)
+        let toastView = UIVisualEffectView(effect: UIBlurEffect(style: Theme.style == .dark ? .light:.dark)).cornerRadius(.medium)
         toastView.alpha = 0
         toastView.backgroundColor = Theme.style == .dark ? UIColor.theme.barrageLightColor3:UIColor.theme.barrageDarkColor3
         toastView.translatesAutoresizingMaskIntoConstraints = false

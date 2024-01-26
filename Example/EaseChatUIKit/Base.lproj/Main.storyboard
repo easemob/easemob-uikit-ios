@@ -104,7 +104,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="YAz-vQ-HPh">
-                                <rect key="frame" x="141" y="173" width="93" height="32"/>
+                                <rect key="frame" x="141" y="164" width="93" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="31" id="O6i-0H-liK"/>
                                 </constraints>
@@ -118,7 +118,7 @@
                                 </connections>
                             </segmentedControl>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" selected="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="5fm-mB-PAJ">
-                                <rect key="frame" x="95" y="283" width="185" height="32"/>
+                                <rect key="frame" x="95" y="274" width="185" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="31" id="9ZU-0G-TMF"/>
                                 </constraints>
@@ -132,7 +132,7 @@
                                 </connections>
                             </segmentedControl>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="BubbleStyle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X1R-Cf-xUY">
-                                <rect key="frame" x="138" y="237" width="98" height="21"/>
+                                <rect key="frame" x="138" y="228" width="98" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="AEQ-q2-8zY"/>
                                 </constraints>
@@ -141,7 +141,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="jlJ-5o-6gk">
-                                <rect key="frame" x="136" y="388" width="103" height="32"/>
+                                <rect key="frame" x="136" y="379" width="103" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="31" id="g84-uA-Tqb"/>
                                 </constraints>
@@ -154,7 +154,7 @@
                                 </connections>
                             </segmentedControl>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AAS-rv-zsA">
-                                <rect key="frame" x="132" y="114" width="110" height="35"/>
+                                <rect key="frame" x="132" y="105" width="110" height="35"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="35" id="l8u-to-8xe"/>
                                 </constraints>
@@ -167,7 +167,7 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="avatarStyle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LeB-f7-dWn">
-                                <rect key="frame" x="142" y="343" width="90" height="21"/>
+                                <rect key="frame" x="142" y="334" width="90" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="fRo-A8-Jls"/>
                                 </constraints>
@@ -175,15 +175,41 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AlertStyle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sdL-Ib-KgF">
+                                <rect key="frame" x="150" y="434" width="75" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="FLE-EZ-EAY"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="41Z-DH-sun">
+                                <rect key="frame" x="136" y="473" width="103" height="31"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="BM9-ne-F2A"/>
+                                </constraints>
+                                <segments>
+                                    <segment title="large"/>
+                                    <segment title="small"/>
+                                </segments>
+                                <connections>
+                                    <action selector="switchAlert:" destination="e57-6Z-yhb" eventType="valueChanged" id="Mbi-Qp-K4t"/>
+                                    <action selector="switchAvatar:" destination="e57-6Z-yhb" eventType="valueChanged" id="uq0-Yf-HmN"/>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="5fm-mB-PAJ" firstAttribute="top" secondItem="X1R-Cf-xUY" secondAttribute="bottom" constant="25" id="2I4-ro-Itk"/>
                             <constraint firstAttribute="trailingMargin" secondItem="5fm-mB-PAJ" secondAttribute="trailing" constant="79" id="55X-KC-G8A"/>
                             <constraint firstItem="jlJ-5o-6gk" firstAttribute="leading" secondItem="kVr-J0-9y9" secondAttribute="leadingMargin" constant="120" id="9ma-he-eL5"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="41Z-DH-sun" secondAttribute="trailing" constant="120" id="DJJ-UM-M1n"/>
                             <constraint firstAttribute="trailingMargin" secondItem="LeB-f7-dWn" secondAttribute="trailing" constant="127" id="EOO-W9-v17"/>
                             <constraint firstAttribute="trailingMargin" secondItem="AAS-rv-zsA" secondAttribute="trailing" constant="117" id="HYF-j6-b7d"/>
                             <constraint firstItem="YAz-vQ-HPh" firstAttribute="leading" secondItem="kVr-J0-9y9" secondAttribute="leadingMargin" constant="125" id="JzD-gC-hPo"/>
+                            <constraint firstItem="sdL-Ib-KgF" firstAttribute="leading" secondItem="kVr-J0-9y9" secondAttribute="leadingMargin" constant="134" id="LbE-PM-noO"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="sdL-Ib-KgF" secondAttribute="trailing" constant="134" id="Ovi-Ti-Lk9"/>
                             <constraint firstItem="5fm-mB-PAJ" firstAttribute="leading" secondItem="kVr-J0-9y9" secondAttribute="leadingMargin" constant="79" id="P9S-KC-zas"/>
                             <constraint firstItem="X1R-Cf-xUY" firstAttribute="leading" secondItem="kVr-J0-9y9" secondAttribute="leadingMargin" constant="122" id="Pwj-Mj-RcS"/>
                             <constraint firstItem="X1R-Cf-xUY" firstAttribute="top" secondItem="YAz-vQ-HPh" secondAttribute="bottom" constant="33" id="Qn7-my-m52"/>
@@ -191,7 +217,10 @@
                             <constraint firstAttribute="trailingMargin" secondItem="jlJ-5o-6gk" secondAttribute="trailing" constant="120" id="RMw-RP-4Lq"/>
                             <constraint firstItem="jlJ-5o-6gk" firstAttribute="top" secondItem="LeB-f7-dWn" secondAttribute="bottom" constant="24" id="UJn-dH-2Ac"/>
                             <constraint firstAttribute="trailingMargin" secondItem="X1R-Cf-xUY" secondAttribute="trailing" constant="123" id="Uzh-PC-cPN"/>
-                            <constraint firstItem="YAz-vQ-HPh" firstAttribute="top" secondItem="W2N-vq-vik" secondAttribute="bottom" constant="153" id="Wyr-56-Z0B"/>
+                            <constraint firstItem="41Z-DH-sun" firstAttribute="top" secondItem="sdL-Ib-KgF" secondAttribute="bottom" constant="18" id="V1c-GM-LBZ"/>
+                            <constraint firstItem="sdL-Ib-KgF" firstAttribute="top" secondItem="jlJ-5o-6gk" secondAttribute="bottom" constant="24" id="VXt-4j-DTF"/>
+                            <constraint firstItem="YAz-vQ-HPh" firstAttribute="top" secondItem="W2N-vq-vik" secondAttribute="bottom" constant="144" id="Wyr-56-Z0B"/>
+                            <constraint firstItem="41Z-DH-sun" firstAttribute="leading" secondItem="kVr-J0-9y9" secondAttribute="leadingMargin" constant="120" id="Y9H-zp-w6y"/>
                             <constraint firstItem="YAz-vQ-HPh" firstAttribute="top" secondItem="AAS-rv-zsA" secondAttribute="bottom" constant="24" id="aVP-VI-HEO"/>
                             <constraint firstItem="LeB-f7-dWn" firstAttribute="leading" secondItem="kVr-J0-9y9" secondAttribute="leadingMargin" constant="126" id="eTx-uc-Ue0"/>
                             <constraint firstItem="AAS-rv-zsA" firstAttribute="leading" secondItem="kVr-J0-9y9" secondAttribute="leadingMargin" constant="116" id="p5r-Qh-FXZ"/>
@@ -199,6 +228,8 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="alertStyle" destination="sdL-Ib-KgF" id="JCD-Xc-die"/>
+                        <outlet property="alertStyleSegment" destination="41Z-DH-sun" id="twQ-fQ-1hQ"/>
                         <outlet property="avatarStyle" destination="LeB-f7-dWn" id="dgf-f2-7Wj"/>
                         <outlet property="avatarStyleSegment" destination="jlJ-5o-6gk" id="bUw-tW-HED"/>
                         <outlet property="bubbleStyle" destination="X1R-Cf-xUY" id="q68-Jj-mgO"/>
@@ -400,7 +431,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="GZx-DM-6ZF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1710" y="66"/>
+            <point key="canvasLocation" x="2063" y="45"/>
         </scene>
     </scenes>
     <resources>
@@ -408,7 +439,7 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray2Color">
-            <color red="0.68235294120000001" green="0.68235294120000001" blue="0.69803921570000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.68235294117647061" green="0.68235294117647061" blue="0.69803921568627447" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

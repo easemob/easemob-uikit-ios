@@ -10,18 +10,22 @@ import UIKit
 @objcMembers open class GroupListCell: UITableViewCell {
 
     public private(set) lazy var avatar: ImageView = {
-        ImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-50)/2.0, width: 50, height: 50)).cornerRadius(.large).backgroundColor(.clear)
+        ImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-40)/2.0, width: 40, height: 40)).cornerRadius(Appearance.avatarRadius).backgroundColor(.clear)
     }()
     
     public private(set) lazy var nickName: UILabel = {
         UILabel(frame: CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX+4, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 16)).backgroundColor(.clear)
+    }()
+    
+    public private(set) lazy var separateLine: UIView = {
+        UIView(frame: CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5))
     }()
 
     @objc public required override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.contentView.backgroundColor = .clear
         self.backgroundColor = .clear
-        self.contentView.addSubViews([self.avatar,self.nickName])
+        self.contentView.addSubViews([self.avatar,self.nickName,self.separateLine])
     }
     
     required public init?(coder: NSCoder) {
@@ -31,13 +35,17 @@ import UIKit
     open override func layoutSubviews() {
         super.layoutSubviews()
         self.avatar.center = CGPoint(x: self.avatar.center.x, y: self.contentView.center.y)
+        self.nickName.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX+4, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 16)
         self.nickName.center = CGPoint(x: self.nickName.center.x, y: self.contentView.center.y)
+        self.separateLine.frame = CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5)
     }
     
     func refresh(info: EaseProfileProtocol,keyword: String) {
         let nickName = info.nickname.isEmpty ? info.id:info.nickname
-        self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: nickName ?? "")
+        self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: nickName )
         self.avatar.image(with: info.avatarURL, placeHolder: Appearance.conversation.groupPlaceHolder)
+        self.separateLine.backgroundColor = Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
+    
     }
     
     func highlightKeywords(keyword: String, in string: String) -> NSAttributedString {

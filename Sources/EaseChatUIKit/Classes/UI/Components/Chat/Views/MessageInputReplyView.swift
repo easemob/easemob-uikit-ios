@@ -13,6 +13,7 @@ import UIKit
     private var replyAudioImage = UIImage(named: "reply_audio", in: .chatBundle, with: nil)
     private var replyVideoImage = UIImage(named: "reply_video", in: .chatBundle, with: nil)
     private var replyFileImage = UIImage(named: "reply_file", in: .chatBundle, with: nil)
+    private var replyContactImage = UIImage(named: "reply_contact", in: .chatBundle, with: nil)
     
     private var cancelImage = UIImage(named: "reply_cancel", in: .chatBundle, with: nil)
     
@@ -56,10 +57,10 @@ import UIKit
         self.replyContent.attributedText = self.constructReplyContent(message: message, replyTo: replyTo)
         if message.body.type == .image || message.body.type == .video {
             self.replyIcon.isHidden = false
-            self.constructIcon(message: message)
         } else {
             self.replyIcon.isHidden = true
         }
+        self.constructIcon(message: message)
     }
     
     required init?(coder: NSCoder) {
@@ -80,6 +81,7 @@ import UIKit
         } else {
             reply.append(NSAttributedString {
                 AttributedText("  "+message.showType).font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5)
+                AttributedText("  "+message.showContent).font(Font.theme.bodySmall).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5)
             })
         }
         return reply
@@ -105,6 +107,13 @@ import UIKit
         case .voice: return self.replyAudioImage
         case .video: return self.replyVideoImage
         case .file: return self.replyFileImage
+        case .custom:
+            if let body = message.body as? ChatCustomMessageBody {
+                if body.event == EaseChatUIKit_user_card_message {
+                    return self.replyContactImage
+                }
+            }
+            return nil
         default:
             return nil
         }
@@ -126,7 +135,9 @@ extension MessageInputReplyView: ThemeSwitchProtocol {
         self.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
         self.line.backgroundColor(style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor8)
         if style == .light {
-            self.cancelImage?.withTintColor(UIColor.theme.neutralColor3)
+            self.cancelImage = self.cancelImage?.withTintColor(UIColor.theme.neutralColor3)
+        } else {
+            self.cancelImage = self.cancelImage?.withTintColor(UIColor.theme.neutralColor5)
         }
         self.cancel.setImage(self.cancelImage, for: .normal)
     }

@@ -47,7 +47,7 @@ import UIKit
     }
     
     @objc open func createSearchBar() -> UIButton {
-        UIButton(type: .custom).frame(CGRect(x: 16, y: self.navigation.frame.maxY+5, width: self.view.frame.width-32, height: 36)).backgroundColor(UIColor.theme.neutralColor95).textColor(UIColor.theme.neutralColor6, .normal).title(" Search".chat.localize, .normal).image(UIImage(named: "search", in: .chatBundle, with: nil), .normal).addTargetFor(self, action: #selector(searchAction), for: .touchUpInside).cornerRadius(Appearance.avatarRadius)
+        UIButton(type: .custom).frame(CGRect(x: 16, y: self.navigation.frame.maxY+5, width: self.view.frame.width-32, height: 36)).backgroundColor(UIColor.theme.neutralColor95).textColor(UIColor.theme.neutralColor6, .normal).title("Search".chat.localize, .normal).image(UIImage(named: "search", in: .chatBundle, with: nil), .normal).addTargetFor(self, action: #selector(searchAction), for: .touchUpInside).cornerRadius(Appearance.avatarRadius)
     }
     
     @objc open func createList() -> ConversationList {
@@ -240,9 +240,8 @@ import UIKit
     @objc open func createGroup() {
         let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .newGroup,provider: nil)
         vc.confirmClosure = { [weak self] profiles in
-            vc.dismiss(animated: true) {
-                self?.create(profiles: profiles)
-            }
+            vc.dismiss(animated: false)
+            self?.create(profiles: profiles)
         }
         self.present(vc, animated: true)
     }

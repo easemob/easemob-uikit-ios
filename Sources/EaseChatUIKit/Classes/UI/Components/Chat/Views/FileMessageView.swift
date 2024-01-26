@@ -12,7 +12,7 @@ import UIKit
     public private(set) var towards = BubbleTowards.left
 
     public private(set) lazy var content: UILabel = {
-        UILabel(frame: CGRect(x: self.towards == .left ? 12:self.frame.width-12-20-12, y: 5, width: self.frame.width - self.frame.height - 16 - 16 - 12, height: 24)).backgroundColor(.clear).numberOfLines(1).font(UIFont.theme.labelLarge)
+        UILabel(frame: CGRect(x: self.towards == .left ? 12:self.frame.width-12-20-12, y: 5, width: self.frame.width - self.frame.height - 16 - 16 - 12, height: 24)).backgroundColor(.clear).numberOfLines(1).font(UIFont.theme.labelLarge).lineBreakMode(.byTruncatingMiddle)
     }()
     
     public private(set) lazy var fileSize: UILabel = {
@@ -41,7 +41,12 @@ import UIKit
         self.fileSize.frame = CGRect(x: self.content.frame.minX, y: self.content.frame.maxY, width: self.content.frame.width, height: 18)
         self.fileIcon.cornerRadius(.extraSmall)
         self.switchTheme(style: Theme.style)
-        self.content.textColor = self.towards == .right ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor
+        if self.towards == .right {
+            self.content.textColor = Theme.style == .light ? UIColor.theme.neutralColor95:UIColor.theme.neutralColor2
+        } else {
+            self.content.textColor = Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5
+        
+        }
         self.content.text = entity.message.showContent
         if let body = entity.message.body as? ChatFileMessageBody {
             self.fileSize.text = "\(self.formatFileSize(Int(body.fileLength)))"

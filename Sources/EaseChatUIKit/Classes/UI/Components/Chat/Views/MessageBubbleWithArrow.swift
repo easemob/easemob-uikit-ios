@@ -28,11 +28,10 @@ import UIKit
 
         self.bubbleLayer.fillColor = (self.towards == .left ? Appearance.chat.receiveBubbleColor:Appearance.chat.sendBubbleColor).cgColor
         self.bubbleLayer.strokeColor = (self.towards == .left ? Appearance.chat.receiveBubbleColor:Appearance.chat.sendBubbleColor).cgColor
-        self.bubbleLayer.lineWidth = 2.0
+        self.bubbleLayer.lineWidth = 1
         self.bubbleLayer.lineJoin = .round
         self.bubbleLayer.lineCap = .round
-        self.bubbleLayer.shouldRasterize = true
-        self.layer.addSublayer(self.bubbleLayer)
+        self.layer.insertSublayer(bubbleLayer, at: 0)
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -45,7 +44,8 @@ import UIKit
         self.bubbleLayer.strokeColor = (self.towards == .left ? Appearance.chat.receiveBubbleColor:Appearance.chat.sendBubbleColor).cgColor
         // 重新设置气泡路径
         let bubblePath = UIBezierPath()
-        
+        bubblePath.usesEvenOddFillRule = true
+        bubblePath.lineWidth = 1
         // 气泡的圆角半径
         let cornerRadius: CGFloat = 4
         
@@ -54,8 +54,9 @@ import UIKit
         let arrowHeight: CGFloat = 5.0
         
         let bounds = self.bounds
-        let width = bounds.width
-        let height = bounds.height
+        let width = CGFloat(ceilf(Float(bounds.width)))
+        let height = CGFloat(ceilf(Float(bounds.height)))
+        
         if self.towards == .left {
             
             bubblePath.move(to: CGPoint(x: width - cornerRadius, y: 0))
@@ -87,6 +88,5 @@ import UIKit
         
         bubblePath.close()
         self.bubbleLayer.path = bubblePath.cgPath
-        self.bubbleLayer.shouldRasterize = true
     }
 }

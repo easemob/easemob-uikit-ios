@@ -35,7 +35,7 @@ import UIKit
     }()
     
     lazy var add: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.contentView.frame.width-76, y: self.nickName.frame.minY+2, width: 72, height: 28)).cornerRadius(.small).title("Add".chat.localize, .normal).textColor(UIColor.theme.neutralColor98, .normal).font(UIFont.theme.labelMedium).addTargetFor(self, action: #selector(addFriend), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: self.contentView.frame.width-76, y: self.nickName.frame.minY+2, width: 72, height: 28)).cornerRadius(Appearance.avatarRadius).title("Add".chat.localize, .normal).textColor(UIColor.theme.neutralColor98, .normal).font(UIFont.theme.labelMedium).addTargetFor(self, action: #selector(addFriend), for: .touchUpInside)
     }()
 
     public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

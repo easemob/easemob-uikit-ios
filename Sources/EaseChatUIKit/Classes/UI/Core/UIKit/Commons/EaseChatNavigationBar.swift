@@ -87,7 +87,7 @@ import UIKit
     }()
     
     public private(set) lazy var titleLabel: UILabel = {
-        UILabel(frame: CGRect(x: self.avatar.frame.maxX+8, y: StatusBarHeight+10, width: ScreenWidth-self.avatar.frame.maxX*2-8*3, height: 22)).font(UIFont.theme.titleMedium).textColor(UIColor.theme.neutralColor1).backgroundColor(.clear).tag(2)
+        UILabel(frame: CGRect(x: self.avatar.frame.maxX+8, y: StatusBarHeight+2, width: ScreenWidth-self.avatar.frame.maxX*2-8*3, height: 22)).font(UIFont.theme.titleMedium).textColor(UIColor.theme.neutralColor1).backgroundColor(.clear).tag(2)
     }()
     
     public private(set) lazy var detail: UILabel = {
@@ -109,6 +109,10 @@ import UIKit
     
     public private(set) lazy var rightItem: UIButton = {
         UIButton(type: .custom).frame(CGRect(x: ScreenWidth-150, y: self.frame.height-34, width: 138, height: 28)).font(UIFont.theme.labelMedium).tag(3).backgroundColor(.clear).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside)
+    }()
+    
+    public private(set) lazy var separateLine: UIView = {
+        UIView(frame: CGRect(x: 0, y: self.frame.height-0.5, width: ScreenWidth, height: 0.5)).backgroundColor(UIColor.theme.neutralColor9)
     }()
 
     internal override init(frame: CGRect) {
@@ -137,23 +141,23 @@ import UIKit
                 width = self.avatar.frame.maxX+8
             }
             if hiddenAvatar {
-                self.addSubViews([self.leftItem,self.titleLabel,self.detail,self.rightItems])
+                self.addSubViews([self.leftItem,self.titleLabel,self.detail,self.rightItems,self.separateLine])
             } else {
-                self.addSubViews([self.leftItem,self.avatar,self.status,self.titleLabel,self.detail,self.rightItems])
+                self.addSubViews([self.leftItem,self.avatar,self.status,self.titleLabel,self.detail,self.rightItems,self.separateLine])
             }
-            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: StatusBarHeight+10, width: ScreenWidth - width*2 - 8, height: 22)
+            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: StatusBarHeight+4, width: ScreenWidth - width*2 - 8, height: 22)
             if textAlignment == .center {
                 self.titleLabel.center = CGPoint(x: self.center.x, y: self.titleLabel.center.y)
             }
             self.detail.frame = CGRect(x: self.titleLabel.frame.minX, y: self.titleLabel.frame.maxY, width: self.titleLabel.frame.width, height: 14)
         } else {
             if hiddenAvatar {
-                self.addSubViews([self.titleLabel,self.detail,self.rightItems])
+                self.addSubViews([self.titleLabel,self.detail,self.rightItems,self.separateLine])
             } else {
-                self.addSubViews([self.avatar,self.status,self.titleLabel,self.detail,self.rightItems])
+                self.addSubViews([self.avatar,self.status,self.titleLabel,self.detail,self.rightItems,self.separateLine])
             }
             
-            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: StatusBarHeight+10, width: ScreenWidth - CGFloat(self.rightImages.count*36)*2, height: 22)
+            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: StatusBarHeight+4, width: ScreenWidth - CGFloat(self.rightImages.count*36)*2, height: 22)
             if textAlignment == .center {
                 self.titleLabel.center = CGPoint(x: self.center.x, y: self.titleLabel.center.y)
             }
@@ -168,6 +172,7 @@ import UIKit
         }
         self.leftItem.setHitTestEdgeInsets(UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10))
         self.addGesture()
+        self.leftItem.center = CGPoint(x: self.leftItem.center.x, y: self.leftItem.center.y-2)
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
     }
@@ -178,11 +183,11 @@ import UIKit
     ///   - rightTitle: Title of the right item.
     @objc required public convenience init(frame: CGRect = CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: NSTextAlignment = .center,rightTitle: String? = nil) {
         self.init(frame: frame)
-        self.addSubViews([self.leftItem,self.titleLabel,self.detail,self.rightItem])
+        self.addSubViews([self.leftItem,self.titleLabel,self.detail,self.rightItem,self.separateLine])
         self.leftItem.setHitTestEdgeInsets(UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10))
-        self.titleLabel.frame = CGRect(x: self.leftItem.frame.maxX+10, y: StatusBarHeight+10, width: ScreenWidth - 168, height: 22)
+        self.titleLabel.frame = CGRect(x: self.leftItem.frame.maxX, y: StatusBarHeight+4, width: ScreenWidth - 168, height: 22)
         if textAlignment == .center {
-            self.titleLabel.frame = CGRect(x: 84, y: StatusBarHeight+10, width: ScreenWidth - 168, height: 22)
+            self.titleLabel.frame = CGRect(x: 84, y: StatusBarHeight+4, width: ScreenWidth - 168, height: 22)
             self.titleLabel.center = CGPoint(x: self.center.x, y: self.titleLabel.center.y)
         }
         self.rightItem.contentHorizontalAlignment = .right
@@ -270,10 +275,11 @@ extension EaseChatNavigationBar: ThemeSwitchProtocol {
             self.status.backgroundColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5
         }
         self.titleLabel.textColor = style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
-        self.detail.textColor = style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
+        self.detail.textColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5
         self.leftItem.setImage(self.backImage?.withTintColor(Theme.style == .light ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor98), for: .normal)
         self.rightItem.setTitleColor(style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor7, for: .disabled)
         self.rightItem.setTitleColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, for: .normal)
+        self.separateLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
         self.rightItems.reloadData()
     }
     

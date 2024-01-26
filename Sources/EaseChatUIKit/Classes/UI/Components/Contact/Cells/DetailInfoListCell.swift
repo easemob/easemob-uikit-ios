@@ -35,12 +35,17 @@ import UIKit
     public private(set) lazy var switchMenu: UISwitch = {
         UISwitch(frame: CGRect(x: self.frame.width-62, y: (self.contentView.frame.height-30)/2.0, width: 50, height: 30))
     }()
+    
+    public private(set) lazy var separatorLine: UIView = {
+        UIView(frame: CGRect(x: 16, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-16, height: 0.5))
+    }()
+
 
     public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.contentView.backgroundColor = .clear
         self.backgroundColor = .clear
-        self.contentView.addSubViews([self.titleLabel,self.detailLabel,self.switchMenu])
+        self.contentView.addSubViews([self.titleLabel,self.detailLabel,self.switchMenu,separatorLine])
         self.switchMenu.addTarget(self, action: #selector(valueSwitch), for: .valueChanged)
         self.switchMenu.isHidden = true
         Theme.registerSwitchThemeViews(view: self)
@@ -56,13 +61,14 @@ import UIKit
         self.titleLabel.frame = CGRect(x: 16, y: 16, width: (self.frame.width/2.0-22), height: 22)
         self.detailLabel.frame = CGRect(x: self.frame.width/2.0, y: 16, width: (self.frame.width/2.0-36), height: 22)
         self.switchMenu.frame = CGRect(x: self.frame.width-62, y: (self.contentView.frame.height-30)/2.0, width: 50, height: 30)
+        self.separatorLine.frame = CGRect(x: 16, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width, height: 0.5)
     }
     
     @objc public func refresh(info: DetailInfo) {
         self.switchMenu.isHidden = !info.withSwitch
         self.titleLabel.text = info.title
         self.detailLabel.text = info.detail
-        self.accessoryType = info.withSwitch ? .none:.disclosureIndicator
+        
         self.switchMenu.isOn = info.switchValue
     }
     
@@ -78,6 +84,10 @@ extension DetailInfoListCell: ThemeSwitchProtocol {
         self.titleLabel.textColor = style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
         self.detailLabel.textColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5
         self.switchMenu.onTintColor = style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        self.accessoryView?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor5
+        self.accessoryView?.subviews.first?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor5
+        
+        self.separatorLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
     }
     
     

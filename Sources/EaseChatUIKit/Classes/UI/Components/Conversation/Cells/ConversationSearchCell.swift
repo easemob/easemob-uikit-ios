@@ -10,18 +10,26 @@ import UIKit
 @objc open class ConversationSearchCell: UITableViewCell {
     
     public private(set) lazy var avatar: ImageView = {
-        ImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-50)/2.0, width: 50, height: 50)).cornerRadius(.large).backgroundColor(.clear)
+        ImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-50)/2.0, width: 50, height: 50)).cornerRadius(Appearance.avatarRadius).backgroundColor(.clear)
     }()
     
     public private(set) lazy var nickName: UILabel = {
         UILabel(frame: CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX+4, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 16)).backgroundColor(.clear)
     }()
+    
+    public private(set) lazy var separatorLine: UIView = {
+        self.createSeparatorLine()
+    }()
+    
+    @objc open func createSeparatorLine() -> UIView {
+        UIView(frame: CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5))
+    }
 
     @objc public required override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.contentView.backgroundColor = .clear
         self.backgroundColor = .clear
-        self.contentView.addSubViews([self.avatar,self.nickName])
+        self.contentView.addSubViews([self.avatar,self.nickName,self.separatorLine])
     }
     
     required public init?(coder: NSCoder) {
@@ -32,12 +40,16 @@ import UIKit
         super.layoutSubviews()
         self.avatar.center = CGPoint(x: self.avatar.center.x, y: self.contentView.center.y)
         self.nickName.center = CGPoint(x: self.nickName.center.x, y: self.contentView.center.y)
+        self.separatorLine.frame = CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5)
+    
     }
     
     func refresh(info: ConversationInfo,keyword: String) {
         let nickName = info.nickname.isEmpty ? info.id:info.nickname
         self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: nickName)
         self.avatar.image(with: info.avatarURL, placeHolder: info.type == .chat ? Appearance.conversation.singlePlaceHolder:Appearance.conversation.groupPlaceHolder)
+        self.separatorLine.backgroundColor = Theme.style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor9
+    
     }
     
     func highlightKeywords(keyword: String, in string: String) -> NSAttributedString {

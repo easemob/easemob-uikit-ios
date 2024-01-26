@@ -2,7 +2,7 @@
 
 # 单群聊 UIKit
 
-本产品主要旨在给用户打造一个良好体验的单群聊UIKit。主要为用户解决直接集成SDK繁琐，复杂度高，部分api体验不好（在用户侧开发者来看）等问题。致力于打造集成简单，自由度高，流程简单，文档说明足够详细的单群聊UIKit产品。
+本产品主要旨在给用户打造一个良好体验的单群聊UIKit。主要为用户解决直接集成SDK繁琐，复杂度高等问题。致力于打造集成简单，自由度高，流程简单，文档说明足够详细的单群聊UIKit产品。
 
 # 示例演示
 
@@ -22,12 +22,12 @@
 
 - [前置开发环境要求](#前置开发环境要求)
 - [安装](#安装)
-- [文档](#文档)
 - [结构](#结构)
 - [快速开始](#快速开始)
 - [注意事项](#注意事项)
 - [进阶用法](#进阶用法)
 - [自定义](#自定义)
+- [文档](#文档)
 - [设计指南](#设计指南)
 - [贡献](#贡献)
 - [许可证](#许可证)
@@ -106,42 +106,6 @@ Classes
        └─ Extension // 一些方便的系统类扩展。
 ```
 
-# 文档
-
-## [文档](/Documentation/EaseChatUIKit.doccarchive)
-
-您可以在 Xcode 中打开“EaseChatUIKit.doccarchive”文件来查看其中的文件或将此文件部署到您的主页。
-
-另外，您可以右键单击该文件以显示包内容并将其中的所有文件复制到一个文件夹中。 然后将此文件夹拖到“terminal”应用程序中并运行以下命令将其部署到本地IP地址上。
-
-```bash
-python3 -m http.server 8080
-```
-
-部署完成后，您可以在浏览器中访问 http://yourlocalhost:8080/documentation/EaseChatUIKit   其中`yourlocalhost`是您的本地IP地址。 或者，您可以将此文件夹部署在外部网络地址上。
-
-## 1.Appearance 
-
-[Appearance](./Documentation/Appearance.md). 
-
-即加载UI前的所有可改动的配置项。包含公共配置以及三类业务功能配置
-- 公共配置  包含自定义皮肤的色相值配置、Alert、ActionSheet、默认头像等。
-- 会话列表  包含会话滑动后的菜单项，会话列表'+'按钮点击后菜单项的配置等。
-- 联系人    包含联系人页面以及header等配置项
-- 聊天页面  包含消息长按以及键盘发送附件消息等可配菜单项、以及消息收发方的气泡颜色、字体颜色等。
-
-## 2.ComponentRegister 
-
-[ComponentRegister](./Documentation/ComponentsRegister.md). 
-
-即可继承进行自定义定制的 UI 组件。
-
-包含会话列表相关的页面以及UITableViewCell、联系人页面以及UITableViewCell、聊天页面以及不同类型消息内容的可定制组件等
-
-## 3.ComponentViewsActionHooker
-
-[ComponentViewsActionHooker](./Documentation/ComponentsActionEventsRegister.md). 所有可拦截的点击事件
-
 # 快速开始
 
 本指南提供了不同 EaseChatUIKit 组件的多个使用示例。 请参阅“示例”文件夹以获取显示各种用例的详细代码片段和项目。
@@ -218,7 +182,7 @@ public final class YourAppUser: NSObject, EaseProfileProtocol {
 
 ```Swift
         // 在Console中创建一个新用户，将这个用id复制后传入下面构造方法参数中，跳转页面即可。
-        let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: <#刚创建用户的id#>, chatType: .chat)
+        let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: <#用户id#>, chatType: .chat)
         //或者push或者present都可
         vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
@@ -266,6 +230,8 @@ public final class YourAppUser: NSObject, EaseProfileProtocol {
 ```
 
 ## 3.会话列表页面及Provider
+
+Provider是一个数据提供者，当会话列表展示并且滑动减速时候，EaseChatUIKit会向你请求一些当前屏幕上要显示会话的展示信息例如头像昵称等。下面是Provider的具体示例以及用法。
 
 ```Swift
         //前者仅限于Swift下使用，是使用协程异步返回。后者Swift OC均可使用使用闭包返回即可此处不做示例仅做协程示例
@@ -333,6 +299,8 @@ extension YourViewController: EaseProfileProvider {
 ## 4.联系人及其后续页面Provider
 
 ### 4.1 联系人列表页Provider
+
+Provider是一个数据提供者，当列表展示并且滑动减速时候，EaseChatUIKit会向你请求一些当前屏幕上要显示联系人的展示信息例如头像昵称等。下面是Provider的具体示例以及用法。
 
 ```Swift
         //前者仅限于Swift下使用，是使用协程异步返回。后者Swift OC均可使用使用闭包返回即可。
@@ -470,6 +438,42 @@ Appearance.neutralHue = 191/360.0
 Appearance.neutralSpecialHue = 199/360.0
 Theme.switchTheme(style: .custom)
 ```
+
+# 文档
+
+## [文档](/Documentation/EaseChatUIKit.doccarchive)
+
+您可以在 Xcode 中打开“EaseChatUIKit.doccarchive”文件来查看其中的文件。
+
+另外，您可以右键单击该文件以显示包内容并将其中的所有文件复制到一个文件夹中。 然后将此文件夹拖到“terminal”应用程序中并运行以下命令将其部署到本地IP地址上。
+
+```bash
+python3 -m http.server 8080
+```
+
+部署完成后，您可以在浏览器中访问 http://yourlocalhost:8080/documentation/EaseChatUIKit   其中`yourlocalhost`是您的本地IP地址。 或者，您可以将此文件夹部署在外部网络地址上。
+
+## 1.Appearance 
+
+[Appearance](./Documentation/Appearance.md). 
+
+即加载UI前的所有可改动的配置项。包含公共配置以及三类业务功能配置
+- 公共配置  包含自定义皮肤的色相值配置、Alert、ActionSheet、默认头像等。
+- 会话列表  包含会话滑动后的菜单项，会话列表'+'按钮点击后菜单项的配置等。
+- 联系人    包含联系人页面以及header等配置项
+- 聊天页面  包含消息长按以及键盘发送附件消息等可配菜单项、以及消息收发方的气泡颜色、字体颜色等。
+
+## 2.ComponentRegister 
+
+[ComponentRegister](./Documentation/ComponentsRegister.md). 
+
+即可继承进行自定义定制的 UI 组件。
+
+包含会话列表相关的页面以及UITableViewCell、联系人页面以及UITableViewCell、聊天页面以及不同类型消息内容的可定制组件等
+
+## 3.ComponentViewsActionHooker
+
+[ComponentViewsActionHooker](./Documentation/ComponentsActionEventsRegister.md). 所有可拦截的点击事件
 
 # 设计指南
 

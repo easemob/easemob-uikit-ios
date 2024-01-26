@@ -1,10 +1,3 @@
-//
-//  Appearance.swift
-//  EaseChatUIKit
-//
-//  Created by 朱继超 on 2023/9/6.
-//
-
 import UIKit
 
 
@@ -101,7 +94,7 @@ import UIKit
     /// Shown menus on ``ConversationListController`` right item clicked.
     public var listMoreActions: [ActionSheetItemProtocol] = [
         ActionSheetItem(title: "new_chat_button_click_menu_selectcontacts".chat.localize, type: .normal, tag: "SelectContacts", image: UIImage(named: "chatWith", in: .chatBundle, with: nil)),
-        ActionSheetItem(title: "new_chat_button_click_menu_addcontacts".chat.localize, type: .normal, tag: "AddContact", image: UIImage(named: "person_add", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor5)),
+        ActionSheetItem(title: "new_chat_button_click_menu_addcontacts".chat.localize, type: .normal, tag: "AddContact", image: UIImage(named: "person_add_fill", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor5)),
         ActionSheetItem(title: "new_chat_button_click_menu_creategroup".chat.localize, type: .normal, tag: "CreateGroup", image: UIImage(named: "create_group", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor5))
     ]
 }
@@ -197,14 +190,14 @@ import UIKit
     
     /// The color of the sender of the text message.
     public var sendTextColor = Theme.style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
-    
-    
+        
     /// The color of the recipient of the text message.
     public var receiveTranslationColor = Theme.style == .light ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor5
     
     /// The color of the sender of the text message.
     public var sendTranslationColor = Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
     
+
     /// The corner of the image message.
     public var imageMessageCorner = CGFloat(4)
     
@@ -240,7 +233,7 @@ import UIKit
     ]
     
     /// The contact info header extension items.
-    public var detailExtensionActionItems: [ContactListHeaderItemProtocol] = [ContactListHeaderItem(featureIdentify: "Chat", featureName: "Chat", featureIcon: UIImage(named: "chatTo", in: .chatBundle, with: nil))]
+    public var detailExtensionActionItems: [ContactListHeaderItemProtocol] = [ContactListHeaderItem(featureIdentify: "Chat", featureName: "Chat".chat.localize, featureIcon: UIImage(named: "chatTo", in: .chatBundle, with: nil))]
     
     /// ActionSheet menu configuration items after clicking more buttons in a single session side sliding menu.
     /// How to use?

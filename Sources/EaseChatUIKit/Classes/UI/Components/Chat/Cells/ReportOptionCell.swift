@@ -21,9 +21,13 @@ import UIKit
         UIImageView(frame: CGRect(x: self.contentView.frame.width-44, y: (self.contentView.frame.height-32)/2.0, width: 32, height: 32)).backgroundColor(.clear)
     }()
     
+    lazy var separatorLine: UIView = {
+        UIView(frame: CGRect(x: self.content.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.content.frame.minX, height: 0.5))
+    }()
+    
     @objc public required override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        self.contentView.addSubViews([self.content,self.stateView])
+        self.contentView.addSubViews([self.content,self.stateView,self.separatorLine])
         self.contentView.backgroundColor = .clear
         self.backgroundColor = .clear
         Theme.registerSwitchThemeViews(view: self)
@@ -38,6 +42,7 @@ import UIKit
         super.layoutSubviews()
         self.content.frame = CGRect(x: 16, y: (self.contentView.frame.height-22)/2.0, width: self.contentView.frame.width-72, height: 22)
         self.stateView.frame = CGRect(x: self.contentView.frame.width-44, y: (self.contentView.frame.height-32)/2.0, width: 32, height: 32)
+        self.separatorLine.frame = CGRect(x:self.content.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.content.frame.minX, height: 0.5)
     }
     
     /// Refresh report option select state.
@@ -55,6 +60,7 @@ extension ReportOptionCell: ThemeSwitchProtocol {
         self.content.textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
         self.selectImage = style == .dark ? self.selectImage?.withTintColor(UIColor.theme.primaryColor6, renderingMode: .automatic):self.selectImage
         self.normalImage = style == .dark ? self.normalImage?.withTintColor(UIColor.theme.neutralColor8, renderingMode: .automatic):self.normalImage
+        self.separatorLine.backgroundColor = (style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9)
     }
     
     

@@ -25,13 +25,22 @@ class OptionsViewController: UIViewController {
     
     @IBOutlet var contentStyle: UIView!
     
+    @IBOutlet weak var alertStyle: UILabel!
+    
+    @IBOutlet weak var alertStyleSegment: UISegmentedControl!
+    
+    
     lazy var switchCellStyle: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: ScreenWidth/2.0-100, y: self.avatarStyleSegment.frame.maxY+150, width: 200, height: 40)).textColor(.white, .normal).backgroundColor(UIColor.theme.primaryColor6).cornerRadius(.small).title(".all", .normal).title("ContentStyle", .normal).font(.systemFont(ofSize: 16, weight: .semibold))
+        UIButton(type: .custom).frame(CGRect(x: ScreenWidth/2.0-100, y: self.alertStyleSegment.frame.maxY+150, width: 200, height: 40)).textColor(.white, .normal).backgroundColor(UIColor.theme.primaryColor6).cornerRadius(.small).title(".all", .normal).title("ContentStyle", .normal).font(.systemFont(ofSize: 16, weight: .semibold))
     }()
     override func viewDidLoad() {
         super.viewDidLoad()
         self.themeSegment.selectedSegmentIndex = Int(Theme.style.rawValue)
         self.bubbleStyleSegment.selectedSegmentIndex = 0
+        self.themeSegment.selectedSegmentIndex = 0
+        self.avatarStyleSegment.selectedSegmentIndex = 0
+        self.alertStyleSegment.selectedSegmentIndex = 1
+        Appearance.alertStyle = .small
         // Do any additional setup after loading the view.
         self.switchCellStyle.addInteraction(UIContextMenuInteraction(delegate: self))
         self.view.addSubview(self.switchCellStyle)
@@ -50,6 +59,10 @@ class OptionsViewController: UIViewController {
     @IBAction func switchAvatar(_ sender: UISegmentedControl) {
         Appearance.avatarRadius = sender.selectedSegmentIndex == 1 ? .small:.large
         Theme.switchTheme(style: Theme.style)
+    }
+    
+    @IBAction func switchAlert(_ sender: UISegmentedControl) {
+        Appearance.alertStyle =  sender.selectedSegmentIndex == 1 ? .small:.large
     }
     
     @IBAction func setHue(_ sender: UIButton) {

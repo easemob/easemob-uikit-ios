@@ -47,7 +47,7 @@ import UIKit
     }()
     
     lazy var cancel: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.frame.width-68-16, y: (self.frame.height-16)/2.0, width: 68, height: 16)).font(UIFont.theme.labelMedium).textColor(UIColor.theme.primaryColor5, .normal).tag(1).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside).backgroundColor(.clear).title("Cancel".chat.localize, .normal)
+        UIButton(type: .custom).frame(CGRect(x: self.frame.width-68-16, y: (self.frame.height-16)/2.0, width: 68, height: 16)).font(UIFont.theme.labelMedium).textColor(UIColor.theme.primaryColor5, .normal).tag(1).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside).backgroundColor(.clear).title("group_details_extend_button_disband_alert_button_cancel".chat.localize, .normal)
     }()
     
     @objc public required convenience init(frame: CGRect, displayStyle: SearchHeaderBarDisplayStyle) {

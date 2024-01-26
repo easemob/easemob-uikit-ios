@@ -18,10 +18,10 @@ import UIKit
      - Returns: An instance of EaseChatNavigationBar.
      */
     @objc open func createNavigation() -> EaseChatNavigationBar {
-        if self.style == .newGroup || self.style == .addGroupParticipant || self.style == .shareContact {
-            return EaseChatNavigationBar(frame: (self.style == .newGroup || self.style == .newChat) ? CGRect(x: 0, y: 0, width: ScreenWidth, height: 44):CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: .left,rightTitle: "").backgroundColor(.clear)
+        if self.style == .newGroup  || self.style == .shareContact || self.style == .newChat {
+            return EaseChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "").backgroundColor(.clear)
         } else {
-            return EaseChatNavigationBar(frame: (self.style == .newGroup || self.style == .newChat) ? CGRect(x: 0, y: 0, width: ScreenWidth, height: 44):CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: self.style != .contact, rightImages: self.style == .newChat ? []:[UIImage(named: "person_add", in: .chatBundle, with: nil)!],hiddenAvatar: self.style == .contact ? false:true).backgroundColor(.clear)
+            return EaseChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: self.style != .contact, rightImages: self.style == .newChat ? []:[UIImage(named: "person_add", in: .chatBundle, with: nil)!],hiddenAvatar: self.style == .contact ? false:true).backgroundColor(.clear)
         }
     }
     
@@ -35,7 +35,7 @@ import UIKit
      - Returns: The created search button.
      */
     @objc open func createSearch() -> UIButton {
-        UIButton(type: .custom).frame(CGRect(x: 16, y: self.navigation.frame.maxY + 5, width: self.view.frame.width-32, height: 36)).backgroundColor(UIColor.theme.neutralColor95).textColor(UIColor.theme.neutralColor6, .normal).title(" Search".chat.localize, .normal).image(UIImage(named: "search", in: .chatBundle, with: nil), .normal).addTargetFor(self, action: #selector(searchAction), for: .touchUpInside).cornerRadius(Appearance.avatarRadius)
+        UIButton(type: .custom).frame(CGRect(x: 16, y: self.navigation.frame.maxY + 5, width: self.view.frame.width-32, height: 36)).backgroundColor(UIColor.theme.neutralColor95).textColor(UIColor.theme.neutralColor6, .normal).title("Search".chat.localize, .normal).image(UIImage(named: "search", in: .chatBundle, with: nil), .normal).addTargetFor(self, action: #selector(searchAction), for: .touchUpInside).cornerRadius(Appearance.avatarRadius)
     }
     
     public private(set) lazy var contactList: ContactView = {
@@ -88,6 +88,9 @@ import UIKit
     open override func viewDidLoad() {
         super.viewDidLoad()
         self.view.addSubViews([self.navigation,self.search,self.contactList])
+        if self.style != .newGroup || self.style != .newChat || self.style != .shareContact {
+            self.navigation.separateLine.isHidden = true
+        }
         self.viewModel?.bind(driver: self.contactList)
         self.setupTitle()
     
@@ -185,7 +188,9 @@ import UIKit
             self?.viewContact(profile: item)
         }
         if let vc = vc {
-            vc.modalPresentationStyle = .fullScreen
+            if self.style != .newGroup,self.style != .newChat,self.style != .shareContact {
+                vc.modalPresentationStyle = .fullScreen
+            }
             ControllerStack.toDestination(vc: vc)
         }
     }

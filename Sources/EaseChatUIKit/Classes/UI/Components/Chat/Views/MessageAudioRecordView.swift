@@ -162,6 +162,8 @@ import UIKit
         self.buildTimer()
         self.recordTitle.text = "Recording".chat.localize
         AudioTools.shared.startRecording()
+        self.recordIcon.setImage(nil, for: .normal)
+        self.recordIcon.setTitle("0s", for: .normal)
     }
     
     private func stopRecord() {
@@ -188,7 +190,7 @@ import UIKit
     
     private func stopPlay(send: Bool) {
         self.playCount = self.duration
-        self.recordTitle.text = "Play"
+        self.recordTitle.text = "Play".chat.localize
         self.timer?.invalidate()
         AudioTools.shared.stopPlaying()
         self.recordIcon.stopAnimation()
@@ -235,14 +237,12 @@ import UIKit
 
 extension MessageAudioRecordView: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
-        self.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.primaryColor98
+        self.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
         self.recordCover.backgroundColor(style == .dark ? UIColor.theme.primaryColor2:UIColor.theme.primaryColor95)
         self.recordIcon.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
         self.send.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
         self.trash.backgroundColor(style == .light ? UIColor.theme.neutralColor9:UIColor.theme.neutralColor2)
-        if style == .dark {
-            self.trashIcon?.withTintColor(UIColor.theme.neutralColor7)
-        }
+        self.trashIcon?.withTintColor(style == .dark ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor5)
         self.trash.setImage(self.trashIcon, for: .normal)
     }
     
@@ -257,7 +257,7 @@ extension MessageAudioRecordView: ThemeSwitchProtocol {
     
     var borderWidth: CGFloat = 5.0
     
-    var rippleRadius: CGFloat = 1.5
+    var rippleRadius: CGFloat = 1.1618
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -312,7 +312,7 @@ extension MessageAudioRecordView: ThemeSwitchProtocol {
         
         let scaleAnimation = CABasicAnimation()
         scaleAnimation.keyPath = "transform.scale"
-        scaleAnimation.toValue = NSValue(caTransform3D: CATransform3DMakeScale(self.rippleRadius, self.rippleRadius, 1.0))
+        scaleAnimation.toValue = NSValue(caTransform3D: CATransform3DMakeScale(self.rippleRadius, self.rippleRadius, 1))
         
         let alphaAnimation = CABasicAnimation()
         alphaAnimation.keyPath = "opacity"

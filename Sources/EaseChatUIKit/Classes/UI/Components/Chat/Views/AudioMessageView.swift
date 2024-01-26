@@ -39,7 +39,7 @@ import UIKit
         self.switchTheme(style: Theme.style)
         let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
         self.content.textColor = currentUser == entity.message.from ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor
-        self.content.textAlignment = entity.message.direction == .receive ? .left:.right
+        self.content.textAlignment = entity.message.direction == .receive ? .right:.left
         self.content.text = entity.message.showContent
         if entity.playing {
             self.audioIcon.startAnimating()

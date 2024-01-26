@@ -8,21 +8,23 @@ import Foundation
     /// The option of chat sdk function.
     public var option_chat: ChatOptions = ChatOptions()
     
-    @objcMembers public class ChatOptions: ChatSDKOptions {
-        
-        /// Whether to store session avatars and nicknames in EaseChatUIKit.
-        var saveConversationInfo = true
-        
-        /// Whether to play a sound when new messages are received
-        var soundOnReceivedNewMessage = true
-        
-        /// Whether load messages from local database.
-        var loadLocalHistoryMessages = true
-    }
     
-    @objcMembers public class UIOptions: NSObject {
-        
-    }
+}
+
+@objcMembers public class ChatOptions: ChatSDKOptions {
+    
+    /// Whether to store session avatars and nicknames in EaseChatUIKit.
+    var saveConversationInfo = true
+    
+    /// Whether to play a sound when new messages are received
+    var soundOnReceivedNewMessage = true
+    
+    /// Whether load messages from local database.
+    var loadLocalHistoryMessages = true
+}
+
+@objcMembers public class UIOptions: NSObject {
+    
 }
 
 @objcMembers public class EaseChatUIKitClient: NSObject {
@@ -40,8 +42,8 @@ import Foundation
     ///   - appKey: The unique identifier that Chat assigns to each app.
     /// Returns the initialization success or an error that includes the description of the cause of the failure.
     @objc(setupWithAppkey:option:)
-    public func setup(appKey: String,option: EaseChatUIKitOptions.ChatOptions = EaseChatUIKitOptions.ChatOptions()) -> ChatError? {
-        let option = EaseChatUIKitOptions.ChatOptions(appkey: appKey)
+    public func setup(appKey: String,option: ChatOptions = ChatOptions()) -> ChatError? {
+        let option = ChatOptions(appkey: appKey)
         option.enableConsoleLog = true
         option.isAutoLogin = false
         option.deleteMessagesOnLeaveGroup = false

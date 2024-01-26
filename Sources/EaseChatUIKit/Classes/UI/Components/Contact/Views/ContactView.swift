@@ -107,7 +107,7 @@ import UIKit
     }()
     
     public private(set) lazy var indexIndicator: SectionIndexList = {
-        SectionIndexList(frame: CGRect(x: self.frame.width-16, y: self.header.frame.height+20, width: 16, height: CGFloat(Appearance.contact.listHeaderExtensionActions.count)*Appearance.contact.rowHeight+20), style: .plain).backgroundColor(.clear)
+        SectionIndexList(frame: CGRect(x: self.frame.width-18, y: self.header.frame.height+20, width: 16, height: CGFloat(Appearance.contact.listHeaderExtensionActions.count)*Appearance.contact.rowHeight+20), style: .plain).backgroundColor(.clear)
     }()
 
     internal override init(frame: CGRect) {
@@ -127,6 +127,7 @@ import UIKit
         }
         self.contactList.keyboardDismissMode = .onDrag
         self.addSubViews([self.contactList,self.indexIndicator])
+        self.indexIndicator.center = CGPoint(x: self.indexIndicator.center.x, y: self.contactList.center.y)
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
         self.indexIndicator.selectClosure = { [weak self] in

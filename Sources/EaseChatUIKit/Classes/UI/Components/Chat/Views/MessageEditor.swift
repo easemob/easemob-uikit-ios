@@ -26,7 +26,7 @@ import UIKit
     }()
     
     lazy var done: UIButton = {
-        UIButton(type: .system).frame(.zero).image(UIImage(named: "uncheck", in: .chatBundle, with: nil), .normal).image(UIImage(named: "check", in: .chatBundle, with: nil), .selected).font(.systemFont(ofSize: 16, weight: .medium)).tag(12).addTargetFor(self, action: #selector(doneAction), for: .touchUpInside).textColor(UIColor(0x999999), .disabled)
+        UIButton(type: .system).frame(.zero).font(.systemFont(ofSize: 16, weight: .medium)).tag(12).addTargetFor(self, action: #selector(doneAction), for: .touchUpInside)
     }()
     
     lazy var editor: TextEditorView = {
@@ -37,6 +37,8 @@ import UIKit
         self.modifyClosure = changeClosure
         super.init(frame: UIScreen.main.bounds)
         self.addSubViews([self.statusView,self.editor,self.done])
+        
+        self.statusView.contentHorizontalAlignment = .left
         
         self.statusView.translatesAutoresizingMaskIntoConstraints = false
         self.statusView.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
@@ -113,6 +115,7 @@ extension MessageEditor: ThemeSwitchProtocol {
         if style == .dark {
             self.statusImage?.withTintColor(UIColor.theme.neutralSpecialColor6)
         }
+        self.done.image(UIImage(named: "uncheck", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.neutralColor4:UIColor.theme.neutralColor7, renderingMode: .alwaysOriginal), .normal).image(UIImage(named: "check", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5), .selected)
         self.statusView.setImage(self.statusImage, for: .normal)
     }
 }

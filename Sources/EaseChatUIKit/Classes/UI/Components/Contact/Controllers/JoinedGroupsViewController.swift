@@ -34,7 +34,7 @@ import UIKit
     }
     
     public private(set) lazy var groupList: UITableView = {
-        UITableView(frame: CGRect(x: 0, y: self.navigation.frame.maxY+10, width: self.view.frame.width, height: self.view.frame.height-self.navigation.frame.maxY-10), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).rowHeight(60).backgroundColor(.clear)
+        UITableView(frame: CGRect(x: 0, y: self.navigation.frame.maxY+10, width: self.view.frame.width, height: self.view.frame.height-self.navigation.frame.maxY-10), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).rowHeight(60).backgroundColor(.clear).separatorStyle(.none)
     }()
     
     private lazy var empty: EmptyStateView = {

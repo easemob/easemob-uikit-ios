@@ -51,14 +51,23 @@ import UIKit
         UIView(frame: CGRect(x: self.contentView.frame.width-28, y: self.nickName.frame.maxY+10, width: 8, height: 8)).cornerRadius(.large).backgroundColor(UIColor.theme.primaryColor5)
     }
     
+    public private(set) lazy var separatorLine: UIView = {
+        self.createSeparatorLine()
+    }()
+    
+    @objc open func createSeparatorLine() -> UIView {
+        UIView(frame: CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5))
+    }
+    
     @objc required public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.contentView.backgroundColor = .clear
         self.backgroundColor = .clear
-        self.contentView.addSubViews([self.avatar,self.nickName,self.date,self.content,self.badge,self.dot])
+        self.contentView.addSubViews([self.avatar,self.nickName,self.date,self.content,self.badge,self.dot,self.separatorLine])
         self.nickName.contentHorizontalAlignment = .left
         self.nickName.semanticContentAttribute = .forceLeftToRight
         Theme.registerSwitchThemeViews(view: self)
+        self.switchTheme(style: Theme.style)
     }
     
     open override func layoutSubviews() {
@@ -68,7 +77,8 @@ import UIKit
         self.date.frame = CGRect(x: self.contentView.frame.width-66, y: self.nickName.frame.minY+2, width: 50, height: 16)
         self.content.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.nickName.frame.maxY+2, width: self.contentView.frame.width-12-12-16-50, height: 20)
 //        self.badge.frame = CGRect(x: self.contentView.frame.width-48, y: self.nickName.frame.maxY+5, width: 32, height: 18)
-        self.dot.frame =  CGRect(x: self.contentView.frame.width-38, y: self.nickName.frame.maxY+10, width: 8, height: 8)
+        self.dot.frame =  CGRect(x: self.date.frame.maxX-12, y: self.nickName.frame.maxY+10, width: 8, height: 8)
+        self.separatorLine.frame =  CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5)
     }
     
     required public init?(coder: NSCoder) {
@@ -108,8 +118,14 @@ import UIKit
         } else {
             self.badge.isHidden = info.unreadCount <= 0
             self.dot.isHidden = true
-            let badgeWidth = CGFloat(info.unreadCount > 9 ? 32:18)
-            self.badge.frame = CGRect(x: self.date.frame.maxX-badgeWidth, y: self.nickName.frame.maxY+5, width: badgeWidth, height: 18)
+            var badgeWidth = 18
+            if info.unreadCount > 9 {
+                badgeWidth = 24
+                if info.unreadCount > 99 {
+                    badgeWidth = 32
+                }
+            }
+            self.badge.frame = CGRect(x: Int(self.date.frame.maxX)-badgeWidth, y: Int(self.nickName.frame.maxY)+5, width: badgeWidth, height: 18)
         }
     }
     
@@ -123,6 +139,7 @@ extension ConversationListCell: ThemeSwitchProtocol {
         self.date.textColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5
         self.badge.backgroundColor = style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
         self.dot.backgroundColor = style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        self.separatorLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
     }
     
     
@@ -214,7 +231,7 @@ extension ConversationListCell: ThemeSwitchProtocol {
             } else {
                 let from = message.from
                 let showText = NSMutableAttributedString {
-                    AttributedText((message.user?.nickname ?? from) + ": ").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5)
+                    AttributedText((message.user?.nickname ?? from) + ": ").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(Font.theme.bodyMedium)
                 }
                 showText.append(text)
                 showText.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor6, range: NSRange(location: 0, length: showText.length))

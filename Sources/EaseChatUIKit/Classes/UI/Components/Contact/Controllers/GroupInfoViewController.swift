@@ -339,7 +339,9 @@ import UIKit
         vc.mentionClosure = { [weak self] in
             self?.transferConfirm(profile: $0)
         }
-        vc.modalPresentationStyle = .fullScreen
+        if vc.presentingViewController != nil {
+            vc.modalPresentationStyle = .fullScreen
+        }
         ControllerStack.toDestination(vc: vc)
     }
     
@@ -416,6 +418,15 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
         cell?.indexPath = indexPath
         if let info = self.datas[safe: indexPath.section]?[safe: indexPath.row] {
             cell?.refresh(info: info)
+            if EaseChatUIKitContext.shared?.currentUserId ?? "" == self.chatGroup.owner {
+                cell?.accessoryType = info.withSwitch ? .none:.disclosureIndicator
+            } else {
+                if indexPath.section == 1 {
+                    cell?.accessoryType = .none
+                } else {
+                    cell?.accessoryType = info.withSwitch ? .none:.disclosureIndicator
+                }
+            }
         }
         cell?.switchMenu.isEnabled = !self.chatGroup.isDisabled
         cell?.valueChanged = { [weak self] in
@@ -427,7 +438,14 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
 
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        self.didSelectRowAt(indexPath: indexPath)
+        if EaseChatUIKitContext.shared?.currentUserId ?? "" == self.chatGroup.owner {
+            self.didSelectRowAt(indexPath: indexPath)
+        } else {
+            if indexPath.section == 0 {
+                self.didSelectRowAt(indexPath: indexPath)
+            }
+        }
+        
     }
     
     /**

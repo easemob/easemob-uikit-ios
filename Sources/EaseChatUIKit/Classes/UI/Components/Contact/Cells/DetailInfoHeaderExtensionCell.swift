@@ -51,5 +51,6 @@ extension DetailInfoHeaderExtensionCell: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         self.contentView.backgroundColor = style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor95
         self.title.textColor = style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        
     }
 }

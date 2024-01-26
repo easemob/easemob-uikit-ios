@@ -94,6 +94,7 @@
 "group_details_button_announcement" = "Group Announcement";
 "group_details_switch_public" = "Set public";
 "group_details_extend_button_transfer" = "Transfer owner";
+"group_mention_title" = "Mention";
 "group_details_extend_button_disband" = "Disband group";
 "group_details_extend_button_disband_alert_title" = "Disband group";
 "group_details_extend_button_disband_alert_subtitle" = "Disbanding the group will remove all members.";
@@ -107,6 +108,7 @@
 "Reach content character limit." = "Reach content character limit.";
 "Group was disabled" = "Group was disabled";
 "Save" = "Save";
+"Chat" = "Chat";
 "Please input" = "Please input";
 "Group" = "Group";
 "has been created." = "has been created.";
