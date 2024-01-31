@@ -285,7 +285,7 @@ extension MessageListController: MessageListDriverEventsListener {
         if !Appearance.chat.contentStyle.contains(.withReply) {
             messageActions.removeAll { $0.tag == "Reply" }
         }
-        if !Appearance.chat.contentStyle.contains(.withMessageTopic) || message.message.chatType == .chat {
+        if !Appearance.chat.contentStyle.contains(.withMessageTopic) || message.message.chatType == .chat || message.message.chatThread != nil {
             messageActions.removeAll { $0.tag == "Topic" }
         }
         if message.message.direction != .send {
