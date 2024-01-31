@@ -107,6 +107,40 @@ import UIKit
         self.switchTheme(style: Theme.style)
     }
     
+    @objc public convenience init(items:[ActionSheetItemProtocol],withHeader: UIView? = nil,action: @escaping (ActionSheetItemProtocol) -> Void) {
+        let messageHeight = 0
+        var contentHeight = 11+Int(Appearance.actionSheetRowHeight)*items.count+Int(Appearance.actionSheetRowHeight)+8+Int(BottomBarHeight)
+        var itemCount = items.count
+        if CGFloat(contentHeight) > ScreenHeight/2.0 {
+            itemCount = items.count-2
+            contentHeight = 11+Int(Appearance.actionSheetRowHeight)*itemCount+Int(Appearance.actionSheetRowHeight)+8+Int(BottomBarHeight)
+        }
+        if messageHeight > 0 {
+            contentHeight += (Int(messageHeight)+20)
+        }
+        if CGFloat(contentHeight) > ScreenHeight*(2/3.0) {
+            contentHeight = Int(ScreenHeight*(2/3.0))
+        }
+        if let header = withHeader {
+            contentHeight += Int(header.frame.height+9)
+        }
+        self.init(frame: CGRect(x: 0, y: abs(Int(ScreenHeight)-contentHeight), width: Int(ScreenWidth), height: contentHeight))
+        self.backgroundColor(UIColor.theme.neutralColor98)
+        self.items.append(contentsOf: items)
+        if let header = withHeader {
+            self.addSubViews([self.indicator,header,self.menuList,self.cancel,self.dividingLine])
+            header.frame = CGRect(x: 0, y: self.indicator.frame.maxY+5, width: header.frame.width, height: header.frame.height)
+            self.menuList.frame = CGRect(x: 0, y: header.frame.maxY+5, width: self.frame.width, height: CGFloat(Int(Appearance.actionSheetRowHeight)*itemCount + 8))
+        } else {
+            self.addSubViews([self.indicator,self.menuList,self.cancel,self.dividingLine])
+            self.menuList.frame = CGRect(x: 0, y: self.indicator.frame.maxY+15, width: self.frame.width, height: CGFloat(Int(Appearance.actionSheetRowHeight)*itemCount + 8))
+        }
+        self.menuList.bounces = false
+        self.actionClosure = action
+        Theme.registerSwitchThemeViews(view: self)
+        self.switchTheme(style: Theme.style)
+    }
+    
     @objc private func cancelAction() {
         UIViewController.currentController?.dismiss(animated: true)
     }

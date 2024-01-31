@@ -33,8 +33,8 @@ import UIKit
     /// - Parameters:
     ///   - actions: ``ActionSheetItemProtocol`` array.
     ///   - action: Callback upon a click of a message operation.
-    @objc public func showMessageActions(actions: [ActionSheetItemProtocol],action: @escaping (ActionSheetItemProtocol) -> Void) {
-        let actionSheet = ActionSheet(items: actions) { item in
+    @objc public func showMessageActions(actions: [ActionSheetItemProtocol],withHeader: UIView? = nil, action: @escaping (ActionSheetItemProtocol) -> Void) {
+        let actionSheet = ActionSheet(items: actions,withHeader: withHeader) { item in
             UIViewController.currentController?.dismiss(animated: true) {
                 action(item)
             }
@@ -102,4 +102,6 @@ import UIKit
             vc?.presentViewController(alertVC)
         }
     }
+    
+    
 }

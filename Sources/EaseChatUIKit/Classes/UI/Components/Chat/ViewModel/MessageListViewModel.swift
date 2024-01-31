@@ -34,6 +34,12 @@ import UIKit
     /// Insert extension info before sending message.
     /// - Returns: Extension info.
     func onMessageWillSendFillExtensionInfo() -> Dictionary<String,Any>
+    
+    /// When you click a message's reaction ,the method will call.
+    /// - Parameters:
+    ///   - entity: ``MessageEntity``
+    func onMessageMoreReactionAreaClicked(entity: MessageEntity)
+    
 }
 
 @objcMembers open class MessageListViewModel: NSObject {
@@ -315,17 +321,26 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
     
     @objc open func messageReactionClicked(reaction: MessageReaction?, entity: MessageEntity) {
         if reaction == nil {
-            //show reactions userlist
+            //show reactions user list
+            for handler in self.handlers.allObjects {
+                handler.onMessageMoreReactionAreaClicked(entity: entity)
+            }
+        
         } else {
             guard let reaction = reaction else { return }
-            self.chatService?.reaction(reaction: reaction, message: entity.message, completion: { error in
-                if error == nil {
-                    self.driver?.reloadReaction(message: entity.message)
-                } else {
-                    consoleLogInfo("reaction error:\(error?.errorDescription ?? "")", type: .error)
-                }
-            })
+            guard let emoji = reaction.reaction else { return }
+            self.operationReaction(emoji: emoji, message: entity.message)
         }
+    }
+    
+    @objc open func operationReaction(emoji: String,message: ChatMessage) {
+        self.chatService?.reaction(reaction: emoji, message: message, completion: { error in
+            if error == nil {
+                self.driver?.reloadReaction(message: message)
+            } else {
+                consoleLogInfo("reaction error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        })
     }
     
     

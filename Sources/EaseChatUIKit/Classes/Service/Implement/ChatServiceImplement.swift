@@ -25,14 +25,19 @@ import UIKit
 
 extension ChatServiceImplement: ChatService {
     
-    public func reaction(reaction: MessageReaction, message: ChatMessage, completion: @escaping (ChatError?) -> Void) {
-        if let emoji = reaction.reaction {
-            if !reaction.isAddedBySelf {
-                ChatClient.shared().chatManager?.addReaction(emoji, toMessage: message.messageId, completion: { error in
+    public func reaction(reaction: String, message: ChatMessage, completion: @escaping (ChatError?) -> Void) {
+        let messageReaction = message.reactionList?.first(where: { $0.reaction ?? "" == reaction })
+        if messageReaction == nil {
+            ChatClient.shared().chatManager?.addReaction(reaction, toMessage: message.messageId, completion: { error in
+                completion(error)
+            })
+        } else {
+            if messageReaction!.isAddedBySelf {
+                ChatClient.shared().chatManager?.removeReaction(reaction, fromMessage: message.messageId, completion: { error in
                     completion(error)
                 })
             } else {
-                ChatClient.shared().chatManager?.removeReaction(emoji, fromMessage: message.messageId, completion: { error in
+                ChatClient.shared().chatManager?.addReaction(reaction, toMessage: message.messageId, completion: { error in
                     completion(error)
                 })
             }

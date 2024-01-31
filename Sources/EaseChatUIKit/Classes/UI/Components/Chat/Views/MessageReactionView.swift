@@ -20,7 +20,7 @@ import UIKit
     }()
     
     public private(set) lazy var moreReaction: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.frame.width-30, y: 2, width: 24, height: 24)).image(UIImage(named: "reaction_more", in: .chatBundle, with: nil), .normal).addTargetFor(self, action: #selector(moreAction), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: self.frame.width-30, y: 2, width: 24, height: 24)).image(UIImage(named: "reaction_more", in: .chatBundle, with: nil), .normal).addTargetFor(self, action: #selector(moreAction), for: .touchUpInside).cornerRadius(Appearance.avatarRadius)
     }()
 
     public override init(frame: CGRect) {
@@ -106,7 +106,7 @@ extension MessageReactionView: ThemeSwitchProtocol {
     }()
     
     @objc open func createContent() -> UILabel {
-        UILabel(frame: self.bounds).cornerRadius(4).layerProperties(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, 1).textAlignment(.center)
+        UILabel(frame: self.bounds).cornerRadius(Appearance.avatarRadius).layerProperties(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, 1).textAlignment(.center)
     }
     
     public override init(frame: CGRect) {

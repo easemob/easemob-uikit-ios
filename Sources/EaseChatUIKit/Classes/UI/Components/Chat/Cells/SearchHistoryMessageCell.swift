@@ -27,7 +27,7 @@ import UIKit
         self.backgroundColor = .clear
         self.contentView.addSubViews([self.avatar,self.conversationName,self.messageContent])
         Theme.registerSwitchThemeViews(view: self)
-        
+        self.switchTheme(style: Theme.style)
     }
     
     required public init?(coder: NSCoder) {

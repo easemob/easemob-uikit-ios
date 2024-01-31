@@ -236,6 +236,12 @@ extension MessageListController {
 
 //MARK: - MessageListDriverEventsListener
 extension MessageListController: MessageListDriverEventsListener {
+    
+    public func onMessageMoreReactionAreaClicked(entity: MessageEntity) {
+        self.showReactionDetailsController(message: entity)
+    }
+    
+    
     public func onMessageWillSendFillExtensionInfo() -> Dictionary<String, Any> {
         //Insert extension info before sending message.
         [:]
@@ -279,7 +285,7 @@ extension MessageListController: MessageListDriverEventsListener {
         if !Appearance.chat.contentStyle.contains(.withReply) {
             messageActions.removeAll { $0.tag == "Reply" }
         }
-        if !Appearance.chat.contentStyle.contains(.withMessageTopic) {
+        if !Appearance.chat.contentStyle.contains(.withMessageTopic) || message.message.chatType == .chat {
             messageActions.removeAll { $0.tag == "Topic" }
         }
         if message.message.direction != .send {
@@ -304,9 +310,34 @@ extension MessageListController: MessageListDriverEventsListener {
         - message: The chat message for which the dialog is shown.
      */
     @objc open func showMessageLongPressedDialog(message: MessageEntity) {
-        DialogManager.shared.showMessageActions(actions: self.filterMessageActions(message: message)) { [weak self] item in
+        let header =  CommonReactionView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 44), message: message.message).backgroundColor(.clear)
+        header.reactionClosure = { [weak self] emoji,rawMessage in
+            UIViewController.currentController?.dismiss(animated: true) {
+                if emoji.isEmpty {
+                    //more reaction
+                    self?.showAllReactionsController(message: message)
+                } else {
+                    self?.viewModel.operationReaction(emoji: emoji, message: rawMessage)
+                }
+            }
+        }
+        DialogManager.shared.showMessageActions(actions: self.filterMessageActions(message: message),withHeader: Appearance.chat.contentStyle.contains(.withMessageReaction) ? header:nil) { [weak self] item in
             self?.processMessage(item: item, message: message.message)
         }
+    }
+    
+    @objc open func showAllReactionsController(message: MessageEntity) {
+        let vc = MessageReactionsController(message: message.message) { [weak self] in
+            self?.viewModel.driver?.reloadReaction(message: message.message)
+        }
+        self.presentViewController(vc)
+    }
+    
+    @objc open func showReactionDetailsController(message: MessageEntity) {
+        let vc = MessageReactionsDetailController(message: message.message) { [weak self] in
+            self?.viewModel.driver?.reloadReaction(message: message.message)
+        }
+        self.presentViewController(vc)
     }
     
     /**

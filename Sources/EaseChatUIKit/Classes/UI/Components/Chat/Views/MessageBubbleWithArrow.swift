@@ -47,7 +47,7 @@ import UIKit
         bubblePath.usesEvenOddFillRule = true
         bubblePath.lineWidth = 1
         // 气泡的圆角半径
-        let cornerRadius: CGFloat = 4
+        let cornerRadius: CGFloat = 10
         
         // 气泡的尖角宽度和高度
         let arrowWidth: CGFloat = 5.0

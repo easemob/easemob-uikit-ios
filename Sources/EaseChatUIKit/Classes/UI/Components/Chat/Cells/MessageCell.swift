@@ -79,7 +79,7 @@ let message_bubble_space = CGFloat(5)
     }()
     
     @objc open func createCheckbox() -> UIImageView {
-        UIImageView(frame: CGRect(x: 12, y: (self.contentView.frame.height-28)/2.0, width: 28, height: 28)).contentMode(.scaleAspectFit).backgroundColor(.orange)
+        UIImageView(frame: CGRect(x: 12, y: (self.contentView.frame.height-28)/2.0, width: 28, height: 28)).contentMode(.scaleAspectFit).backgroundColor(.clear)
     }
     
     public private(set) lazy var avatar: ImageView = {

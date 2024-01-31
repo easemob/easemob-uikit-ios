@@ -88,10 +88,10 @@ let EaseChatUIKit_user_card_message = "userCard"
     
     /// Operation reaction api.
     /// - Parameters:
-    ///   - reaction: ``MessageReaction``
+    ///   - reaction: ``String``
     ///   - message: ``ChatMessage``
     ///   - completion: Callback, returns error whether successful error is `nil`, or error occur.
-    func reaction(reaction: MessageReaction, message: ChatMessage, completion: @escaping (ChatError?) -> Void)
+    func reaction(reaction: String, message: ChatMessage, completion: @escaping (ChatError?) -> Void)
     
     
 }

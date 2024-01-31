@@ -209,7 +209,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
             width = 36
         }
         let translateSize = Appearance.chat.enableTranslation ? self.translationSize():.zero
-        let height = size.height+14+(self.message.edited ? 19:0)+(self.showTranslation ? (translateSize.height > 0 ? (18+translateSize.height):0):0)
+        let height = size.height+14+(self.message.edited ? 19:0)+(self.showTranslation ? (translateSize.height > 0 ? (28+translateSize.height):0):0)
         
         return CGSize(width: width, height: height)
     }
