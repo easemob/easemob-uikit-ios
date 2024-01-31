@@ -225,7 +225,7 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
         var text = NSMutableAttributedString()
         if self.message.body.type != .text, self.message.body.type != .custom {
             text.append(NSAttributedString {
-                AttributedText(self.message.showType).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(UIFont.theme.bodyLarge)
+                AttributedText(self.message.showType+self.message.showContent).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(UIFont.theme.bodyLarge)
             })
             return text
         }
@@ -242,7 +242,7 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
                 }
             default:
                 text.append(NSAttributedString {
-                    AttributedText(self.message.showType).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(UIFont.theme.bodyLarge)
+                    AttributedText(self.message.showType+self.message.showContent).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(UIFont.theme.bodyLarge)
                 })
                 break
             }

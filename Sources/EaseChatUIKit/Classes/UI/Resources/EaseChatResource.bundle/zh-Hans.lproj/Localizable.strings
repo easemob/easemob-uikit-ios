@@ -126,6 +126,7 @@
 "contact_details_extend_button_delete_alert_subtitle" = "删除联系人同时删除历史消息";
 "contact_details_extend_button_delete_alert_button_confirm" = "确定";
 "contact_details_extend_button_delete_alert_button_cancel" = "取消";
+"group_details_extend_button_disband_alert_button_cancel" = "取消";
 "contact_details_extend_button_cancel" = "取消";
 
 "remaining..." = "后停止";

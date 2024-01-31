@@ -108,7 +108,7 @@ import UIKit
     public var inputPlaceHolder = "Aa"
     
     /// The corner radius of ``MessageInputBar``.
-    public var inputBarCorner: CornerRadius = .medium
+    public var inputBarCorner: CornerRadius = .extraSmall
     
     /// Message bubble display style.``BubbleDisplayStyle``
     public var bubbleStyle: MessageCell.BubbleDisplayStyle = .withArrow
