@@ -320,7 +320,11 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
             hooker(indexPath,info)
         } else {
             consoleLogInfo("onConversationLongPressed", type: .debug)
+            self.conversationLongPressed(indexPath: indexPath, info: info)
         }
+    }
+    
+    @objc open func conversationLongPressed(indexPath: IndexPath, info: ConversationInfo) {
     }
     
     @objc open func moreAction(info: ConversationInfo) {

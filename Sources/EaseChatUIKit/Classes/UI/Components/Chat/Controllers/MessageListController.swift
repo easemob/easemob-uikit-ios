@@ -239,10 +239,12 @@ extension MessageListController {
 extension MessageListController: MessageListDriverEventsListener {
     public func onMessageWillSendFillExtensionInfo() -> Dictionary<String, Any> {
         //Insert extension info before sending message.
-        [:]
+        self.messageWillSendFillExtensionInfo()
     }
     
-    
+    @objc open func messageWillSendFillExtensionInfo() -> Dictionary<String, Any> {
+        [:]
+    }
     /**
      Filters the available message actions based on the provided `ChatMessage`.
 
