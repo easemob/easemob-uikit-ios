@@ -332,14 +332,12 @@ extension ConversationServiceImplement: ChatEventsListener {
     public func messagesInfoDidRecall(_ aRecallMessagesInfo: [RecallInfo]) {
         for info in aRecallMessagesInfo {
             if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(info.recallMessage.conversationId) {
-                if let recallMessage = ChatClient.shared().chatManager?.getMessageWithMessageId(info.recallMessage.messageId) {
-                    let alertMessage = ChatMessage(conversationID: recallMessage.conversationId, body: ChatCustomMessageBody(event: EaseChatUIKit_alert_message, customExt: nil), ext: ["something":"recalled a message".chat.localize])
-                    alertMessage.timestamp = recallMessage.timestamp
-                    alertMessage.localTime = recallMessage.localTime
-                    alertMessage.from = info.recallBy
-                    conversation.insert(alertMessage, error: nil)
-                    self.notifyHandler(message: alertMessage, local: true)
-                }
+                let alertMessage = ChatMessage(conversationID: info.recallMessage.conversationId, body: ChatCustomMessageBody(event: EaseChatUIKit_alert_message, customExt: nil), ext: ["something":"recalled a message".chat.localize])
+                alertMessage.timestamp = info.recallMessage.timestamp
+                alertMessage.localTime = info.recallMessage.localTime
+                alertMessage.from = info.recallBy
+                conversation.insert(alertMessage, error: nil)
+                self.notifyHandler(message: alertMessage, local: true)
             }
             
         }
