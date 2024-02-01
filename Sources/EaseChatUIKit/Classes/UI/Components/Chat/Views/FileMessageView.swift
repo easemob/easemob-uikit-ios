@@ -28,13 +28,18 @@ import UIKit
     }()
     
     public private(set) lazy var fileIcon: UIImageView = {
-        UIImageView(frame: CGRect(x: self.towards == .right ? 8:self.frame.width - self.frame.height - 16 - 8, y: 5, width: self.frame.height - 16, height: self.frame.height - 16)).backgroundColor(.clear).contentMode(.scaleAspectFit).cornerRadius(Appearance.chat.bubbleStyle == .withArrow ? 4:8)
+        UIImageView(frame: .zero).backgroundColor(.clear).contentMode(.scaleAspectFit).cornerRadius(Appearance.chat.bubbleStyle == .withArrow ? 4:8)
+    }()
+    
+    public private(set) lazy var fileIconView: UIImageView = {
+        UIImageView(frame: CGRect(x: 6, y: 6, width: self.fileIcon.frame.height-12, height: self.fileIcon.frame.height-12)).backgroundColor(.clear).contentMode(.scaleAspectFit).cornerRadius(Appearance.chat.bubbleStyle == .withArrow ? 4:8)
     }()
     
     @objc required public init(frame: CGRect,towards: BubbleTowards) {
         super.init(frame: frame)
         self.towards = towards
         self.addSubViews([self.content,self.fileSize,self.fileIcon])
+        self.fileIcon.addSubview(self.fileIconView)
         Theme.registerSwitchThemeViews(view: self)
     }
     
@@ -45,6 +50,7 @@ import UIKit
     @objc public func refresh(entity: MessageEntity) {
         self.towards = entity.message.direction == .receive ? .left:.right
         self.fileIcon.frame = CGRect(x: self.towards == .right ? 8:self.frame.width - (self.frame.height - 16) - 8, y: 8, width: self.frame.height - 16, height: self.frame.height - 16)
+        self.fileIconView.frame = CGRect(x: 6, y: 6, width: self.fileIcon.frame.height-12, height: self.fileIcon.frame.height-12)
         self.content.frame = CGRect(x: self.towards == .left ? 12:self.fileIcon.frame.maxX+12, y: 5, width: self.frame.width - (self.frame.height - 16) - 16 - 12, height: 24)
         self.fileSize.frame = CGRect(x: self.content.frame.minX, y: self.content.frame.maxY, width: self.content.frame.width, height: 18)
         self.fileIcon.cornerRadius(.extraSmall)
@@ -81,12 +87,11 @@ import UIKit
 extension FileMessageView: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         
-        
-        self.fileIcon.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor100
+        self.fileIcon.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor98
         var image = UIImage(named: "file_message_icon", in: .chatBundle, with: nil)
         if style == .dark {
             image = image?.withTintColor(UIColor.theme.neutralColor6)
         }
-        self.fileIcon.image = image
+        self.fileIconView.image = image
     }
 }
