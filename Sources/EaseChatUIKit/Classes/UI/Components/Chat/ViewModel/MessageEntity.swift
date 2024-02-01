@@ -202,15 +202,16 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
     
     open func textSize() -> CGSize {
         let label = UILabel().numberOfLines(0).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
-        label.attributedText = self.convertTextAttribute()
+        let textAttribute = self.convertTextAttribute()
+        label.attributedText = textAttribute
         let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-24, height: 9999))
-        var width = size.width+24
-        if width < 36 {
-            width = 36
+        var width = size.width
+        if textAttribute?.string.count ?? 0 <= 1 {
+            width += 8
         }
+         width += 24
         let translateSize = Appearance.chat.enableTranslation ? self.translationSize():.zero
         let height = size.height+14+(self.message.edited ? 19:0)+(self.showTranslation ? (translateSize.height > 0 ? (28+translateSize.height):0):0)
-        
         return CGSize(width: width, height: height)
     }
     
@@ -308,7 +309,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
         var text = NSMutableAttributedString()
         if self.message.body.type != .text, self.message.body.type != .custom {
             text.append(NSAttributedString {
-                AttributedText(self.message.showType).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(UIFont.theme.bodyLarge)
+                AttributedText(self.message.showType+self.message.showContent).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(UIFont.theme.bodyLarge)
             })
             return text
         }
@@ -330,7 +331,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
                 }
             default:
                 text.append(NSAttributedString {
-                    AttributedText(self.message.showType).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(UIFont.theme.bodyLarge)
+                    AttributedText(self.message.showType+self.message.showContent).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(UIFont.theme.bodyLarge)
                 })
                 break
             }

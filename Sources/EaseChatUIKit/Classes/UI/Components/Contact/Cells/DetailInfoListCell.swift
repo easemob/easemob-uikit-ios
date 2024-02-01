@@ -68,7 +68,11 @@ import UIKit
         self.switchMenu.isHidden = !info.withSwitch
         self.titleLabel.text = info.title
         self.detailLabel.text = info.detail
-        
+        if self.accessoryType == .disclosureIndicator {
+            self.detailLabel.frame = CGRect(x: self.frame.width/2.0, y: 16, width: (self.frame.width/2.0-36), height: 22)
+        } else {
+            self.detailLabel.frame = CGRect(x: ScreenWidth-116, y: 16, width: 100, height: 22)
+        }
         self.switchMenu.isOn = info.switchValue
     }
     

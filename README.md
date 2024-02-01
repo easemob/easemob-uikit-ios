@@ -475,6 +475,14 @@ python3 -m http.server 8080
 
 [ComponentViewsActionHooker](./Documentation/ComponentsActionEventsRegister.md). 所有可拦截的点击事件
 
+## 4.拦截主要页面点击以及跳转事件
+
+详见[](./Documentation/customize_click_jump.md).
+
+## 5.拦截主要页面回调事件监听
+
+详见[](./Documentation/modular_events_listener.md).
+
 # 设计指南
 
 如果您对设计指南和细节有任何疑问，您可以在 Figma 设计稿中添加评论并提及我们的设计师 Stevie Jiang。

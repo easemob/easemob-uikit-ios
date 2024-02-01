@@ -21,7 +21,11 @@ import UIKit
         if self.style == .newGroup  || self.style == .shareContact || self.style == .newChat {
             return EaseChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "").backgroundColor(.clear)
         } else {
-            return EaseChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: self.style != .contact, rightImages: self.style == .newChat ? []:[UIImage(named: "person_add", in: .chatBundle, with: nil)!],hiddenAvatar: self.style == .contact ? false:true).backgroundColor(.clear)
+            if style == .addGroupParticipant {
+                return EaseChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: .left,rightTitle: "Add".chat.localize).backgroundColor(.clear)
+            } else {
+                return EaseChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: self.style != .contact, rightImages: self.style == .newChat ? []:[UIImage(named: "person_add", in: .chatBundle, with: nil)!],hiddenAvatar: self.style == .contact ? false:true).backgroundColor(.clear)
+            }
         }
     }
     
@@ -143,7 +147,7 @@ import UIKit
             text = "new_chat_button_click_menu_creategroup".chat.localize
             self.navigation.rightItem.title("Create".chat.localize, .normal)
         case .newChat:
-            text = "New Message".chat.localize
+            text = "new_chat_button_click_menu_selectcontacts".chat.localize
         case .contact:
             text = "Contact".chat.localize
         case .shareContact:
@@ -202,7 +206,13 @@ import UIKit
      */
     @objc open func rightActions(indexPath: IndexPath) {
         switch indexPath.row {
-        case 0: self.addContact()
+        case 0:
+            if self.style == .contact {
+                self.addContact()
+            }
+            if self.style == .addGroupParticipant {
+                self.confirmAction()
+            }
         default:
             break
         }

@@ -85,7 +85,7 @@
 
 "new_chat_button_click_menu_addcontacts" = "添加联系人";
 "new_chat_button_click_menu_creategroup" = "创建群组";
-"new_chat_button_click_menu_selectcontacts" = "选择联系人";
+"new_chat_button_click_menu_selectcontacts" = "发起会话";
 
 "remove_participants" = "删除群成员";
 "group_delete_members_alert" = "你确定删除这";
@@ -112,6 +112,7 @@
 "Save" = "保存";
 "Please input" = "请输入";
 "New Message" = "新消息";
+"New Request" = "新请求";
 
 
 "add_contacts_subtitle" = "通过用户ID添加联系人";
@@ -132,6 +133,7 @@
 "contact_details_extend_button_delete_alert_subtitle" = "删除联系人同时删除历史消息";
 "contact_details_extend_button_delete_alert_button_confirm" = "确定";
 "contact_details_extend_button_delete_alert_button_cancel" = "取消";
+"group_details_extend_button_disband_alert_button_cancel" = "取消";
 "contact_details_extend_button_cancel" = "取消";
 
 "remaining..." = "后停止";

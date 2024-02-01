@@ -71,7 +71,7 @@ import UIKit
     }
     
     public private(set) lazy var leftItem: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: 10, y: self.frame.height-30, width: 24, height: 24)).image(self.backImage, .normal).tag(0).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside).backgroundColor(.clear)
+        UIButton(type: .custom).frame(CGRect(x: 8, y: self.frame.height-30, width: 24, height: 24)).image(self.backImage, .normal).tag(0).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside).backgroundColor(.clear)
     }()
     
     public private(set) lazy var avatar: ImageView = {
@@ -87,11 +87,11 @@ import UIKit
     }()
     
     public private(set) lazy var titleLabel: UILabel = {
-        UILabel(frame: CGRect(x: self.avatar.frame.maxX+8, y: StatusBarHeight+2, width: ScreenWidth-self.avatar.frame.maxX*2-8*3, height: 22)).font(UIFont.theme.titleMedium).textColor(UIColor.theme.neutralColor1).backgroundColor(.clear).tag(2)
+        UILabel(frame: CGRect(x: self.avatar.frame.maxX+4, y: StatusBarHeight+2, width: ScreenWidth-self.avatar.frame.maxX*2-8*3, height: 22)).font(UIFont.theme.titleMedium).textColor(UIColor.theme.neutralColor1).backgroundColor(.clear).tag(2)
     }()
     
     public private(set) lazy var detail: UILabel = {
-        UILabel(frame: CGRect(x: self.avatar.frame.maxX+8, y: self.titleLabel.frame.maxY, width: self.titleLabel.frame.width, height: 14)).font(UIFont.theme.bodyExtraSmall).textColor(UIColor.theme.neutralColor5).backgroundColor(.clear)
+        UILabel(frame: CGRect(x: self.avatar.frame.maxX+4, y: self.titleLabel.frame.maxY, width: self.titleLabel.frame.width, height: 14)).font(UIFont.theme.bodyExtraSmall).textColor(UIColor.theme.neutralColor5).backgroundColor(.clear)
     }()
     
     lazy var layout: UICollectionViewFlowLayout = {
@@ -108,7 +108,7 @@ import UIKit
     }()
     
     public private(set) lazy var rightItem: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: ScreenWidth-150, y: self.frame.height-34, width: 138, height: 28)).font(UIFont.theme.labelMedium).tag(3).backgroundColor(.clear).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: ScreenWidth-158, y: self.frame.height-34, width: 138, height: 28)).font(UIFont.theme.labelMedium).tag(3).backgroundColor(.clear).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside)
     }()
     
     public private(set) lazy var separateLine: UIView = {
@@ -137,15 +137,15 @@ import UIKit
         }
         if showLeftItem {
             var width = CGFloat(self.rightImages.count*36)
-            if self.avatar.frame.maxX+8 > width {
-                width = self.avatar.frame.maxX+8
+            if self.avatar.frame.maxX+4 > width {
+                width = self.avatar.frame.maxX+4
             }
             if hiddenAvatar {
                 self.addSubViews([self.leftItem,self.titleLabel,self.detail,self.rightItems,self.separateLine])
             } else {
                 self.addSubViews([self.leftItem,self.avatar,self.status,self.titleLabel,self.detail,self.rightItems,self.separateLine])
             }
-            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: StatusBarHeight+4, width: ScreenWidth - width*2 - 8, height: 22)
+            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+4, y: StatusBarHeight+4, width: ScreenWidth - width*2 - 4, height: 22)
             if textAlignment == .center {
                 self.titleLabel.center = CGPoint(x: self.center.x, y: self.titleLabel.center.y)
             }
@@ -157,7 +157,7 @@ import UIKit
                 self.addSubViews([self.avatar,self.status,self.titleLabel,self.detail,self.rightItems,self.separateLine])
             }
             
-            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: StatusBarHeight+4, width: ScreenWidth - CGFloat(self.rightImages.count*36)*2, height: 22)
+            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+4, y: StatusBarHeight+4, width: ScreenWidth - CGFloat(self.rightImages.count*36)*2, height: 22)
             if textAlignment == .center {
                 self.titleLabel.center = CGPoint(x: self.center.x, y: self.titleLabel.center.y)
             }
@@ -185,7 +185,7 @@ import UIKit
         self.init(frame: frame)
         self.addSubViews([self.leftItem,self.titleLabel,self.detail,self.rightItem,self.separateLine])
         self.leftItem.setHitTestEdgeInsets(UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10))
-        self.titleLabel.frame = CGRect(x: self.leftItem.frame.maxX, y: StatusBarHeight+4, width: ScreenWidth - 168, height: 22)
+        self.titleLabel.frame = CGRect(x: self.leftItem.frame.maxX+4, y: StatusBarHeight+4, width: ScreenWidth - 168, height: 22)
         if textAlignment == .center {
             self.titleLabel.frame = CGRect(x: 84, y: StatusBarHeight+4, width: ScreenWidth - 168, height: 22)
             self.titleLabel.center = CGPoint(x: self.center.x, y: self.titleLabel.center.y)

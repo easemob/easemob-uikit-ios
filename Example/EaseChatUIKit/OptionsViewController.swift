@@ -57,7 +57,7 @@ class OptionsViewController: UIViewController {
     }
     
     @IBAction func switchAvatar(_ sender: UISegmentedControl) {
-        Appearance.avatarRadius = sender.selectedSegmentIndex == 1 ? .small:.large
+        Appearance.avatarRadius = sender.selectedSegmentIndex == 1 ? .extraSmall:.large
         Theme.switchTheme(style: Theme.style)
     }
     

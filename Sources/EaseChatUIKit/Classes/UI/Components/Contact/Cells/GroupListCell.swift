@@ -14,7 +14,7 @@ import UIKit
     }()
     
     public private(set) lazy var nickName: UILabel = {
-        UILabel(frame: CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX+4, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 16)).backgroundColor(.clear)
+        UILabel(frame: CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX+4, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 22)).backgroundColor(.clear)
     }()
     
     public private(set) lazy var separateLine: UIView = {

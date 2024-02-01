@@ -25,7 +25,7 @@ import AVFoundation
     /// Creates a navigation bar for the MessageListController.
     /// - Returns: An instance of EaseChatNavigationBar.
     @objc open func createNavigation() -> EaseChatNavigationBar {
-        EaseChatNavigationBar(showLeftItem: true,rightImages: [UIImage(named: "audio_call", in: .chatBundle, with: nil)!,UIImage(named: "video_call", in: .chatBundle, with: nil)!]).backgroundColor(.clear)
+        EaseChatNavigationBar(showLeftItem: true,textAlignment: .left,rightImages: [UIImage(named: "audio_call", in: .chatBundle, with: nil)!,UIImage(named: "video_call", in: .chatBundle, with: nil)!]).backgroundColor(.clear)
     }
     
     public private(set) lazy var messageContainer: MessageListView = {
@@ -244,10 +244,12 @@ extension MessageListController: MessageListDriverEventsListener {
     
     public func onMessageWillSendFillExtensionInfo() -> Dictionary<String, Any> {
         //Insert extension info before sending message.
-        [:]
+        self.messageWillSendFillExtensionInfo()
     }
     
-    
+    @objc open func messageWillSendFillExtensionInfo() -> Dictionary<String, Any> {
+        [:]
+    }
     /**
      Filters the available message actions based on the provided `MessageEntity`.
 

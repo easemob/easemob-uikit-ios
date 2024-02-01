@@ -71,7 +71,7 @@ import UIKit
     private var hiddenDuration = Double(0.2)
     
     public private(set) lazy var rightView: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.frame.width-84, y: self.inputField.frame.maxY-32, width: 30, height: 30)).addTargetFor(self, action: #selector(changeToEmoji), for: .touchUpInside).backgroundColor(.clear)
+        UIButton(type: .custom).frame(CGRect(x: self.frame.width-80, y: self.inputField.frame.maxY-32, width: 30, height: 30)).addTargetFor(self, action: #selector(changeToEmoji), for: .touchUpInside).backgroundColor(.clear)
     }()
     
     public private(set) lazy var audio: UIButton = {
@@ -114,7 +114,7 @@ import UIKit
         self.inputField.contentInsetAdjustmentBehavior = .never
         self.inputField.cornerRadius(Appearance.chat.inputBarCorner)
         self.inputField.placeHolder = Appearance.chat.inputPlaceHolder.chat.localize
-        self.inputField.contentInset = UIEdgeInsets(top: 4, left: 12, bottom: 4, right: 12)
+        self.inputField.contentInset = UIEdgeInsets(top: 4, left: 6, bottom: 4, right: 6)
         self.inputField.tintColor = UIColor.theme.primaryColor5
         self.inputField.placeHolderColor = UIColor.theme.neutralColor6
         self.inputField.textColor = UIColor.theme.neutralColor1
@@ -131,6 +131,7 @@ import UIKit
         
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
+        
     }
     
     deinit {
@@ -249,7 +250,7 @@ extension MessageInputBar: UITextViewDelegate {
             }
             
             self.audio.frame = CGRect(x: 12, y: self.inputField.frame.maxY-32, width: 30, height: 30)
-            self.rightView.frame = CGRect(x: self.frame.width-84, y: self.inputField.frame.maxY-32, width: 30, height: 30)
+            self.rightView.frame = CGRect(x: self.frame.width-80, y: self.inputField.frame.maxY-32, width: 30, height: 30)
             self.attachment.frame = CGRect(x: self.frame.width - 42, y: self.inputField.frame.maxY-32, width: 30, height: 30)
             self.emoji?.frame = CGRect(x: 0, y: self.inputField.frame.maxY+8, width: self.frame.width, height: self.keyboardHeight)
             self.emoji?.backgroundColor(self.backgroundColor ?? UIColor.theme.neutralColor98)
@@ -285,7 +286,7 @@ extension MessageInputBar: UITextViewDelegate {
         self.rawTextHeight = self.rawHeight-16
         self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: 36)
         self.audio.frame = CGRect(x: 12, y: self.inputField.frame.maxY-32, width: 30, height: 30)
-        self.rightView.frame = CGRect(x: self.frame.width-84, y: self.inputField.frame.maxY-32, width: 30, height: 30)
+        self.rightView.frame = CGRect(x: self.frame.width-80, y: self.inputField.frame.maxY-32, width: 30, height: 30)
         self.attachment.frame = CGRect(x: self.frame.width - 42, y: self.inputField.frame.maxY-32, width: 30, height: 30)
     }
     

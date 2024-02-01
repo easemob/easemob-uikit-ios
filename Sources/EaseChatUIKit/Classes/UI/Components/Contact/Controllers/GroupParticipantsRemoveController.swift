@@ -88,7 +88,7 @@ import UIKit
         } else {
             removeAlert += "\(nickNames.first ?? "")"
         }
-        DialogManager.shared.showAlert(title: "", content: removeAlert, showCancel: true, showConfirm: true) { [weak self] _ in
+        DialogManager.shared.showAlert(title: removeAlert, content: "", showCancel: true, showConfirm: true) { [weak self] _ in
             guard let `self` = self else { return }
             self.service.remove(userIds: userIds, from: self.chatGroup.groupId) { [weak self] group, error in
                 if error != nil {

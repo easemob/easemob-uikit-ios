@@ -65,7 +65,7 @@ import UIKit
     
     open override func layoutSubviews() {
         super.layoutSubviews()
-        self.separatorLine.frame = CGRect(x: 16, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width, height: 0.5)
+        self.separatorLine.frame = CGRect(x: 16, y: self.contentView.frame.height-0.5, width: ScreenWidth, height: 0.5)
     }
     
     /// Refresh cell on needed.
@@ -81,7 +81,8 @@ import UIKit
         if item.numberCount > 0 {
             self.badge.text = "\(item.numberCount)"
         }
-        self.badge.frame = CGRect(x: ScreenWidth-70, y: self.contentView.frame.height/2.0-9, width: item.numberCount > 9 ? 32:18, height: 18)
+        let badgeWidth = item.numberCount > 9 ? 32:18
+        self.badge.frame = CGRect(x: Int(ScreenWidth)-38-badgeWidth, y: Int(Appearance.contact.headerRowHeight/2.0)-9, width: badgeWidth, height: 18)
         self.badge.isHidden = !item.showNumber
     }
     
@@ -96,8 +97,8 @@ extension ContactListHeaderCell: ThemeSwitchProtocol {
     @objc open func switchTheme(style: ThemeStyle) {
         self.badge.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
         self.textLabel?.textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
-        self.accessoryView?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor5
-        self.accessoryView?.subviews.first?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor5
+        self.accessoryView?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor3
+        self.accessoryView?.subviews.first?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor3
         
         self.separatorLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
     }
