@@ -50,7 +50,7 @@ import UIKit
     
     public override func refresh(entity: MessageEntity) {
         super.refresh(entity: entity)
-        self.content.frame = CGRect(x: 12, y: 5, width: entity.bubbleSize.width-24, height: entity.message.edited ? entity.bubbleSize.height-21:entity.bubbleSize.height)
+        self.content.frame = CGRect(x: 12, y: 0, width: entity.bubbleSize.width-24, height: entity.message.edited ? entity.bubbleSize.height-21:entity.bubbleSize.height)
         if entity.message.edited {
             self.edit.isHidden = false
             self.edit.frame = CGRect(x: 12, y: self.content.frame.maxY, width: entity.bubbleSize.width-24, height: 14)

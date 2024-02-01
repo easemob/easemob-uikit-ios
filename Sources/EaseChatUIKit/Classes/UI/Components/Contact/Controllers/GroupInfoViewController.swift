@@ -184,6 +184,9 @@ import UIKit
         self.view.addSubViews([self.navigation,self.menuList])
         // Do any additional setup after loading the view.
         //click of the navigation
+        if self.chatGroup.owner != EaseChatUIKitContext.shared?.currentUserId ?? "" {
+            self.datas = self.datas.dropLast()
+        }
         self.navigation.clickClosure = { [weak self] in
             self?.navigationClick(type: $0, indexPath: $1)
         }
@@ -346,7 +349,7 @@ import UIKit
     }
     
     private func transferConfirm(profile: EaseProfileProtocol) {
-        DialogManager.shared.showAlert(title: "", content: "group_details_extend_button_transfer".chat.localize+"to ".chat.localize+"\(profile.nickname)?", showCancel: true, showConfirm: true) { [weak self] text in
+        DialogManager.shared.showAlert(title: "group_details_extend_button_transfer".chat.localize+"to ".chat.localize+"\(profile.nickname)?", content: "", showCancel: true, showConfirm: true) { [weak self] text in
             guard let `self` = self else { return }
             self.service.transfer(groupId: self.chatGroup.groupId, userId: profile.id, completion: { group, error in
                 if error == nil {
@@ -391,11 +394,19 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        section <= 0 ? 30:0
+        if self.datas.count > 1 {
+            return (section <= 0 ? 30:0)
+        } else {
+            return 0
+        }
     }
     
     public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        section <= 0 ? UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 30)).backgroundColor(Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95):nil
+        if self.datas.count > 1 {
+            return section <= 0 ? UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 30)).backgroundColor(Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95):nil
+        } else {
+            return nil
+        }
     }
 
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -417,7 +428,6 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
         }
         cell?.indexPath = indexPath
         if let info = self.datas[safe: indexPath.section]?[safe: indexPath.row] {
-            cell?.refresh(info: info)
             if EaseChatUIKitContext.shared?.currentUserId ?? "" == self.chatGroup.owner {
                 cell?.accessoryType = info.withSwitch ? .none:.disclosureIndicator
             } else {
@@ -427,6 +437,7 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
                     cell?.accessoryType = info.withSwitch ? .none:.disclosureIndicator
                 }
             }
+            cell?.refresh(info: info)
         }
         cell?.switchMenu.isEnabled = !self.chatGroup.isDisabled
         cell?.valueChanged = { [weak self] in
@@ -480,7 +491,7 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
      Cleans the history messages of the group.
      */
     @objc open func cleanHistoryMessages() {
-        DialogManager.shared.showAlert(title: "", content: "group_details_button_clearchathistory".chat.localize, showCancel: true, showConfirm: true) { [weak self] _ in
+        DialogManager.shared.showAlert(title: "group_details_button_clearchathistory".chat.localize, content: "", showCancel: true, showConfirm: true) { [weak self] _ in
             guard let `self` = self else { return }
             ChatClient.shared().chatManager?.getConversationWithConvId(self.chatGroup.groupId)?.deleteAllMessages(nil)
             NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_clean_history_messages"), object: self.chatGroup.groupId)
@@ -498,7 +509,7 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
     @objc open func edit(type: GroupInfoEditType, detail: String) {
         // Check if the group is disabled
         if self.chatGroup.isDisabled {
-            DialogManager.shared.showAlert(title: "", content: "Group was disabled".chat.localize, showCancel: false, showConfirm: true) { _ in
+            DialogManager.shared.showAlert(title: "Group was disabled".chat.localize, content: "", showCancel: false, showConfirm: true) { _ in
                 
             }
             return

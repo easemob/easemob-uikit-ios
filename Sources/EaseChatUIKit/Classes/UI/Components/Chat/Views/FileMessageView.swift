@@ -10,6 +10,14 @@ import UIKit
 @objc open class FileMessageView: UIView {
     
     public private(set) var towards = BubbleTowards.left
+    
+    public var fileSizeReceiveColor: UIColor {
+        Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5
+    }
+    
+    public var fileSizeSendColor: UIColor {
+        Theme.style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor95
+    }
 
     public private(set) lazy var content: UILabel = {
         UILabel(frame: CGRect(x: self.towards == .left ? 12:self.frame.width-12-20-12, y: 5, width: self.frame.width - self.frame.height - 16 - 16 - 12, height: 24)).backgroundColor(.clear).numberOfLines(1).font(UIFont.theme.labelLarge).lineBreakMode(.byTruncatingMiddle)
@@ -20,7 +28,7 @@ import UIKit
     }()
     
     public private(set) lazy var fileIcon: UIImageView = {
-        UIImageView(frame: CGRect(x: self.towards == .right ? 8:self.frame.width - self.frame.height - 16 - 8, y: 5, width: self.frame.height - 16, height: self.frame.height - 16)).backgroundColor(.clear).contentMode(.scaleAspectFit)
+        UIImageView(frame: CGRect(x: self.towards == .right ? 8:self.frame.width - self.frame.height - 16 - 8, y: 5, width: self.frame.height - 16, height: self.frame.height - 16)).backgroundColor(.clear).contentMode(.scaleAspectFit).cornerRadius(Appearance.chat.bubbleStyle == .withArrow ? 4:8)
     }()
     
     @objc required public init(frame: CGRect,towards: BubbleTowards) {
@@ -43,9 +51,10 @@ import UIKit
         self.switchTheme(style: Theme.style)
         if self.towards == .right {
             self.content.textColor = Theme.style == .light ? UIColor.theme.neutralColor95:UIColor.theme.neutralColor2
+            self.fileSize.textColor = self.fileSizeSendColor
         } else {
             self.content.textColor = Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5
-        
+            self.fileSize.textColor = self.fileSizeReceiveColor
         }
         self.content.text = entity.message.showContent
         if let body = entity.message.body as? ChatFileMessageBody {
@@ -71,7 +80,8 @@ import UIKit
 
 extension FileMessageView: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
-        self.fileSize.textColor = style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5
+        
+        
         self.fileIcon.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor100
         var image = UIImage(named: "file_message_icon", in: .chatBundle, with: nil)
         if style == .dark {

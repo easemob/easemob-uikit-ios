@@ -36,7 +36,7 @@ public let statusTag = 168
 }
 
 /// The amount of space between the message bubble and the cell.
-let message_bubble_space = CGFloat(5)
+let message_bubble_space = CGFloat(1)
 
 @objcMembers open class MessageCell: UITableViewCell {
     
@@ -264,9 +264,9 @@ let message_bubble_space = CGFloat(5)
     @objc(updateAxisWithEntity:)
     open func updateAxis(entity: MessageEntity) {
         if entity.message.direction == .receive {
-            self.avatar.frame = CGRect(x: 12, y: entity.height - 8 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - 28, width: 28, height: 28)
+            self.avatar.frame = CGRect(x: 12, y: entity.height - 8 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - 34, width: 28, height: 28)
             self.nickName.frame = CGRect(x:  Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+12:12, y: 10, width: limitBubbleWidth, height: 16)
-            self.messageDate.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+12:12, y: entity.height-16, width: 120, height: 16)
+            self.messageDate.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+12:12, y: entity.height-24, width: 120, height: 16)
             self.messageDate.textAlignment = .left
             self.nickName.textAlignment = .left
             if Appearance.chat.contentStyle.contains(.withReply) {
@@ -282,12 +282,12 @@ let message_bubble_space = CGFloat(5)
                 self.bubbleMultiCorners.draw(self.bubbleMultiCorners.frame)
             }
             self.status.isHidden = true
-            self.status.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+entity.bubbleSize.width+4:12+entity.bubbleSize.width+4, y: entity.height - 8 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - 20, width: 20, height: 20)
+            self.status.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+entity.bubbleSize.width+4:12+entity.bubbleSize.width+4, y: entity.height - 8 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - 22, width: 20, height: 20)
         } else {
             self.status.isHidden = false
-            self.avatar.frame = CGRect(x: ScreenWidth-40, y: entity.height - 8 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - 28, width: 28, height: 28)
+            self.avatar.frame = CGRect(x: ScreenWidth-40, y: entity.height - 8 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - 34, width: 28, height: 28)
             self.nickName.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.minX-limitBubbleWidth-12:ScreenWidth-limitBubbleWidth-12, y: 10, width: limitBubbleWidth, height: 16)
-            self.messageDate.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? (self.avatar.frame.minX-12-120):(ScreenWidth-132), y: entity.height-16, width: 120, height: 16)
+            self.messageDate.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? (self.avatar.frame.minX-12-120):(ScreenWidth-132), y: entity.height-24, width: 120, height: 16)
             self.messageDate.textAlignment = .right
             self.nickName.textAlignment = .right
             if Appearance.chat.contentStyle.contains(.withReply) {
@@ -302,7 +302,7 @@ let message_bubble_space = CGFloat(5)
                 self.bubbleMultiCorners.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.minX-entity.bubbleSize.width-12:ScreenWidth-entity.bubbleSize.width-12, y: entity.height - 16 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - entity.bubbleSize.height, width: entity.bubbleSize.width, height: entity.bubbleSize.height+message_bubble_space*2)
                 self.bubbleMultiCorners.draw(self.bubbleMultiCorners.frame)
             }
-            self.status.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.minX-entity.bubbleSize.width-12-20-4:ScreenWidth-entity.bubbleSize.width-12-20-4, y: entity.height - 8 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - 20, width: 20, height: 20)
+            self.status.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.minX-entity.bubbleSize.width-12-20-4:ScreenWidth-entity.bubbleSize.width-12-20-4, y: entity.height - 8 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - 22, width: 20, height: 20)
             self.replyContent.cornerRadius(Appearance.chat.imageMessageCorner)
         }
     }

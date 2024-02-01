@@ -48,11 +48,11 @@ import UIKit
     
     private var timer: Timer?
     
-    private let icon = UIImage(named: "mic_on", in: .chatBundle, with: nil)
+    private var icon = UIImage(named: "mic_on", in: .chatBundle, with: nil)
     
-    private let trashIcon = UIImage(named: "trash", in: .chatBundle, with: nil)
+    private var trashIcon = UIImage(named: "trash", in: .chatBundle, with: nil)
     
-    private let sendIcon = UIImage(named: "send_audio", in: .chatBundle, with: nil)
+    private var sendIcon = UIImage(named: "send_audio", in: .chatBundle, with: nil)
     
     public private(set) lazy var recordCover: UIView = {
         UIView(frame: CGRect(x: self.frame.width/2.0-45, y: 60, width: 90, height: 68)).cornerRadius(.large).backgroundColor(UIColor.theme.primaryColor95)
@@ -242,7 +242,7 @@ extension MessageAudioRecordView: ThemeSwitchProtocol {
         self.recordIcon.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
         self.send.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
         self.trash.backgroundColor(style == .light ? UIColor.theme.neutralColor9:UIColor.theme.neutralColor2)
-        self.trashIcon?.withTintColor(style == .dark ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor5)
+        self.trashIcon = self.trashIcon?.withTintColor(style == .dark ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor5)
         self.trash.setImage(self.trashIcon, for: .normal)
     }
     

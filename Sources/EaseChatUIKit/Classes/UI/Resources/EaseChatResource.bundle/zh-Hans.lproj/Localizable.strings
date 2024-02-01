@@ -79,7 +79,7 @@
 
 "new_chat_button_click_menu_addcontacts" = "添加联系人";
 "new_chat_button_click_menu_creategroup" = "创建群组";
-"new_chat_button_click_menu_selectcontacts" = "选择联系人";
+"new_chat_button_click_menu_selectcontacts" = "发起会话";
 
 "remove_participants" = "删除群成员";
 "group_delete_members_alert" = "你确定删除这";
@@ -106,6 +106,7 @@
 "Save" = "保存";
 "Please input" = "请输入";
 "New Message" = "新消息";
+"New Request" = "新请求";
 
 
 "add_contacts_subtitle" = "通过用户ID添加联系人";

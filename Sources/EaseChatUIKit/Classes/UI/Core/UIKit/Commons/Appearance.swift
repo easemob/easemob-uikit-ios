@@ -41,7 +41,7 @@ import UIKit
     public static var neutralSpecialHue: CGFloat = 220/360.0
     
     /// The corner radius of the avatar image view of ``ChatInputBar``.
-    public static var avatarRadius: CornerRadius = .large
+    public static var avatarRadius: CornerRadius = .extraSmall
         
     /// ActionSheet row height.
     public static var actionSheetRowHeight: CGFloat = 56
@@ -206,10 +206,10 @@ import UIKit
 @objcMembers final public class ContactAppearance: NSObject {
     
     /// Contact row height.
-    public var rowHeight = CGFloat(54)
+    public var rowHeight = CGFloat(60)
     
     /// Header of contact list list row height.
-    public var headerRowHeight = CGFloat(54)
+    public var headerRowHeight = CGFloat(60)
     
     /// The header items of the contact list.
     public var listHeaderExtensionActions: [ContactListHeaderItemProtocol] = [

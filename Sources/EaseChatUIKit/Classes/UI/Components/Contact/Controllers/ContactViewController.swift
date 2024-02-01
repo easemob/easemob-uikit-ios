@@ -147,7 +147,7 @@ import UIKit
             text = "new_chat_button_click_menu_creategroup".chat.localize
             self.navigation.rightItem.title("Create".chat.localize, .normal)
         case .newChat:
-            text = "New Message".chat.localize
+            text = "new_chat_button_click_menu_selectcontacts".chat.localize
         case .contact:
             text = "Contact".chat.localize
         case .shareContact:

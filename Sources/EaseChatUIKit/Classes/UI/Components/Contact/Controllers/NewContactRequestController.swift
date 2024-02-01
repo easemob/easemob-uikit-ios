@@ -26,7 +26,7 @@ import UIKit
     }
     
     public private(set) lazy var requestList: UITableView = {
-        UITableView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height), style: .plain).tableFooterView(UIView()).delegate(self).dataSource(self).rowHeight(Appearance.contact.rowHeight).backgroundColor(.clear)
+        UITableView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height), style: .plain).tableFooterView(UIView()).delegate(self).dataSource(self).rowHeight(Appearance.contact.rowHeight).backgroundColor(.clear).separatorStyle(.none)
     }()
     
     public private(set) lazy var empty: EmptyStateView = {
@@ -136,6 +136,12 @@ extension NewContactRequestController: UITableViewDelegate,UITableViewDataSource
                 self.datas.removeAll()
                 self.datas = self.fillDatas()
                 self.datas.sort { $0.time > $1.time }
+                if self.datas.count <= 0 {
+                    self.requestList.backgroundView = self.empty
+                } else {
+                    self.requestList.backgroundView = nil
+                }
+                
                 self.requestList.reloadData()
             }
         }

@@ -125,12 +125,14 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
     
     open func textSize() -> CGSize {
         let label = UILabel().numberOfLines(0).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
-        label.attributedText = self.convertTextAttribute()
+        let textAttribute = self.convertTextAttribute()
+        label.attributedText = textAttribute
         let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-24, height: 9999))
-        var width = size.width+24
-        if width < 36 {
-            width = 36
+        var width = size.width
+        if textAttribute?.string.count ?? 0 <= 1 {
+            width += 8
         }
+        width += 24
         let height = size.height+14+(self.message.edited ? 19:0)
         return CGSize(width: width, height: height)
     }
