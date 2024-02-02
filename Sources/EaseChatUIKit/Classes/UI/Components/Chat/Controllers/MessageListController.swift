@@ -429,10 +429,15 @@ extension MessageListController: MessageListDriverEventsListener {
                 self.viewContact(body: body)
             }
         case .combine:
-//            ChatHistoryViewController
+            self.viewHistoryMessages(entity: message)
         default:
             break
         }
+    }
+    
+    @objc open func viewHistoryMessages(entity: MessageEntity) {
+        let vc = ChatHistoryViewController(message: entity.message)
+        ControllerStack.toDestination(vc: vc)
     }
     
     /**

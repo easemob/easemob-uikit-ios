@@ -186,7 +186,7 @@ import UIKit
             ext["something"] = text
             chatMessage = ChatMessage(conversationID: self.to, body: ChatCustomMessageBody(event: EaseChatUIKit_alert_message, customExt: nil), ext: ext)
         case .combine:
-            chatMessage = ChatMessage(conversationID: self.to, body: ChatCombineMessageBody(title: "[Chat History]".chat.localize, summary: text, compatibleText: "Current version doesn't support.", messageIdList: []), ext: ext)
+            chatMessage = ChatMessage(conversationID: self.to, body: ChatCombineMessageBody(title: "[\("Chat History".chat.localize)]", summary: text, compatibleText: "Current version doesn't support.", messageIdList: []), ext: ext)
         case .location:
             var ext = extensionInfo
             var latitude: Double = 0

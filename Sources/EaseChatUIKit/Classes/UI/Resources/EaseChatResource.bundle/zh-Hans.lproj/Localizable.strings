@@ -175,7 +175,7 @@
 "[Video]" = "[视频]";
 "[File]" = "[文件]";
 "[Location]" = "[位置]";
-"[Chat History]" = "[聊天记录]";
+"Chat History" = "聊天记录";
 "[Transparent]" = "[透传消息]";
 "[Contact]" = "[个人名片]";
 "[Alert]" = "[提醒]";

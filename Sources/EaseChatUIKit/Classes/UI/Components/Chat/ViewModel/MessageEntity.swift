@@ -195,7 +195,19 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
         case .video: return self.thumbnailSize(video: true)
         case .file:  return CGSize(width: limitBubbleWidth, height: fileHeight)
         case .location: return self.message.contentSize
-        case .combine: return self.message.contentSize
+        case .combine:
+            if let body = self.message.body as? ChatCombineMessageBody {
+                if self.historyMessage {
+                    return CGSize(width: ScreenWidth-68, height: 20)
+                } else {
+                    var summaryHeight = body.summary?.chat.sizeWithText(font: UIFont.theme.bodySmall, size: CGSize(width: limitBubbleWidth-24, height: combineHeight-14)).height ?? 0
+                    if summaryHeight < 16 {
+                        summaryHeight = 16
+                    }
+                    return CGSize(width: limitBubbleWidth, height: summaryHeight+20)
+                }
+            }
+            return .zero
         case .custom: return self.customSize()
         default:
             return CGSize(width: limitBubbleWidth, height: 30)
@@ -208,7 +220,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
         label.attributedText = textAttribute
         let size = label.sizeThatFits(CGSize(width: self.historyMessage ? ScreenWidth-68:limitBubbleWidth-24, height: 9999))
         var width = size.width
-        if textAttribute?.string.count ?? 0 <= 1 {
+        if textAttribute?.string.count ?? 0 <= 1,self.message.body.type == .text {
             width += 8
         }
          width += 24
@@ -290,7 +302,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
     open func customSize() -> CGSize {
         if let body = self.message.body as? ChatCustomMessageBody {
             if body.event == EaseChatUIKit_user_card_message {
-                return CGSize(width: limitBubbleWidth, height: contactCardHeight)
+                return CGSize(width: self.historyMessage ? ScreenWidth-32:limitBubbleWidth, height: contactCardHeight)
             } else {
                 if body.event == EaseChatUIKit_alert_message {
                     let label = UILabel().numberOfLines(0).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
@@ -311,7 +323,13 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
         var text = NSMutableAttributedString()
         if self.message.body.type != .text, self.message.body.type != .custom {
             text.append(NSAttributedString {
-                AttributedText(self.message.showType+self.message.showContent).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(UIFont.theme.bodyLarge)
+                AttributedText(self.message.showType+self.message.showContent).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
+            })
+            return text
+        }
+        if self.historyMessage,self.message.body.type == .custom {
+            text.append(NSAttributedString {
+                AttributedText(self.message.showType+self.message.showContent).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
             })
             return text
         }
@@ -338,7 +356,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
                 
             default:
                 text.append(NSAttributedString {
-                    AttributedText(self.message.showType+self.message.showContent).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(UIFont.theme.bodyLarge)
+                    AttributedText(self.message.showType+self.message.showContent).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
                 })
                 break
             }
@@ -350,14 +368,14 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
             }
             if self.message.mention.isEmpty {
                 text.append(NSAttributedString {
-                    AttributedText(result).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(UIFont.theme.bodyLarge)
+                    AttributedText(result).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
                 })
             } else {
                 let content = result
                 let mentionRange = content.lowercased().chat.rangeOfString(self.message.mention.lowercased())
                 let range = NSMakeRange(mentionRange.location-1, mentionRange.length+1)
                 let mentionAttribute = NSMutableAttributedString {
-                    AttributedText(content).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(UIFont.theme.bodyLarge)
+                    AttributedText(content).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
                 }
                 mentionAttribute.addAttribute(.foregroundColor, value: (Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5), range: range)
                 text.append(mentionAttribute)
@@ -367,7 +385,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
                 if string.range(of: symbol).location != NSNotFound {
                     let ranges = text.string.chat.rangesOfString(symbol)
                     text = ChatEmojiConvertor.shared.convertEmoji(input: text, ranges: ranges, symbol: symbol,imageBounds: CGRect(x: 0, y: -4, width: 18, height: 18))
-                    text.addAttribute(.font, value: UIFont.theme.bodyLarge, range: NSMakeRange(0, text.length))
+                    text.addAttribute(.font, value: self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge, range: NSMakeRange(0, text.length))
                     text.addAttribute(.foregroundColor, value: self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor, range: NSMakeRange(0, text.length))
                 }
             }
@@ -555,7 +573,7 @@ extension ChatMessage {
         case .video: text = "[Video]".chat.localize
         case .file: text = "[File]".chat.localize
         case .location: text = "[Location]".chat.localize
-        case .combine: text = "[Chat History]".chat.localize
+        case .combine: text = "[\("Chat History".chat.localize)]"
         case .cmd: text = "[Transparent]".chat.localize
         case .custom:
             if let body = self.body as? ChatCustomMessageBody {
@@ -655,12 +673,6 @@ extension ChatMessage {
             return extraCustomSize
         case .location:
             return CGSize(width: limitBubbleWidth, height: locationHeight)
-        case .combine:
-            if let body = self.body as? ChatCombineMessageBody {
-                let summaryHeight = body.summary?.chat.sizeWithText(font: UIFont.theme.bodySmall, size: CGSize(width: limitBubbleWidth-24, height: combineHeight-14)).height ?? 16
-                return CGSize(width: limitBubbleWidth, height: summaryHeight+14)
-            }
-            return .zero
         default:
             return CGSize(width: limitBubbleWidth, height: 30)
         }

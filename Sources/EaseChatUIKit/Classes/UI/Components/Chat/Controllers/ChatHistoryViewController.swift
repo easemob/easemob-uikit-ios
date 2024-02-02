@@ -22,7 +22,7 @@ import UIKit
     }()
     
     public private(set) lazy var tableView: UITableView = {
-        UITableView(frame: CGRect(x: 0, y: NavigationHeight, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight), style: .plain).backgroundColor(.clear).separatorStyle(.none).registerCell(ChatHistoryCell.self, forCellReuseIdentifier: "CombineChatHistoryCell").delegate(self).dataSource(self)
+        UITableView(frame: CGRect(x: 0, y: NavigationHeight, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight), style: .plain).backgroundColor(.clear).separatorStyle(.none).delegate(self).dataSource(self)
     }()
     
     public required init(message: ChatMessage) {
@@ -38,10 +38,40 @@ import UIKit
     open override func viewDidLoad() {
         super.viewDidLoad()
         self.view.addSubViews([self.tableView,self.navigation])
+        self.navigation.title = "Chat History".chat.localize
+        self.navigation.clickClosure = { [weak self] in
+            self?.navigationClick(type: $0, indexPath: $1)
+        }
         // Do any additional setup after loading the view.
         self.requestMessages()
+        Theme.registerSwitchThemeViews(view: self)
+        self.switchTheme(style: Theme.style)
     }
     
+    /**
+     Handles the navigation bar click events.
+     
+     - Parameters:
+        - type: The type of navigation bar click event.
+        - indexPath: The index path associated with the event (optional).
+     */
+    @objc open func navigationClick(type: EaseChatNavigationBarClickEvent, indexPath: IndexPath?) {
+        switch type {
+        case .back: self.pop()
+        case .rightItems: self.rightItemsAction(indexPath: indexPath)
+        default:
+            break
+        }
+    }
+    
+    @objc open func rightItemsAction(indexPath: IndexPath?) {
+//        switch indexPath?.row {
+//        case <#pattern#>:
+//            <#code#>
+//        default:
+//            <#code#>
+//        }
+    }
 
     @objc open func requestMessages() {
         ChatClient.shared().chatManager?.downloadAndParseCombineMessage(self.message, completion: { messages, error in
@@ -61,11 +91,20 @@ import UIKit
     @objc open func convertMessage(message: ChatMessage) -> MessageEntity {
         let entity = ComponentsRegister.shared.MessageRenderEntity.init()
         entity.state = .succeed
+        entity.historyMessage = true
         entity.message = message
         _ = entity.content
         _ = entity.bubbleSize
         _ = entity.height
         return entity
+    }
+    
+    @objc open func pop() {
+        if self.navigationController != nil {
+            self.navigationController?.popViewController(animated: true)
+        } else {
+            self.dismiss(animated: true)
+        }
     }
 
 }
@@ -79,7 +118,7 @@ extension ChatHistoryViewController: UITableViewDelegate,UITableViewDataSource {
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         guard let message = self.messages[safe: indexPath.row] else { return 62 }
         if message.message.body.type == .text || message.message.body.type == .image || message.message.body.type == .video {
-            return message.bubbleSize.height+40
+            return message.bubbleSize.height+(message.message.body.type != .text ? 40:35)
         } else {
             return 62
         }
@@ -99,3 +138,8 @@ extension ChatHistoryViewController: UITableViewDelegate,UITableViewDataSource {
     
 }
 
+extension ChatHistoryViewController: ThemeSwitchProtocol {
+    public func switchTheme(style: ThemeStyle) {
+        self.view.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
+    }
+}
