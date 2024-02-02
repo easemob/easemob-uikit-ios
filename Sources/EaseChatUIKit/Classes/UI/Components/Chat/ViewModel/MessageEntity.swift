@@ -110,13 +110,11 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
     /// - Returns: ``CGSize`` of bubble.
     open func updateBubbleSize() -> CGSize {
         switch self.message.body.type {
-        case .text: return self.textSize()
+        case .text,.combine,.location: return self.textSize()
         case .image: return self.thumbnailSize(video: false)
         case .voice: return self.audioSize()
         case .video: return self.thumbnailSize(video: true)
         case .file:  return CGSize(width: limitBubbleWidth, height: fileHeight)
-        case .location: return self.message.contentSize
-        case .combine: return self.message.contentSize
         case .custom: return self.customSize()
         default:
             return CGSize(width: limitBubbleWidth, height: 30)
