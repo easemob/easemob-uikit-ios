@@ -376,7 +376,7 @@ extension MessageListController: MessageListDriverEventsListener {
             }
             self.openFile()
         case .custom:
-            if let body = message.body as? ChatCustomMessageBody {
+            if let body = message.body as? ChatCustomMessageBody,body.event == EaseChatUIKit_user_card_message {
                 self.viewContact(body: body)
             }
         default:
