@@ -371,6 +371,7 @@ import UIKit
         DialogManager.shared.showAlert(title: "group_details_extend_button_leave_alert_title".chat.localize, content: "group_details_extend_button_leave_alert_subtilte".chat.localize, showCancel: true, showConfirm: true) { [weak self] _ in
             self?.service.leave(groupId: self?.chatGroup.groupId ?? "") { error in
                 if error == nil {
+                    NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_leaveGroup"), object: self?.chatGroup.groupId ?? "")
                     self?.pop()
                 } else {
                     consoleLogInfo("disband error:\(error?.errorDescription ?? "")", type: .error)
