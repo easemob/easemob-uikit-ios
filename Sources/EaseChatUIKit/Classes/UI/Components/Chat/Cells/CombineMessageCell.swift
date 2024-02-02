@@ -9,12 +9,12 @@ import UIKit
 
 @objc open class CombineMessageCell: MessageCell {
 
-    public private(set) lazy var content: UIView = {
+    public private(set) lazy var content: CombineMessageView = {
         self.createContent()
     }()
     
-    @objc open func createContent() -> UIView {
-        UIView(frame: .zero).backgroundColor(.clear).tag(bubbleTag)
+    @objc open func createContent() -> CombineMessageView {
+        CombineMessageView(frame: .zero).backgroundColor(.clear).tag(bubbleTag)
     }
     
     @objc required public init(towards: BubbleTowards,reuseIdentifier: String) {
@@ -33,14 +33,9 @@ import UIKit
     
     open override func refresh(entity: MessageEntity) {
         super.refresh(entity: entity)
-        let frame = Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame:self.bubbleMultiCorners.frame
-        let size = frame.size
+        let size = entity.bubbleSize
         self.content.frame = CGRect(x: 0, y: 0, width: size.width, height: size.height)
-        if entity.message.direction == .receive {
-            //render receive UI
-        } else {
-            //render send UI
-        }
+        self.content.refresh(message: entity.message)
     }
     
     open override func switchTheme(style: ThemeStyle) {

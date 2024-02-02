@@ -7,7 +7,7 @@ public var audioHeight = CGFloat(36)
 public var fileHeight = CGFloat(60)
 
 /// Combine message `default` height.
-public var combineHeight = CGFloat(70)
+public var combineHeight = CGFloat(98)
 
 /// Location message `default` height.
 public var locationHeight = CGFloat(70)
@@ -133,9 +133,9 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
                 }
                 return width
             }
-            return 0;
+            return 0
         }
-        return 0;
+        return 0
     }
     
     open func topicContentHeight() -> CGFloat {
@@ -579,8 +579,10 @@ extension ChatMessage {
             return UIImage(named: "reply_audio", in: .chatBundle, with: nil)
         case .video:
             return UIImage(named: "reply_video", in: .chatBundle, with: nil)
-        case .file,.combine:
+        case .file:
             return UIImage(named: "reply_file", in: .chatBundle, with: nil)
+        case .combine:
+            return UIImage(named: "reply_history", in: .chatBundle, with: nil)
         case .location:
             return UIImage(named: "reply_location", in: .chatBundle, with: nil)
         case .custom:
@@ -654,7 +656,11 @@ extension ChatMessage {
         case .location:
             return CGSize(width: limitBubbleWidth, height: locationHeight)
         case .combine:
-            return CGSize(width: limitBubbleWidth, height: combineHeight)
+            if let body = self.body as? ChatCombineMessageBody {
+                let summaryHeight = body.summary?.chat.sizeWithText(font: UIFont.theme.bodySmall, size: CGSize(width: limitBubbleWidth-24, height: combineHeight-14)).height ?? 16
+                return CGSize(width: limitBubbleWidth, height: summaryHeight+14)
+            }
+            return .zero
         default:
             return CGSize(width: limitBubbleWidth, height: 30)
         }
