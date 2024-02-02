@@ -668,10 +668,10 @@ extension MessageListController:UIImagePickerControllerDelegate, UINavigationCon
             } else {
                 guard let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else { return }
                 let correctImage = image.fixOrientation()
-                let fileName = "\(Date().timeIntervalSince1970).jpeg"
+                let fileName = "\(Int(Date().timeIntervalSince1970)).jpeg"
                 let fileURL = URL(fileURLWithPath: MediaConvertor.filePath()+"/\(fileName)")
                 do {
-                    try image.jpegData(compressionQuality: 1)?.write(to: fileURL)
+                    try correctImage.jpegData(compressionQuality: 1)?.write(to: fileURL)
                 } catch {
                     consoleLogInfo("write camera fixOrientation image error:\(error.localizedDescription)", type: .error)
                 }
