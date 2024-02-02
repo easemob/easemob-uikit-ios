@@ -481,7 +481,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                         message.playing = false
                     }
                     if let visibleIndexPaths = self.messageList.indexPathsForVisibleRows {
-                        self.messageList.reloadRows(at: visibleIndexPaths, with: .automatic)
+                        self.messageList.reloadData()
                     }
                 }
                 for handler in self.eventHandlers.allObjects {
@@ -554,9 +554,9 @@ extension MessageListView: IMessageListViewDriver {
                 let reactionWidth = entity.reactionMenuWidth()
                 if reactionWidth < reactionMaxWidth-30 {
                     if let reactions = message.reactionList {
-                        if reactions.count > entity.visibleReactionToIndex+1 || reactions.count <= 0 {
+                        if (reactions.count == 1 && reactions.count > entity.visibleReactionToIndex) || reactions.count <= 0 {
                             self.messages.replaceSubrange(index...index, with: [entity])
-                            self.messageList.reloadRows(at: [indexPath], with: .automatic)
+                            self.messageList.reloadData()
                         } else {
                             if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
                                 if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }),let entity = self.messages[safe: index] {
@@ -578,7 +578,7 @@ extension MessageListView: IMessageListViewDriver {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }) {
                 self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
-                self.messageList.reloadRows(at: [indexPath], with: .automatic)
+                self.messageList.reloadData()
             }
         }
     }
@@ -759,7 +759,7 @@ extension MessageListView: IMessageListViewDriver {
             _ = entity.height
             _ = entity.replySize
             self.messages.replaceSubrange(index...index, with: [entity])
-            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.messageList.reloadData()
         }
     }
     
@@ -778,7 +778,7 @@ extension MessageListView: IMessageListViewDriver {
             _ = entity.height
             _ = entity.replySize
             self.messages.replaceSubrange(index...index, with: [entity])
-            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.messageList.reloadData()
         }
     }
     
@@ -794,7 +794,7 @@ extension MessageListView: IMessageListViewDriver {
     private func editAction(_ message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
-            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.messageList.reloadData()
         }
     }
     
@@ -815,7 +815,7 @@ extension MessageListView: IMessageListViewDriver {
     private func recallAction(_ message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.timestamp == message.timestamp }) {
             self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
-            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.messageList.reloadData()
         }
     }
     

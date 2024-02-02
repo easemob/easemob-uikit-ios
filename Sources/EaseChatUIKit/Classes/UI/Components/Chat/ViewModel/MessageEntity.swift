@@ -46,6 +46,8 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
     
     public var visibleReactionToIndex = 0
     
+    public var historyMessage: Bool = false
+    
     /// Whether message show translations or not.
     public var showTranslation: Bool {
         set {
@@ -204,7 +206,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
         let label = UILabel().numberOfLines(0).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
         let textAttribute = self.convertTextAttribute()
         label.attributedText = textAttribute
-        let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-24, height: 9999))
+        let size = label.sizeThatFits(CGSize(width: self.historyMessage ? ScreenWidth-68:limitBubbleWidth-24, height: 9999))
         var width = size.width
         if textAttribute?.string.count ?? 0 <= 1 {
             width += 8
@@ -293,7 +295,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
                 if body.event == EaseChatUIKit_alert_message {
                     let label = UILabel().numberOfLines(0).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
                     label.attributedText = self.convertTextAttribute()
-                    let size = label.sizeThatFits(CGSize(width: ScreenWidth, height: 9999))
+                    let size = label.sizeThatFits(CGSize(width: ScreenWidth-32, height: 9999))
                     return CGSize(width: ScreenWidth-32, height: size.height+50)
                 } else {
                     return self.message.contentSize
@@ -316,19 +318,24 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
         if self.message.body.type == .custom,let body = self.message.body as? ChatCustomMessageBody {
             switch body.event {
             case EaseChatUIKit_alert_message:
-                text.append(NSMutableAttributedString {
-                    AttributedText(self.message.user?.nickname ?? self.message.from).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.labelSmall)
-                })
                 if let something = self.message.ext?["something"] as? String {
-                    text.append(NSAttributedString {
-                        AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall)
-                    })
-                    
                     if let threadName = self.message.ext?["threadName"] as? String {
                         let range = something.chat.rangeOfString(threadName)
+                        text.append(NSAttributedString {
+                            AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall)
+                        })
                         text.addAttribute(NSAttributedString.Key.foregroundColor, value: Theme.style == .dark ? Color.theme.primaryColor6:Color.theme.primaryColor5, range: range)
+                    } else {
+                        text.append(NSMutableAttributedString {
+                            AttributedText(self.message.user?.nickname ?? self.message.from).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.labelSmall)
+                        })
+                        text.append(NSAttributedString {
+                            AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall)
+                        })
                     }
+                    
                 }
+                
             default:
                 text.append(NSAttributedString {
                     AttributedText(self.message.showType+self.message.showContent).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(UIFont.theme.bodyLarge)
