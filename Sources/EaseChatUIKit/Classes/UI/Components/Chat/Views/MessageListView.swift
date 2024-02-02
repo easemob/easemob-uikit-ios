@@ -527,6 +527,7 @@ extension MessageListView: IMessageListViewDriver {
     public func updateMessageAttachmentStatus(message: ChatMessage) {
         self.replyId = ""
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
+            self.messages[index] = self.convertMessage(message: message)
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .fade)
         }
     }
