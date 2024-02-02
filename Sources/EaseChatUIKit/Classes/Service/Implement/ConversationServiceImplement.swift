@@ -343,6 +343,10 @@ extension ConversationServiceImplement: ChatEventsListener {
         }
     }
     
+    public func onMessageContentChanged(_ message: ChatMessage, operatorId: String, operationTime: UInt) {
+        self.notifyHandler(message: message, local: false)
+    }
+    
     private func notifyHandler(message: ChatMessage,local: Bool) {
         guard let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(message.conversationId) else {
             return

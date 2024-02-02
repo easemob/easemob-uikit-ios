@@ -165,7 +165,8 @@ extension JoinedGroupsViewController: UITableViewDelegate,UITableViewDataSource 
                 break
             }
         }
-        self.groupList.reloadRows(at: [IndexPath(row: idx, section: 0)], with: .automatic)
+        self.datas.remove(at: idx)
+        self.groupList.reloadData()
     }
 }
 
