@@ -151,7 +151,7 @@ import UIKit
         case .text:
             chatMessage = ChatMessage(conversationID: self.to, body: ChatTextMessageBody(text: text), ext: ext)
         case .image:
-            chatMessage = ChatMessage(conversationID: self.to, body: ChatImageMessageBody(localPath: text, displayName: text.components(separatedBy: "/").last ?? "\(Date().timeIntervalSince1970)"), ext: ext)
+            chatMessage = ChatMessage(conversationID: self.to, body: ChatImageMessageBody(localPath: text, displayName: text.components(separatedBy: "/").last ?? "\(Date().timeIntervalSince1970).jpeg"), ext: ext)
         case .voice:
             let body = ChatAudioMessageBody(localPath: text, displayName: "\(Int(Date().timeIntervalSince1970*1000)).amr")
             if let duration = extensionInfo["duration"] as? Int {
