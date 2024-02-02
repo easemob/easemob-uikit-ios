@@ -419,7 +419,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
                 try data.write(to: URL(fileURLWithPath: body.localPath))
                 ChatClient.shared().chatManager?.update(message)
             } catch {
-                consoleLogInfo("download image then load error:\(error.localizedDescription)", type: .error)
+                consoleLogInfo("download image then rewrite format path load error:\(error.localizedDescription)", type: .error)
             }
         }
     }
