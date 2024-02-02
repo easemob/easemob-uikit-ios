@@ -211,7 +211,7 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
                 if body.event == EaseChatUIKit_alert_message {
                     let label = UILabel().numberOfLines(0).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
                     label.attributedText = self.convertTextAttribute()
-                    let size = label.sizeThatFits(CGSize(width: ScreenWidth, height: 9999))
+                    let size = label.sizeThatFits(CGSize(width: ScreenWidth-32, height: 9999))
                     return CGSize(width: ScreenWidth-32, height: size.height+50)
                 } else {
                     return self.message.contentSize
