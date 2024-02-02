@@ -59,6 +59,7 @@ import UIKit
         self.nickName.frame =  CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minY+3, width: self.contentView.frame.width-self.avatar.frame.maxX-12-90, height: 16)
         self.content.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.nickName.frame.maxY+5, width: self.contentView.frame.width-self.avatar.frame.maxX-12-90, height: 16)
         self.add.frame = CGRect(x: self.contentView.frame.width-90, y: self.nickName.frame.minY+2, width: 72, height: 28)
+        self.separateLine.frame = CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5)
     }
     
     @objc public func refresh(request: NewContactRequest) {
