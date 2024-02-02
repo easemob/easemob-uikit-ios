@@ -14,7 +14,11 @@ import UIKit
     }()
     
     public private(set) lazy var nickname: UILabel = {
-        UILabel(frame: CGRect(x: self.avatar.frame.maxX+10, y: self.avatar.frame.minY, width: self.contentView.frame.width-self.avatar.frame.maxX-10-8, height: 20)).font(UIFont.theme.labelMedium)
+        UILabel(frame: CGRect(x: self.avatar.frame.maxX+10, y: self.avatar.frame.minY, width: self.contentView.frame.width-self.avatar.frame.maxX-10-132, height: 20)).font(UIFont.theme.labelMedium)
+    }()
+    
+    public private(set) lazy var messageDate: UILabel = {
+        UILabel(frame: CGRect(x: self.contentView.frame.width-132, y: 10, width: 120, height: 16)).font(UIFont.theme.bodySmall).backgroundColor(.clear).textAlignment(.right)
     }()
     
     public private(set) lazy var content: UIView = {
@@ -40,7 +44,7 @@ import UIKit
         }
         self.contentView.backgroundColor = .clear
         self.backgroundColor = .clear
-        self.contentView.addSubViews([self.avatar,self.nickname,self.content,self.separatorLine])
+        self.contentView.addSubViews([self.avatar,self.nickname,self.content,self.messageDate,self.separatorLine])
         self.content.addSubview(self.play)
         self.play.isHidden = true
         Theme.registerSwitchThemeViews(view: self)
@@ -50,7 +54,8 @@ import UIKit
     open override func layoutSubviews() {
         super.layoutSubviews()
         self.avatar.frame = CGRect(x: 16, y: 10, width: 32, height: 32)
-        self.nickname.frame = CGRect(x: self.avatar.frame.maxX+10, y: self.avatar.frame.minY, width: self.contentView.frame.width-self.avatar.frame.maxX-10-8, height: 20)
+        self.nickname.frame = CGRect(x: self.avatar.frame.maxX+10, y: self.avatar.frame.minY, width: self.contentView.frame.width-self.avatar.frame.maxX-10-132, height: 20)
+        self.messageDate.frame =  CGRect(x: self.contentView.frame.width-132, y: 10, width: 120, height: 16)
         self.separatorLine.frame = CGRect(x: self.nickname.frame.minX, y: self.contentView.frame.height - 0.5, width: self.contentView.frame.width, height: 0.5)
         
     }
@@ -63,6 +68,7 @@ import UIKit
         } else {
             self.avatar.image = Appearance.conversation.singlePlaceHolder
         }
+        self.messageDate.text = entity.message.showDetailDate
         switch entity.message.body.type {
         case .video,.image:
             self.content.frame = CGRect(x: self.nickname.frame.minX, y: self.nickname.frame.maxY, width: entity.bubbleSize.width, height: entity.bubbleSize.height)
@@ -115,6 +121,7 @@ extension ChatHistoryCell: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         self.nickname.textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
         self.separatorLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
+        self.messageDate.textColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor7
     }
     
     

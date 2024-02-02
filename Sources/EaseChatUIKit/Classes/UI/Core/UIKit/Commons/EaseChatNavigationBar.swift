@@ -242,7 +242,7 @@ import UIKit
         } else {
             self.rightImages = images
         }
-        self.rightItems.frame = CGRect(x: ScreenWidth-CGFloat(self.rightImages.count*36)-8, y: StatusBarHeight+8, width: CGFloat(self.rightImages.count*36), height: 36)
+        self.rightItems.frame = CGRect(x: ScreenWidth-CGFloat(self.rightImages.count*36)-8, y: StatusBarHeight+10, width: CGFloat(self.rightImages.count*36), height: 36)
         self.rightItems.reloadData()
     }
 }

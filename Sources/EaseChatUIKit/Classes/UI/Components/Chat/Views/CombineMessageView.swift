@@ -52,7 +52,7 @@ import UIKit
         if let icon = message.replyIcon?.withTintColor(textColor) {
             text.append(NSAttributedString {
                 ImageAttachment(icon, bounds: CGRect(x: 0, y: -3.5, width: 16, height: 16))
-                AttributedText(message.showType).font(Font.theme.labelMedium).foregroundColor(textColor)
+                AttributedText("Chat History".chat.localize).font(Font.theme.labelMedium).foregroundColor(textColor)
             })
         }
         return text
