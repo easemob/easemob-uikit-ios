@@ -321,7 +321,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
     @objc open func onMessageBubbleClicked(message: MessageEntity) {
         let bodyType = message.message.body.type
         
-        if bodyType == .voice || bodyType == .file || bodyType == .video || bodyType == .combine {
+        if bodyType == .voice || bodyType == .file || bodyType == .video || bodyType == .combine || bodyType == .image {
             if !FileManager.default.fileExists(atPath: (message.message.body as? ChatFileMessageBody)?.localPath ?? "") {
                 self.downloadMessageAttachment(message: message)
             } else {
