@@ -141,7 +141,8 @@ import UIKit
         case .text:
             chatMessage = ChatMessage(conversationID: self.to, body: ChatTextMessageBody(text: text), ext: ext)
         case .image:
-            chatMessage = ChatMessage(conversationID: self.to, body: ChatImageMessageBody(localPath: text, displayName: text.components(separatedBy: "/").last ?? "\(Date().timeIntervalSince1970)"), ext: ext)
+            let displayName = text.components(separatedBy: "/").last ?? "\(Date().timeIntervalSince1970).jpeg"
+            chatMessage = ChatMessage(conversationID: self.to, body: ChatImageMessageBody(localPath: text, displayName:  displayName.components(separatedBy: ".").count < 1 ? displayName+"jpeg":displayName), ext: ext)
         case .voice:
             let body = ChatAudioMessageBody(localPath: text, displayName: "\(Int(Date().timeIntervalSince1970*1000)).amr")
             if let duration = extensionInfo["duration"] as? Int {
@@ -149,7 +150,7 @@ import UIKit
             }
             chatMessage = ChatMessage(conversationID: self.to, body: body, ext: ext)
         case .video:
-            let body = ChatVideoMessageBody(localPath: text, displayName: text.components(separatedBy: "/").last ?? "\(Date().timeIntervalSince1970)")
+            let body = ChatVideoMessageBody(localPath: text, displayName: text.components(separatedBy: "/").last ?? "\(Date().timeIntervalSince1970).mp4")
             if let duration = extensionInfo["duration"] as? Int {
                 body.duration = Int32(duration)
             }
