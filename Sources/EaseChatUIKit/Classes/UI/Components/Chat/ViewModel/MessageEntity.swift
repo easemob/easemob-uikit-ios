@@ -394,10 +394,13 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
     }
     
     open func convertTopicContent() -> NSAttributedString? {
-        guard let topicMessage = self.message.chatThread?.lastMessage else {
-            return nil
-        }
         var text = NSMutableAttributedString()
+        guard let topicMessage = self.message.chatThread?.lastMessage else {
+            text.append(NSAttributedString {
+                AttributedText("No Messages".chat.localize).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.labelSmall)
+            })
+            return text
+        }
         let nickname = topicMessage.user?.nickname ?? topicMessage.from
         
         if topicMessage.body.type != .text {

@@ -40,6 +40,10 @@ import UIKit
     ///   - entity: ``MessageEntity``
     func onMessageMoreReactionAreaClicked(entity: MessageEntity)
     
+    /// When you click a message's topic area ,the method will call.
+    /// - Parameter entity: ``MessageEntity``
+    func onMessageTopicAreaClicked(entity: MessageEntity)
+    
 }
 
 @objcMembers open class MessageListViewModel: NSObject {
@@ -313,7 +317,9 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
     }
     
     @objc open func messageTopicClicked(entity: MessageEntity) {
-        
+        for handler in self.handlers.allObjects {
+            handler.onMessageTopicAreaClicked(entity: entity)
+        }
     }
     
     public func onMessageReactionClicked(reaction: MessageReaction?, entity: MessageEntity) {

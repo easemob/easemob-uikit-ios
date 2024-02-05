@@ -21,7 +21,7 @@ import AVFoundation
     public private(set) lazy var navigation: EaseChatNavigationBar = {
         self.createNavigation()
     }()
-        
+    
     /// Creates a navigation bar for the MessageListController.
     /// - Returns: An instance of EaseChatNavigationBar.
     @objc open func createNavigation() -> EaseChatNavigationBar {
@@ -51,8 +51,8 @@ import AVFoundation
      Initializes a new instance of the `MessageListController` class with the specified conversation ID and chat type.
      
      - Parameters:
-         - conversationId: The ID of the conversation.
-         - chatType: The type of chat. Default value is `.chat`.
+     - conversationId: The ID of the conversation.
+     - chatType: The type of chat. Default value is `.chat`.
      
      This initializer sets the `profile` property based on the conversation ID. If the conversation ID is found in the conversations cache, the profile is set to the corresponding information. Otherwise, the profile ID is set to the conversation ID.
      
@@ -83,7 +83,7 @@ import AVFoundation
     open override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: false)
-     }
+    }
     
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -125,8 +125,8 @@ extension MessageListController {
      Handles the navigation bar click events.
      
      - Parameters:
-        - type: The type of navigation bar click event.
-        - indexPath: The index path associated with the event (optional).
+     - type: The type of navigation bar click event.
+     - indexPath: The index path associated with the event (optional).
      */
     @objc open func navigationClick(type: EaseChatNavigationBarClickEvent, indexPath: IndexPath?) {
         switch type {
@@ -157,7 +157,7 @@ extension MessageListController {
                     if self.chatType == .chat {
                         let vc = ComponentsRegister.shared.ContactInfoController.init(profile: self.profile)
                         vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+                        ControllerStack.toDestination(vc: vc)
                     } else {
                         let vc = ComponentsRegister.shared.GroupInfoController.init(group: self.profile.id) { [weak self] id, name in
                             self?.navigation.title = name
@@ -214,12 +214,12 @@ extension MessageListController {
     }
     
     @objc open func rightItemsAction(indexPath: IndexPath?) {
-//        switch indexPath?.row {
-//        case <#pattern#>:
-//            <#code#>
-//        default:
-//            <#code#>
-//        }
+        //        switch indexPath?.row {
+        //        case <#pattern#>:
+        //            <#code#>
+        //        default:
+        //            <#code#>
+        //        }
     }
     
     @objc open func pop() {
@@ -229,13 +229,30 @@ extension MessageListController {
             self.dismiss(animated: true)
         }
     }
-
+    
     
     
 }
 
 //MARK: - MessageListDriverEventsListener
 extension MessageListController: MessageListDriverEventsListener {
+    public func onMessageTopicAreaClicked(entity: MessageEntity) {
+        if var thread = entity.message.chatThread {
+            ChatClient.shared().threadManager?.joinChatThread(thread.threadId, completion: { chatThread, error in
+                if error == nil || error?.code == .userAlreadyExist  {
+                    if let joinThread = chatThread {
+                        thread = joinThread
+                    }
+                    let vc = ChatThreadViewController(chatThread: thread,firstMessage: nil)
+                    ControllerStack.toDestination(vc: vc)
+                } else {
+                    consoleLogInfo("Join chat thread error:\(error?.errorDescription ?? "")", type: .error)
+                }
+            })
+        }
+        
+    }
+    
     
     public func onMessageMoreReactionAreaClicked(entity: MessageEntity) {
         self.showReactionDetailsController(message: entity)
@@ -252,10 +269,10 @@ extension MessageListController: MessageListDriverEventsListener {
     }
     /**
      Filters the available message actions based on the provided `MessageEntity`.
-
+     
      - Parameters:
-         - message: The `MessageEntity` object to filter the actions for.
-
+     - message: The `MessageEntity` object to filter the actions for.
+     
      - Returns: An array of `ActionSheetItemProtocol` representing the filtered message actions.
      */
     @objc open func filterMessageActions(message: MessageEntity) -> [ActionSheetItemProtocol] {
@@ -309,7 +326,7 @@ extension MessageListController: MessageListDriverEventsListener {
      Shows a long-pressed dialog for a given chat message.
      
      - Parameters:
-        - message: The chat message for which the dialog is shown.
+     - message: The chat message for which the dialog is shown.
      */
     @objc open func showMessageLongPressedDialog(message: MessageEntity) {
         let header =  CommonReactionView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 44), message: message.message).backgroundColor(.clear)
@@ -346,8 +363,8 @@ extension MessageListController: MessageListDriverEventsListener {
      Processes a chat message based on the selected action sheet item.
      
      - Parameters:
-         - item: The selected action sheet item.
-         - message: The chat message to be processed.
+     - item: The selected action sheet item.
+     - message: The chat message to be processed.
      */
     @objc open func processMessage(item: ActionSheetItemProtocol,message: ChatMessage) {
         switch item.tag {
@@ -367,18 +384,25 @@ extension MessageListController: MessageListDriverEventsListener {
             self.viewModel.processMessage(operation: .delete, message: message)
         case "Report":
             self.reportAction(message: message)
+        case "Topic":
+            self.toCreateThread(message: message)
         default:
             item.action?(item,message)
             break
         }
     }
     
+    @objc open func toCreateThread(message: ChatMessage) {
+        let vc = ChatThreadCreateController(message: message)
+        ControllerStack.toDestination(vc: vc)
+    }
+    
     /**
-        Opens the message editor for editing a chat message.
+     Opens the message editor for editing a chat message.
      
-        - Parameters:
-            - message: The chat message to be edited.
-    */
+     - Parameters:
+     - message: The chat message to be edited.
+     */
     @objc open func editAction(message: ChatMessage) {
         if let body = message.body as? ChatTextMessageBody {
             let editor = MessageEditor(content: body.text) { text in
@@ -415,7 +439,7 @@ extension MessageListController: MessageListDriverEventsListener {
      Handles the click event on a message bubble.
      
      - Parameters:
-        - message: The ChatMessage object representing the clicked message.
+     - message: The ChatMessage object representing the clicked message.
      */
     @objc open func messageBubbleClicked(message: MessageEntity) {
         switch message.message.body.type {
@@ -444,7 +468,7 @@ extension MessageListController: MessageListDriverEventsListener {
      Opens the contact view for the given custom message body.
      
      - Parameters:
-        - body: The custom message body containing contact information.
+     - body: The custom message body containing contact information.
      */
     @objc open func viewContact(body: ChatCustomMessageBody) {
         var userId = body.customExt?["userId"] as? String
@@ -460,7 +484,7 @@ extension MessageListController: MessageListDriverEventsListener {
             profile.avatarURL = avatarURL ?? ""
             let vc = ComponentsRegister.shared.ContactInfoController.init(profile: profile)
             vc.modalPresentationStyle = .fullScreen
-        ControllerStack.toDestination(vc: vc)
+            ControllerStack.toDestination(vc: vc)
         }
     }
     
@@ -472,7 +496,7 @@ extension MessageListController: MessageListDriverEventsListener {
      Handles the click event on the message avatar.
      
      - Parameters:
-        - user: The user profile associated with the clicked avatar.
+     - user: The user profile associated with the clicked avatar.
      */
     @objc open func messageAvatarClick(user: EaseProfileProtocol) {
         if user.id == EaseChatUIKitContext.shared?.currentUserId ?? "" {
@@ -509,7 +533,7 @@ extension MessageListController: MessageListDriverEventsListener {
         } trashClosure: {
             
         }
-
+        
         DialogManager.shared.showCustomDialog(customView: audioView,dismiss: false)
     }
     
@@ -596,10 +620,10 @@ extension MessageListController: MessageListDriverEventsListener {
     
     /**
      Selects a contact and shares their information.
-
+     
      - Parameters:
-         - None
-
+     - None
+     
      - Returns: None
      */
     @objc open func selectContact() {
@@ -636,7 +660,7 @@ extension MessageListController:UIImagePickerControllerDelegate, UINavigationCon
      Processes the data received from the image picker.
      
      - Parameters:
-         - info: A dictionary containing the information about the selected media.
+     - info: A dictionary containing the information about the selected media.
      */
     @objc open func processImagePickerData(info: [UIImagePickerController.InfoKey : Any]) {
         let mediaType = info[UIImagePickerController.InfoKey.mediaType] as? String
@@ -679,7 +703,7 @@ extension MessageListController:UIImagePickerControllerDelegate, UINavigationCon
             }
         }
     }
-
+    
     public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
     }
