@@ -153,19 +153,24 @@ public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
         }
         if size == .zero {
             if let body = self.message.body as? ChatImageMessageBody {
-                size = body.size
+                if size == .zero {
+                    if let path = body.thumbnailLocalPath,FileManager.default.fileExists(atPath: path) {
+                        size = UIImage(contentsOfFile: path)?.size ?? .zero
+                    } else {
+                        if let localPath = body.localPath,FileManager.default.fileExists(atPath: localPath) {
+                            size = UIImage(contentsOfFile: localPath)?.size ?? .zero
+                        }
+                    }
+                }
+            }
+            if size == .zero {
+                size = defaultSize
             }
             if let body = self.message.body as? ChatVideoMessageBody {
                 size = body.thumbnailSize
             }
             
-            if size == .zero {
-                if let path = (self.message.body as? ChatFileMessageBody)?.localPath {
-                    size = UIImage(contentsOfFile: path)?.size ?? defaultSize
-                } else {
-                    size = defaultSize
-                }
-            }
+            
         }
         let scale = size.width/size.height
         switch scale {
