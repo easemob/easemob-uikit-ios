@@ -44,6 +44,8 @@ import UIKit
     /// - Parameter entity: ``MessageEntity``
     func onMessageTopicAreaClicked(entity: MessageEntity)
     
+    ///  When received quit signal form other device on the chat thread.
+    @objc optional func onUserQuitTopic()
 }
 
 @objcMembers open class MessageListViewModel: NSObject {
@@ -71,6 +73,7 @@ import UIKit
         super.init()
         self.chatService?.bindChatEventsListener(listener: self)
         self.groupService?.bindGroupEventsListener(listener: self)
+        self.multiService?.bindMultiDeviceListener(listener: self)
         if Appearance.chat.contentStyle.contains(.withMessageTopic) {
             self.groupService?.bindGroupChatThreadEventListener(listener: self)
         }
@@ -758,4 +761,20 @@ extension MessageListViewModel: GroupChatThreadEventListener {
         }
     }
 
+}
+
+extension MessageListViewModel: MultiDeviceListener {
+    
+    public func onGroupEventDidChanged(event: MultiDeviceEvent, groupId: String, users: [String]) {
+        switch event {
+        case .groupDestroy:
+            if groupId == self.to, let alertMessage = self.constructMessage(text: "Group were destroyed.", type: .alert,extensionInfo: [:]) {
+                ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.insert(alertMessage, error: nil)
+                self.driver?.showMessage(message: alertMessage)
+            }
+        default:
+            break
+        }
+    }
+    
 }

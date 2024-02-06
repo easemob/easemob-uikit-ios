@@ -109,7 +109,6 @@ import UIKit
                 container.attributedText = entity.content
             }
         }
-        self.switchTheme(style: Theme.style)
     }
     
     required public init?(coder: NSCoder) {

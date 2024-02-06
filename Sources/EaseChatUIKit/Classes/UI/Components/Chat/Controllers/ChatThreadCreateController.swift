@@ -16,7 +16,7 @@ import AVFoundation
     
     //Thread id empty represents creating a new thread,constructing the first message, and then entering the chat thread send the first message.
     public private(set) lazy var viewModel: ChatThreadViewModel = {
-        ChatThreadViewModel(threadId: "")
+        ChatThreadViewModel(chatThread: nil)
     }()
     
     public private(set) lazy var entity: MessageEntity = {
@@ -128,11 +128,11 @@ import AVFoundation
     open func toChatThread(thread: GroupChatThread,firstMessage: ChatMessage) {
         if self.navigationController != nil {
             self.navigationController?.popViewController(animated: false)
-            let vc = ChatThreadViewController(chatThread: thread,firstMessage: firstMessage)
+            let vc = ChatThreadViewController(chatThread: thread,firstMessage: firstMessage,parentMessageId: self.message.messageId)
             ControllerStack.toDestination(vc: vc)
         } else {
             self.dismiss(animated: false) {
-                let vc = ChatThreadViewController(chatThread: thread,firstMessage: firstMessage)
+                let vc = ChatThreadViewController(chatThread: thread,firstMessage: firstMessage,parentMessageId: self.message.messageId)
                 ControllerStack.toDestination(vc: vc)
             }
         }

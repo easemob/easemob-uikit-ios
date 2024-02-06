@@ -69,6 +69,8 @@ import UIKit
     
     var replyMessageId: String {get}
     
+    var dataSource: [ChatMessage] {get}
+    
     /// Add action events listener of ``MessageListView``.
     /// - Parameter actionHandler: The object of conform ``MessageListViewActionEventsDelegate``.
     func addActionHandler(actionHandler: MessageListViewActionEventsDelegate)
@@ -547,6 +549,11 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
 }
 
 extension MessageListView: IMessageListViewDriver {
+    
+    public var dataSource: [ChatMessage] {
+        self.messages.map { $0.message }
+    }
+    
     public func reloadReaction(message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }) {

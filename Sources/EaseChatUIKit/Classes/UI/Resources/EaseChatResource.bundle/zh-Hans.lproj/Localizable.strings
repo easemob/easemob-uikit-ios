@@ -180,3 +180,5 @@
 "[Contact]" = "[个人名片]";
 "[Alert]" = "[提醒]";
 "No Messages" = "暂无消息";
+"CreateThreadAlert" = "创建了一个话题!";
+"Group were destroyed." = "群聊已被销毁";

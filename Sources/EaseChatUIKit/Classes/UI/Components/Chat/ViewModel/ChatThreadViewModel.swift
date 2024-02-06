@@ -10,6 +10,8 @@ import UIKit
 @objcMembers open class ChatThreadViewModel: NSObject {
     
     public private(set) var to = ""
+    
+    public private(set) var chatThread: GroupChatThread?
         
     public private(set) weak var driver: IMessageListViewDriver?
     
@@ -19,12 +21,19 @@ import UIKit
     
     var handlers: NSHashTable<MessageListDriverEventsListener> = NSHashTable<MessageListDriverEventsListener>.weakObjects()
     
-    @objc public required init(threadId: String) {
-        self.to = threadId
-        self.chatService = ChatServiceImplement(to: threadId)
+    @objc public required init(chatThread: GroupChatThread?) {
+        self.to = chatThread?.threadId ?? ""
+        self.chatThread = chatThread
+        self.chatService = ChatServiceImplement(to: self.to)
         super.init()
         self.chatService?.bindChatEventsListener(listener: self)
-        
+        self.multiService?.bindMultiDeviceListener(listener: self)
+        if let groupId = chatThread?.parentId {
+            let group = ChatGroup(id: groupId)
+            if group == nil || group?.owner.isEmpty ?? true {
+                self.requestGroupDetail()
+            }
+        }
     }
     
     /// Bind ``IMessageListViewDriver``
@@ -54,20 +63,38 @@ import UIKit
         }
     }
     
+    open func requestGroupDetail() {
+        ChatClient.shared().groupManager?.getGroupSpecificationFromServer(withId: self.chatThread?.parentId ?? "", completion: { group, error in
+            if error == nil {
+                
+            } else {
+                consoleLogInfo("requestGroupDetail error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        })
+    }
+    
     @objc open func loadMessages() {
-        if let start = self.driver?.firstMessageId {
-            self.chatService?.loadMessages(start: start, pageSize: 20, completion: { [weak self] error, messages in
-                if error == nil {
-                    if (self?.driver?.firstMessageId ?? "").isEmpty {
-                        self?.driver?.refreshMessages(messages: messages)
+        self.chatService?.fetchChatThreadHistoryMessages(conversationId: self.to, start: self.driver?.firstMessageId ?? "", pageSize: 10, completion: { [weak self] error, messages in
+            if error == nil {
+                let id = self?.chatThread?.owner ?? ""
+                let nickname = EaseChatUIKitContext.shared?.chatCache?[id]?.nickname ?? id
+                
+                if (self?.driver?.firstMessageId ?? "").isEmpty {
+                    if let createMessage = self?.constructMessage(text: "\(nickname)"+"CreateThreadAlert".chat.localize, type: .alert) {
+                        var threadMessages = messages
+                        threadMessages.insert(createMessage, at: 0)
+                        self?.driver?.refreshMessages(messages: threadMessages)
                     } else {
-                        self?.driver?.insertMessages(messages: messages)
+                        self?.driver?.refreshMessages(messages: messages)
                     }
+                    
                 } else {
-                    consoleLogInfo("loadMessages error:\(error?.errorDescription ?? "")", type: .error)
+                    self?.driver?.insertMessages(messages: messages)
                 }
-            })
-        }
+            } else {
+                consoleLogInfo("chat thread loadMessages error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        })
     }
 
     /// Send message with text&type&extension info.
@@ -631,4 +658,20 @@ extension ChatThreadViewModel: ChatResponseListener {
             }
         }
     }
+}
+
+
+extension ChatThreadViewModel: MultiDeviceListener {
+    
+    public func onGroupEventDidChanged(event: MultiDeviceEvent, groupId: String, users: [String]) {
+        switch event {
+        case .groupDestroy,.chatThreadKick,.chatThreadDestroy,.chatThreadLeave,.groupLeave:
+            for handler in self.handlers.allObjects {
+                handler.onUserQuitTopic?()
+            }
+        default:
+            break
+        }
+    }
+    
 }

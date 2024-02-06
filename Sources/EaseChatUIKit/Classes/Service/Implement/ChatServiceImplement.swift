@@ -25,6 +25,13 @@ import UIKit
 
 extension ChatServiceImplement: ChatService {
     
+    public func fetchChatThreadHistoryMessages(conversationId: String, start messageId: String, pageSize: UInt, completion: @escaping (ChatError?, [ChatMessage]) -> Void) {
+        ChatClient.shared().chatManager?.asyncFetchHistoryMessages(fromServer: conversationId, conversationType: .groupChat, startMessageId: messageId, fetch: .down, pageSize: Int32(pageSize), completion: { result, error in
+            completion(error, result?.list ?? [])
+        })
+    }
+    
+    
     public func reaction(reaction: String, message: ChatMessage, completion: @escaping (ChatError?) -> Void) {
         let messageReaction = message.reactionList?.first(where: { $0.reaction ?? "" == reaction })
         if messageReaction == nil {

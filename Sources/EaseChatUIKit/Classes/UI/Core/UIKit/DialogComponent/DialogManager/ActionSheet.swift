@@ -183,7 +183,11 @@ extension ActionSheet: UITableViewDelegate,UITableViewDataSource {
         cell?.textLabel?.text = item.title
         cell?.textLabel?.font = .systemFont(ofSize: 16, weight: .regular)
         cell?.textLabel?.textAlignment = item.image == nil ? .center:.left
-        cell?.imageView?.image = Theme.style == .dark ? item.image?.withTintColor(UIColor.theme.primaryColor6):item.image?.withTintColor(UIColor.theme.primaryColor5)
+        if item.type == .normal {
+            cell?.imageView?.image = Theme.style == .dark ? item.image?.withTintColor(UIColor.theme.primaryColor6):item.image?.withTintColor(UIColor.theme.primaryColor5)
+        } else {
+            cell?.imageView?.image = Theme.style == .dark ? item.image?.withTintColor(UIColor.theme.errorColor6):item.image?.withTintColor(UIColor.theme.errorColor5)
+        }
         cell?.imageView?.contentMode = .scaleAspectFit
         cell?.textLabel?.numberOfLines = 2
         cell?.textLabel?.backgroundColor = .clear

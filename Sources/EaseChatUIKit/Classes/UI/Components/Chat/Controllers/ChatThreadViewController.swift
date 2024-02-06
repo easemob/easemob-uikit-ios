@@ -13,9 +13,7 @@ import AVFoundation
 @objcMembers open class ChatThreadViewController: UIViewController {
     
     public private(set) var filePath = ""
-    
-    public private(set) var threadId = ""
-        
+            
     public private(set) var profile: GroupChatThread = GroupChatThread()
     
     public private(set) lazy var navigation: EaseChatNavigationBar = {
@@ -66,17 +64,19 @@ import AVFoundation
         LoadingView(frame: self.view.bounds)
     }
     
-    public private(set) lazy var viewModel: ChatThreadViewModel = { ChatThreadViewModel(threadId: self.threadId)
+    public private(set) lazy var viewModel: ChatThreadViewModel = {
+        ChatThreadViewModel(chatThread: self.profile)
     }()
     
     public private(set) var firstMessage: ChatMessage?
     
     public private(set) var parentMessage: ChatMessage?
     
-    @objc(initWithChatThread:firstMessage:)
-    public required init(chatThread: GroupChatThread,firstMessage: ChatMessage? = nil) {
+    @objc(initWithChatThread:firstMessage:parentMessageId:)
+    public required init(chatThread: GroupChatThread,firstMessage: ChatMessage? = nil,parentMessageId: String = "") {
         self.firstMessage = firstMessage
         self.profile = chatThread
+        self.parentMessage = ChatClient.shared().chatManager?.getMessageWithMessageId(parentMessageId)
         super.init(nibName: nil, bundle: nil)
         if self.profile.threadName.isEmpty || self.profile.threadId.isEmpty {
             self.requestChatThreadDetail()
@@ -109,7 +109,7 @@ import AVFoundation
         self.view.backgroundColor = UIColor.theme.neutralColor98
         self.view.addSubViews([self.messageContainer,self.navigation])
         self.setupTitle()
-        if self.firstMessage != nil {
+        if self.parentMessage != nil {
             self.messageContainer.messageList.tableHeaderView = self.messageHeader
         }
         self.navigation.clickClosure = { [weak self] in
@@ -131,12 +131,15 @@ import AVFoundation
     }
     
     open func requestChatThreadDetail() {
-        ChatClient.shared().threadManager?.getChatThread(fromSever: self.threadId, completion: { [weak self] thread, error in
+        ChatClient.shared().threadManager?.getChatThread(fromSever: self.profile.threadId, completion: { [weak self] thread, error in
             guard let `self` = self else { return }
             if error == nil,let chatThread = thread {
                 self.profile = chatThread
                 self.parentMessage = ChatClient.shared().chatManager?.getMessageWithMessageId(chatThread.messageId)
                 self.entity = self.createEntity()
+                if self.parentMessage != nil {
+                    self.messageContainer.messageList.tableHeaderView = self.messageHeader
+                }
                 self.messageHeader.reloadData()
                 if let group = ChatGroup(id: chatThread.parentId) {
                     self.navigation.subtitle = group.groupName.isEmpty ? group.groupId:group.groupName
@@ -148,9 +151,7 @@ import AVFoundation
         })
     }
     
-    open func requestGroupDetail() {
-        
-    }
+    
     
     deinit {
         EaseChatUIKitContext.shared?.cleanCache(type: .chat)
@@ -187,12 +188,42 @@ extension ChatThreadViewController {
     }
     
     @objc open func rightItemsAction(indexPath: IndexPath?) {
-        //        switch indexPath?.row {
-        //        case <#pattern#>:
-        //            <#code#>
-        //        default:
-        //            <#code#>
-        //        }
+       
+        switch indexPath?.row {
+        case 0: self.showMoreActions()
+        default: break
+        }
+    }
+    
+    open func filterActions() -> [ActionSheetItemProtocol] {
+        var items = [
+            ActionSheetItem(title: "Topic Members", type: .normal, tag: "TopicMembers", image: UIImage(named: "create_group", in: .chatBundle, with: nil)),
+            ActionSheetItem(title: "Leave Topic", type: .destructive, tag: "LeaveTopic", image: UIImage(named: "quit", in: .chatBundle, with: nil))
+        ]
+        let group = ChatGroup(id: self.profile.parentId)
+        if self.profile.owner == EaseChatUIKitContext.shared?.currentUserId ?? "" || group?.owner == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+            items.removeLast()
+            items.append(ActionSheetItem(title: "Disband Topic", type: .destructive, tag: "DisbandTopic", image: UIImage(named: "quit", in: .chatBundle, with: nil)))
+            items.insert(ActionSheetItem(title: "Edit Topic", type: .normal, tag: "EditTopic", image: UIImage(named: "message_action_edit", in: .chatBundle, with: nil)), at: 0)
+        }
+        return items
+    }
+    
+    open func showMoreActions() {
+        DialogManager.shared.showActions(actions: self.filterActions()) { [weak self] item in
+            self?.processAction(item: item)
+        }
+    }
+    
+    open func processAction(item: ActionSheetItemProtocol) {
+        switch item.tag {
+        case "EditTopic": ""
+        case "LeaveTopic": ""
+        case "TopicMembers": ""
+        case "DisbandTopic": ""
+        default:
+            break
+        }
     }
     
     @objc open func pop() {
@@ -209,6 +240,11 @@ extension ChatThreadViewController {
 
 //MARK: - MessageListDriverEventsListener
 extension ChatThreadViewController: MessageListDriverEventsListener {
+    
+    public func onUserQuitTopic() {
+        self.pop()
+    }
+    
     public func onMessageTopicAreaClicked(entity: MessageEntity) { }
     
     
@@ -586,12 +622,12 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
 extension ChatThreadViewController: UITableViewDataSource, UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        return self.parentMessage == nil ? 0:1
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCell(withIdentifier: "ChatThreadCreateHeaderCell") as? ChatHistoryCell
-        if cell == nil,let message = self.firstMessage {
+        if cell == nil,let message = self.parentMessage {
             cell = ChatHistoryCell(reuseIdentifier: "ChatThreadCreateHeaderCell", message: message)
         }
         cell?.selectionStyle = .none

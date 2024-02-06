@@ -251,19 +251,24 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
         }
         if size == .zero {
             if let body = self.message.body as? ChatImageMessageBody {
-                size = body.size
+                if size == .zero {
+                    if let path = body.thumbnailLocalPath,FileManager.default.fileExists(atPath: path) {
+                        size = UIImage(contentsOfFile: path)?.size ?? .zero
+                    } else {
+                        if let localPath = body.localPath,FileManager.default.fileExists(atPath: localPath) {
+                            size = UIImage(contentsOfFile: localPath)?.size ?? .zero
+                        }
+                    }
+                }
+            }
+            if size == .zero {
+                size = defaultSize
             }
             if let body = self.message.body as? ChatVideoMessageBody {
                 size = body.thumbnailSize
             }
             
-            if size == .zero {
-                if let path = (self.message.body as? ChatFileMessageBody)?.localPath {
-                    size = UIImage(contentsOfFile: path)?.size ?? defaultSize
-                } else {
-                    size = defaultSize
-                }
-            }
+            
         }
         let scale = size.width/size.height
         switch scale {
@@ -321,15 +326,19 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
     /// Converts the message text into an attributed string, including the user's nickname, message text, and emojis.
     open func convertTextAttribute() -> NSAttributedString? {
         var text = NSMutableAttributedString()
+        var textColor = self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor
+        if self.historyMessage {
+            textColor = Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
+        }
         if self.message.body.type != .text, self.message.body.type != .custom {
             text.append(NSAttributedString {
-                AttributedText(self.message.showType+self.message.showContent).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
+                AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
             })
             return text
         }
         if self.historyMessage,self.message.body.type == .custom {
             text.append(NSAttributedString {
-                AttributedText(self.message.showType+self.message.showContent).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
+                AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
             })
             return text
         }
@@ -356,7 +365,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
                 
             default:
                 text.append(NSAttributedString {
-                    AttributedText(self.message.showType+self.message.showContent).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
+                    AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
                 })
                 break
             }
@@ -368,14 +377,14 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
             }
             if self.message.mention.isEmpty {
                 text.append(NSAttributedString {
-                    AttributedText(result).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
+                    AttributedText(result).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
                 })
             } else {
                 let content = result
                 let mentionRange = content.lowercased().chat.rangeOfString(self.message.mention.lowercased())
                 let range = NSMakeRange(mentionRange.location-1, mentionRange.length+1)
                 let mentionAttribute = NSMutableAttributedString {
-                    AttributedText(content).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
+                    AttributedText(content).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
                 }
                 mentionAttribute.addAttribute(.foregroundColor, value: (Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5), range: range)
                 text.append(mentionAttribute)
@@ -386,7 +395,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
                     let ranges = text.string.chat.rangesOfString(symbol)
                     text = ChatEmojiConvertor.shared.convertEmoji(input: text, ranges: ranges, symbol: symbol,imageBounds: CGRect(x: 0, y: -4, width: 18, height: 18))
                     text.addAttribute(.font, value: self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge, range: NSMakeRange(0, text.length))
-                    text.addAttribute(.foregroundColor, value: self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor, range: NSMakeRange(0, text.length))
+                    text.addAttribute(.foregroundColor, value: textColor, range: NSMakeRange(0, text.length))
                 }
             }
         }

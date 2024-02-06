@@ -243,7 +243,7 @@ extension MessageListController: MessageListDriverEventsListener {
                     if let joinThread = chatThread {
                         thread = joinThread
                     }
-                    let vc = ChatThreadViewController(chatThread: thread,firstMessage: nil)
+                    let vc = ChatThreadViewController(chatThread: thread,firstMessage: nil,parentMessageId: entity.message.messageId)
                     ControllerStack.toDestination(vc: vc)
                 } else {
                     consoleLogInfo("Join chat thread error:\(error?.errorDescription ?? "")", type: .error)
