@@ -25,7 +25,15 @@ import AVFoundation
     /// Creates a navigation bar for the MessageListController.
     /// - Returns: An instance of EaseChatNavigationBar.
     @objc open func createNavigation() -> EaseChatNavigationBar {
-        EaseChatNavigationBar(showLeftItem: true,textAlignment: .left,rightImages: [UIImage(named: "audio_call", in: .chatBundle, with: nil)!,UIImage(named: "video_call", in: .chatBundle, with: nil)!]).backgroundColor(.clear)
+        EaseChatNavigationBar(showLeftItem: true,textAlignment: .left,rightImages: self.rightImages()).backgroundColor(.clear)
+    }
+    
+    @objc open func rightImages() -> [UIImage] {
+        var images = [UIImage(named: "message_action_topic", in: .chatBundle, with: nil)!,UIImage(named: "audio_call", in: .chatBundle, with: nil)!,UIImage(named: "video_call", in: .chatBundle, with: nil)!]
+        if !Appearance.chat.contentStyle.contains(.withMessageTopic) {
+            images.remove(at: 0)
+        }
+        return images
     }
     
     public private(set) lazy var messageContainer: MessageListView = {
@@ -214,12 +222,17 @@ extension MessageListController {
     }
     
     @objc open func rightItemsAction(indexPath: IndexPath?) {
-        //        switch indexPath?.row {
-        //        case <#pattern#>:
-        //            <#code#>
-        //        default:
-        //            <#code#>
-        //        }
+        guard let idx = indexPath else { return }
+        switch idx.row {
+        case 0: self.viewTopicList()
+        default:
+            break
+        }
+    }
+    
+    @objc open func viewTopicList() {
+        let vc = ChatThreadListController(groupId: self.profile.id)
+        ControllerStack.toDestination(vc: vc)
     }
     
     @objc open func pop() {
@@ -236,6 +249,45 @@ extension MessageListController {
 
 //MARK: - MessageListDriverEventsListener
 extension MessageListController: MessageListDriverEventsListener {
+    public func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation) {
+        self.messageContainer.editMode = false
+        let messages = self.filterSelectedMessages()
+        switch operation {
+        case .delete:
+            DialogManager.shared.showAlert(title: "barrage_long_press_menu_delete".chat.localize+" \(messages.count)"+" messages".chat.localize, content: "", showCancel: true, showConfirm: true) { [weak self] _ in
+                self?.deleteMessages(messages: messages)
+            }
+        case .forward: self.forwardMessages(messages: messages)
+        }
+    }
+    
+    open func forwardMessages(messages: [ChatMessage]) {
+        if messages.isEmpty {
+            self.showToast(toast: "Please select a message to forward.")
+            return
+        }
+        let vc = ForwardTargetViewController(messages: messages, combine: true)
+        self.present(vc, animated: true)
+    }
+    
+    open func deleteMessages(messages: [ChatMessage]) {
+        if messages.isEmpty {
+            self.showToast(toast: "Please select a message to delete.")
+            return
+        }
+        self.viewModel.deleteMessages(messages: messages)
+    }
+    
+    open func filterSelectedMessages() -> [ChatMessage] {
+        var messages = [ChatMessage]()
+        for message in self.messageContainer.messages {
+            if message.selected {
+                messages.append(message.message)
+            }
+        }
+        return messages
+    }
+    
     public func onMessageTopicAreaClicked(entity: MessageEntity) {
         if var thread = entity.message.chatThread {
             ChatClient.shared().threadManager?.joinChatThread(thread.threadId, completion: { chatThread, error in
@@ -386,10 +438,18 @@ extension MessageListController: MessageListDriverEventsListener {
             self.reportAction(message: message)
         case "Topic":
             self.toCreateThread(message: message)
+        case "MultiSelect":
+            self.multiSelect(message: message)
         default:
             item.action?(item,message)
             break
         }
+    }
+    
+    @objc open func multiSelect(message: ChatMessage) {
+        self.messageContainer.messages.first { $0.message.messageId == message.messageId }?.selected = true
+        self.messageContainer.editMode = true
+        self.messageContainer.messageList.reloadData()
     }
     
     @objc open func toCreateThread(message: ChatMessage) {
@@ -762,11 +822,6 @@ extension MessageListController: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         self.navigation.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
         self.view.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
-        var images = [UIImage(named: "audio_call", in: .chatBundle, with: nil)!,UIImage(named: "video_call", in: .chatBundle, with: nil)!]
-        if style == .light {
-            images = images.map({ $0.withTintColor(UIColor.theme.neutralColor3) })
-        }
-        self.navigation.updateRightItems(images: images)
     }
     
 }

@@ -38,14 +38,18 @@ import UIKit
     /// When you click a message's reaction ,the method will call.
     /// - Parameters:
     ///   - entity: ``MessageEntity``
-    func onMessageMoreReactionAreaClicked(entity: MessageEntity)
+    @objc optional func onMessageMoreReactionAreaClicked(entity: MessageEntity)
     
     /// When you click a message's topic area ,the method will call.
     /// - Parameter entity: ``MessageEntity``
-    func onMessageTopicAreaClicked(entity: MessageEntity)
+    @objc optional func onMessageTopicAreaClicked(entity: MessageEntity)
     
     ///  When received quit signal form other device on the chat thread.
     @objc optional func onUserQuitTopic()
+    
+    /// When you click a message list multi select bar item,the method will call.
+    /// - Parameter operation: ``MessageMultiSelectedBottomBarOperation``
+    func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation)
 }
 
 @objcMembers open class MessageListViewModel: NSObject {
@@ -311,9 +315,26 @@ import UIKit
         self.driver?.processMessage(operation: .delete, message: message)
         self.chatService?.removeLocalMessage(messageId: message.messageId)
     }
+    
+    open func deleteMessages(messages: [ChatMessage]) {
+        //Thread 需要多选删除吗？是否删除服务端的？
+        if var dataSource = self.driver?.dataSource {
+            for message in messages {
+                self.deleteMessage(message: message)
+                dataSource.removeAll(where: { $0.messageId == message.messageId })
+            }
+            self.driver?.refreshMessages(messages: dataSource)
+        }
+    }
 }
 
 extension MessageListViewModel: MessageListViewActionEventsDelegate {
+    
+    public func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation) {
+        for handler in self.handlers.allObjects {
+            handler.onMessageMultiSelectBarClicked(operation: operation)
+        }
+    }
     
     public func onMessageTopicClicked(entity: MessageEntity) {
         self.messageTopicClicked(entity: entity)
@@ -321,7 +342,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
     
     @objc open func messageTopicClicked(entity: MessageEntity) {
         for handler in self.handlers.allObjects {
-            handler.onMessageTopicAreaClicked(entity: entity)
+            handler.onMessageTopicAreaClicked?(entity: entity)
         }
     }
     
@@ -333,7 +354,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
         if reaction == nil {
             //show reactions user list
             for handler in self.handlers.allObjects {
-                handler.onMessageMoreReactionAreaClicked(entity: entity)
+                handler.onMessageMoreReactionAreaClicked?(entity: entity)
             }
         
         } else {

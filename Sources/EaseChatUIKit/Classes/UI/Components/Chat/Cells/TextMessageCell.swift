@@ -57,8 +57,10 @@ import UIKit
         super.init(towards: towards, reuseIdentifier: reuseIdentifier)
         if Appearance.chat.bubbleStyle == .withArrow {
             self.bubbleWithArrow.addSubViews([self.content,self.edit,self.separatorLine,self.translation,self.translateSymbol])
+            self.addGestureTo(view: self.bubbleWithArrow, target: self)
         } else {
             self.bubbleMultiCorners.addSubViews([self.content,self.edit,self.separatorLine,self.translation,self.translateSymbol])
+            self.addGestureTo(view: self.bubbleMultiCorners, target: self)
         }
         self.edit.contentHorizontalAlignment = .right
         self.translateSymbol.contentHorizontalAlignment = .right

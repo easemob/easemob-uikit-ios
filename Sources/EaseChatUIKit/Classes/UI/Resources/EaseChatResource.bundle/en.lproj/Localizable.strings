@@ -181,3 +181,6 @@
 "No Messages" = "No Messages";
 "CreateThreadAlert" = "chat thread created successful!";
 "Group were destroyed." = "Group were destroyed.";
+"thread_name" = "Thread Name";
+"topic_members" = "Thread Members";
+" messages" = " messages";

@@ -22,16 +22,20 @@ import UIKit
     private let forwardIcon = UIImage(named: "message_select_bottom_forward", in: .chatBundle, with: nil)
     
     public private(set) lazy var trash: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: 12, y: 4, width: 36, height: 36)).backgroundColor(UIColor.theme.neutralColor9).cornerRadius(.large).addTargetFor(self, action: #selector(removeAction), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: 12, y: 4, width: 36, height: 36)).backgroundColor(.clear).cornerRadius(.large).addTargetFor(self, action: #selector(removeAction), for: .touchUpInside)
     }()
     
     public private(set) lazy var forward: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.frame.width-48, y: 2, width: 36, height: 36)).backgroundColor(UIColor.theme.primaryColor5).cornerRadius(.large).addTargetFor(self, action: #selector(forwardAction), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: self.frame.width-48, y: 2, width: 36, height: 36)).backgroundColor(.clear).cornerRadius(.large).addTargetFor(self, action: #selector(forwardAction), for: .touchUpInside)
+    }()
+    
+    public private(set) lazy var separatorLine: UIView = {
+        UIView(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: 0.5)).backgroundColor(UIColor.theme.neutralColor9)
     }()
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
-        self.addSubViews([self.trash,self.forward])
+        self.addSubViews([self.trash,self.forward,self.separatorLine])
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
     }
@@ -54,7 +58,7 @@ extension MessageMultiSelectedBottomBar: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         
         self.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
-        
+        self.separatorLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
         let disable_trash = self.trashIcon?.withTintColor(style == .dark ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor6)
         self.trash.setImage(disable_trash, for: .disabled)
         let enable_trash = self.trashIcon?.withTintColor(style == .dark ? UIColor.theme.errorColor6:UIColor.theme.errorColor5)

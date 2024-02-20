@@ -45,7 +45,10 @@ class SettingViewController: UIViewController {
     }
     
     @IBAction func logoutAction(_ sender: UIButton) {
+        print("logout begin :\(Date().timeIntervalSince1970*1000)")
         EaseChatUIKitClient.shared.logout()
+        print("logout end :\(Date().timeIntervalSince1970*1000)")
+        
         EaseChatUIKitContext.shared?.cleanCache(type: .all)
         UIApplication.shared.chat.keyWindow?.rootViewController = LoginViewController()
     }

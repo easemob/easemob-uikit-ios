@@ -7,6 +7,12 @@
 
 import UIKit
 
+@objc public enum ChatTopicOptions: UInt {
+    case leave
+    case destroy
+    
+}
+
 @objcMembers open class ChatThreadViewModel: NSObject {
     
     public private(set) var to = ""
@@ -39,11 +45,24 @@ import UIKit
     /// Bind ``IMessageListViewDriver``
     /// - Parameters:
     ///   - driver: ``IMessageListViewDriver``
-    @objc(bindWithDriver:)
-    open func bindDriver(driver: IMessageListViewDriver) {
+    ///   - create: Whether to create a new thread
+    @objc(bindWithDriver:create:)
+    open func bindDriver(driver: IMessageListViewDriver,create: Bool) {
         self.driver = driver
         driver.addActionHandler(actionHandler: self)
-        self.loadMessages()
+        if create == false {
+            self.loadMessages()
+        } else {
+            let id = self.chatThread?.owner ?? ""
+            let nickname = EaseChatUIKitContext.shared?.chatCache?[id]?.nickname ?? id
+            if let createMessage = self.constructMessage(text: "\(nickname)"+"CreateThreadAlert".chat.localize, type: .alert) {
+                var threadMessages = [ChatMessage]()
+                createMessage.localTime = Int64(self.chatThread?.createAt ?? Int(Date().timeIntervalSince1970))
+                createMessage.timestamp = Int64(self.chatThread?.createAt ?? Int(Date().timeIntervalSince1970))
+                threadMessages.insert(createMessage, at: 0)
+                self.driver?.refreshMessages(messages: threadMessages)
+            }
+        }
     }
     
     /// Add events listener of the message list.
@@ -76,21 +95,7 @@ import UIKit
     @objc open func loadMessages() {
         self.chatService?.fetchChatThreadHistoryMessages(conversationId: self.to, start: self.driver?.firstMessageId ?? "", pageSize: 10, completion: { [weak self] error, messages in
             if error == nil {
-                let id = self?.chatThread?.owner ?? ""
-                let nickname = EaseChatUIKitContext.shared?.chatCache?[id]?.nickname ?? id
-                
-                if (self?.driver?.firstMessageId ?? "").isEmpty {
-                    if let createMessage = self?.constructMessage(text: "\(nickname)"+"CreateThreadAlert".chat.localize, type: .alert) {
-                        var threadMessages = messages
-                        threadMessages.insert(createMessage, at: 0)
-                        self?.driver?.refreshMessages(messages: threadMessages)
-                    } else {
-                        self?.driver?.refreshMessages(messages: messages)
-                    }
-                    
-                } else {
-                    self?.driver?.insertMessages(messages: messages)
-                }
+                self?.driver?.refreshMessages(messages: messages)
             } else {
                 consoleLogInfo("chat thread loadMessages error:\(error?.errorDescription ?? "")", type: .error)
             }
@@ -116,6 +121,22 @@ import UIKit
                     if let message = message {
                         self?.driver?.updateMessageStatus(message: message, status: .failure)
                     }
+                }
+            }
+        }
+    }
+    
+    open func sendFirstMessage(message: ChatMessage) {
+        self.driver?.showMessage(message: message)
+        self.chatService?.send(message: message) { [weak self] error, message in
+            if error == nil {
+                if let message = message {
+                    self?.driver?.updateMessageStatus(message: message, status: .succeed)
+                }
+            } else {
+                consoleLogInfo("send text message failure:\(error?.errorDescription ?? "")", type: .error)
+                if let message = message {
+                    self?.driver?.updateMessageStatus(message: message, status: .failure)
                 }
             }
         }
@@ -267,9 +288,51 @@ import UIKit
         self.driver?.processMessage(operation: .delete, message: message)
         self.chatService?.removeLocalMessage(messageId: message.messageId)
     }
+    
+    open func operationTopic(option: ChatTopicOptions,completion: @escaping (Bool) -> Void) {
+        switch option {
+        case .leave: self.leaveChatTopic(completion: completion)
+        case .destroy: self.destroyChatTopic(completion: completion)
+        }
+    }
+    
+    open func leaveChatTopic(completion: @escaping (Bool) -> Void) {
+        ChatClient.shared().threadManager?.leaveChatThread(self.to, completion: { error in
+            completion(error == nil)
+            if error != nil {
+                consoleLogInfo("leave chat topic error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        })
+    }
+    
+    open func destroyChatTopic(completion: @escaping (Bool) -> Void) {
+        ChatClient.shared().threadManager?.destroyChatThread(self.to, completion: { error in
+            completion(error == nil)
+            if error != nil {
+                consoleLogInfo("destroy chat topic error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        })
+    }
+    
+    open func deleteMessages(messages: [ChatMessage]) {
+        //Thread 需要多选删除吗？是否删除服务端的？
+        if var dataSource = self.driver?.dataSource {
+            for message in messages {
+                dataSource.removeAll(where: { $0.messageId == message.messageId })
+            }
+//            self.chatService.
+            self.driver?.refreshMessages(messages: dataSource)
+        }
+    }
 }
 
 extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
+    public func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation) {
+        for handler in self.handlers.allObjects {
+            handler.onMessageMultiSelectBarClicked(operation: operation)
+        }
+    }
+    
     
     public func onMessageTopicClicked(entity: MessageEntity) {
         self.messageTopicClicked(entity: entity)
@@ -287,7 +350,7 @@ extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
         if reaction == nil {
             //show reactions user list
             for handler in self.handlers.allObjects {
-                handler.onMessageMoreReactionAreaClicked(entity: entity)
+                handler.onMessageMoreReactionAreaClicked?(entity: entity)
             }
         
         } else {

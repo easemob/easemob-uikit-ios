@@ -130,11 +130,6 @@ import UIKit
     @objc required public convenience init(frame: CGRect = CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: Bool, textAlignment: NSTextAlignment = .center, placeHolder: UIImage? = nil,avatarURL: String? = nil,rightImages: [UIImage] = [],hiddenAvatar: Bool = false) {
         self.init(frame: frame)
         self.showLeft = showLeftItem
-        if rightImages.count > 3 {
-            self.rightImages = Array(rightImages.prefix(3))
-        } else {
-            self.rightImages = rightImages
-        }
         if showLeftItem {
             var width = CGFloat(self.rightImages.count*36)
             if self.avatar.frame.maxX+4 > width {
@@ -173,6 +168,7 @@ import UIKit
         self.leftItem.setHitTestEdgeInsets(UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10))
         self.addGesture()
         self.leftItem.center = CGPoint(x: self.leftItem.center.x, y: self.leftItem.center.y-2)
+        self.updateRightItems(images: rightImages)
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
     }
@@ -237,12 +233,12 @@ import UIKit
     
     @objc public func updateRightItems(images: [UIImage]) {
         self.rightImages.removeAll()
-        if rightImages.count > 3 {
+        if images.count > 3 {
             self.rightImages = Array(images.prefix(3))
         } else {
-            self.rightImages = images
+            self.rightImages.append(contentsOf: images)
         }
-        self.rightItems.frame = CGRect(x: ScreenWidth-CGFloat(self.rightImages.count*36)-8, y: StatusBarHeight+10, width: CGFloat(self.rightImages.count*36), height: 36)
+        self.rightItems.frame = CGRect(x: ScreenWidth-CGFloat(images.count*36)-8, y: StatusBarHeight+8, width: CGFloat(images.count*36), height: 36)
         self.rightItems.reloadData()
     }
 }

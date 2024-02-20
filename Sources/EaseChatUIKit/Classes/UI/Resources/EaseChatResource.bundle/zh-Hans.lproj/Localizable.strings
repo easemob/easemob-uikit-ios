@@ -182,3 +182,6 @@
 "No Messages" = "暂无消息";
 "CreateThreadAlert" = "创建了一个话题!";
 "Group were destroyed." = "群聊已被销毁";
+"thread_name" = "话题名称";
+"topic_members" = "话题成员";
+" messages" = "条消息";

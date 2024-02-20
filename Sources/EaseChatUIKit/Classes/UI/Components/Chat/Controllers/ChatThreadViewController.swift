@@ -115,9 +115,11 @@ import AVFoundation
         self.navigation.clickClosure = { [weak self] in
             self?.navigationClick(type: $0, indexPath: $1)
         }
-        
-        self.viewModel.bindDriver(driver: self.messageContainer)
+        self.viewModel.bindDriver(driver: self.messageContainer, create: self.firstMessage != nil)
         self.viewModel.addEventsListener(self)
+        if let firstMessage = self.firstMessage {
+            self.viewModel.sendFirstMessage(message: firstMessage)
+        }
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
         self.view.addSubview(self.loadingView)
@@ -217,14 +219,38 @@ extension ChatThreadViewController {
     
     open func processAction(item: ActionSheetItemProtocol) {
         switch item.tag {
-        case "EditTopic": ""
-        case "LeaveTopic": ""
-        case "TopicMembers": ""
-        case "DisbandTopic": ""
+        case "EditTopic": self.editTopicName()
+        case "LeaveTopic": self.leaveTopic()
+        case "TopicMembers": self.editTopicName()
+        case "DisbandTopic": self.disbandTopic()
         default:
             break
         }
     }
+    
+    open func editTopicName() {
+        let vc = GroupInfoEditViewController(groupId: self.profile.threadId, type: .threadName, rawText: self.profile.threadName) { [weak self] text in
+            self?.navigation.title = text
+        }
+        ControllerStack.toDestination(vc: vc)
+    }
+    
+    open func leaveTopic() {
+        self.viewModel.operationTopic(option: .leave) {  [weak self] success in
+            if success {
+                self?.pop()
+            }
+        }
+    }
+    
+    open func disbandTopic() {
+        self.viewModel.operationTopic(option: .destroy) {  [weak self] success in
+            if success {
+                self?.pop()
+            }
+        }
+    }
+    
     
     @objc open func pop() {
         if self.navigationController != nil {
@@ -240,6 +266,46 @@ extension ChatThreadViewController {
 
 //MARK: - MessageListDriverEventsListener
 extension ChatThreadViewController: MessageListDriverEventsListener {
+    public func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation) {
+        self.messageContainer.editMode = false
+        let messages = self.filterSelectedMessages()
+        switch operation {
+        case .delete:
+            DialogManager.shared.showAlert(title: "barrage_long_press_menu_delete".chat.localize+" \(messages.count)"+" messages".chat.localize, content: "", showCancel: true, showConfirm: true) { [weak self] _ in
+                self?.deleteMessages(messages: messages)
+            }
+        case .forward: self.forwardMessages(messages: messages)
+        }
+    }
+    
+    open func forwardMessages(messages: [ChatMessage]) {
+        if messages.isEmpty {
+            self.showToast(toast: "Please select a message to forward.")
+            return
+        }
+        let vc = ForwardTargetViewController(messages: messages, combine: true)
+        self.present(vc, animated: true)
+    }
+    
+    open func deleteMessages(messages: [ChatMessage]) {
+        if messages.isEmpty {
+            self.showToast(toast: "Please select a message to delete.")
+            return
+        }
+        self.viewModel.deleteMessages(messages: messages)
+    }
+    
+    open func filterSelectedMessages() -> [ChatMessage] {
+        var messages = [ChatMessage]()
+        for message in self.messageContainer.messages {
+            if message.selected {
+                messages.append(message.message)
+            }
+        }
+        return messages
+    }
+    
+    
     
     public func onUserQuitTopic() {
         self.pop()

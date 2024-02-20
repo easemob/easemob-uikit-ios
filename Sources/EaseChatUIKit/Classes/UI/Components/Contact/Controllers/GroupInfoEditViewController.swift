@@ -65,6 +65,7 @@ import UIKit
         case .alias: text = "group_details_button_alias".chat.localize
         case .description: text = "group_details_button_description".chat.localize
         case .announcement: text = "group_details_button_announcement".chat.localize
+        case .threadName: text = "thread_name".chat.localize
         }
         return text
     }
@@ -81,7 +82,7 @@ import UIKit
     private func textLimit() -> Int {
         var limitCount = 128
         switch self.editType {
-        case .name:
+        case .name,.threadName:
             limitCount = 64
         case .description,.announcement:
             limitCount = 512

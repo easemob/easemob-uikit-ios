@@ -108,6 +108,7 @@ extension ChatServiceImplement: ChatService {
     
     public func removeLocalMessage(messageId: String) {
         ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.deleteMessage(withId: messageId, error: nil)
+        
     }
     
     public func removeHistoryMessages() {

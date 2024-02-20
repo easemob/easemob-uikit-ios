@@ -61,6 +61,11 @@ import UIKit
     ///   - entity: ``MessageEntity``
     func onMessageReactionClicked(reaction: MessageReaction?,entity: MessageEntity)
     
+    /// When message multi select bar clicked.
+    /// - Parameters:
+    ///   - operation: ``MessageMultiSelectedBottomBarOperation``
+    func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation)
+    
 }
 
 @objc public protocol IMessageListViewDriver: NSObjectProtocol {
@@ -234,6 +239,10 @@ import UIKit
             }
         }
         
+        self.editBottomBar.operationClosure = { [weak self] in
+            self?.bottomMultiSelectedBarEvents(operation: $0)
+        }
+        
         NotificationCenter.default.addObserver(forName: Notification.Name("EaseChatUIKit_clean_history_messages"), object: nil, queue: .main) { [weak self] notification in
             if let conversationId = notification.object as? String {
                 if self?.messages.first?.message.conversationId ?? "" == conversationId {
@@ -248,6 +257,12 @@ import UIKit
     
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func bottomMultiSelectedBarEvents(operation: MessageMultiSelectedBottomBarOperation) {
+        for handler in self.eventHandlers.allObjects {
+            handler.onMessageMultiSelectBarClicked(operation: operation)
+        }
     }
     
     private func inputBarEvents() {
@@ -322,6 +337,14 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
         }
         cell?.selectionStyle = .none
         return cell ?? MessageCell()
+    }
+    
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        if let entity = self.messages[safe: indexPath.row],self.editMode {
+            entity.selected = !entity.selected
+            tableView.reloadData()
+        }
     }
     
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -428,6 +451,11 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
     }
     
     private func handleClick(area: MessageCellClickArea,entity: MessageEntity) {
+        if self.editMode {
+            entity.selected = !entity.selected
+            self.messageList.reloadData()
+            return
+        }
         switch area {
         case .avatar:
             if ComponentViewsActionHooker.shared.chat.bubbleClicked != nil {
@@ -482,9 +510,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                     for message in self.messages {
                         message.playing = false
                     }
-                    if let visibleIndexPaths = self.messageList.indexPathsForVisibleRows {
-                        self.messageList.reloadData()
-                    }
+                    self.messageList.reloadData()
                 }
                 for handler in self.eventHandlers.allObjects {
                     handler.onMessageContentClicked(message: entity)
@@ -509,6 +535,9 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
     }
     
     private func processReactionEmojiClick(reaction: MessageReaction?,entity: MessageEntity) {
+        if self.editMode {
+            return
+        }
         for handler in self.eventHandlers.allObjects {
             handler.onMessageReactionClicked(reaction: reaction, entity: entity)
         }

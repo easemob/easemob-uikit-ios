@@ -103,13 +103,17 @@ import AVFoundation
         }
     }
     
-    open func createChatThread(message: ChatMessage) {
+    open func createChatThread(text: String,type: MessageCellStyle,extensionInfo: Dictionary<String,Any> = [:] ) {
         ChatClient.shared().threadManager?.createChatThread(self.navigation.titleLabel.text ?? "", messageId: self.message.messageId, parentId: self.message.conversationId, completion: { [weak self] chatThread, error in
+            guard let `self` = self else { return  }
             if error == nil,let thread = chatThread {
-                self?.toChatThread(thread: thread, firstMessage: message)
+                self.viewModel = ChatThreadViewModel(chatThread: thread)
+                if let firstMessage = self.viewModel.constructMessage(text: text, type: .text, extensionInfo: extensionInfo) {
+                    self.toChatThread(thread: thread, firstMessage: firstMessage)
+                }
             } else {
                 consoleLogInfo("create chat thread error:\(error?.errorDescription ?? "")", type: .error)
-                self?.pop()
+                self.pop()
             }
         })
         
@@ -151,9 +155,7 @@ import AVFoundation
         AudioTools.shared.stopPlaying()
         let audioView = MessageAudioRecordView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 200+BottomBarHeight)) { [weak self] url, duration in
             UIViewController.currentController?.dismiss(animated: true)
-            if let message = self?.viewModel.constructMessage(text: url.path, type: .voice,extensionInfo: ["duration":duration]) {
-                self?.createChatThread(message: message)
-            }
+            self?.createChatThread(text: url.path, type: .voice, extensionInfo: ["duration":duration])
             
         } trashClosure: {
             
@@ -241,9 +243,7 @@ import AVFoundation
             vc.dismiss(animated: true) {
                 if let user = profiles.first {
                     DialogManager.shared.showAlert(title: "Share Contact".chat.localize, content: "Share Contact".chat.localize+"`\(user.nickname.isEmpty ? user.id:user.nickname)`?", showCancel: true, showConfirm: true) { [weak self] _ in
-                        if let message = self?.viewModel.constructMessage(text: EaseChatUIKit_user_card_message, type: .contact, extensionInfo: ["uid":user.id,"avatar":user.avatarURL,"nickname":user.nickname]) {
-                            self?.createChatThread(message: message)
-                        }
+                        self?.createChatThread(text: EaseChatUIKit_user_card_message, type: .contact, extensionInfo: ["uid":user.id,"avatar":user.avatarURL,"nickname":user.nickname])
                     }
                     
                 }
@@ -255,6 +255,10 @@ import AVFoundation
 }
 
 extension ChatThreadCreateController: MessageListViewActionEventsDelegate {
+    public func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation) {
+        
+    }
+    
     public func onMessageListPullRefresh() { }
     
     public func onMessageReplyClicked(message: MessageEntity) { }
@@ -269,8 +273,8 @@ extension ChatThreadCreateController: MessageListViewActionEventsDelegate {
     
     public func onInputBoxEventsOccur(action type: MessageInputBarActionType, attributeText: NSAttributedString?) {
         if type == .send {
-            if let text = attributeText?.toString(), let textMessage = self.viewModel.constructMessage(text: text, type: .text) {
-                self.createChatThread(message: textMessage)
+            if let text = attributeText?.toString() {
+                self.createChatThread(text: text,type: .text)
             }
         }
     }
@@ -333,9 +337,7 @@ extension ChatThreadCreateController:UIImagePickerControllerDelegate, UINavigati
                 }
             }
             let duration = AVURLAsset(url: fileURL).duration.value
-            if let message = self.viewModel.constructMessage(text: fileURL.path, type: .video, extensionInfo: ["duration":duration]) {
-                self.createChatThread(message: message)
-            }
+            self.createChatThread(text: fileURL.path, type: .video, extensionInfo: ["duration":duration])
         } else {
             if let imageURL = info[.imageURL] as? URL {
                 let fileName = imageURL.lastPathComponent
@@ -346,9 +348,7 @@ extension ChatThreadCreateController:UIImagePickerControllerDelegate, UINavigati
                 } catch {
                     consoleLogInfo("write image error:\(error.localizedDescription)", type: .error)
                 }
-                if let message = self.viewModel.constructMessage(text: fileURL.path, type: .image) {
-                    self.createChatThread(message: message)
-                }
+                self.createChatThread(text: fileURL.path, type: .image)
             } else {
                 guard let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else { return }
                 let correctImage = image.fixOrientation()
@@ -359,9 +359,7 @@ extension ChatThreadCreateController:UIImagePickerControllerDelegate, UINavigati
                 } catch {
                     consoleLogInfo("write camera fixOrientation image error:\(error.localizedDescription)", type: .error)
                 }
-                if let message = self.viewModel.constructMessage(text: fileURL.path, type: .image) {
-                    self.createChatThread(message: message)
-                }
+                self.createChatThread(text: fileURL.path, type: .image)
             }
         }
     }
@@ -390,9 +388,7 @@ extension ChatThreadCreateController: UIDocumentPickerDelegate {
                 } catch {
                     consoleLogInfo("write file error:\(error.localizedDescription)", type: .error)
                 }
-                if let message = self.viewModel.constructMessage(text: fileURL.path, type: .file) {
-                    self.createChatThread(message: message)
-                }
+                self.createChatThread(text: fileURL.path, type: .file)
                 selectedFileURL.stopAccessingSecurityScopedResource()
             } else {
                 DialogManager.shared.showAlert(title: "permissions disable".chat.localize, content: "file_disable".chat.localize, showCancel: false, showConfirm: true) { _ in

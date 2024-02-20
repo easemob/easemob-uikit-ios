@@ -140,6 +140,10 @@ extension GroupServiceImplement: GroupService {
             ChatClient.shared().groupManager?.updateGroupAnnouncement(withId: groupId, announcement: content,completion: { group, error in
                 completion(group,error)
             })
+        case .threadName:
+            ChatClient.shared().threadManager?.updateChatThreadName(content, threadId: groupId, completion: { error in
+                completion(nil,error)
+            })
         default:
             break
         }

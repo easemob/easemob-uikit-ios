@@ -12,6 +12,7 @@ import Foundation
     case alias
     case description
     case announcement
+    case threadName
 }
 
 @objc public protocol GroupService: NSObjectProtocol {
