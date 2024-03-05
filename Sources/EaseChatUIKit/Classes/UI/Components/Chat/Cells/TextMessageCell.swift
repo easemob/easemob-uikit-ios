@@ -37,12 +37,12 @@ import UIKit
         UIView(frame: .zero)
     }()
     
-    public private(set) lazy var translation: UILabel = {
+    public private(set) lazy var translation: UITextView = {
         self.createTranslation()
     }()
     
-    @objc open func createTranslation() -> UILabel {
-        UILabel(frame: .zero).backgroundColor(.clear).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping).numberOfLines(0)
+    @objc open func createTranslation() -> UITextView {
+        UITextView(frame: .zero).backgroundColor(.clear)
     }
     
     public private(set) lazy var translateSymbol: UIButton = {
@@ -64,6 +64,8 @@ import UIKit
         }
         self.edit.contentHorizontalAlignment = .right
         self.translateSymbol.contentHorizontalAlignment = .right
+        self.translation.isEditable = false 
+        self.translation.contentInset = .zero
     }
     
     required public init?(coder: NSCoder) {
@@ -72,8 +74,9 @@ import UIKit
     
     public override func refresh(entity: MessageEntity) {
         super.refresh(entity: entity)
+        let textSize = entity.textSize()
         let translationSize = Appearance.chat.enableTranslation ? entity.translationSize():.zero
-        self.content.frame = CGRect(x: 12, y: 0, width: entity.bubbleSize.width-24, height: (entity.message.edited ? entity.bubbleSize.height-21:entity.bubbleSize.height)-(translationSize.height > 0 ? (38+translationSize.height):0))
+        self.content.frame = CGRect(x: 12, y: 0, width: entity.bubbleSize.width-24, height: textSize.height)
         let stateColor: UIColor = entity.message.direction == .send ? self.sendStateColor:self.receiveStateColor
         self.edit.setTitleColor(stateColor, for: .normal)
         self.translateSymbol.setTitleColor(stateColor, for: .normal)
@@ -98,8 +101,8 @@ import UIKit
             self.separatorLine.isHidden = false
             self.translation.isHidden = false
             self.translateSymbol.isHidden = false
-            self.separatorLine.frame = CGRect(x: 12, y: self.content.frame.maxY+(entity.message.edited ? 24:12), width: entity.bubbleSize.width-24, height: 0.5)
-            self.translation.frame = CGRect(x: 12, y: self.separatorLine.frame.maxY+8, width: entity.bubbleSize.width-24, height: translationSize.height)
+            self.separatorLine.frame = CGRect(x: 12, y: self.content.frame.maxY+(entity.message.edited ? 20:6), width: entity.bubbleSize.width-24, height: 0.5)
+            self.translation.frame = CGRect(x: 12, y: self.separatorLine.frame.maxY+4, width: entity.bubbleSize.width-24, height: translationSize.height)
             self.translateSymbol.frame = CGRect(x: 12, y: self.translation.frame.maxY+4, width: entity.bubbleSize.width-24, height: 16)
             self.translateSymbol.setTitle("Translated".chat.localize, for: .normal)
             let image = UIImage(named: "text_message_translated", in: .chatBundle, with: nil)

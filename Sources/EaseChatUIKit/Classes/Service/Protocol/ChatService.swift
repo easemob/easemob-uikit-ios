@@ -101,8 +101,6 @@ let EaseChatUIKit_user_card_message = "userCard"
     ///   - message: ``ChatMessage``
     ///   - completion: Callback, returns error whether successful error is `nil`, or error occur.
     func reaction(reaction: String, message: ChatMessage, completion: @escaping (ChatError?) -> Void)
-    
-    
 }
 
 @objc public protocol ChatResponseListener: NSObjectProtocol {

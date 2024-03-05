@@ -14,7 +14,7 @@ import UIKit
     }()
     
     public private(set) lazy var content: UILabel = {
-        UILabel(frame: CGRect(x: 16, y: 32, width: ScreenWidth-32, height: 16)).textAlignment(.center).backgroundColor(.clear)
+        UILabel(frame: CGRect(x: 16, y: 32, width: ScreenWidth-32, height: 16)).textAlignment(.center).backgroundColor(.clear).tag(bubbleTag)
     }()
 
     internal override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -35,6 +35,7 @@ import UIKit
         self.bubbleWithArrow.isHidden = true
         self.bubbleMultiCorners.isHidden = true
         self.contentView.addSubViews([self.time,self.content])
+        self.addGestureTo(view: self.content, target: self)
         self.switchTheme(style: Theme.style)
     }
     
@@ -45,6 +46,7 @@ import UIKit
     }
     
     open override func refresh(entity: MessageEntity) {
+        self.entity = entity
         self.content.attributedText = entity.content
         self.time.text = entity.message.showDate
     }

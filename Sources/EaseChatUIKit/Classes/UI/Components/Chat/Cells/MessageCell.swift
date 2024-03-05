@@ -17,6 +17,8 @@ public let reactionTag = 202
 /// Tag used for identifying the status view in the message cell.
 public let statusTag = 168
 
+public let checkBoxTag = 189
+
 /// Enum representing the style of a message cell.
 @objc public enum MessageCellStyle: UInt {
     case text
@@ -39,6 +41,7 @@ public let statusTag = 168
     case topic
     case reaction
     case status
+    case checkbox
 }
 
 @objc public enum MessageContentDisplayStyle: UInt {
@@ -62,7 +65,7 @@ let message_bubble_space = CGFloat(1)
     
     private var longGestureEnabled: Bool = true
     
-    public private(set) var entity = ComponentsRegister.shared.MessageRenderEntity.init()
+    public var entity = ComponentsRegister.shared.MessageRenderEntity.init()
     
     public private(set) var towards = BubbleTowards.left
     
@@ -79,7 +82,7 @@ let message_bubble_space = CGFloat(1)
     }()
     
     @objc open func createCheckbox() -> UIImageView {
-        UIImageView(frame: CGRect(x: 12, y: (self.contentView.frame.height-28)/2.0, width: 28, height: 28)).contentMode(.scaleAspectFit).backgroundColor(.clear)
+        UIImageView(frame: CGRect(x: 12, y: (self.contentView.frame.height-28)/2.0, width: 28, height: 28)).contentMode(.scaleAspectFit).backgroundColor(.clear).tag(checkBoxTag)
     }
     
     public private(set) lazy var avatar: ImageView = {
@@ -174,6 +177,7 @@ let message_bubble_space = CGFloat(1)
         self.contentView.backgroundColor = .clear
         self.towards = towards
         self.contentView.addSubview(self.checkbox)
+        self.addGestureTo(view: self.checkbox, target: self)
         if Appearance.chat.contentStyle.contains(.withNickName) {
             self.contentView.addSubview(self.nickName)
         }
@@ -242,6 +246,8 @@ let message_bubble_space = CGFloat(1)
                 self.clickAction?(.avatar,self.entity)
             case topicTag:
                 self.clickAction?(.topic,self.entity)
+            case checkBoxTag:
+                self.clickAction?(.checkbox,self.entity)
             default:
                 break
             }
@@ -289,8 +295,8 @@ let message_bubble_space = CGFloat(1)
         if !self.checkbox.isHidden {
             self.checkbox.image = UIImage(named: entity.selected ? "select":"unselect", in: .chatBundle, with: nil)
         }
-        //nickname
-        self.nickName.text = entity.message.from
+        //remark > nickname > userId
+        self.nickName.text = entity.showUserName
         //reply
         self.replyContent.isHidden = entity.replyContent == nil
         self.replyContent.isHidden = entity.replySize.height <= 0
@@ -356,9 +362,11 @@ let message_bubble_space = CGFloat(1)
             self.bubbleMultiCorners.towards = (entity.message.direction == .receive ? .left:.right)
             if Appearance.chat.bubbleStyle == .withArrow {
                 self.bubbleWithArrow.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+12:(self.editMode ? self.checkbox.frame.maxX+12:12), y: entity.height - 16 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - entity.bubbleSize.height - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageTopic }) ? (self.topicView.isHidden ? 0:topicHeight):0) - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageReaction }) ? reactionContentHeight:0), width: entity.bubbleSize.width, height: entity.bubbleSize.height+message_bubble_space*2)
+                self.bubbleWithArrow.towards = entity.message.direction == .send ? .right:.left
                 self.bubbleWithArrow.draw(self.bubbleWithArrow.frame)
             } else {
                 self.bubbleMultiCorners.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+12:(self.editMode ? self.checkbox.frame.maxX+12:12), y: entity.height - 16 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - entity.bubbleSize.height - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageTopic }) ? (self.topicView.isHidden ? 0:topicHeight):0) - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageReaction }) ? reactionContentHeight:0), width: entity.bubbleSize.width, height: entity.bubbleSize.height+message_bubble_space*2)
+                self.bubbleMultiCorners.towards = entity.message.direction == .send ? .right:.left
                 self.bubbleMultiCorners.draw(self.bubbleMultiCorners.frame)
             }
             self.status.isHidden = true
@@ -386,9 +394,11 @@ let message_bubble_space = CGFloat(1)
             self.bubbleMultiCorners.towards = (entity.message.direction == .receive ? .left:.right)
             if Appearance.chat.bubbleStyle == .withArrow {
                 self.bubbleWithArrow.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.minX-entity.bubbleSize.width-12:ScreenWidth-entity.bubbleSize.width-12, y: entity.height - 16 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - entity.bubbleSize.height - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageTopic }) ? (self.topicView.isHidden ? 0:topicHeight):0) - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageReaction }) ? reactionContentHeight:0), width: entity.bubbleSize.width, height: entity.bubbleSize.height+message_bubble_space*2)
+                self.bubbleWithArrow.towards = entity.message.direction == .send ? .right:.left
                 self.bubbleWithArrow.draw(self.bubbleWithArrow.frame)
             } else {
                 self.bubbleMultiCorners.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.minX-entity.bubbleSize.width-12:ScreenWidth-entity.bubbleSize.width-12, y: entity.height - 16 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - entity.bubbleSize.height - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageTopic }) ? (self.topicView.isHidden ? 0:topicHeight):0) - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageReaction }) ? reactionContentHeight:0), width: entity.bubbleSize.width, height: entity.bubbleSize.height+message_bubble_space*2)
+                self.bubbleMultiCorners.towards = entity.message.direction == .send ? .right:.left
                 self.bubbleMultiCorners.draw(self.bubbleMultiCorners.frame)
             }
 
@@ -400,6 +410,14 @@ let message_bubble_space = CGFloat(1)
             if Appearance.chat.contentStyle.contains(.withMessageReaction) {
                 self.reactionView.frame = CGRect(x: (Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame.maxX:self.bubbleMultiCorners.frame.maxX)-reactionWidth-30, y: entity.height-(Appearance.chat.contentStyle.contains(.withDateAndTime) ? 24:2)-(Appearance.chat.contentStyle.contains(.withMessageReaction) ? reactionContentHeight:2), width: reactionWidth+30, height: reactionContentHeight)
             }
+        }
+    }
+    
+    open func renderCheck(entity: MessageEntity) {
+        self.checkbox.isHidden = !self.editMode
+        
+        if !self.checkbox.isHidden {
+            self.checkbox.image = UIImage(named: entity.selected ? "select":"unselect", in: .chatBundle, with: nil)
         }
     }
     

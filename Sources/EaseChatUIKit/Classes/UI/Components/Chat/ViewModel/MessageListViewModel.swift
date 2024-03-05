@@ -58,6 +58,8 @@ import UIKit
     
     public private(set) var to = ""
     
+    public private(set) var searchMessageId = ""
+    
     public private(set) var chatType = ChatType.chat
     
     public private(set) weak var driver: IMessageListViewDriver?
@@ -86,11 +88,17 @@ import UIKit
     /// Bind ``IMessageListViewDriver``
     /// - Parameters:
     ///   - driver: ``IMessageListViewDriver``
-    @objc(bindWithDriver:)
-    open func bindDriver(driver: IMessageListViewDriver) {
+    ///   - searchMessageId: If you want to search a message, you can pass id of the message.
+    @objc(bindWithDriver:searchMessageId:)
+    open func bindDriver(driver: IMessageListViewDriver,searchMessageId: String = "") {
         self.driver = driver
+        self.searchMessageId = searchMessageId
         driver.addActionHandler(actionHandler: self)
-        self.loadMessages()
+        if !searchMessageId.isEmpty {
+            self.loadSearchMessage()
+        } else {
+            self.loadMessages()
+        }
     }
     
     /// Add events listener of the message list.
@@ -108,6 +116,16 @@ import UIKit
         if self.handlers.contains(listener) {
             self.handlers.remove(listener)
         }
+    }
+    
+    open func loadSearchMessage() {
+        self.chatService?.loadMessages(start: self.searchMessageId, pageSize: 20, completion: { [weak self] error, messages in
+            if error == nil {
+                self?.driver?.refreshMessages(messages: messages)
+            } else {
+                consoleLogInfo("loadSearchMessage error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        })
     }
     
     @objc open func loadMessages() {
@@ -312,23 +330,56 @@ import UIKit
     }
     
     @objc open func deleteMessage(message: ChatMessage) {
-        self.driver?.processMessage(operation: .delete, message: message)
-        self.chatService?.removeLocalMessage(messageId: message.messageId)
+        if EaseChatUIKitClient.shared.option.option_chat.loadLocalHistoryMessages {
+            self.driver?.processMessage(operation: .delete, message: message)
+            self.chatService?.removeLocalMessage(messageId: message.messageId)
+        } else {
+            ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.removeMessages(fromServerMessageIds: [message.messageId], completion: { error in
+                if error == nil {
+                    self.driver?.processMessage(operation: .delete, message: message)
+                } else {
+                    consoleLogInfo("delete message error:\(error?.errorDescription ?? "")", type: .error)
+                }
+            })
+        }
     }
     
     open func deleteMessages(messages: [ChatMessage]) {
-        //Thread 需要多选删除吗？是否删除服务端的？
-        if var dataSource = self.driver?.dataSource {
-            for message in messages {
-                self.deleteMessage(message: message)
-                dataSource.removeAll(where: { $0.messageId == message.messageId })
+        
+        if EaseChatUIKitClient.shared.option.option_chat.loadLocalHistoryMessages {
+            if var dataSource = self.driver?.dataSource {
+                for message in messages {
+                    self.chatService?.removeLocalMessage(messageId: message.messageId)
+                    dataSource.removeAll(where: { $0.messageId == message.messageId })
+                }
+                self.driver?.refreshMessages(messages: dataSource)
             }
-            self.driver?.refreshMessages(messages: dataSource)
+        } else {
+            if var dataSource = self.driver?.dataSource {
+                let deleteIds = messages.map { $0.messageId }
+                ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.removeMessages(fromServerMessageIds: deleteIds, completion: { [weak self] error in
+                    if error == nil {
+                        for message in messages {
+                            dataSource.removeAll(where: { $0.messageId == message.messageId })
+                        }
+                        self?.driver?.refreshMessages(messages: dataSource)
+                    } else {
+                        consoleLogInfo("delete topic messages error:\(error?.errorDescription ?? "")", type: .error)
+                    }
+                })
+                self.driver?.refreshMessages(messages: dataSource)
+            }
         }
     }
 }
 
 extension MessageListViewModel: MessageListViewActionEventsDelegate {
+    
+    public func onMoreMessagesClicked() {
+        ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.markAllMessages(asRead: nil)
+        ChatClient.shared().chatManager?.ackConversationRead(self.to)
+    }
+    
     
     public func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation) {
         for handler in self.handlers.allObjects {
@@ -381,10 +432,18 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
     
     @objc open func messageVisibleMark(entity: MessageEntity) {
         let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)
-        conversation?.markMessageAsRead(withId: entity.message.messageId, error: nil)
-        if conversation?.type ?? .chat == .chat {
-            ChatClient.shared().chatManager?.sendMessageReadAck(entity.message.messageId, toUser: self.to)
-        }
+        if !entity.message.isRead {
+            conversation?.markMessageAsRead(withId: entity.message.messageId, error: nil)
+            if conversation?.type ?? .chat == .chat {
+                switch entity.message.body.type {
+                case .text,.location,.custom,.image:
+                    ChatClient.shared().chatManager?.sendMessageReadAck(entity.message.messageId, toUser: self.to)
+                default:
+                    break
+                }
+            }
+        } 
+        
     }
     
     public func onFailureMessageRetrySend(entity: MessageEntity) {
@@ -621,14 +680,16 @@ extension MessageListViewModel: ChatResponseListener {
         if message.conversationId == self.to {
             let entity = message
             entity.direction = message.direction
-            let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)
-            conversation?.markMessageAsRead(withId: message.messageId, error: nil)
-            if conversation?.type ?? .chat == .chat {
-                switch message.body.type {
-                case .text,.location,.custom,.image:
-                    ChatClient.shared().chatManager?.sendMessageReadAck(message.messageId, toUser: self.to)
-                default:
-                    break
+            if let scrolledBottom = self.driver?.scrolledBottom,scrolledBottom {
+                let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)
+                conversation?.markMessageAsRead(withId: message.messageId, error: nil)
+                if conversation?.type ?? .chat == .chat {
+                    switch message.body.type {
+                    case .text,.location,.custom,.image:
+                        ChatClient.shared().chatManager?.sendMessageReadAck(message.messageId, toUser: self.to)
+                    default:
+                        break
+                    }
                 }
             }
             self.driver?.showMessage(message: entity)
@@ -768,7 +829,7 @@ extension MessageListViewModel: GroupChatThreadEventListener {
                 }
                 if type == .created {
                     let topicName = event.chatThread?.threadName ?? ""
-                    if let alertMessage = self.constructMessage(text: "[\(event.from ?? "")] \("Create".chat.localize) \("Topic".chat.localize): \(topicName)", type: .alert,extensionInfo: ["threadId":event.chatThread.threadId ?? "","threadName":topicName]) {
+                    if let alertMessage = self.constructMessage(text: "[\(event.from ?? "")] \("Create".chat.localize) \("Topic".chat.localize): \(topicName)", type: .alert,extensionInfo: ["threadId":event.chatThread.threadId ?? "","threadName":topicName,"messageId":event.chatThread.messageId ?? "","parentId":event.chatThread.parentId ?? ""]) {
                         self.driver?.showMessage(message: alertMessage)
                     }
                 }
@@ -779,6 +840,20 @@ extension MessageListViewModel: GroupChatThreadEventListener {
             default:
                 break
             }
+        }
+    }
+    
+    public func onAttributesChangedOfGroupMember(groupId: String, userId: String, operatorId: String, attributes: Dictionary<String, String>) {
+        if userId != EaseChatUIKitContext.shared?.currentUserId ?? "" {
+            ChatClient.shared().chatManager?.getConversationWithConvId(groupId)?.loadMessages(withKeyword: "", timestamp: Int64(Date().timeIntervalSince1970*1000), count: 1, fromUser: userId, searchDirection: .up, scope: .content, completion: { messages, error in
+                if error === nil,let message = messages?.first {
+                    message.ext?["remark"] = attributes["nickName"]
+                    ChatClient.shared().chatManager?.update(message)
+                    EaseChatUIKitContext.shared?.chatCache?[userId]?.remark = attributes["nickName"] ?? userId
+                } else {
+                    consoleLogInfo("onAttributesChangedOfGroupMember loadMessages user:\(userId)'s latest message error:\(error?.errorDescription ?? "")", type: .error)
+                }
+            })
         }
     }
 

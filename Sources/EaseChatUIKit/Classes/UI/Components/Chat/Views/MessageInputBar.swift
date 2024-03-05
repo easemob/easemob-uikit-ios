@@ -102,9 +102,9 @@ import UIKit
     ///   - text: `String` value
     ///   - placeHolder: `String` value
     @objc required public init(frame: CGRect,text: String? = nil,placeHolder: String? = nil) {
+        self.rawFrame = frame
         self.rawHeight = frame.height
         self.rawTextHeight = self.rawHeight-16
-        self.rawFrame = frame
         super.init(frame: frame)
         self.addSubViews([self.audio,self.inputField, self.rightView,self.attachment,self.line])
         self.rightView.setImage(UIImage(named: "emojiKeyboard", in: Bundle.chatBundle, with: nil)?.withTintColor(UIColor.theme.neutralColor3), for: .normal)
@@ -131,7 +131,7 @@ import UIKit
         
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
-        
+        self.backgroundColor = .orange
     }
     
     deinit {
@@ -183,6 +183,8 @@ extension MessageInputBar: UITextViewDelegate {
                             }
                         }
                     }
+                    
+                    self.updateHeight()
                     return !mention
                 }
                 if self.typingAttributesText.isEmpty,!textView.typingAttributes.isEmpty {
@@ -235,8 +237,8 @@ extension MessageInputBar: UITextViewDelegate {
     
     /// Update subviews height on text input content changed.
     private func updateHeight() {
-        let textHeight = self.inputField.sizeThatFits(CGSize(width: self.inputField.frame.width, height: 9999)).height
-        if textHeight >= self.rawTextHeight {
+        let textHeight = self.inputField.sizeThatFits(CGSize(width: self.inputField.frame.width-12, height: 9999)).height
+        if textHeight > 38 {
             let increment = textHeight - self.rawTextHeight
             self.rawTextHeight += increment
             self.rawHeight = self.rawTextHeight + 16
@@ -245,8 +247,8 @@ extension MessageInputBar: UITextViewDelegate {
                 self.frame = CGRect(x: 0, y: ScreenHeight - NavigationHeight - (Appearance.chat.maxInputHeight+16) - self.keyboardHeight, width: self.frame.width, height: Appearance.chat.maxInputHeight+16)
                 self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: Appearance.chat.maxInputHeight)
             } else {
-                self.frame = CGRect(x: 0, y: ScreenHeight - NavigationHeight - self.rawHeight - self.keyboardHeight, width: self.frame.width, height: self.rawHeight)
-                self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: self.rawTextHeight)
+                self.frame = CGRect(x: 0, y: ScreenHeight - NavigationHeight - self.rawHeight - self.keyboardHeight, width: self.frame.width, height: textHeight+16)
+                self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: textHeight+4)
             }
             
             self.audio.frame = CGRect(x: 12, y: self.inputField.frame.maxY-32, width: 30, height: 30)
@@ -254,6 +256,12 @@ extension MessageInputBar: UITextViewDelegate {
             self.attachment.frame = CGRect(x: self.frame.width - 42, y: self.inputField.frame.maxY-32, width: 30, height: 30)
             self.emoji?.frame = CGRect(x: 0, y: self.inputField.frame.maxY+8, width: self.frame.width, height: self.keyboardHeight)
             self.emoji?.backgroundColor(self.backgroundColor ?? UIColor.theme.neutralColor98)
+        } else {
+            self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: 36)
+            self.audio.frame = CGRect(x: 12, y: self.inputField.frame.maxY-32, width: 30, height: 30)
+            self.rightView.frame = CGRect(x: self.frame.width-80, y: self.inputField.frame.maxY-32, width: 30, height: 30)
+            self.attachment.frame = CGRect(x: self.frame.width - 42, y: self.inputField.frame.maxY-32, width: 30, height: 30)
+            self.frame = CGRect(x: 0, y: ScreenHeight - NavigationHeight - self.rawFrame.height - self.keyboardHeight, width: self.frame.width, height: self.rawFrame.height)
         }
     }
     

@@ -25,7 +25,7 @@ import UIKit
     }()
     
     public private(set) lazy var action: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: 72, y: self.nickName.frame.minY, width: 60, height: 18)).font(UIFont.theme.labelMedium).cornerRadius(Appearance.avatarRadius).textColor(UIColor.theme.neutralColor1, .normal).backgroundColor(UIColor.theme.neutralColor95).title("Send".chat.localize, .normal).title("Sent".chat.localize, .disabled)
+        UIButton(type: .custom).frame(CGRect(x: 72, y: self.nickName.frame.minY, width: 60, height: 18)).font(UIFont.theme.labelMedium).cornerRadius(Appearance.avatarRadius).textColor(UIColor.theme.neutralColor1, .normal).backgroundColor(UIColor.theme.neutralColor95).title("Send".chat.localize, .normal).title("Sent".chat.localize, .disabled).addTargetFor(self, action: #selector(actionClick), for: .touchUpInside)
     }()
     
     public private(set) lazy var separateLine: UIView = {

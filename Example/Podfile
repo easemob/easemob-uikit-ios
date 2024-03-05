@@ -4,8 +4,6 @@ platform :ios, '13.0'
 
 target 'EaseChatUIKit_Example' do
   pod 'EaseChatUIKit', :path => '../'
-  
-  pod 'KakaJSON', '~> 1.1.2' 
   post_install do |installer|
     installer.generated_projects.each do |project|
       project.targets.each do |target|

@@ -1,4 +1,5 @@
-"Sent "="Sent ";
+"Sent" = "Sent";
+"Send" = "Send";
 "Joined"="Joined";
 "Added"="Added";
 
@@ -184,3 +185,6 @@
 "thread_name" = "Thread Name";
 "topic_members" = "Thread Members";
 " messages" = " messages";
+"AudioCall" = "Call";
+"VideoCall" = "Video";
+"SearchMessages" = "Search";

@@ -115,7 +115,7 @@ extension MessageEditor: ThemeSwitchProtocol {
         if style == .dark {
             self.statusImage?.withTintColor(UIColor.theme.neutralSpecialColor6)
         }
-        self.done.image(UIImage(named: "uncheck", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.neutralColor4:UIColor.theme.neutralColor7, renderingMode: .alwaysOriginal), .normal).image(UIImage(named: "check", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5), .selected)
+        self.done.image(UIImage(named: "uncheck", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.neutralColor4:UIColor.theme.neutralColor7, renderingMode: .alwaysOriginal), .disabled).image(UIImage(named: "check", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5), .normal)
         self.statusView.setImage(self.statusImage, for: .normal)
     }
 }

@@ -42,7 +42,7 @@ import UIKit
     open override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        self.contentEditor.contentInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
+        self.contentEditor.contentInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
         self.contentEditor.placeHolderColor = Theme.style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor6
         let content = self.titleForHeader()
         self.contentEditor.placeHolder = "Please input".chat.localize
@@ -80,12 +80,12 @@ import UIKit
     }
     
     private func textLimit() -> Int {
-        var limitCount = 128
+        var limitCount = 64
         switch self.editType {
         case .name,.threadName:
-            limitCount = 64
+            limitCount = 32
         case .description,.announcement:
-            limitCount = 512
+            limitCount = 256
         default:
             break
         }

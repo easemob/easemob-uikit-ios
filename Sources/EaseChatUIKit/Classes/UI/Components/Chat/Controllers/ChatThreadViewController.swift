@@ -78,9 +78,7 @@ import AVFoundation
         self.profile = chatThread
         self.parentMessage = ChatClient.shared().chatManager?.getMessageWithMessageId(parentMessageId)
         super.init(nibName: nil, bundle: nil)
-        if self.profile.threadName.isEmpty || self.profile.threadId.isEmpty {
-            self.requestChatThreadDetail()
-        }
+        self.requestChatThreadDetail()
     }
     
     required public init?(coder: NSCoder) {
@@ -109,17 +107,13 @@ import AVFoundation
         self.view.backgroundColor = UIColor.theme.neutralColor98
         self.view.addSubViews([self.messageContainer,self.navigation])
         self.setupTitle()
-        if self.parentMessage != nil {
-            self.messageContainer.messageList.tableHeaderView = self.messageHeader
-        }
+//        if self.parentMessage != nil {
+//            self.messageContainer.messageList.tableHeaderView = self.messageHeader
+//        }
         self.navigation.clickClosure = { [weak self] in
             self?.navigationClick(type: $0, indexPath: $1)
         }
-        self.viewModel.bindDriver(driver: self.messageContainer, create: self.firstMessage != nil)
-        self.viewModel.addEventsListener(self)
-        if let firstMessage = self.firstMessage {
-            self.viewModel.sendFirstMessage(message: firstMessage)
-        }
+        
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
         self.view.addSubview(self.loadingView)
@@ -141,6 +135,11 @@ import AVFoundation
                 self.entity = self.createEntity()
                 if self.parentMessage != nil {
                     self.messageContainer.messageList.tableHeaderView = self.messageHeader
+                }
+                self.viewModel.bindDriver(driver: self.messageContainer, create: self.firstMessage != nil)
+                self.viewModel.addEventsListener(self)
+                if let firstMessage = self.firstMessage {
+                    self.viewModel.sendFirstMessage(message: firstMessage)
                 }
                 self.messageHeader.reloadData()
                 if let group = ChatGroup(id: chatThread.parentId) {
@@ -165,8 +164,8 @@ extension ChatThreadViewController {
     
     open func messageHeight() -> CGFloat {
         var height = CGFloat(0)
-        if self.firstMessage?.body.type == .text || self.firstMessage?.body.type == .image || self.firstMessage?.body.type == .video {
-            height = self.entity.bubbleSize.height+(self.firstMessage?.body.type != .text ? 40:35)
+        if self.parentMessage?.body.type == .text || self.parentMessage?.body.type == .image || self.parentMessage?.body.type == .video {
+            height = self.entity.bubbleSize.height+(self.parentMessage?.body.type != .text ? 40:35)
         } else {
             height = 62
         }
@@ -184,6 +183,9 @@ extension ChatThreadViewController {
         switch type {
         case .back: self.pop()
         case .rightItems: self.rightItemsAction(indexPath: indexPath)
+        case .cancel:
+            self.navigation.editMode = false
+            self.messageContainer.editMode = false
         default:
             break
         }
@@ -266,8 +268,10 @@ extension ChatThreadViewController {
 
 //MARK: - MessageListDriverEventsListener
 extension ChatThreadViewController: MessageListDriverEventsListener {
+    
     public func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation) {
         self.messageContainer.editMode = false
+        self.navigation.editMode = false
         let messages = self.filterSelectedMessages()
         switch operation {
         case .delete:
@@ -278,7 +282,12 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
         }
     }
     
-    open func forwardMessages(messages: [ChatMessage]) {
+    @objc open func forwardMessage(message: ChatMessage) {
+        let vc = ForwardTargetViewController(messages: [message], combine: false)
+        self.present(vc, animated: true)
+    }
+    
+    @objc open func forwardMessages(messages: [ChatMessage]) {
         if messages.isEmpty {
             self.showToast(toast: "Please select a message to forward.")
             return
@@ -287,7 +296,7 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
         self.present(vc, animated: true)
     }
     
-    open func deleteMessages(messages: [ChatMessage]) {
+    @objc open func deleteMessages(messages: [ChatMessage]) {
         if messages.isEmpty {
             self.showToast(toast: "Please select a message to delete.")
             return
@@ -443,12 +452,22 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
             self.viewModel.processMessage(operation: .delete, message: message)
         case "Report":
             self.reportAction(message: message)
+        case "MultiSelect":
+            self.multiSelect(message: message)
+        case "Forward":
+            self.forwardMessage(message: message)
         default:
             item.action?(item,message)
             break
         }
     }
     
+    @objc open func multiSelect(message: ChatMessage) {
+        self.messageContainer.messages.first { $0.message.messageId == message.messageId }?.selected = true
+        self.messageContainer.editMode = true
+        self.navigation.editMode = true
+        self.messageContainer.messageList.reloadData()
+    }
     /**
      Opens the message editor for editing a chat message.
      
@@ -657,11 +676,6 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
     
     /**
      Selects a contact and shares their information.
-     
-     - Parameters:
-     - None
-     
-     - Returns: None
      */
     @objc open func selectContact() {
         let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .shareContact,provider: nil)

@@ -14,7 +14,7 @@ import UIKit
     public private(set) var messages = [MessageEntity]()
     
     @objc open func createNavigation() -> EaseChatNavigationBar {
-        EaseChatNavigationBar(showLeftItem: true,textAlignment: .left,rightImages: [UIImage(named: "message_select_bottom_forward", in: .chatBundle, with: nil)!],hiddenAvatar: true)
+        EaseChatNavigationBar(showLeftItem: true,textAlignment: .left,rightImages: [],hiddenAvatar: true)
     }
     
     public private(set) lazy var navigation: EaseChatNavigationBar = {

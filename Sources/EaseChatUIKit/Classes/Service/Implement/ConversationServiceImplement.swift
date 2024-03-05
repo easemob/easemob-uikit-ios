@@ -378,20 +378,30 @@ extension ConversationServiceImplement: ChatEventsListener {
     }
     
     public func onConversationRead(_ from: String, to: String) {
-        if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(to) {
-            conversation.markAllMessages(asRead: nil)
-            if let info = self.mapper(objects: [conversation]).first{
-                info.unreadCount = 0
-                for listener in self.responseDelegates.allObjects {
-                    listener.onConversationMessageAlreadyReadOnOtherDevice(info: info)
-                }
-                
-                for handler in self.eventsNotifiers.allObjects {
-                    handler.onResult(error: nil, type: .read)
+        if from == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+            if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(to) {
+                self.onConversationReadCallback(conversation: conversation)
+            } else {
+                if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(from) {
+                    self.onConversationReadCallback(conversation: conversation)
                 }
             }
         }
         
+    }
+    
+    @objc open func onConversationReadCallback(conversation: ChatConversation ) {
+        conversation.markAllMessages(asRead: nil)
+        if let info = self.mapper(objects: [conversation]).first{
+            info.unreadCount = 0
+            for listener in self.responseDelegates.allObjects {
+                listener.onConversationMessageAlreadyReadOnOtherDevice(info: info)
+            }
+            
+            for handler in self.eventsNotifiers.allObjects {
+                handler.onResult(error: nil, type: .read)
+            }
+        }
     }
 
 }

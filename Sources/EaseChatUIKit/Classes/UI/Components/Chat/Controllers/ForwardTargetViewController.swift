@@ -227,8 +227,19 @@ extension ForwardTargetViewController: UITableViewDelegate,UITableViewDataSource
     }
     
     @objc open func forwardMessages(indexPath: IndexPath) {
-        let body = ChatCombineMessageBody(title: "Chat History".chat.localize, summary: self.forwardSummary(), compatibleText: "[Chat History]", messageIdList: self.messages.map({ $0.messageId }))
-        let message =  ChatMessage(conversationID: "", body: body, ext: nil)
+        var body = self.messages.first?.body ?? ChatMessageBody()
+        if self.combineForward {
+            body = ChatCombineMessageBody(title: "Chat History".chat.localize, summary: self.forwardSummary(), compatibleText: "[Chat History]", messageIdList: self.messages.map({ $0.messageId }))
+        }
+        
+        var conversationId = ""
+        if self.searchMode {
+            conversationId = self.searchResults[indexPath.row].id
+        } else {
+            conversationId = self.datas[indexPath.row].id
+        }
+        let message =  ChatMessage(conversationID: conversationId, body: body, ext: EaseChatUIKitContext.shared?.currentUser?.toJsonObject())
+        message.chatType = self.index == 0 ? .chat:.groupChat
         ChatClient.shared().chatManager?.send(message, progress: nil, completion: { [weak self] successMessage, error in
             guard let `self` = self else { return }
             if error == nil {

@@ -53,15 +53,19 @@ import UIKit
         if create == false {
             self.loadMessages()
         } else {
-            let id = self.chatThread?.owner ?? ""
-            let nickname = EaseChatUIKitContext.shared?.chatCache?[id]?.nickname ?? id
-            if let createMessage = self.constructMessage(text: "\(nickname)"+"CreateThreadAlert".chat.localize, type: .alert) {
-                var threadMessages = [ChatMessage]()
-                createMessage.localTime = Int64(self.chatThread?.createAt ?? Int(Date().timeIntervalSince1970))
-                createMessage.timestamp = Int64(self.chatThread?.createAt ?? Int(Date().timeIntervalSince1970))
-                threadMessages.insert(createMessage, at: 0)
-                self.driver?.refreshMessages(messages: threadMessages)
-            }
+            self.threadCreateAlert()
+        }
+    }
+    
+    @objc open func threadCreateAlert() {
+        let id = self.chatThread?.owner ?? ""
+        let nickname = EaseChatUIKitContext.shared?.chatCache?[id]?.nickname ?? id
+        if let createMessage = self.constructMessage(text: "\(nickname)"+"CreateThreadAlert".chat.localize, type: .alert) {
+            var threadMessages = self.driver?.dataSource ?? []
+            createMessage.localTime = Int64(self.chatThread?.createAt ?? Int(Date().timeIntervalSince1970))
+            createMessage.timestamp = Int64(self.chatThread?.createAt ?? Int(Date().timeIntervalSince1970))
+            threadMessages.insert(createMessage, at: 0)
+            self.driver?.refreshMessages(messages: threadMessages)
         }
     }
     
@@ -93,9 +97,13 @@ import UIKit
     }
     
     @objc open func loadMessages() {
-        self.chatService?.fetchChatThreadHistoryMessages(conversationId: self.to, start: self.driver?.firstMessageId ?? "", pageSize: 10, completion: { [weak self] error, messages in
+        let firstMessageId = self.driver?.dataSource.last?.messageId ?? ""
+        self.chatService?.fetchChatThreadHistoryMessages(conversationId: self.to, start: firstMessageId, pageSize: 15, completion: { [weak self] error, messages in
             if error == nil {
                 self?.driver?.refreshMessages(messages: messages)
+                if firstMessageId.isEmpty {
+                    self?.threadCreateAlert()
+                }
             } else {
                 consoleLogInfo("chat thread loadMessages error:\(error?.errorDescription ?? "")", type: .error)
             }
@@ -285,8 +293,13 @@ import UIKit
     }
     
     @objc open func deleteMessage(message: ChatMessage) {
-        self.driver?.processMessage(operation: .delete, message: message)
-        self.chatService?.removeLocalMessage(messageId: message.messageId)
+        ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.removeMessages(fromServerMessageIds: [message.messageId], completion: { [weak self] error in
+            if error != nil {
+                consoleLogInfo("delete message error:\(error?.errorDescription ?? "")", type: .error)
+            } else {
+                self?.driver?.processMessage(operation: .delete, message: message)
+            }
+        })
     }
     
     open func operationTopic(option: ChatTopicOptions,completion: @escaping (Bool) -> Void) {
@@ -315,18 +328,31 @@ import UIKit
     }
     
     open func deleteMessages(messages: [ChatMessage]) {
-        //Thread 需要多选删除吗？是否删除服务端的？
+        
         if var dataSource = self.driver?.dataSource {
-            for message in messages {
-                dataSource.removeAll(where: { $0.messageId == message.messageId })
-            }
-//            self.chatService.
+            var deleteIds = messages.map { $0.messageId }
+            ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.removeMessages(fromServerMessageIds: deleteIds, completion: { [weak self] error in
+                if error == nil {
+                    for message in messages {
+                        dataSource.removeAll(where: { $0.messageId == message.messageId })
+                    }
+                    self?.driver?.refreshMessages(messages: dataSource)
+                } else {
+                    consoleLogInfo("delete topic messages error:\(error?.errorDescription ?? "")", type: .error)
+                }
+            })
             self.driver?.refreshMessages(messages: dataSource)
         }
     }
 }
 
 extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
+    
+    public func onMoreMessagesClicked() {
+        ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.markAllMessages(asRead: nil)
+//        ChatClient.shared().chatManager?.ackConversationRead(self.to)
+    }
+    
     public func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation) {
         for handler in self.handlers.allObjects {
             handler.onMessageMultiSelectBarClicked(operation: operation)
@@ -377,9 +403,16 @@ extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
     
     @objc open func messageVisibleMark(entity: MessageEntity) {
         let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)
-        conversation?.markMessageAsRead(withId: entity.message.messageId, error: nil)
-        if conversation?.type ?? .chat == .chat {
-            ChatClient.shared().chatManager?.sendMessageReadAck(entity.message.messageId, toUser: self.to)
+        if !entity.message.isRead {
+            if conversation?.type ?? .chat == .chat {
+                switch entity.message.body.type {
+                case .text,.location,.custom,.image:
+                    conversation?.markMessageAsRead(withId: entity.message.messageId, error: nil)
+//                    ChatClient.shared().chatManager?.sendMessageReadAck(entity.message.messageId, toUser: self.to)
+                default:
+                    break
+                }
+            }
         }
     }
     
@@ -617,16 +650,18 @@ extension ChatThreadViewModel: ChatResponseListener {
         if message.conversationId == self.to {
             let entity = message
             entity.direction = message.direction
-            let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)
-            conversation?.markMessageAsRead(withId: message.messageId, error: nil)
-            if conversation?.type ?? .chat == .chat {
-                switch message.body.type {
-                case .text,.location,.custom,.image:
-                    ChatClient.shared().chatManager?.sendMessageReadAck(message.messageId, toUser: self.to)
-                default:
-                    break
-                }
-            }
+//            if let scrolledBottom = self.driver?.scrolledBottom,scrolledBottom {
+//                let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)
+//                conversation?.markMessageAsRead(withId: message.messageId, error: nil)
+//                if conversation?.type ?? .chat == .chat {
+//                    switch message.body.type {
+//                    case .text,.location,.custom,.image:
+//                        ChatClient.shared().chatManager?.sendMessageReadAck(message.messageId, toUser: self.to)
+//                    default:
+//                        break
+//                    }
+//                }
+//            }
             self.driver?.showMessage(message: entity)
         }
     }

@@ -142,20 +142,11 @@ extension ChatThreadParticipantsController: UITableViewDelegate,UITableViewDataS
                 }
             }
         }
+
         if !unknownInfoIds.isEmpty {
-            if EaseChatUIKitContext.shared?.groupMemberAttributeCache?.provider == nil,EaseChatUIKitContext.shared?.groupMemberAttributeCache?.providerOC == nil {
-                EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheValue(groupId: self.profile.parentId, userIds: unknownInfoIds, key: "nickName") { [weak self] error, values in
-                    if error == nil,let values = values {
-                        self?.processCacheInfos(values: values)
-                    }
-                }
-            } else {
-                if EaseChatUIKitContext.shared?.groupMemberAttributeCache?.provider != nil {
-                    self.processCacheProfiles(values: EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheProfile(groupId: self.profile.parentId, userIds: unknownInfoIds) ?? [])
-                } else {
-                    EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheProfileOC(groupId: self.profile.parentId, userIds: unknownInfoIds) { [weak self] profiles in
-                        self?.processCacheProfiles(values: profiles)
-                    }
+            EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheValue(groupId: self.profile.parentId, userIds: unknownInfoIds, key: "nickName") { [weak self] error, values in
+                if error == nil,let values = values {
+                    self?.processCacheInfos(values: values)
                 }
             }
         }
@@ -186,7 +177,7 @@ extension ChatThreadParticipantsController: UITableViewDelegate,UITableViewDataS
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        DialogManager.shared.showActions(actions: [ActionSheetItem(title: "Remove Member", type: .destructive, tag: "RemoveMember")]) { [weak self] item in
+        DialogManager.shared.showActions(actions: [ActionSheetItem(title: "remove_participants".chat.localize, type: .destructive, tag: "RemoveMember")]) { [weak self] item in
             if item.tag == "RemoveMember" {
                 self?.removeMember(user: self?.participants[safe: indexPath.row] ?? EaseProfile())
             }

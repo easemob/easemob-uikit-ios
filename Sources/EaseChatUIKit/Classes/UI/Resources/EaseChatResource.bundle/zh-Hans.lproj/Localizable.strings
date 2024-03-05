@@ -1,4 +1,5 @@
 "Send"="发送";
+"Sent" = "已发送";
 "Joined"="已加入";
 "Search" = "搜索";
 "Added"="添加了";
@@ -87,7 +88,7 @@
 "new_chat_button_click_menu_creategroup" = "创建群组";
 "new_chat_button_click_menu_selectcontacts" = "发起会话";
 
-"remove_participants" = "删除群成员";
+"remove_participants" = "删除成员";
 "group_delete_members_alert" = "你确定删除这";
 "group members" = "群成员";
 "group_details_button_members" = "群成员";
@@ -185,3 +186,6 @@
 "thread_name" = "话题名称";
 "topic_members" = "话题成员";
 " messages" = "条消息";
+"AudioCall" = "音频通话";
+"VideoCall" = "视频通话";
+"SearchMessages" = "搜索消息";

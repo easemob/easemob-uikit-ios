@@ -16,6 +16,7 @@ import Foundation
 /// Profile of the EaseChatUIKit display needed.
 @objc public protocol EaseProfileProtocol: NSObjectProtocol {
     var id: String {set get}
+    var remark: String {set get}
     var selected: Bool {set get}
     var nickname: String {set get}
     var avatarURL: String {set get}
@@ -24,8 +25,10 @@ import Foundation
 }
 
 @objcMembers open class EaseProfile:NSObject, EaseProfileProtocol {
+    public var remark: String = ""
+    
     public func toJsonObject() -> Dictionary<String, Any>? {
-        ["ease_chat_uikit_info":["nickname":self.nickname,"avatarURL":self.avatarURL,"userId":self.id]]
+        ["ease_chat_uikit_info":["nickname":self.nickname,"avatarURL":self.avatarURL,"userId":self.id,"remark":self.remark]]
     }
     
     

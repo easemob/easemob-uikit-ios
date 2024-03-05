@@ -1,5 +1,11 @@
 import UIKit
 
+@objc public enum MoreMessagePosition: UInt {
+    case left
+    case center
+    case right
+}
+
 @objc public enum MessageOperation: UInt {
     case copy
     case edit
@@ -66,15 +72,23 @@ import UIKit
     ///   - operation: ``MessageMultiSelectedBottomBarOperation``
     func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation)
     
+    /// More messages button clicked.
+    func onMoreMessagesClicked()
+    
 }
 
 @objc public protocol IMessageListViewDriver: NSObjectProtocol {
     
+    /// Latest message id.
     var firstMessageId: String {get}
     
+    /// Reply message id.
     var replyMessageId: String {get}
     
     var dataSource: [ChatMessage] {get}
+    
+    /// Whether scroll view is scrolled to bottom.
+    var scrolledBottom: Bool {get}
     
     /// Add action events listener of ``MessageListView``.
     /// - Parameter actionHandler: The object of conform ``MessageListViewActionEventsDelegate``.
@@ -132,6 +146,10 @@ import UIKit
     /// Reload reaction content.
     /// - Parameter message: ``ChatMessage``
     func reloadReaction(message: ChatMessage)
+    
+    /// Update state on chat thread load messages finished.
+    /// - Parameter finished: Bool
+    func updateThreadLoadMessagesFinished(finished: Bool)
 }
 
 
@@ -192,6 +210,39 @@ import UIKit
         MessageInputReplyView(frame: CGRect(x: 0, y: self.inputBar.frame.minY-52, width: self.frame.width, height: 53))
     }()
     
+    private var moreMessagesCount = 0  {
+        willSet {
+            DispatchQueue.main.async {
+                self.moreMessages.isHidden = newValue <= 0
+                if self.replyBar.isHidden  {
+                    self.moreMessages.frame = CGRect(x: self.moreMessageAxisX, y: self.inputBar.frame.minY-44, width: 180, height: 36)
+                } else {
+                    self.moreMessages.frame = CGRect(x: self.moreMessageAxisX, y: self.replyBar.frame.minY-44, width: 180, height: 36)
+                }
+            }
+            
+        }
+    }
+    
+    public private(set) lazy var moreMessages: UIButton = {
+        UIButton(type: .custom).frame(CGRect(x: self.moreMessageAxisX, y: self.inputBar.frame.minY-44, width: 180, height: 36)).font(UIFont.theme.labelMedium).title("    \(self.moreMessagesCount) "+"new messages".chat.localize, .normal).addTargetFor(self, action: #selector(scrollTableViewToBottom), for: .touchUpInside)
+    }()
+    
+    public private(set) var historyResult = false
+    
+    /// More messages button `X` position.
+    private var moreMessageAxisX: CGFloat {
+        switch Appearance.chat.moreMessageAlertPosition {
+        case .left:
+            return 12
+        case .center:
+            return (self.frame.width-180)/2.0
+        case .right:
+            return self.frame.width-192
+        }
+    }
+    
+    public private(set) var threadMessagesLoadFinished = false
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -201,28 +252,59 @@ import UIKit
     /// - Parameters:
     ///   - frame: ``CGRect``
     ///   - mention: Whether to enable the mention function of UI.
-    @objc required public init(frame: CGRect,mention: Bool) {
+    ///   - historyResult: Whether to enable the history result.
+    @objc required public init(frame: CGRect,mention: Bool,historyResult: Bool = false) {
         super.init(frame: frame)
         self.oldFrame = frame
         self.canMention = mention
+        self.historyResult = historyResult
         self.messageList.keyboardDismissMode = .onDrag
         self.messageList.allowsSelection = false
         if Appearance.chat.contentStyle.contains(.withReply) {
-            self.addSubViews([self.messageList,self.inputBar,self.replyBar,self.editBottomBar])
+            if !historyResult {
+                self.addSubViews([self.messageList,self.inputBar,self.replyBar,self.moreMessages,self.editBottomBar])
+            } else {
+                self.addSubViews([self.messageList,self.inputBar,self.replyBar,self.editBottomBar])
+            }
         } else {
-            self.addSubViews([self.messageList,self.inputBar,self.editBottomBar])
+            if !historyResult {
+                self.addSubViews([self.messageList,self.inputBar,self.moreMessages,self.editBottomBar])
+            } else {
+                self.addSubViews([self.messageList,self.inputBar,self.editBottomBar])
+            }
         }
+        self.moreMessages.isHidden = true
         self.editBottomBar.isHidden = true
         self.messageList.refreshControl = UIRefreshControl()
         self.messageList.refreshControl?.addTarget(self, action: #selector(pullRefresh), for: .valueChanged)
         self.replyBar.isHidden = true
         self.inputBarEvents()
         Theme.registerSwitchThemeViews(view: self)
+        self.switchTheme(style: Theme.style)
+        
+        self.moreMessages.layer.cornerRadius = CGFloat(Appearance.avatarRadius.rawValue)
+        self.moreMessages.layer.masksToBounds = false
+        let shadowPath0 = UIBezierPath(roundedRect: self.moreMessages.bounds, cornerRadius: 4)
+        let layer0 = CALayer()
+        layer0.shadowPath = shadowPath0.cgPath
+        layer0.shadowColor = UIColor(red: 0.275, green: 0.306, blue: 0.325, alpha: 0.15).cgColor
+        layer0.shadowOpacity = 1
+        layer0.shadowRadius = 8
+        layer0.shadowOffset = CGSize(width: 2, height: 4)
+        layer0.bounds = self.moreMessages.bounds
+        layer0.position = self.moreMessages.center
+        self.moreMessages.layer.addSublayer(layer0)
+        
         self.inputBar.axisYChanged = { [weak self] value in
             guard let `self` = self else { return }
             DispatchQueue.main.async {
                 UIView.animate(withDuration: 0.22) {
                     self.replyBar.frame = CGRect(x: 0, y: self.inputBar.frame.minY-52, width: self.frame.width, height: 53)
+                    if self.replyBar.isHidden  {
+                        self.moreMessages.frame = CGRect(x: self.moreMessageAxisX, y: self.inputBar.frame.minY-44, width: 180, height: 36)
+                    } else {
+                        self.moreMessages.frame = CGRect(x: self.moreMessageAxisX, y: self.replyBar.frame.minY-44, width: 180, height: 36)
+                    }
                 }
             }
         }
@@ -297,11 +379,32 @@ import UIKit
         }
     }
     
+    @objc public func scrollTableViewToBottom() {
+        if !self.threadMessagesLoadFinished {
+            return
+        }
+        self.moreMessagesCount = 0
+        self.inputBar.hiddenInput()
+        for handler in self.eventHandlers.allObjects {
+            handler.onMoreMessagesClicked()
+        }
+        if self.messages.count  > 1 {
+            self.messageList.reloadData()
+            let lastIndexPath = IndexPath(row: self.messageList.numberOfRows(inSection: 0) - 1, section: 0)
+            if lastIndexPath.row >= 0 {
+                self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
+            }
+        }
+    }
     
 }
 
 extension MessageListView: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
+        self.moreMessages.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
+        self.moreMessages.layerProperties(style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9, 0.5)
+        self.moreMessages.setTitleColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, for: .normal)
+        self.moreMessages.image(UIImage(named: "more_messages", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5), .normal)
         self.messageList.reloadData()
     }
     
@@ -339,18 +442,16 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
         return cell ?? MessageCell()
     }
     
-    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        if let entity = self.messages[safe: indexPath.row],self.editMode {
-            entity.selected = !entity.selected
-            tableView.reloadData()
-        }
-    }
-    
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         for listener in self.eventHandlers.allObjects {
             if let entity = self.messages[safe: indexPath.row] {
                 listener.onMessageVisible(entity: entity)
+            }
+        }
+        if indexPath.row == self.messages.count - 1 {
+            self.moreMessagesCount = 0
+            for handler in self.eventHandlers.allObjects {
+                handler.onMoreMessagesClicked()
             }
         }
     }
@@ -453,7 +554,9 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
     private func handleClick(area: MessageCellClickArea,entity: MessageEntity) {
         if self.editMode {
             entity.selected = !entity.selected
-            self.messageList.reloadData()
+            if let idx = self.messages.firstIndex(where: { $0.message.messageId == entity.message.messageId }) {
+                (self.messageList.cellForRow(at: IndexPath(row: idx, section: 0)) as? MessageCell)?.renderCheck(entity: entity)
+            }
             return
         }
         switch area {
@@ -530,6 +633,8 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
             for handler in self.eventHandlers.allObjects {
                 handler.onMessageReactionClicked(reaction: nil, entity: entity)
             }
+        default:
+            break
         }
         
     }
@@ -578,6 +683,15 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
 }
 
 extension MessageListView: IMessageListViewDriver {
+    public func updateThreadLoadMessagesFinished(finished: Bool) {
+        self.threadMessagesLoadFinished = finished
+    }
+    
+    
+    public var scrolledBottom: Bool {
+        (self.messageList.indexPathsForVisibleRows?.contains(IndexPath(row: self.messages.count-1, section: 0))) ?? false
+    }
+    
     
     public var dataSource: [ChatMessage] {
         self.messages.map { $0.message }
@@ -619,7 +733,6 @@ extension MessageListView: IMessageListViewDriver {
         }
     }
     
-    
     public func updateGroupMessageChatThreadChanged(message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }),let entity = self.messages[safe: index] {
@@ -642,12 +755,6 @@ extension MessageListView: IMessageListViewDriver {
             self.convertMessage(message: $0)
         }), at: 0)
         self.messageList.reloadData()
-        if self.messages.count > 1 {
-            let indexPath = IndexPath(row: 1, section: 0)
-            if indexPath.row >= 0 {
-                self.messageList.scrollToRow(at: indexPath, at: .bottom, animated: true)
-            }
-        }
     }
     
     
@@ -661,10 +768,18 @@ extension MessageListView: IMessageListViewDriver {
             self.convertMessage(message: $0)
         })
         self.messageList.reloadData()
+        if !self.threadMessagesLoadFinished {
+            return
+        }
         if self.messages.count > 1 {
-            let lastIndexPath = IndexPath(row: self.messageList.numberOfRows(inSection: 0) - 1, section: 0)
-            if lastIndexPath.row >= 0 {
-                self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
+            if self.historyResult {
+                let firstIndexPath = IndexPath(row: self.messageList.numberOfRows(inSection: 0), section: 0)
+                self.messageList.scrollToRow(at: firstIndexPath, at: .bottom, animated: true)
+            } else {
+                let lastIndexPath = IndexPath(row: self.messageList.numberOfRows(inSection: 0) - 1, section: 0)
+                if lastIndexPath.row >= 0 {
+                    self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
+                }
             }
         }
     }
@@ -748,6 +863,9 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     public func showMessage(message: ChatMessage) {
+        if !self.threadMessagesLoadFinished {
+            return
+        }
         if message.direction == .send {
             self.replyId = ""
         }
@@ -758,10 +876,26 @@ extension MessageListView: IMessageListViewDriver {
         self.messages.append(self.convertMessage(message: message))
         self.messageList.reloadData()
         if self.messages.count > 1 {
-            let lastIndexPath = IndexPath(row: self.messageList.numberOfRows(inSection: 0) - 1, section: 0)
-            if lastIndexPath.row > 0 {
-                self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
+            if message.direction == .send {
+                let lastIndexPath = IndexPath(row: self.messageList.numberOfRows(inSection: 0) - 1, section: 0)
+                if lastIndexPath.row > 0 {
+                    self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
+                }
+                for handler in self.eventHandlers.allObjects {
+                    handler.onMoreMessagesClicked()
+                }
+            } else {
+                if self.scrolledBottom {
+                    let lastIndexPath = IndexPath(row: self.messageList.numberOfRows(inSection: 0) - 1, section: 0)
+                    if lastIndexPath.row > 0 {
+                        self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
+                    }
+                } else {
+                    self.moreMessagesCount += 1
+                    self.moreMessages.setTitle("\(self.moreMessagesCount) "+"new messages".chat.localize, for: .normal)
+                }
             }
+            
         }
     }
     
@@ -778,8 +912,7 @@ extension MessageListView: IMessageListViewDriver {
         case .recall: self.recallAction(message)
         case .translate: self.translateAction(message)
         case .originalText: self.showOriginalTextAction(message)
-        default:
-            break
+        default:  break
         }
     }
     

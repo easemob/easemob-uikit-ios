@@ -282,19 +282,9 @@ extension GroupParticipantsController: UITableViewDelegate,UITableViewDataSource
             }
         }
         if !unknownInfoIds.isEmpty {
-            if EaseChatUIKitContext.shared?.groupMemberAttributeCache?.provider == nil,EaseChatUIKitContext.shared?.groupMemberAttributeCache?.providerOC == nil {
-                EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheValue(groupId: self.chatGroup.groupId, userIds: unknownInfoIds, key: "nickName") { [weak self] error, values in
-                    if error == nil,let values = values {
-                        self?.processCacheInfos(values: values)
-                    }
-                }
-            } else {
-                if EaseChatUIKitContext.shared?.groupMemberAttributeCache?.provider != nil {
-                    self.processCacheProfiles(values: EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheProfile(groupId: self.chatGroup.groupId, userIds: unknownInfoIds) ?? [])
-                } else {
-                    EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheProfileOC(groupId: self.chatGroup.groupId, userIds: unknownInfoIds) { [weak self] profiles in
-                        self?.processCacheProfiles(values: profiles)
-                    }
+            EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheValue(groupId: self.chatGroup.groupId, userIds: unknownInfoIds, key: "nickName") { [weak self] error, values in
+                if error == nil,let values = values {
+                    self?.processCacheInfos(values: values)
                 }
             }
         }

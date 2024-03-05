@@ -75,7 +75,7 @@ import UIKit
         self.avatar.frame = CGRect(x: 16, y: (self.contentView.frame.height-50)/2.0, width: 50, height: 50)
         self.nickName.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX+4, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 16)
         self.date.frame = CGRect(x: self.contentView.frame.width-66, y: self.nickName.frame.minY+2, width: 50, height: 16)
-        self.content.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.nickName.frame.maxY+2, width: self.contentView.frame.width-12-12-16-50, height: 20)
+        self.content.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.nickName.frame.maxY+2, width: self.contentView.frame.width-12-12-16-80, height: 20)
 //        self.badge.frame = CGRect(x: self.contentView.frame.width-48, y: self.nickName.frame.maxY+5, width: 32, height: 18)
         self.dot.frame =  CGRect(x: self.date.frame.maxX-12, y: self.nickName.frame.maxY+10, width: 8, height: 8)
         self.separatorLine.frame =  CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5)
@@ -150,6 +150,7 @@ extension ConversationListCell: ThemeSwitchProtocol {
         [:]
     }
     
+    public var remark: String = ""
     
     public var selected: Bool = false
     

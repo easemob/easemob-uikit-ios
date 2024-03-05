@@ -71,6 +71,7 @@ import UIKit
         self.tableView.keyboardDismissMode = .onDrag
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
+        self.searchController.searchBar.becomeFirstResponder()
     }
     
     
@@ -112,7 +113,9 @@ import UIKit
     open override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if self.searchController.isActive,let item = self.searchResults[safe: indexPath.row] {
-            self.selectClosure?(item)
+            let vc = SearchResultMessagesController(conversationId: item.conversationId, chatType: item.chatType == .chat ? .chat:.group, searchMessageId: item.messageId)
+            ControllerStack.toDestination(vc: vc)
+//            self.selectClosure?(item)
         }
         self.tableView.reloadData()
     }
@@ -126,7 +129,7 @@ extension SearchHistoryMessagesViewController: UISearchResultsUpdating,UISearchC
         searchController.searchResultsController?.view.isHidden = false
         let searchText = searchController.searchBar.text?.lowercased() ?? ""
         self.searchKeyWord = searchText
-        self.service?.searchMessage(keyword: self.searchKeyWord, pageSize: 1, userId: "", completion: { [weak self] error, messages in
+        self.service?.searchMessage(keyword: self.searchKeyWord, pageSize: 999, userId: "", completion: { [weak self] error, messages in
             if error == nil {
                 self?.rawDatas.removeAll()
                 self?.rawDatas.append(contentsOf: messages)
@@ -141,7 +144,7 @@ extension SearchHistoryMessagesViewController: UISearchResultsUpdating,UISearchC
     @objc open func filterResultsWithSearchString(_ searchText: String) {
         self.searchResults = self.rawDatas.filter({ message in
             let showName = message.showType
-            return (showName.lowercased() as NSString).range(of: searchText).location != NSNotFound && (showName.lowercased() as NSString).range(of: searchText).length >= 0
+            return (showName.lowercased() as NSString).range(of: searchText).location != NSNotFound && (showName.lowercased() as NSString).range(of: searchText).length >= 0 && message.body.type == .text
         })
         self.tableView.reloadData()
     }

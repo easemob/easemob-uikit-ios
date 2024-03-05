@@ -255,6 +255,10 @@ import AVFoundation
 }
 
 extension ChatThreadCreateController: MessageListViewActionEventsDelegate {
+    public func onMoreMessagesClicked() {
+        
+    }
+    
     public func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation) {
         
     }

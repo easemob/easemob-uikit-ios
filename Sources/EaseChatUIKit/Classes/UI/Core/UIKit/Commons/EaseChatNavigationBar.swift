@@ -15,6 +15,7 @@ import UIKit
     case subtitle
     case rightTitle
     case rightItems
+    case cancel
 }
 
 /// Navigation  bar of the EaseChatUIKit.
@@ -36,10 +37,23 @@ import UIKit
     
     private var showLeft = false
     
+    /// Title kind of the ``NSAttributedString``.
     public var titleAttribute: NSAttributedString? {
         didSet {
             self.titleLabel.text = nil
             self.titleLabel.attributedText = self.titleAttribute
+        }
+    }
+    
+    /// Entry edit mode or not.
+    public var editMode = false {
+        didSet {
+            DispatchQueue.main.async {
+                self.cancel.isHidden = !self.editMode
+                self.rightItems.isHidden = self.editMode
+                self.rightItem.isHidden = self.editMode
+                self.leftItem.isHidden = self.editMode
+            }
         }
     }
     
@@ -94,7 +108,7 @@ import UIKit
         UILabel(frame: CGRect(x: self.avatar.frame.maxX+4, y: self.titleLabel.frame.maxY, width: self.titleLabel.frame.width, height: 14)).font(UIFont.theme.bodyExtraSmall).textColor(UIColor.theme.neutralColor5).backgroundColor(.clear)
     }()
     
-    lazy var layout: UICollectionViewFlowLayout = {
+    public private(set) lazy var layout: UICollectionViewFlowLayout = {
         let flow = UICollectionViewFlowLayout()
         flow.itemSize = CGSize(width: 36, height: 36)
         flow.scrollDirection = .horizontal
@@ -113,6 +127,10 @@ import UIKit
     
     public private(set) lazy var separateLine: UIView = {
         UIView(frame: CGRect(x: 0, y: self.frame.height-0.5, width: ScreenWidth, height: 0.5)).backgroundColor(UIColor.theme.neutralColor9)
+    }()
+    
+    public private(set) lazy var cancel: UIButton = {
+        UIButton(type: .custom).frame(CGRect(x: ScreenWidth-58, y: self.frame.height-36, width: 50, height: 28)).backgroundColor(.clear).title("barrage_long_press_menu_cancel".chat.localize, .normal).font(UIFont.theme.labelMedium).textColor(UIColor.theme.primaryColor5, .normal).tag(4).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside)
     }()
 
     internal override init(frame: CGRect) {
@@ -136,9 +154,9 @@ import UIKit
                 width = self.avatar.frame.maxX+4
             }
             if hiddenAvatar {
-                self.addSubViews([self.leftItem,self.titleLabel,self.detail,self.rightItems,self.separateLine])
+                self.addSubViews([self.leftItem,self.titleLabel,self.detail,self.rightItems,self.separateLine,self.cancel])
             } else {
-                self.addSubViews([self.leftItem,self.avatar,self.status,self.titleLabel,self.detail,self.rightItems,self.separateLine])
+                self.addSubViews([self.leftItem,self.avatar,self.status,self.titleLabel,self.detail,self.rightItems,self.separateLine,self.cancel])
             }
             self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+4, y: StatusBarHeight+4, width: ScreenWidth - width*2 - 4, height: 22)
             if textAlignment == .center {
@@ -147,9 +165,9 @@ import UIKit
             self.detail.frame = CGRect(x: self.titleLabel.frame.minX, y: self.titleLabel.frame.maxY, width: self.titleLabel.frame.width, height: 14)
         } else {
             if hiddenAvatar {
-                self.addSubViews([self.titleLabel,self.detail,self.rightItems,self.separateLine])
+                self.addSubViews([self.titleLabel,self.detail,self.rightItems,self.separateLine,self.cancel])
             } else {
-                self.addSubViews([self.avatar,self.status,self.titleLabel,self.detail,self.rightItems,self.separateLine])
+                self.addSubViews([self.avatar,self.status,self.titleLabel,self.detail,self.rightItems,self.separateLine,self.cancel])
             }
             
             self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+4, y: StatusBarHeight+4, width: ScreenWidth - CGFloat(self.rightImages.count*36)*2, height: 22)
@@ -167,6 +185,7 @@ import UIKit
         }
         self.leftItem.setHitTestEdgeInsets(UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10))
         self.addGesture()
+        self.cancel.isHidden = true
         self.leftItem.center = CGPoint(x: self.leftItem.center.x, y: self.leftItem.center.y-2)
         self.updateRightItems(images: rightImages)
         Theme.registerSwitchThemeViews(view: self)
@@ -179,7 +198,7 @@ import UIKit
     ///   - rightTitle: Title of the right item.
     @objc required public convenience init(frame: CGRect = CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: NSTextAlignment = .center,rightTitle: String? = nil) {
         self.init(frame: frame)
-        self.addSubViews([self.leftItem,self.titleLabel,self.detail,self.rightItem,self.separateLine])
+        self.addSubViews([self.leftItem,self.titleLabel,self.detail,self.rightItem,self.separateLine,self.cancel])
         self.leftItem.setHitTestEdgeInsets(UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10))
         self.titleLabel.frame = CGRect(x: self.leftItem.frame.maxX+4, y: StatusBarHeight+4, width: ScreenWidth - 168, height: 22)
         if textAlignment == .center {
@@ -192,6 +211,7 @@ import UIKit
         self.titleLabel.textAlignment = textAlignment
         self.detail.textAlignment = textAlignment
         self.addGesture()
+        self.cancel.isHidden = true
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
     }
@@ -226,6 +246,8 @@ import UIKit
             self.clickClosure?(.back,nil)
         case 3:
             self.clickClosure?(.rightTitle,nil)
+        case 4:
+            self.clickClosure?(.cancel,nil)
         default:
             break
         }
@@ -276,6 +298,7 @@ extension EaseChatNavigationBar: ThemeSwitchProtocol {
         self.rightItem.setTitleColor(style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor7, for: .disabled)
         self.rightItem.setTitleColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, for: .normal)
         self.separateLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
+        self.cancel.textColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, .normal)
         self.rightItems.reloadData()
     }
     

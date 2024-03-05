@@ -27,6 +27,7 @@ final class MainViewController: UITabBarController {
         self.tabBar.insetsLayoutMarginsFromSafeArea = false
         self.tabBarController?.additionalSafeAreaInsets = .zero
         Theme.registerSwitchThemeViews(view: self)
+        self.switchTheme(style: Theme.style)
     }
 
     private func loadViewControllers() {

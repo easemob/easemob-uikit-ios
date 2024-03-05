@@ -215,10 +215,32 @@ import UIKit
      */
     @objc open func headerActions() {
         if let chat = Appearance.contact.detailExtensionActionItems.first(where: { $0.featureIdentify == "Chat" }) {
-            chat.actionClosure = { [weak self] _ in
-                self?.alreadyChat()
+            chat.actionClosure = { [weak self] in
+                self?.processHeaderActionEvents(item: $0)
             }
         }
+        if let search = Appearance.contact.detailExtensionActionItems.first(where: { $0.featureIdentify == "SearchMessages" }) {
+            search.actionClosure = { [weak self] in
+                self?.processHeaderActionEvents(item: $0)
+            }
+        }
+    }
+    
+    @objc open func processHeaderActionEvents(item: ContactListHeaderItemProtocol) {
+        switch item.featureIdentify {
+        case "Chat": self.alreadyChat()
+//        case "AudioCall":
+//        case "VideoCall":
+        case "SearchMessages": self.searchHistoryMessages()
+        default: break
+        }
+    }
+    
+    @objc open func searchHistoryMessages() {
+        let vc = SearchHistoryMessagesViewController(conversationId: self.profile.id) { message in
+            
+        }
+        ControllerStack.toDestination(vc: vc)
     }
     
     /**

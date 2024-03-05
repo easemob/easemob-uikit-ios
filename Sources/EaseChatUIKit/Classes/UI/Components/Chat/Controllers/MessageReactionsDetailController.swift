@@ -144,19 +144,9 @@ import UIKit
             }
         }
         if !unknownInfoIds.isEmpty,self.message.chatType == .groupChat {
-            if EaseChatUIKitContext.shared?.groupMemberAttributeCache?.provider == nil,EaseChatUIKitContext.shared?.groupMemberAttributeCache?.providerOC == nil {
-                EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheValue(groupId: self.message.conversationId, userIds: unknownInfoIds, key: "nickName") { [weak self] error, values in
-                    if error == nil,let values = values {
-                        self?.processCacheInfos(values: values)
-                    }
-                }
-            } else {
-                if EaseChatUIKitContext.shared?.groupMemberAttributeCache?.provider != nil {
-                    self.processCacheProfiles(values: EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheProfile(groupId: self.message.conversationId, userIds: unknownInfoIds) ?? [])
-                } else {
-                    EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheProfileOC(groupId: self.message.conversationId, userIds: unknownInfoIds) { [weak self] profiles in
-                        self?.processCacheProfiles(values: profiles)
-                    }
+            EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheValue(groupId: self.message.conversationId, userIds: unknownInfoIds, key: "nickName") { [weak self] error, values in
+                if error == nil,let values = values {
+                    self?.processCacheInfos(values: values)
                 }
             }
         }

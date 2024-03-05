@@ -90,6 +90,10 @@ import UIKit
 //        ConversationListController().viewModel.unregisterEventsListener(listener: <#T##ConversationEmergencyListener#>)
     }
     
+    
+}
+
+extension ConversationListController {
     /**
      Handles the navigation bar click event.
 

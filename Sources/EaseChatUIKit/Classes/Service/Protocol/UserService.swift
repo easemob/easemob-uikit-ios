@@ -79,6 +79,10 @@ import Foundation
     
     /// The user account logout by server.
     func userAccountDidForcedToLogout(error: ChatError?)
+    
+    /// When user auto login completion.
+    /// - Parameter error: ``ChatError``
+    func onUserAutoLoginCompletion(error: ChatError?)
         
 }
 

@@ -12,7 +12,7 @@ import UIKit
     /// You can change the width of a single option with ``PageContainerTitleBar`` in the popup container by setting the current property.
     public static var pageContainerTitleBarItemWidth: CGFloat = (ScreenWidth-32)/2.0
     
-    /// The size of ``PageContainersDialogController`` constraints.
+    /// The size of ``PageContainersDialogC ontroller`` constraints.
     public static var pageContainerConstraintsSize = CGSize(width: ScreenWidth, height: ScreenHeight*(3.0/5.0))
     
     /// The size of alert container constraints.``AlertViewController``
@@ -219,6 +219,8 @@ import UIKit
     
     var commonReactionMap = ["👍":UIImage(named: "👍", in: .chatBundle, with: nil), "❤️":UIImage(named: "❤️", in: .chatBundle, with: nil), "😄":UIImage(named: "😄", in: .chatBundle, with: nil), "😱":UIImage(named: "😱", in: .chatBundle, with: nil), "😡":UIImage(named: "😡", in: .chatBundle, with: nil), "🎉":UIImage(named: "🎉", in: .chatBundle, with: nil)]
     
+    var moreMessageAlertPosition = MoreMessagePosition.center
+    
 }
 
 /// Contact Module
@@ -237,7 +239,7 @@ import UIKit
     ]
     
     /// The contact info header extension items.
-    public var detailExtensionActionItems: [ContactListHeaderItemProtocol] = [ContactListHeaderItem(featureIdentify: "Chat", featureName: "Chat".chat.localize, featureIcon: UIImage(named: "chatTo", in: .chatBundle, with: nil))]
+    public var detailExtensionActionItems: [ContactListHeaderItemProtocol] = [ContactListHeaderItem(featureIdentify: "Chat", featureName: "Chat".chat.localize, featureIcon: UIImage(named: "chatTo", in: .chatBundle, with: nil)),ContactListHeaderItem(featureIdentify: "AudioCall", featureName: "AudioCall".chat.localize, featureIcon: UIImage(named: "voice_call", in: .chatBundle, with: nil)),ContactListHeaderItem(featureIdentify: "VideoCall", featureName: "VideoCall".chat.localize, featureIcon: UIImage(named: "video_call", in: .chatBundle, with: nil)),ContactListHeaderItem(featureIdentify: "SearchMessages", featureName: "Search Messages".chat.localize, featureIcon: UIImage(named: "search_history_messages", in: .chatBundle, with: nil))]
     
     /// ActionSheet menu configuration items after clicking more buttons in a single session side sliding menu.
     /// How to use?

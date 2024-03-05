@@ -12,9 +12,9 @@ import AVFoundation
 
 @objcMembers open class MessageListController: UIViewController {
     
-    public var filePath = ""
+    public private(set) var filePath = ""
     
-    private var chatType = ChatType.chat
+    public private(set) var chatType = ChatType.chat
     
     public private(set) var profile: EaseProfileProtocol = EaseProfile()
     
@@ -37,8 +37,12 @@ import AVFoundation
     }
     
     public private(set) lazy var messageContainer: MessageListView = {
-        MessageListView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight), mention: self.chatType == .group)
+        self.createMessageContainer()
     }()
+    
+    open func createMessageContainer() -> MessageListView {
+        MessageListView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight), mention: self.chatType == .group)
+    }
     
     public private(set) lazy var loadingView: LoadingView = {
         self.createLoading()
@@ -141,6 +145,9 @@ extension MessageListController {
         case .back: self.pop()
         case .avatar, .title: self.viewDetail()
         case .rightItems: self.rightItemsAction(indexPath: indexPath)
+        case .cancel:
+            self.navigation.editMode = false
+            self.messageContainer.editMode = false
         default:
             break
         }
@@ -243,14 +250,13 @@ extension MessageListController {
         }
     }
     
-    
-    
 }
 
 //MARK: - MessageListDriverEventsListener
 extension MessageListController: MessageListDriverEventsListener {
     public func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation) {
         self.messageContainer.editMode = false
+        self.navigation.editMode = false
         let messages = self.filterSelectedMessages()
         switch operation {
         case .delete:
@@ -261,7 +267,9 @@ extension MessageListController: MessageListDriverEventsListener {
         }
     }
     
-    open func forwardMessages(messages: [ChatMessage]) {
+    /// Combine forward messages.
+    /// - Parameter messages: Array kind of the ``ChatMessage``.
+    @objc open func forwardMessages(messages: [ChatMessage]) {
         if messages.isEmpty {
             self.showToast(toast: "Please select a message to forward.")
             return
@@ -270,7 +278,12 @@ extension MessageListController: MessageListDriverEventsListener {
         self.present(vc, animated: true)
     }
     
-    open func deleteMessages(messages: [ChatMessage]) {
+    @objc open func forwardMessage(message: ChatMessage) {
+        let vc = ForwardTargetViewController(messages: [message], combine: false)
+        self.present(vc, animated: true)
+    }
+    
+    @objc open func deleteMessages(messages: [ChatMessage]) {
         if messages.isEmpty {
             self.showToast(toast: "Please select a message to delete.")
             return
@@ -289,20 +302,31 @@ extension MessageListController: MessageListDriverEventsListener {
     }
     
     public func onMessageTopicAreaClicked(entity: MessageEntity) {
-        if var thread = entity.message.chatThread {
-            ChatClient.shared().threadManager?.joinChatThread(thread.threadId, completion: { chatThread, error in
-                if error == nil || error?.code == .userAlreadyExist  {
-                    if let joinThread = chatThread {
-                        thread = joinThread
-                    }
-                    let vc = ChatThreadViewController(chatThread: thread,firstMessage: nil,parentMessageId: entity.message.messageId)
+        if let thread = entity.message.chatThread {
+            self.enterTopic(threadId: thread.threadId, message: entity.message)
+        }
+        
+    }
+    
+    @objc open func enterTopic(threadId: String,message: ChatMessage) {
+        ChatClient.shared().threadManager?.joinChatThread(threadId, completion: { chatThread, error in
+            if error == nil  {
+                if let joinThread = chatThread {
+                    let vc = ChatThreadViewController(chatThread: joinThread,firstMessage: nil,parentMessageId: joinThread.messageId)
                     ControllerStack.toDestination(vc: vc)
+                }
+                
+            } else {
+                if error?.code == .userAlreadyExist {
+                    if let thread = message.chatThread {
+                        let vc = ChatThreadViewController(chatThread: thread,firstMessage: nil,parentMessageId: message.messageId)
+                        ControllerStack.toDestination(vc: vc)
+                    }
                 } else {
                     consoleLogInfo("Join chat thread error:\(error?.errorDescription ?? "")", type: .error)
                 }
-            })
-        }
-        
+            }
+        })
     }
     
     
@@ -440,6 +464,8 @@ extension MessageListController: MessageListDriverEventsListener {
             self.toCreateThread(message: message)
         case "MultiSelect":
             self.multiSelect(message: message)
+        case "Forward":
+            self.forwardMessage(message: message)
         default:
             item.action?(item,message)
             break
@@ -449,6 +475,7 @@ extension MessageListController: MessageListDriverEventsListener {
     @objc open func multiSelect(message: ChatMessage) {
         self.messageContainer.messages.first { $0.message.messageId == message.messageId }?.selected = true
         self.messageContainer.editMode = true
+        self.navigation.editMode = true
         self.messageContainer.messageList.reloadData()
     }
     
@@ -512,6 +539,9 @@ extension MessageListController: MessageListDriverEventsListener {
             if let body = message.message.body as? ChatCustomMessageBody,body.event == EaseChatUIKit_user_card_message {
                 self.viewContact(body: body)
             }
+            if let body = message.message.body as? ChatCustomMessageBody,body.event == EaseChatUIKit_alert_message {
+                self.viewAlertDetail(message: message.message)
+            }
         case .combine:
             self.viewHistoryMessages(entity: message)
         default:
@@ -522,6 +552,24 @@ extension MessageListController: MessageListDriverEventsListener {
     @objc open func viewHistoryMessages(entity: MessageEntity) {
         let vc = ChatHistoryViewController(message: entity.message)
         ControllerStack.toDestination(vc: vc)
+    }
+    
+    @objc open func viewAlertDetail(message: ChatMessage) {
+        if let body = message.body as? ChatCustomMessageBody,body.event == EaseChatUIKit_alert_message,let threadId = message.ext?["threadId"] as? String,let messageId = message.ext?["messageId"] as? String {
+            ChatClient.shared().threadManager?.joinChatThread(threadId, completion: { [weak self] chatThread, error in
+                if error == nil {
+                    if let thread = chatThread,let message = ChatClient.shared().chatManager?.getMessageWithMessageId(messageId) {
+                        self?.enterTopic(threadId: thread.threadId, message: message)
+                    }
+                } else {
+                    if error?.code == .userAlreadyExist {
+                        self?.enterTopic(threadId: threadId, message: message)
+                    } else {
+                        consoleLogInfo("viewAlertDetail error:\(error?.errorDescription ?? "")", type: .error)
+                    }
+                }
+            })
+        }
     }
     
     /**

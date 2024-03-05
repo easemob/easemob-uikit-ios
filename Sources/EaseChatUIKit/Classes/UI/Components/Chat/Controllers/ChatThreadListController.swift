@@ -41,6 +41,19 @@ import UIKit
         UITableView(frame: CGRect(x: 0, y: NavigationHeight, width: self.view.frame.width, height: ScreenHeight-NavigationHeight), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).rowHeight(60).separatorStyle(.none).showsVerticalScrollIndicator(false).tableFooterView(UIView()).backgroundColor(.clear)
     }()
     
+    public private(set) lazy var loadingView: LoadingView = {
+        self.createLoading()
+    }()
+    
+    /**
+     Creates a loading view.
+     
+     - Returns: A `LoadingView` instance.
+     */
+    @objc open func createLoading() -> LoadingView {
+        LoadingView(frame: self.view.bounds)
+    }
+    
     public required init(groupId: String) {
         self.groupId = groupId
         super.init(nibName: nil, bundle: nil)
@@ -52,7 +65,7 @@ import UIKit
     
     open override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.addSubViews([self.navigation,self.topicList])
+        self.view.addSubViews([self.navigation,self.topicList,self.loadingView])
         self.navigation.title = "All Threads"
         // Do any additional setup after loading the view.
         self.requestThreadList()
@@ -63,21 +76,43 @@ import UIKit
     }
     
     open func requestThreadList() {
-        ChatClient.shared().threadManager?.getJoinedChatThreadsFromServer(withParentId: self.groupId, cursor: self.cursor, pageSize: self.pageSize, completion: { [weak self] result, error in
-            guard let `self` = self else { return }
-            if error == nil {
-                self.cursor = result?.cursor ?? ""
-                if let threads = result?.list {
-                    self.threads.append(contentsOf: threads)
+        self.loadingView.stopAnimating()
+        self.loadingView.startAnimating()
+        ChatClient.shared().groupManager?.getGroupSpecificationFromServer(withId: self.groupId, completion: { groupInfo, error in
+            if error == nil, let group = groupInfo {
+                if group.owner == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+                    ChatClient.shared().threadManager?.getChatThreadsFromServer(withParentId: self.groupId, cursor: self.cursor, pageSize: self.pageSize, completion: { [weak self] result, error in
+                        guard let `self` = self else { return }
+                        self.loadingView.stopAnimating()
+                        self.handleThreadRequest(result: result, error: error)
+                    })
                 } else {
-                    self.threads = []
+                    ChatClient.shared().threadManager?.getJoinedChatThreadsFromServer(withParentId: self.groupId, cursor: self.cursor, pageSize: self.pageSize, completion: { [weak self] result, error in
+                        guard let `self` = self else { return }
+                        self.loadingView.stopAnimating()
+                        self.handleThreadRequest(result: result, error: error)
+                    })
                 }
             } else {
-                self.topicList.backgroundView = self.empty
-                consoleLogInfo("requestThreadList error:\(error?.errorDescription ?? "")", type: .debug)
+                self.loadingView.stopAnimating()
+                consoleLogInfo("requestGroupDetail error:\(error?.errorDescription ?? "")", type: .debug)
             }
-            self.topicList.reloadData()
         })
+    }
+    
+    open func handleThreadRequest(result: CursorResult<GroupChatThread>?, error: ChatError?) {
+        if error == nil {
+            self.cursor = result?.cursor ?? ""
+            if let threads = result?.list {
+                self.threads.append(contentsOf: threads)
+            } else {
+                self.threads = []
+            }
+        } else {
+            self.topicList.backgroundView = self.empty
+            consoleLogInfo("requestThreadList error:\(error?.errorDescription ?? "")", type: .debug)
+        }
+        self.topicList.reloadData()
     }
     
     /**

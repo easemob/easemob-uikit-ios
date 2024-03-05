@@ -24,7 +24,6 @@ import UIKit
 }
 
 extension ChatServiceImplement: ChatService {
-    
     public func fetchChatThreadHistoryMessages(conversationId: String, start messageId: String, pageSize: UInt, completion: @escaping (ChatError?, [ChatMessage]) -> Void) {
         ChatClient.shared().chatManager?.asyncFetchHistoryMessages(fromServer: conversationId, conversationType: .groupChat, startMessageId: messageId, fetch: .down, pageSize: Int32(pageSize), completion: { result, error in
             completion(error, result?.list ?? [])
@@ -129,11 +128,9 @@ extension ChatServiceImplement: ChatService {
                 if error == nil,let messages = messages {
                     for message in messages {
                         if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-                            if var profile = EaseChatUIKitContext.shared?.chatCache?[message.from] {
-                                let user = EaseProfile()
-                                user.setValuesForKeys(dic)
-                                EaseChatUIKitContext.shared?.chatCache?[message.from] = user
-                            }
+                            let user = EaseProfile()
+                            user.setValuesForKeys(dic)
+                            EaseChatUIKitContext.shared?.chatCache?[message.from] = user
                         }
                     }
                 }
@@ -145,11 +142,9 @@ extension ChatServiceImplement: ChatService {
                 if error == nil,let messages = result?.list {
                     for message in messages {
                         if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-                            if var profile = EaseChatUIKitContext.shared?.chatCache?[message.from] {
-                                let user = EaseProfile()
-                                user.setValuesForKeys(dic)
-                                EaseChatUIKitContext.shared?.chatCache?[message.from] = user
-                            }
+                            let user = EaseProfile()
+                            user.setValuesForKeys(dic)
+                            EaseChatUIKitContext.shared?.chatCache?[message.from] = user
                         }
                     }
                 }
@@ -159,7 +154,7 @@ extension ChatServiceImplement: ChatService {
     }
     
     public func searchMessage(keyword: String, pageSize: UInt, userId: String, completion: @escaping (ChatError?, [ChatMessage]) -> Void) {
-        ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.loadMessages(withKeyword: keyword, timestamp: 0, count: Int32(pageSize), fromUser: userId, searchDirection: .up,completion: { messages, error in
+        ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.loadMessages(withKeyword: keyword, timestamp: -1, count: Int32(pageSize), fromUser: userId, searchDirection: .up, scope: .content, completion: { messages, error in
             completion(error,messages ?? [])
         })
     }
