@@ -298,6 +298,7 @@ extension MessageListController: MessageListDriverEventsListener {
                 messages.append(message.message)
             }
         }
+        self.messageContainer.messages.forEach { $0.selected = false }
         return messages
     }
     

@@ -358,15 +358,13 @@ let message_bubble_space = CGFloat(1)
             if Appearance.chat.contentStyle.contains(.withReply) {
                 self.replyContent.frame = CGRect(x:  Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+12:(self.editMode ? self.checkbox.frame.maxX+12:12), y: Appearance.chat.contentStyle.contains(where: { $0 == .withNickName }) ? self.nickName.frame.maxY:12, width: entity.replySize.width, height: entity.replySize.height)
             }
-            self.bubbleWithArrow.towards = (entity.message.direction == .receive ? .left:.right)
-            self.bubbleMultiCorners.towards = (entity.message.direction == .receive ? .left:.right)
+            self.bubbleWithArrow.towards = self.towards
+            self.bubbleMultiCorners.towards = self.towards
             if Appearance.chat.bubbleStyle == .withArrow {
                 self.bubbleWithArrow.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+12:(self.editMode ? self.checkbox.frame.maxX+12:12), y: entity.height - 16 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - entity.bubbleSize.height - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageTopic }) ? (self.topicView.isHidden ? 0:topicHeight):0) - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageReaction }) ? reactionContentHeight:0), width: entity.bubbleSize.width, height: entity.bubbleSize.height+message_bubble_space*2)
-                self.bubbleWithArrow.towards = entity.message.direction == .send ? .right:.left
                 self.bubbleWithArrow.draw(self.bubbleWithArrow.frame)
             } else {
                 self.bubbleMultiCorners.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+12:(self.editMode ? self.checkbox.frame.maxX+12:12), y: entity.height - 16 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - entity.bubbleSize.height - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageTopic }) ? (self.topicView.isHidden ? 0:topicHeight):0) - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageReaction }) ? reactionContentHeight:0), width: entity.bubbleSize.width, height: entity.bubbleSize.height+message_bubble_space*2)
-                self.bubbleMultiCorners.towards = entity.message.direction == .send ? .right:.left
                 self.bubbleMultiCorners.draw(self.bubbleMultiCorners.frame)
             }
             self.status.isHidden = true

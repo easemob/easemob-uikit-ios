@@ -27,7 +27,7 @@ fileprivate let space = Int((ScreenWidth-10-CGFloat((Appearance.chat.commonReact
     }()
     
     public private(set) lazy var reactionsList: UICollectionView = {
-        UICollectionView(frame: CGRect(x: 5, y: 4, width: self.frame.width-10, height: 36), collectionViewLayout: self.layout).backgroundColor(.clear).registerCell(ReactionEmojiCell.self, forCellReuseIdentifier: "CommonReactionCell").dataSource(self).delegate(self).showsVerticalScrollIndicator(false).showsHorizontalScrollIndicator(false)
+        UICollectionView(frame: CGRect(x: 5, y: 4, width: self.frame.width-68, height: 36), collectionViewLayout: self.layout).backgroundColor(.clear).registerCell(ReactionEmojiCell.self, forCellReuseIdentifier: "CommonReactionCell").dataSource(self).delegate(self).showsVerticalScrollIndicator(false).showsHorizontalScrollIndicator(false)
     }()
     
     public private(set) lazy var reactionMore: UIButton = {

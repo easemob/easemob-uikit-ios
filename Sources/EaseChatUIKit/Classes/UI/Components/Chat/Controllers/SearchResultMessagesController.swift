@@ -12,7 +12,7 @@ import UIKit
     public private(set) var searchMessageId = ""
     
     open override func createMessageContainer() -> MessageListView {
-        MessageListView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight), mention: self.chatType == .group,historyResult: true)
+        MessageListView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight), mention: self.chatType == .group,showType: .history)
     }
     
     @objc(initWithConversationId:chatType:searchMessageId:)
@@ -32,8 +32,19 @@ import UIKit
     
     open override func viewDidLoad() {
         super.viewDidLoad()
- 
-        // Do any additional setup after loading the view.
+        self.view.backgroundColor = UIColor.theme.neutralColor98
+        self.navigation.subtitle = "online"
+        self.navigation.title = self.profile.nickname.isEmpty ? self.profile.id:self.profile.nickname
+        self.view.addSubViews([self.messageContainer,self.navigation])
+        self.navigation.clickClosure = { [weak self] in
+            self?.navigationClick(type: $0, indexPath: $1)
+        }
+        
+        self.viewModel.bindDriver(driver: self.messageContainer,searchMessageId: self.searchMessageId)
+        self.viewModel.addEventsListener(self)
+        Theme.registerSwitchThemeViews(view: self)
+        self.switchTheme(style: Theme.style)
+        self.view.addSubview(self.loadingView)
     }
     
     open override func viewDetail() {

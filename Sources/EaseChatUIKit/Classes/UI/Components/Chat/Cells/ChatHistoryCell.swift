@@ -80,7 +80,11 @@ import UIKit
                     if let url = body.thumbnailLocalPath,!url.isEmpty,FileManager.default.fileExists(atPath: url) {
                         container.image = UIImage(contentsOfFile: url)
                     } else {
-                        container.image(with: body.thumbnailRemotePath, placeHolder: Appearance.chat.imagePlaceHolder)
+                        container.image(with: body.thumbnailRemotePath, placeHolder: Appearance.chat.imagePlaceHolder) { image in
+                            if image == nil {
+                                container.image = Appearance.chat.imagePlaceHolder
+                            }
+                        }
                     }
                 }
                 if let body = (entity.message.body as? ChatVideoMessageBody) {
@@ -122,6 +126,9 @@ extension ChatHistoryCell: ThemeSwitchProtocol {
         self.nickname.textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
         self.separatorLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
         self.messageDate.textColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor7
+        if let container = self.content as? ImageView {
+            self.content.backgroundColor(style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9)
+        }
     }
     
     

@@ -45,7 +45,7 @@ import UIKit
         self.play.center = CGPoint(x: entity.bubbleSize.width/2.0, y: entity.bubbleSize.height/2.0)
         if let body = (entity.message.body as? ChatVideoMessageBody) {
             if entity.message.direction == .receive {
-                if let url = (entity.message.body as? ChatVideoMessageBody)?.thumbnailLocalPath {
+                if let url = (entity.message.body as? ChatVideoMessageBody)?.thumbnailLocalPath,FileManager.default.fileExists(atPath: url) {
                     self.content.image = UIImage(contentsOfFile: url)
                     self.play.isHidden = false
                 } else {

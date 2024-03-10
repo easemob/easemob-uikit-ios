@@ -38,11 +38,10 @@ public enum LanguageType: String {
      */
     private func localValue(_ key: String) -> String {
         guard var lang = NSLocale.preferredLanguages.first else { return Bundle.main.bundlePath }
-        if lang.contains("zh") {
-            lang = "zh-Hans"
-        } else {
-            lang = "en"
+        if !Appearance.ease_chat_language.rawValue.isEmpty {
+            lang = Appearance.ease_chat_language.rawValue
         }
+        
         let path = Bundle.chatBundle.path(forResource: lang, ofType: "lproj") ?? ""
         let pathBundle = Bundle(path: path) ?? .main
         let value = pathBundle.localizedString(forKey: key, value: nil, table: nil)

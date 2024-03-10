@@ -65,6 +65,12 @@ import UIKit
         self.navigationController?.navigationBar.isHidden = true
     }
     
+    open override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.navigationController?.navigationBar.isHidden = true
+        self.searchController.isActive = false
+    }
+    
     open override func viewDidLoad() {
         super.viewDidLoad()
         self.tableView.tableFooterView(UIView()).rowHeight(Appearance.contact.rowHeight).tableHeaderView(self.searchController.searchBar)
@@ -112,9 +118,11 @@ import UIKit
     
     open override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if self.searchController.isActive,let item = self.searchResults[safe: indexPath.row] {
+        self.view.endEditing(true)
+//        self.searchController.isActive = false
+        if let item = self.searchResults[safe: indexPath.row] {
             let vc = SearchResultMessagesController(conversationId: item.conversationId, chatType: item.chatType == .chat ? .chat:.group, searchMessageId: item.messageId)
-            ControllerStack.toDestination(vc: vc)
+            self.navigationController?.pushViewController(vc, animated: true)
 //            self.selectClosure?(item)
         }
         self.tableView.reloadData()

@@ -8,10 +8,10 @@
 import UIKit
 
 @objcMembers open class DetailInfo: NSObject {
-    var title: String = ""
-    var detail: String = ""
-    var withSwitch: Bool = false
-    var switchValue: Bool = false
+    public var title: String = ""
+    public var detail: String = ""
+    public var withSwitch: Bool = false
+    public var switchValue: Bool = false
     
     open override func setValue(_ value: Any?, forUndefinedKey key: String) {
         

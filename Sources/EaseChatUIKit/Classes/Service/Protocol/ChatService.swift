@@ -70,7 +70,7 @@ let EaseChatUIKit_user_card_message = "userCard"
     ///   - messageId: The start id of the message.
     ///   - pageSize: The size number.
     ///   - completion: Request a callback, returning an array of message objects if successful, or an error if failed
-    func loadMessages(start messageId: String,pageSize: UInt,completion: @escaping (ChatError?,[ChatMessage]) -> Void)
+    func loadMessages(start messageId: String,pageSize: UInt,searchMessage: Bool,completion: @escaping (ChatError?,[ChatMessage]) -> Void)
     
     /// Load messages from server.
     /// - Parameters:

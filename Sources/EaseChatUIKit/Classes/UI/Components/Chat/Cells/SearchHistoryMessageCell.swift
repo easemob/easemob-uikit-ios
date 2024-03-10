@@ -10,7 +10,7 @@ import UIKit
 @objcMembers open class SearchHistoryMessageCell: UITableViewCell {
 
     public private(set) lazy var avatar: ImageView = {
-        ImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-50)/2.0, width: 50, height: 50)).cornerRadius(.large).backgroundColor(.clear)
+        ImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-50)/2.0, width: 50, height: 50)).cornerRadius(Appearance.avatarRadius).backgroundColor(.clear)
     }()
     
     public private(set) lazy var conversationName: UILabel = {
@@ -37,8 +37,8 @@ import UIKit
     open override func layoutSubviews() {
         super.layoutSubviews()
         self.avatar.center = CGPoint(x: self.avatar.center.x, y: self.contentView.center.y)
-        self.conversationName.frame =  CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX+4, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 18)
-        self.messageContent.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.maxX-20, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 16)
+        self.conversationName.frame =  CGRect(x: self.avatar.frame.maxX+12, y: 10, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 18)
+        self.messageContent.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.maxY-20, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 16)
     }
     
     func refresh(message: ChatMessage,info: ConversationInfo,keyword: String) {

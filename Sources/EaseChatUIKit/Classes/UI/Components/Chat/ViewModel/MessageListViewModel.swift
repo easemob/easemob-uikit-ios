@@ -47,6 +47,10 @@ import UIKit
     ///  When received quit signal form other device on the chat thread.
     @objc optional func onUserQuitTopic()
     
+    /// You can update chat thread on the method called.
+    /// - Parameter chatThread: ``GroupChatThread``
+    @objc optional func onChatThreadUpdated(chatThread: GroupChatThread)
+    
     /// When you click a message list multi select bar item,the method will call.
     /// - Parameter operation: ``MessageMultiSelectedBottomBarOperation``
     func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation)
@@ -119,9 +123,14 @@ import UIKit
     }
     
     open func loadSearchMessage() {
-        self.chatService?.loadMessages(start: self.searchMessageId, pageSize: 20, completion: { [weak self] error, messages in
+        let searchId = self.searchMessageId
+        self.chatService?.loadMessages(start: self.searchMessageId, pageSize: 20, searchMessage: true, completion: { [weak self] error, messages in
             if error == nil {
-                self?.driver?.refreshMessages(messages: messages)
+                if let searchMessage = ChatClient.shared().chatManager?.getMessageWithMessageId(searchId) {
+                    var refreshMessages = messages
+                    refreshMessages.insert(searchMessage, at: 0)
+                    self?.driver?.refreshMessages(messages: refreshMessages)
+                }
             } else {
                 consoleLogInfo("loadSearchMessage error:\(error?.errorDescription ?? "")", type: .error)
             }
@@ -130,7 +139,7 @@ import UIKit
     
     @objc open func loadMessages() {
         if let start = self.driver?.firstMessageId {
-            self.chatService?.loadMessages(start: start, pageSize: 20, completion: { [weak self] error, messages in
+            self.chatService?.loadMessages(start: start, pageSize: 20, searchMessage: false, completion: { [weak self] error, messages in
                 if error == nil {
                     if (self?.driver?.firstMessageId ?? "").isEmpty {
                         self?.driver?.refreshMessages(messages: messages)
@@ -181,7 +190,9 @@ import UIKit
             chatMessage = ChatMessage(conversationID: self.to, body: ChatTextMessageBody(text: text), ext: ext)
         case .image:
             let displayName = text.components(separatedBy: "/").last ?? "\(Date().timeIntervalSince1970).jpeg"
-            chatMessage = ChatMessage(conversationID: self.to, body: ChatImageMessageBody(localPath: text, displayName:  displayName.components(separatedBy: ".").count < 1 ? displayName+"jpeg":displayName), ext: ext)
+            let imageBody = ChatImageMessageBody(localPath: text, displayName:  displayName.components(separatedBy: ".").count < 1 ? displayName+"jpeg":displayName)
+            imageBody.size = UIImage(contentsOfFile: text)?.size ?? .zero
+            chatMessage = ChatMessage(conversationID: self.to, body: imageBody, ext: ext)
         case .voice:
             let body = ChatAudioMessageBody(localPath: text, displayName: "\(Int(Date().timeIntervalSince1970*1000)).amr")
             if let duration = extensionInfo["duration"] as? Int {
@@ -374,6 +385,10 @@ import UIKit
 }
 
 extension MessageListViewModel: MessageListViewActionEventsDelegate {
+    public func onMessageListLoadMore() {
+        
+    }
+    
     
     public func onMoreMessagesClicked() {
         ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.markAllMessages(asRead: nil)
@@ -678,6 +693,12 @@ extension MessageListViewModel: ChatResponseListener {
      */
     @objc open func messageDidReceived(message: ChatMessage) {
         if message.conversationId == self.to {
+            if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
+                let profile = EaseProfile()
+                profile.setValuesForKeys(dic)
+                profile.id = message.from
+                EaseChatUIKitContext.shared?.chatCache?[message.from] = profile
+            }
             let entity = message
             entity.direction = message.direction
             if let scrolledBottom = self.driver?.scrolledBottom,scrolledBottom {

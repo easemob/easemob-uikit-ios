@@ -264,9 +264,9 @@ extension ForwardTargetViewController: UITableViewDelegate,UITableViewDataSource
             if index <= 3 {
                 let nickname = message.user?.nickname ?? message.from
                 if index == 0 {
-                    summary += (nickname+":"+message.showType)
+                    summary += (nickname+":"+message.showType+"\n")
                 } else {
-                    if index < 3 {
+                    if index <= 3 {
                         summary += (nickname+":"+message.showType+"\n")
                     }
                 }

@@ -163,6 +163,29 @@ extension ChatThreadListController: UITableViewDelegate,UITableViewDataSource {
             ControllerStack.toDestination(vc: vc)
         }
     }
+    
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        var unknownInfoIds = [String]()
+        if let visiblePaths = self.topicList.indexPathsForVisibleRows {
+            for indexPath in visiblePaths {
+                if let lastMessage = self.threads[safe: indexPath.row]?.lastMessage {
+                    unknownInfoIds.append(self.threads[safe: indexPath.row]?.threadId ?? "")
+                }
+            }
+        }
+        if !unknownInfoIds.isEmpty {
+            ChatClient.shared().threadManager?.getLastMessageFromSever(withChatThreads: unknownInfoIds, completion: { [weak self] messages, error in
+                guard let `self` = self else { return }
+                if error == nil {
+                    for thread in self.threads {
+//                        thread.lastMessage = messages[thread.threadId]
+                    }
+                } else {
+                    consoleLogInfo("getLastMessageFromSever error:\(error?.errorDescription ?? "")", type: .debug)
+                }
+            })
+        }
+    }
 }
 
 //MARK: - ThemeSwitchProtocol

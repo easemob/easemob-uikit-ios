@@ -25,7 +25,7 @@ import UIKit
     }()
     
     public private(set) lazy var replyIcon: ImageView = {
-        ImageView(frame: CGRect(x: self.frame.width-80, y: 8, width: 36, height: 36)).contentMode(.scaleAspectFit)
+        ImageView(frame: CGRect(x: self.frame.width-80, y: 8, width: 36, height: 36))
     }()
     
     public private(set) lazy var videoPlay: UIImageView = {

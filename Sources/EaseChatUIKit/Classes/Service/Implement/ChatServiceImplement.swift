@@ -15,7 +15,7 @@ import UIKit
     @objc required public init(to: String) {
         super.init()
         self.to = to
-        ChatClient.shared().chatManager?.add(self, delegateQueue: .main)
+        ChatClient.shared().chatManager?.add(self, delegateQueue: nil)
     }
     
     deinit {
@@ -81,22 +81,11 @@ extension ChatServiceImplement: ChatService {
     }
     
     public func send(message: ChatMessage, completion: @escaping (ChatError?, ChatMessage?) -> Void) {
-        if let exist = ChatClient.shared().chatManager?.getMessageWithMessageId(message.messageId) {
-            ChatClient.shared().chatManager?.resend(exist, progress: nil,completion: { [weak self] message, error in
-                self?.pushSendNotification(message: message)
-                completion(error,message)
-            })
-        } else {
-            let message = message
-            if let type = ChatClient.shared().chatManager?.getConversationWithConvId(message.conversationId)?.type {
-                message.chatType = (type.rawValue == 0 ? .chat:.groupChat)
-            }
-            
-            ChatClient.shared().chatManager?.send(message, progress: nil, completion: { [weak self] message, error in
-                self?.pushSendNotification(message: message)
-                completion(error,message)
-            })
-        }
+        let message = message
+        ChatClient.shared().chatManager?.send(message, progress: nil, completion: { [weak self] message, error in
+            self?.pushSendNotification(message: message)
+            completion(error,message)
+        })
     }
     
     private func pushSendNotification(message: ChatMessage?) {
@@ -122,9 +111,9 @@ extension ChatServiceImplement: ChatService {
         ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.markAllMessages(asRead: nil)
     }
     
-    public func loadMessages(start messageId: String, pageSize: UInt, completion: @escaping (ChatError?, [ChatMessage]) -> Void) {
+    public func loadMessages(start messageId: String, pageSize: UInt, searchMessage: Bool, completion: @escaping (ChatError?, [ChatMessage]) -> Void) {
         if EaseChatUIKitClient.shared.option.option_chat.loadLocalHistoryMessages {
-            ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.loadMessagesStart(fromId: messageId, count: Int32(pageSize), searchDirection: .up,completion: { messages, error in
+            ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.loadMessagesStart(fromId: messageId, count: Int32(pageSize), searchDirection: searchMessage ? .down:.up,completion: { messages, error in
                 if error == nil,let messages = messages {
                     for message in messages {
                         if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
@@ -138,7 +127,7 @@ extension ChatServiceImplement: ChatService {
             })
         } else {
             let type = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.type ?? .chat
-            ChatClient.shared().chatManager?.asyncFetchHistoryMessages(fromServer: self.to, conversationType: type, startMessageId: messageId, fetch: .up, pageSize: Int32(pageSize),completion: { result, error in
+            ChatClient.shared().chatManager?.asyncFetchHistoryMessages(fromServer: self.to, conversationType: type, startMessageId: messageId, fetch: searchMessage ? .down:.up, pageSize: Int32(pageSize),completion: { result, error in
                 if error == nil,let messages = result?.list {
                     for message in messages {
                         if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
@@ -171,13 +160,6 @@ extension ChatServiceImplement: ChatEventsListener {
     public func messagesDidReceive(_ aMessages: [ChatMessage]) {
         for listener in self.responseDelegates.allObjects {
             for message in aMessages {
-                if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-                    let profile = EaseProfile()
-                    profile.setValuesForKeys(dic)
-                    profile.id = message.from
-                    EaseChatUIKitContext.shared?.chatCache?[message.from] = profile
-                }
-                
                 listener.onMessageDidReceived(message: message)
             }
         }

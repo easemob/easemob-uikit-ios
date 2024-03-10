@@ -88,7 +88,7 @@ import UIKit
     }()
     
     public private(set) lazy var itemList: UICollectionView = {
-        UICollectionView(frame: CGRect(x: 20, y: self.detail.frame.maxY+20, width: self.frame.width-40, height: 62), collectionViewLayout: self.layout).delegate(self).dataSource(self).registerCell(DetailInfoHeaderExtensionCell.self, forCellReuseIdentifier: "DetailInfoHeaderExtensionCell").backgroundColor(.clear)
+        UICollectionView(frame: CGRect(x: 20, y: self.detail.frame.maxY+20, width: CGFloat((Int(self.itemWidth)*Appearance.contact.detailExtensionActionItems.count)+(Appearance.contact.detailExtensionActionItems.count-1)*8), height: 62), collectionViewLayout: self.layout).delegate(self).dataSource(self).registerCell(DetailInfoHeaderExtensionCell.self, forCellReuseIdentifier: "DetailInfoHeaderExtensionCell").backgroundColor(.clear).showsHorizontalScrollIndicator(false)
     }()
 
     internal override init(frame: CGRect) {
@@ -104,6 +104,8 @@ import UIKit
         super.init(frame: frame)
         if showMenu {
             self.addSubViews([self.avatar,self.status,self.nickName,self.detail,self.itemList])
+            self.itemList.isScrollEnabled = false
+            self.itemList.center = CGPoint(x: self.center.x, y: self.itemList.center.y)
         } else {
             self.addSubViews([self.avatar,self.status,self.nickName,self.detail])
         }

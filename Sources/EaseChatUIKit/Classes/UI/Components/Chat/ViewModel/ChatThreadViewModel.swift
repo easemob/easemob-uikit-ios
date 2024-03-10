@@ -22,6 +22,8 @@ import UIKit
     public private(set) weak var driver: IMessageListViewDriver?
     
     public private(set) var chatService: ChatService?
+    
+    public private(set) var groupService: GroupService? = GroupServiceImplement()
         
     public private(set) var multiService: MultiDeviceService? = MultiDeviceServiceImplement()
     
@@ -34,6 +36,7 @@ import UIKit
         super.init()
         self.chatService?.bindChatEventsListener(listener: self)
         self.multiService?.bindMultiDeviceListener(listener: self)
+        self.groupService?.bindGroupChatThreadEventListener(listener: self)
         if let groupId = chatThread?.parentId {
             let group = ChatGroup(id: groupId)
             if group == nil || group?.owner.isEmpty ?? true {
@@ -53,6 +56,7 @@ import UIKit
         if create == false {
             self.loadMessages()
         } else {
+            self.driver?.updateThreadLoadMessagesFinished(finished: true)
             self.threadCreateAlert()
         }
     }
@@ -98,11 +102,18 @@ import UIKit
     
     @objc open func loadMessages() {
         let firstMessageId = self.driver?.dataSource.last?.messageId ?? ""
-        self.chatService?.fetchChatThreadHistoryMessages(conversationId: self.to, start: firstMessageId, pageSize: 15, completion: { [weak self] error, messages in
+        self.chatService?.fetchChatThreadHistoryMessages(conversationId: self.to, start: firstMessageId, pageSize: 20, completion: { [weak self] error, messages in
             if error == nil {
-                self?.driver?.refreshMessages(messages: messages)
-                if firstMessageId.isEmpty {
-                    self?.threadCreateAlert()
+                if messages.count < 20 {
+                    self?.driver?.updateThreadLoadMessagesFinished(finished: true)
+                }
+                if (self?.driver?.firstMessageId ?? "").isEmpty {
+                    self?.driver?.refreshMessages(messages: messages)
+                    if firstMessageId.isEmpty {
+                        self?.threadCreateAlert()
+                    }
+                } else {
+                    self?.driver?.insertMessages(messages: messages)
                 }
             } else {
                 consoleLogInfo("chat thread loadMessages error:\(error?.errorDescription ?? "")", type: .error)
@@ -163,7 +174,9 @@ import UIKit
             chatMessage = ChatMessage(conversationID: self.to, body: ChatTextMessageBody(text: text), ext: ext)
         case .image:
             let displayName = text.components(separatedBy: "/").last ?? "\(Date().timeIntervalSince1970).jpeg"
-            chatMessage = ChatMessage(conversationID: self.to, body: ChatImageMessageBody(localPath: text, displayName:  displayName.components(separatedBy: ".").count < 1 ? displayName+"jpeg":displayName), ext: ext)
+            let imageBody = ChatImageMessageBody(localPath: text, displayName:  displayName.components(separatedBy: ".").count < 1 ? displayName+"jpeg":displayName)
+            imageBody.size = UIImage(contentsOfFile: text)?.size ?? .zero
+            chatMessage = ChatMessage(conversationID: self.to, body: imageBody, ext: ext)
         case .voice:
             let body = ChatAudioMessageBody(localPath: text, displayName: "\(Int(Date().timeIntervalSince1970*1000)).amr")
             if let duration = extensionInfo["duration"] as? Int {
@@ -347,6 +360,10 @@ import UIKit
 }
 
 extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
+    public func onMessageListLoadMore() {
+        self.loadMessages()
+    }
+    
     
     public func onMoreMessagesClicked() {
         ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.markAllMessages(asRead: nil)
@@ -648,6 +665,12 @@ extension ChatThreadViewModel: ChatResponseListener {
      */
     @objc open func messageDidReceived(message: ChatMessage) {
         if message.conversationId == self.to {
+            if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
+                let profile = EaseProfile()
+                profile.setValuesForKeys(dic)
+                profile.id = message.from
+                EaseChatUIKitContext.shared?.chatCache?[message.from] = profile
+            }
             let entity = message
             entity.direction = message.direction
 //            if let scrolledBottom = self.driver?.scrolledBottom,scrolledBottom {
@@ -758,6 +781,30 @@ extension ChatThreadViewModel: ChatResponseListener {
     }
 }
 
+extension ChatThreadViewModel: GroupChatThreadEventListener {
+    
+    public func onGroupChatThreadEventOccur(type: GroupChatThreadEventType, event: GroupChatThreadEvent) {
+        if self.to == event.chatThread.threadId {
+            switch type {
+            case .destroyed,.userKicked:
+                for handler in self.handlers.allObjects {
+                    handler.onUserQuitTopic?()
+                }
+            case .updated:
+                for handler in self.handlers.allObjects {
+                    handler.onChatThreadUpdated?(chatThread: event.chatThread)
+                }
+            default:
+                break
+            }
+        }
+    }
+    
+    public func onAttributesChangedOfGroupMember(groupId: String, userId: String, operatorId: String, attributes: Dictionary<String, String>) {
+        
+    }
+
+}
 
 extension ChatThreadViewModel: MultiDeviceListener {
     

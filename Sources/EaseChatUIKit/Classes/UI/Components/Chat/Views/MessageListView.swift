@@ -24,6 +24,8 @@ import UIKit
     /// The method will call on message list pull to refreshing.
     func onMessageListPullRefresh()
     
+    func onMessageListLoadMore()
+    
     /// The method will call on message reply content clicked.
     /// - Parameter message: ``ChatMessage``
     func onMessageReplyClicked(message: MessageEntity)
@@ -74,6 +76,7 @@ import UIKit
     
     /// More messages button clicked.
     func onMoreMessagesClicked()
+    
     
 }
 
@@ -152,6 +155,11 @@ import UIKit
     func updateThreadLoadMessagesFinished(finished: Bool)
 }
 
+@objc public enum MessageListType: UInt8 {
+    case normal
+    case history
+    case thread
+}
 
 @objc open class MessageListView: UIView {
         
@@ -228,7 +236,7 @@ import UIKit
         UIButton(type: .custom).frame(CGRect(x: self.moreMessageAxisX, y: self.inputBar.frame.minY-44, width: 180, height: 36)).font(UIFont.theme.labelMedium).title("    \(self.moreMessagesCount) "+"new messages".chat.localize, .normal).addTargetFor(self, action: #selector(scrollTableViewToBottom), for: .touchUpInside)
     }()
     
-    public private(set) var historyResult = false
+    public private(set) var showType = MessageListType.normal
     
     /// More messages button `X` position.
     private var moreMessageAxisX: CGFloat {
@@ -253,21 +261,21 @@ import UIKit
     ///   - frame: ``CGRect``
     ///   - mention: Whether to enable the mention function of UI.
     ///   - historyResult: Whether to enable the history result.
-    @objc required public init(frame: CGRect,mention: Bool,historyResult: Bool = false) {
+    @objc required public init(frame: CGRect,mention: Bool,showType: MessageListType = .normal) {
         super.init(frame: frame)
         self.oldFrame = frame
         self.canMention = mention
-        self.historyResult = historyResult
+        self.showType = showType
         self.messageList.keyboardDismissMode = .onDrag
         self.messageList.allowsSelection = false
         if Appearance.chat.contentStyle.contains(.withReply) {
-            if !historyResult {
+            if showType != .history {
                 self.addSubViews([self.messageList,self.inputBar,self.replyBar,self.moreMessages,self.editBottomBar])
             } else {
                 self.addSubViews([self.messageList,self.inputBar,self.replyBar,self.editBottomBar])
             }
         } else {
-            if !historyResult {
+            if showType != .history {
                 self.addSubViews([self.messageList,self.inputBar,self.moreMessages,self.editBottomBar])
             } else {
                 self.addSubViews([self.messageList,self.inputBar,self.editBottomBar])
@@ -443,6 +451,14 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        //TODO: - thread此处需要回调到ViewModel加载更多消息
+        if self.showType == .thread {
+            if indexPath.row > self.messages.count - 4,!self.threadMessagesLoadFinished {
+                for handler in self.eventHandlers.allObjects {
+                    handler.onMessageListLoadMore()
+                }
+            }
+        }
         for listener in self.eventHandlers.allObjects {
             if let entity = self.messages[safe: indexPath.row] {
                 listener.onMessageVisible(entity: entity)
@@ -751,9 +767,15 @@ extension MessageListView: IMessageListViewDriver {
     
     public func insertMessages(messages: [ChatMessage]) {
         self.messageList.refreshControl?.endRefreshing()
-        self.messages.insert(contentsOf: messages.map({
-            self.convertMessage(message: $0)
-        }), at: 0)
+        if self.showType == .thread {
+            self.messages.append(contentsOf: messages.map({
+                self.convertMessage(message: $0)
+            }))
+        } else {
+            self.messages.insert(contentsOf: messages.map({
+                self.convertMessage(message: $0)
+            }), at: 0)
+        }
         self.messageList.reloadData()
     }
     
@@ -768,17 +790,21 @@ extension MessageListView: IMessageListViewDriver {
             self.convertMessage(message: $0)
         })
         self.messageList.reloadData()
-        if !self.threadMessagesLoadFinished {
-            return
+        if self.showType == .thread {
+            if !self.threadMessagesLoadFinished {
+                return
+            }
         }
         if self.messages.count > 1 {
-            if self.historyResult {
-                let firstIndexPath = IndexPath(row: self.messageList.numberOfRows(inSection: 0), section: 0)
-                self.messageList.scrollToRow(at: firstIndexPath, at: .bottom, animated: true)
+            if self.showType == .history {
+                let firstIndexPath = IndexPath(row: 0, section: 0)
+                self.messageList.scrollToRow(at: firstIndexPath, at: .top, animated: true)
             } else {
-                let lastIndexPath = IndexPath(row: self.messageList.numberOfRows(inSection: 0) - 1, section: 0)
-                if lastIndexPath.row >= 0 {
-                    self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
+                if self.showType == .normal {
+                    let lastIndexPath = IndexPath(row: self.messageList.numberOfRows(inSection: 0) - 1, section: 0)
+                    if lastIndexPath.row >= 0 {
+                        self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
+                    }
                 }
             }
         }
@@ -796,6 +822,7 @@ extension MessageListView: IMessageListViewDriver {
                     entity.playing = false
                 }
             }
+            self.messages[safe: index]?.message = message
             self.messages[safe: index]?.playing = play
             self.messageList.reloadRows(at: indexPaths, with: .none)
         }
@@ -811,7 +838,13 @@ extension MessageListView: IMessageListViewDriver {
     public func addMentionUserToField(user: EaseProfileProtocol) {
         let result = NSMutableAttributedString(attributedString: self.inputBar.inputField.attributedText)
         let key = NSAttributedString.Key("mentionInfo")
-        let nickName = user.nickname.isEmpty ? user.id:user.nickname
+        var nickName = user.remark
+        if nickName.isEmpty {
+            nickName = user.nickname
+            if nickName.isEmpty {
+                nickName = user.id
+            }
+        }
         let newString = NSAttributedString(string: "@\(nickName) ", attributes: [.font: self.inputBar.inputField.font!, key: user, .foregroundColor: (Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)])
         if result.length > 0 && result.string.hasSuffix("@") {
             result.deleteCharacters(in: NSRange(location: result.length - 1, length: 1))
@@ -827,6 +860,7 @@ extension MessageListView: IMessageListViewDriver {
     
     public func updateMessageStatus(message: ChatMessage, status: ChatMessageStatus) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
+            self.messages[safe: index]?.message = message
             self.messages[safe: index]?.state = status
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .fade)
         }
@@ -863,8 +897,10 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     public func showMessage(message: ChatMessage) {
-        if !self.threadMessagesLoadFinished {
-            return
+        if self.showType == .thread {
+            if !self.threadMessagesLoadFinished {
+                return
+            }
         }
         if message.direction == .send {
             self.replyId = ""
@@ -948,7 +984,7 @@ extension MessageListView: IMessageListViewDriver {
             _ = entity.height
             _ = entity.replySize
             self.messages.replaceSubrange(index...index, with: [entity])
-            self.messageList.reloadData()
+            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
         }
     }
     
@@ -964,7 +1000,7 @@ extension MessageListView: IMessageListViewDriver {
     private func editAction(_ message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
-            self.messageList.reloadData()
+            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
         }
     }
     

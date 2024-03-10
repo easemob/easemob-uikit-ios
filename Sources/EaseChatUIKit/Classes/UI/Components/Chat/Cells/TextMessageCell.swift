@@ -56,16 +56,22 @@ import UIKit
     @objc required public init(towards: BubbleTowards,reuseIdentifier: String) {
         super.init(towards: towards, reuseIdentifier: reuseIdentifier)
         if Appearance.chat.bubbleStyle == .withArrow {
-            self.bubbleWithArrow.addSubViews([self.content,self.edit,self.separatorLine,self.translation,self.translateSymbol])
+            self.bubbleWithArrow.addSubViews([self.content,self.edit])
+            if Appearance.chat.enableTranslation {
+                self.bubbleWithArrow.addSubViews([self.separatorLine,self.translation,self.translateSymbol])
+            }
             self.addGestureTo(view: self.bubbleWithArrow, target: self)
         } else {
-            self.bubbleMultiCorners.addSubViews([self.content,self.edit,self.separatorLine,self.translation,self.translateSymbol])
+            self.bubbleMultiCorners.addSubViews([self.content,self.edit])
+            if Appearance.chat.enableTranslation {
+                self.bubbleWithArrow.addSubViews([self.separatorLine,self.translation,self.translateSymbol])
+            }
             self.addGestureTo(view: self.bubbleMultiCorners, target: self)
         }
         self.edit.contentHorizontalAlignment = .right
         self.translateSymbol.contentHorizontalAlignment = .right
         self.translation.isEditable = false 
-        self.translation.contentInset = .zero
+        self.translation.contentInset = UIEdgeInsets(top: -8, left: 0, bottom: 0, right: 0)
     }
     
     required public init?(coder: NSCoder) {
@@ -76,7 +82,7 @@ import UIKit
         super.refresh(entity: entity)
         let textSize = entity.textSize()
         let translationSize = Appearance.chat.enableTranslation ? entity.translationSize():.zero
-        self.content.frame = CGRect(x: 12, y: 0, width: entity.bubbleSize.width-24, height: textSize.height)
+        self.content.frame = CGRect(x: 12, y: 6.5, width: entity.bubbleSize.width-24, height: textSize.height)
         let stateColor: UIColor = entity.message.direction == .send ? self.sendStateColor:self.receiveStateColor
         self.edit.setTitleColor(stateColor, for: .normal)
         self.translateSymbol.setTitleColor(stateColor, for: .normal)
@@ -101,7 +107,7 @@ import UIKit
             self.separatorLine.isHidden = false
             self.translation.isHidden = false
             self.translateSymbol.isHidden = false
-            self.separatorLine.frame = CGRect(x: 12, y: self.content.frame.maxY+(entity.message.edited ? 20:6), width: entity.bubbleSize.width-24, height: 0.5)
+            self.separatorLine.frame = CGRect(x: 12, y: self.content.frame.maxY+(entity.message.edited ? 12:6), width: entity.bubbleSize.width-24, height: 0.5)
             self.translation.frame = CGRect(x: 12, y: self.separatorLine.frame.maxY+4, width: entity.bubbleSize.width-24, height: translationSize.height)
             self.translateSymbol.frame = CGRect(x: 12, y: self.translation.frame.maxY+4, width: entity.bubbleSize.width-24, height: 16)
             self.translateSymbol.setTitle("Translated".chat.localize, for: .normal)

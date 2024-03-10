@@ -35,7 +35,7 @@ import UIKit
         self.content.frame = CGRect(x: Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame.minX:self.bubbleMultiCorners.frame.minX, y: Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame.minY:self.bubbleMultiCorners.frame.minY, width: entity.bubbleSize.width, height: entity.bubbleSize.height)
         if let body = (entity.message.body as? ChatImageMessageBody) {
             if entity.message.direction == .receive {
-                if let url = body.thumbnailLocalPath,!url.isEmpty {
+                if let url = body.thumbnailLocalPath,!url.isEmpty,FileManager.default.fileExists(atPath: url) {
                     self.content.image = UIImage(contentsOfFile: url)
                 } else {
                     self.content.image(with: body.thumbnailRemotePath, placeHolder: Appearance.chat.imagePlaceHolder)

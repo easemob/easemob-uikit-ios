@@ -48,7 +48,7 @@ import AVFoundation
     }()
     
     public private(set) lazy var messageContainer: MessageListView = {
-        MessageListView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight), mention: false)
+        MessageListView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight), mention: false,showType: .thread)
     }()
     
     public private(set) lazy var loadingView: LoadingView = {
@@ -205,9 +205,12 @@ extension ChatThreadViewController {
             ActionSheetItem(title: "Leave Topic", type: .destructive, tag: "LeaveTopic", image: UIImage(named: "quit", in: .chatBundle, with: nil))
         ]
         let group = ChatGroup(id: self.profile.parentId)
-        if self.profile.owner == EaseChatUIKitContext.shared?.currentUserId ?? "" || group?.owner == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+        if group?.owner == EaseChatUIKitContext.shared?.currentUserId ?? "" {
             items.removeLast()
             items.append(ActionSheetItem(title: "Disband Topic", type: .destructive, tag: "DisbandTopic", image: UIImage(named: "quit", in: .chatBundle, with: nil)))
+
+        }
+        if group?.owner == EaseChatUIKitContext.shared?.currentUserId ?? "" || self.profile.owner == EaseChatUIKitContext.shared?.currentUserId ?? ""{
             items.insert(ActionSheetItem(title: "Edit Topic", type: .normal, tag: "EditTopic", image: UIImage(named: "message_action_edit", in: .chatBundle, with: nil)), at: 0)
         }
         return items
@@ -223,7 +226,7 @@ extension ChatThreadViewController {
         switch item.tag {
         case "EditTopic": self.editTopicName()
         case "LeaveTopic": self.leaveTopic()
-        case "TopicMembers": self.editTopicName()
+        case "TopicMembers": self.topicMembers()
         case "DisbandTopic": self.disbandTopic()
         default:
             break
@@ -241,6 +244,8 @@ extension ChatThreadViewController {
         self.viewModel.operationTopic(option: .leave) {  [weak self] success in
             if success {
                 self?.pop()
+            } else {
+                consoleLogInfo("leaveTopic error", type: .error)
             }
         }
     }
@@ -249,10 +254,16 @@ extension ChatThreadViewController {
         self.viewModel.operationTopic(option: .destroy) {  [weak self] success in
             if success {
                 self?.pop()
+            } else {
+                consoleLogInfo("disbandTopic error", type: .error)
             }
         }
     }
     
+    open func topicMembers() {
+        let vc = ChatThreadParticipantsController(chatThread: self.profile)
+        ControllerStack.toDestination(vc: vc)
+    }
     
     @objc open func pop() {
         if self.navigationController != nil {
@@ -268,6 +279,11 @@ extension ChatThreadViewController {
 
 //MARK: - MessageListDriverEventsListener
 extension ChatThreadViewController: MessageListDriverEventsListener {
+    
+    public func onChatThreadUpdated(chatThread: GroupChatThread) {
+        self.profile = chatThread
+        self.navigation.title = chatThread.threadName
+    }
     
     public func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation) {
         self.messageContainer.editMode = false

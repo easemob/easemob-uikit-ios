@@ -62,9 +62,15 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
     public var showTranslation: Bool {
         set {
             if !newValue {
-                self.message.ext?.removeValue(forKey: translationKey)
+                if self.message.ext != nil {
+                    self.message.ext?.removeValue(forKey: translationKey)
+                }
             } else {
-                self.message.ext?[translationKey] = newValue
+                if self.message.ext == nil {
+                    self.message.ext = [translationKey:newValue]
+                } else {
+                    self.message.ext?[translationKey] = newValue
+                }
                 ChatClient.shared().chatManager?.update(self.message)
             }
         }
@@ -227,44 +233,25 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
     open func textSize() -> CGSize {
         let label = UILabel().numberOfLines(0).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
         let textAttribute = self.convertTextAttribute()
-        let translationAttribute = self.convertTextTranslationAttribute()
-        let textLength = textAttribute?.length ?? 0
-        let translationLength = translationAttribute?.length ?? 0
-        if textLength < translationLength {
-            label.attributedText = translationAttribute
-        } else {
-            label.attributedText = textAttribute
-        }
-        var width = label.sizeThatFits(CGSize(width: self.historyMessage ? ScreenWidth-68:limitBubbleWidth-24, height: 9999)).width+(self.historyMessage ? 68:24)
         label.attributedText = textAttribute
+        var width = label.sizeThatFits(CGSize(width: self.historyMessage ? ScreenWidth-68:limitBubbleWidth-24, height: 9999)).width+(self.historyMessage ? 68:24)
         let textHeight = label.sizeThatFits(CGSize(width: limitBubbleWidth-24, height: 9999)).height
         if textAttribute?.string.count ?? 0 <= 1,self.message.body.type == .text {
             width += 8
         }
-         width += 24
-        return CGSize(width: width, height: textHeight+14)
+        return CGSize(width: width, height: textHeight)
     }
     
     open func textBubbleSize() -> CGSize {
-        let label = UILabel().numberOfLines(0).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
-        let textAttribute = self.convertTextAttribute()
-        let translationAttribute = self.convertTextTranslationAttribute()
-        let textLength = textAttribute?.length ?? 0
-        let translationLength = translationAttribute?.length ?? 0
-        if textLength < translationLength {
-            label.attributedText = translationAttribute
-        } else {
-            label.attributedText = textAttribute
-        }
-        var width = label.sizeThatFits(CGSize(width: self.historyMessage ? ScreenWidth-68:limitBubbleWidth-24, height: 9999)).width+(self.historyMessage ? 68:24)
-        label.attributedText = textAttribute
-        let textHeight = label.sizeThatFits(CGSize(width: limitBubbleWidth-24, height: 9999)).height
-        if textAttribute?.string.count ?? 0 <= 1,self.message.body.type == .text {
-            width += 8
-        }
-         width += 24
+        let textSize = self.textSize()
+        var width = textSize.width
+        let textHeight = textSize.height
+
         let translateSize = Appearance.chat.enableTranslation ? self.translationSize():.zero
-        let height = textHeight+14+(self.message.edited ? 19:0)+(self.showTranslation ? (translateSize.height > 0 ? (28+translateSize.height):0):0)
+        if width < translateSize.width {
+            width = translateSize.width
+        }
+        let height = 6.5+textHeight+(self.message.edited ? 20:6)+(self.showTranslation ? translateSize.height+24:0)
         return CGSize(width: width, height: height)
     }
     
@@ -274,7 +261,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
             label.attributedText = self.convertTextTranslationAttribute()
             let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-24, height: 9999))
             let width = size.width+24
-            return CGSize(width: width < 70 ? 70:width, height: size.height+14)
+            return CGSize(width: width < 86 ? 86:width, height: size.height)
         } else {
             return .zero
         }
@@ -372,7 +359,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
         }
         if self.message.body.type != .text, self.message.body.type != .custom {
             text.append(NSAttributedString {
-                AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
+                AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(minimum: 0.98)
             })
             return text
         }
@@ -389,15 +376,15 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
                     if let threadName = self.message.ext?["threadName"] as? String {
                         let range = something.chat.rangeOfString(threadName)
                         text.append(NSAttributedString {
-                            AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall)
+                            AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall).lineHeight(minimum: 0.98)
                         })
                         text.addAttribute(NSAttributedString.Key.foregroundColor, value: Theme.style == .dark ? Color.theme.primaryColor6:Color.theme.primaryColor5, range: range)
                     } else {
                         text.append(NSMutableAttributedString {
-                            AttributedText(self.message.user?.nickname ?? self.message.from).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.labelSmall)
+                            AttributedText(self.message.user?.nickname ?? self.message.from).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.labelSmall).lineHeight(minimum: 0.98)
                         })
                         text.append(NSAttributedString {
-                            AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall)
+                            AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall).lineHeight(minimum: 0.98)
                         })
                     }
                     
@@ -405,29 +392,56 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
                 
             default:
                 text.append(NSAttributedString {
-                    AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
+                    AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(minimum: 0.98)
                 })
                 break
             }
             
         } else {
             var result = self.message.showType
+            
             for (key,value) in ChatEmojiConvertor.shared.oldEmojis {
                 result = result.replacingOccurrences(of: key, with: value)
             }
             if self.message.mention.isEmpty {
                 text.append(NSAttributedString {
-                    AttributedText(result).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
+                    AttributedText(result).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(minimum: 0.98)
                 })
             } else {
-                let content = result
-                let mentionRange = content.lowercased().chat.rangeOfString(self.message.mention.lowercased())
-                let range = NSMakeRange(mentionRange.location-1, mentionRange.length+1)
-                let mentionAttribute = NSMutableAttributedString {
-                    AttributedText(content).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
+                if self.message.mention == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+                    let mentionUser = EaseChatUIKitContext.shared?.chatCache?[self.message.mention]
+                    var nickname = mentionUser?.remark
+                    if nickname?.isEmpty ?? true {
+                        nickname = mentionUser?.nickname
+                        if nickname?.isEmpty ?? true {
+                            nickname = EaseChatUIKitContext.shared?.currentUserId ?? ""
+                        }
+                    }
+                    let content = result
+                    
+                    let mentionRange = content.lowercased().chat.rangeOfString(nickname ?? "")
+                    let range = NSMakeRange(mentionRange.location-1, mentionRange.length+1)
+                    let mentionAttribute = NSMutableAttributedString {
+                        AttributedText(content).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(minimum: 0.98)
+                    }
+                    if mentionRange.location != NSNotFound,mentionRange.length != NSNotFound {
+                        mentionAttribute.addAttribute(.foregroundColor, value: (Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5), range: range)
+                    }
+                    text.append(mentionAttribute)
+                } else {
+                    let content = result
+                    
+                    let mentionRange = content.lowercased().chat.rangeOfString(self.message.mention.lowercased())
+                    let range = NSMakeRange(mentionRange.location-1, mentionRange.length+1)
+                    let mentionAttribute = NSMutableAttributedString {
+                        AttributedText(content).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(minimum: 0.98)
+                    }
+                    if mentionRange.location != NSNotFound,mentionRange.length != NSNotFound {
+                        mentionAttribute.addAttribute(.foregroundColor, value: (Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5), range: range)
+                    }
+                    text.append(mentionAttribute)
                 }
-                mentionAttribute.addAttribute(.foregroundColor, value: (Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5), range: range)
-                text.append(mentionAttribute)
+                
             }
             let string = text.string as NSString
             for symbol in ChatEmojiConvertor.shared.emojis {
@@ -446,7 +460,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
         var text = NSMutableAttributedString()
         guard let topicMessage = self.message.chatThread?.lastMessage else {
             text.append(NSAttributedString {
-                AttributedText("No Messages".chat.localize).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.labelSmall)
+                AttributedText("No Messages".chat.localize).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.labelSmall).lineHeight(minimum: 0.98)
             })
             return text
         }
@@ -454,7 +468,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
         
         if topicMessage.body.type != .text {
             text.append(NSAttributedString {
-                AttributedText(nickname+":"+topicMessage.showType).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.labelSmall)
+                AttributedText(nickname+":"+topicMessage.showType).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.labelSmall).lineHeight(minimum: 0.98)
             })
             return text
         } else {
@@ -463,7 +477,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
                 result = result.replacingOccurrences(of: key, with: value)
             }
             text.append(NSAttributedString {
-                AttributedText(result).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.labelSmall)
+                AttributedText(result).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.labelSmall).lineHeight(minimum: 0.98)
             })
             let string = text.string as NSString
             for symbol in ChatEmojiConvertor.shared.emojis {
@@ -483,7 +497,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
         var text = NSMutableAttributedString()
         if self.message.body.type != .text {
             text.append(NSAttributedString {
-                AttributedText(self.message.showType).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTranslationColor:Appearance.chat.receiveTranslationColor).font(UIFont.theme.bodyLarge).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
+                AttributedText(self.message.showType).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTranslationColor:Appearance.chat.receiveTranslationColor).font(UIFont.theme.bodyLarge).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byWordWrapping).lineHeight(minimum: 0.98)
             })
             return text
         } else {
@@ -492,7 +506,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
                 result = result.replacingOccurrences(of: key, with: value)
             }
             text.append(NSAttributedString {
-                AttributedText(result).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTranslationColor:Appearance.chat.receiveTranslationColor).font(UIFont.theme.bodyLarge).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
+                AttributedText(result).foregroundColor(self.message.direction == .send ? Appearance.chat.sendTranslationColor:Appearance.chat.receiveTranslationColor).font(UIFont.theme.bodyLarge).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping).lineHeight(minimum: 0.98)
             })
             let string = text.string as NSString
             for symbol in ChatEmojiConvertor.shared.emojis {
@@ -504,6 +518,7 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
                     text.addAttribute(.foregroundColor, value: self.message.direction == .send ? Appearance.chat.sendTranslationColor:Appearance.chat.receiveTranslationColor, range: range)
                     let paragraphStyle = NSMutableParagraphStyle()
                     paragraphStyle.lineBreakMode = .byWordWrapping
+                    paragraphStyle.lineHeightMultiple = 0.98
                     text.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
                 }
             }

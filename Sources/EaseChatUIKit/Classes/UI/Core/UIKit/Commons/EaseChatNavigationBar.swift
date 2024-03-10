@@ -93,12 +93,16 @@ import UIKit
     }()
     
     public private(set) lazy var status: UIImageView = {
+        self.createAvatarStatus()
+    }()
+    
+    open func createAvatarStatus() -> UIImageView {
         let r = self.avatar.frame.width / 2.0
         let length = CGFloat(sqrtf(Float(r)))
         let x = (Appearance.avatarRadius == .large ? (r + length + 3):(self.avatar.frame.width-12))
         let y = (Appearance.avatarRadius == .large ? (r + length + 3):(self.avatar.frame.height-12))
         return UIImageView(frame: CGRect(x: self.avatar.frame.minX+x, y: self.avatar.frame.minY+y, width: 12, height: 12)).backgroundColor(UIColor.theme.secondaryColor5).cornerRadius(.large).layerProperties(UIColor.theme.neutralColor98, 2)
-    }()
+    }
     
     public private(set) lazy var titleLabel: UILabel = {
         UILabel(frame: CGRect(x: self.avatar.frame.maxX+4, y: StatusBarHeight+2, width: ScreenWidth-self.avatar.frame.maxX*2-8*3, height: 22)).font(UIFont.theme.titleMedium).textColor(UIColor.theme.neutralColor1).backgroundColor(.clear).tag(2)
@@ -228,7 +232,7 @@ import UIKit
         self.avatar.addGestureRecognizer(gesture)
     }
     
-    @objc private func clickAction(gesture: UITapGestureRecognizer) {
+    @objc open func clickAction(gesture: UITapGestureRecognizer) {
         guard let tag = gesture.view?.tag else { return }
         switch tag {
         case 1:
@@ -240,7 +244,7 @@ import UIKit
         }
     }
     
-    @objc private func buttonAction(sender: UIButton) {
+    @objc open func buttonAction(sender: UIButton) {
         switch sender.tag {
         case 0:
             self.clickClosure?(.back,nil)

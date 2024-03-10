@@ -236,7 +236,7 @@ import UIKit
         let vc = SearchHistoryMessagesViewController(conversationId: self.chatGroup.groupId) { message in
             
         }
-        ControllerStack.toDestination(vc: vc)
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     /**
