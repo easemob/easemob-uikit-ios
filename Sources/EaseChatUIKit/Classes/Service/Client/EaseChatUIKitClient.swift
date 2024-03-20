@@ -92,21 +92,6 @@ public let EaseChatUIKit_VERSION = "1.0.0"
         })
     }
     
-    /// Registers a chat room event listener.
-    /// - Parameter listener: ``UserStateChangedListener``
-    @objc(registerWithUserEventsListener:)
-    public func registerUserEventsListener(_ listener: UserStateChangedListener) {
-        self.userService?.unBindUserStateChangedListener(listener: listener)
-        self.userService?.bindUserStateChangedListener(listener: listener)
-    }
-    
-    /// Unregisters a chat room event listener.
-    /// - Parameter listener: ``UserStateChangedListener``
-    @objc(unregisterWithUserEventsListener:)
-    public func unregisterUserEventsListener(_ listener: UserStateChangedListener) {
-        self.userService?.unBindUserStateChangedListener(listener: listener)
-    }
-    
     ///  Refreshes the user chat token when receiving the ``ChatClientListener.onUserTokenWillExpired`` callback.
     /// - Parameter token: The user chat token.
     @objc(refreshWithToken:)

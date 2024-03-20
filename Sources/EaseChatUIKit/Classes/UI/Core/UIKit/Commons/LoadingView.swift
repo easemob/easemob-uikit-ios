@@ -28,7 +28,7 @@ import UIKit
         UILabel().font(UIFont.theme.labelMedium).textColor(UIColor.theme.neutralColor98).text("Loading...".chat.localize).textAlignment(.center)
     }()
     
-    override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
         self.setupViews()
     }
@@ -70,14 +70,14 @@ import UIKit
     }
     
     /// Start loading animation
-    @MainActor func startAnimating() {
+    @MainActor public func startAnimating() {
         self.isHidden = false
         self.alpha = 1
         self.activityIndicatorView.startAnimating()
     }
     
     /// Stop loading animation
-    @MainActor func stopAnimating() {
+    @MainActor public func stopAnimating() {
         self.activityIndicatorView.stopAnimating()
         self.isHidden = true
         UIView.animate(withDuration: 0.2) {
