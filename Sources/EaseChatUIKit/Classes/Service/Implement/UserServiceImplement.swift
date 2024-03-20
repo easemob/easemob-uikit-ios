@@ -18,6 +18,7 @@ import UIKit
     ///   - completion: Callback,login successful or failure.
     @objc public init(userInfo: EaseProfileProtocol,token: String,completion: @escaping (ChatError?) -> Void) {
         super.init()
+        ChatClient.shared().add(self, delegateQueue: nil)
         self.login(userId: userInfo.id.lowercased(), token: token) { success, error in
             if !success {
                 let errorInfo = error?.errorDescription ?? ""
