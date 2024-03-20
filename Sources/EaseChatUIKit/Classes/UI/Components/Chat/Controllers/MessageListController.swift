@@ -29,7 +29,7 @@ import AVFoundation
     }
     
     @objc open func rightImages() -> [UIImage] {
-        var images = [UIImage(named: "message_action_topic", in: .chatBundle, with: nil)!,UIImage(named: "audio_call", in: .chatBundle, with: nil)!,UIImage(named: "video_call", in: .chatBundle, with: nil)!]
+        var images = [UIImage(named: "message_action_topic", in: .chatBundle, with: nil)!]
         if !Appearance.chat.contentStyle.contains(.withMessageTopic) {
             images.remove(at: 0)
         }

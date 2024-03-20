@@ -21,7 +21,7 @@ import UIKit
     
     private var responseDelegates: NSHashTable<ConversationServiceListener> = NSHashTable<ConversationServiceListener>.weakObjects()
     
-    private var eventsNotifiers: NSHashTable<ConversationEmergencyListener> = NSHashTable<ConversationEmergencyListener>.weakObjects()
+    public private(set) var eventsNotifiers: NSHashTable<ConversationEmergencyListener> = NSHashTable<ConversationEmergencyListener>.weakObjects()
     
     public override init() {
         super.init()
@@ -280,19 +280,19 @@ extension ConversationServiceImplement: ConversationService {
         }
     }
     
-    func handleResult(error: ChatError?,type: ConversationEmergencyType) {
+    public func handleResult(error: ChatError?,type: ConversationEmergencyType) {
         for listener in self.eventsNotifiers.allObjects {
             listener.onResult(error: error, type: type)
         }
     }
     
-    func notifyUnreadCount(count: UInt) {
+    public func notifyUnreadCount(count: UInt) {
         for listener in self.eventsNotifiers.allObjects {
             listener.onConversationsUnreadCountUpdate(unreadCount: count)
         }
     }
     
-    private func mapper(objects: [ChatConversation]) -> [ConversationInfo] {
+    public func mapper(objects: [ChatConversation]) -> [ConversationInfo] {
         objects.map {
             let conversation = ComponentsRegister.shared.Conversation.init()
             conversation.id = $0.conversationId

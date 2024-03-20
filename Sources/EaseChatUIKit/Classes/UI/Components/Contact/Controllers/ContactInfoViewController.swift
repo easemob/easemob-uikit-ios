@@ -32,7 +32,7 @@ import UIKit
     
     private var contacts = [String]()
     
-    @UserDefault("EaseChatUIKit_conversation_mute_map", defaultValue: Dictionary<String,Dictionary<String,Int>>()) private var muteMap
+    @UserDefault("EaseChatUIKit_conversation_mute_map", defaultValue: Dictionary<String,Dictionary<String,Int>>()) public private(set) var muteMap
     
     public private(set) lazy var datas: [DetailInfo] = {
         self.dataSource()
@@ -71,7 +71,7 @@ import UIKit
      - Returns: An instance of DetailInfoHeader.
      */
     @objc open func createHeader() -> DetailInfoHeader {
-        DetailInfoHeader(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 264), showMenu: self.showMenu, placeHolder: UIImage(named: "single", in: .chatBundle, with: nil)).backgroundColor(.clear)
+        DetailInfoHeader(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 284), showMenu: self.showMenu, placeHolder: UIImage(named: "single", in: .chatBundle, with: nil)).backgroundColor(.clear)
     }
     
     lazy var showMenu: Bool = {

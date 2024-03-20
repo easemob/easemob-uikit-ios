@@ -9,7 +9,7 @@ import UIKit
 
 @objcMembers open class ChatThreadListController: UIViewController {
     
-    public private(set) var threads = [GroupChatThread]() {
+    public private(set) var threads = [EaseChatThread]() {
         didSet {
             DispatchQueue.main.async {
                 if self.threads.count <= 0 {
@@ -104,7 +104,11 @@ import UIKit
         if error == nil {
             self.cursor = result?.cursor ?? ""
             if let threads = result?.list {
-                self.threads.append(contentsOf: threads)
+                self.threads.append(contentsOf: threads.map({
+                    let thread = EaseChatThread()
+                    thread.thread = $0
+                    return thread
+                }))
             } else {
                 self.threads = []
             }
@@ -113,6 +117,22 @@ import UIKit
             consoleLogInfo("requestThreadList error:\(error?.errorDescription ?? "")", type: .debug)
         }
         self.topicList.reloadData()
+        self.requestThreadMessage()
+    }
+    
+    private func requestThreadMessage() {
+        ChatClient.shared().threadManager?.getLastMessageFromSever(withChatThreads: self.threads.map({ $0.thread.threadId }), completion: { messageMap, error in
+            if error == nil, let messageMap = messageMap {
+                for (threadId, message) in messageMap {
+                    if let index = self.threads.firstIndex(where: { $0.thread.threadId == threadId }) {
+                        self.threads[index].lastMessage = message
+                    }
+                }
+                self.topicList.reloadData()
+            } else {
+                consoleLogInfo("requestThreadMessage error:\(error?.errorDescription ?? "")", type: .debug)
+            }
+        })
     }
     
     /**
@@ -159,8 +179,14 @@ extension ChatThreadListController: UITableViewDelegate,UITableViewDataSource {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if let thread = self.threads[safe: indexPath.row] {
-            let vc = ChatThreadViewController(chatThread: thread,parentMessageId: thread.messageId)
+            let vc = ChatThreadViewController(chatThread: thread.thread,parentMessageId: thread.thread.messageId)
             ControllerStack.toDestination(vc: vc)
+        }
+    }
+    
+    public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.row <= self.threads.count - 1,!self.cursor.isEmpty,self.threads.count%self.pageSize == 0 {
+            self.requestThreadList()
         }
     }
     
@@ -169,21 +195,9 @@ extension ChatThreadListController: UITableViewDelegate,UITableViewDataSource {
         if let visiblePaths = self.topicList.indexPathsForVisibleRows {
             for indexPath in visiblePaths {
                 if let lastMessage = self.threads[safe: indexPath.row]?.lastMessage {
-                    unknownInfoIds.append(self.threads[safe: indexPath.row]?.threadId ?? "")
+                    unknownInfoIds.append(self.threads[safe: indexPath.row]?.thread.threadId ?? "")
                 }
             }
-        }
-        if !unknownInfoIds.isEmpty {
-            ChatClient.shared().threadManager?.getLastMessageFromSever(withChatThreads: unknownInfoIds, completion: { [weak self] messages, error in
-                guard let `self` = self else { return }
-                if error == nil {
-                    for thread in self.threads {
-//                        thread.lastMessage = messages[thread.threadId]
-                    }
-                } else {
-                    consoleLogInfo("getLastMessageFromSever error:\(error?.errorDescription ?? "")", type: .debug)
-                }
-            })
         }
     }
 }
@@ -196,4 +210,10 @@ extension ChatThreadListController: ThemeSwitchProtocol {
         self.view.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
     }
     
+}
+
+@objcMembers open class EaseChatThread: NSObject {
+    public var thread: GroupChatThread = GroupChatThread()
+    
+    public var lastMessage: ChatMessage?
 }

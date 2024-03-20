@@ -40,7 +40,7 @@ import UIKit
         self.shapeLayer.lineCap = .round
         self.layer.addSublayer(self.shapeLayer)
 //        self.layer.mask = self.shapeLayer
-        self.shapeLayer.shouldRasterize = true
+//        self.shapeLayer.shouldRasterize = true
     }
     
     required public init?(coder: NSCoder) {

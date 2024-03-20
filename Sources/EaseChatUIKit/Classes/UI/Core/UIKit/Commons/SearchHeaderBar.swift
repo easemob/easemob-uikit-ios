@@ -39,7 +39,7 @@ import UIKit
     }()
     
     lazy var icon: UIImageView = {
-        UIImageView(frame: CGRect(x: 8, y: self.leftView.frame.height/2.0-11, width: 22, height: 22)).contentMode(.scaleAspectFit).backgroundColor(.clear)
+        UIImageView(frame: CGRect(x: 8, y: self.leftView.frame.height/2.0-11, width: 22, height: 22)).contentMode(.scaleAspectFill).backgroundColor(.clear)
     }()
     
     lazy var searchField: UITextField = {

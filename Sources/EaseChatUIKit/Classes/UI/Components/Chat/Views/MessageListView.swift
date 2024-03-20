@@ -634,6 +634,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                 for handler in self.eventHandlers.allObjects {
                     handler.onMessageContentClicked(message: entity)
                 }
+                
             }
         case .status:
             if entity.state == .failure {
@@ -725,7 +726,7 @@ extension MessageListView: IMessageListViewDriver {
                             self.messageList.reloadData()
                         } else {
                             if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
-                                if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }),let entity = self.messages[safe: index] {
+                                if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }){
                                     if let cell = self.messageList.cellForRow(at: indexPath) as? MessageCell {
                                         cell.updateAxis(entity: entity)
                                         cell.reactionView.refresh(entity: entity)

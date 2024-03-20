@@ -14,11 +14,11 @@ import UIKit
      */
     private var editIndex = IndexPath(row: 1, section: 0)
     
-    private var chatGroup = ChatGroup()
+    public private(set) var chatGroup = ChatGroup()
     
-    private let service: GroupService = GroupServiceImplement()
+    public private(set) var service: GroupService = GroupServiceImplement()
     
-    private let conversationService = ConversationServiceImplement()
+    public private(set) var conversationService = ConversationServiceImplement()
     
     /**
      A private array of `ActionSheetItem` objects representing the owner options in the group info view controller.
@@ -32,7 +32,7 @@ import UIKit
      ]
      ```
      */
-    private var ownerOptions = [ActionSheetItem(title: "group_details_extend_button_disband".chat.localize, type: .destructive, tag: "disband_group"),ActionSheetItem(title: "group_details_extend_button_transfer".chat.localize, type: .destructive, tag: "transfer_owner")]
+    public var ownerOptions = [ActionSheetItem(title: "group_details_extend_button_disband".chat.localize, type: .destructive, tag: "disband_group"),ActionSheetItem(title: "group_details_extend_button_transfer".chat.localize, type: .destructive, tag: "transfer_owner")]
     
     /**
      A private array that stores the member options for the group.
@@ -44,7 +44,7 @@ import UIKit
      private var memberOptions = [ActionSheetItem(title: "group_details_extend_button_leave".chat.localize, type: .destructive, tag: "quit_group")]
      ```
      */
-    private var memberOptions = [ActionSheetItem(title: "group_details_extend_button_leave".chat.localize, type: .destructive, tag: "quit_group")]
+    public var memberOptions = [ActionSheetItem(title: "group_details_extend_button_leave".chat.localize, type: .destructive, tag: "quit_group")]
     
     public private(set) lazy var navigation: EaseChatNavigationBar = {
         self.createNavigation()

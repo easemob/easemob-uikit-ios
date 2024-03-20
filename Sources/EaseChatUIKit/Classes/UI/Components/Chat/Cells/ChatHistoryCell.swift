@@ -10,7 +10,7 @@ import UIKit
 @objcMembers open class ChatHistoryCell: UITableViewCell {
 
     public private(set) lazy var avatar: ImageView = {
-        ImageView(frame: CGRect(x: 16, y: 10, width: 32, height: 32)).cornerRadius(Appearance.avatarRadius)
+        ImageView(frame: CGRect(x: 16, y: 10, width: 32, height: 32)).cornerRadius(Appearance.avatarRadius).contentMode(.scaleAspectFill)
     }()
     
     public private(set) lazy var nickname: UILabel = {

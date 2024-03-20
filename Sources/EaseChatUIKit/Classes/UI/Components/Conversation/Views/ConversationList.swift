@@ -244,6 +244,8 @@ extension ConversationList: IConversationListDriver {
     }
     
     public func refreshProfiles(infos: [EaseProfileProtocol]) {
+        var indexPaths = [IndexPath]()
+        
         for info in infos {
             if let index = self.indexMap[info.id], let item = self.datas[safe: index] {
                 if !info.nickname.isEmpty {
@@ -252,9 +254,10 @@ extension ConversationList: IConversationListDriver {
                 if !info.avatarURL.isEmpty {
                     item.avatarURL = info.avatarURL
                 }
+                indexPaths.append(IndexPath(row: index, section: 0))
             }
         }
-        self.reloadDataSafe()
+        self.reloadRows(at: indexPaths, with: .automatic)
     }
     
     public func swipeMenuOperation(info: ConversationInfo, type: UIContextualActionType) {

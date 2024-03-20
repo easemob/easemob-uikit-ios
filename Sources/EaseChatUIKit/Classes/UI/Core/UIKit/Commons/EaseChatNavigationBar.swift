@@ -312,7 +312,7 @@ extension EaseChatNavigationBar: ThemeSwitchProtocol {
 @objc open class EaseChatNavigationBarRightCell: UICollectionViewCell {
     
     lazy var imageView: UIImageView = {
-        UIImageView(frame: CGRect(x: 4, y: 4, width: self.contentView.frame.width-8, height: self.contentView.frame.height-8)).contentMode(.scaleAspectFit).backgroundColor(.clear)
+        UIImageView(frame: CGRect(x: 4, y: 4, width: self.contentView.frame.width-8, height: self.contentView.frame.height-8)).contentMode(.scaleAspectFill).backgroundColor(.clear)
     }()
     
     @objc public override init(frame: CGRect) {

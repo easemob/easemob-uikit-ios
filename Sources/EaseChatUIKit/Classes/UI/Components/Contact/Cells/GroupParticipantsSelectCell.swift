@@ -14,7 +14,7 @@ import UIKit
     }()
     
     lazy var avatar: ImageView = {
-        ImageView(frame: CGRect(x: self.checkbox.frame.maxX+12, y: (self.contentView.frame.height-40)/2.0, width: 40, height: 40)).contentMode(.scaleAspectFit).backgroundColor(.clear).cornerRadius(Appearance.avatarRadius)
+        ImageView(frame: CGRect(x: self.checkbox.frame.maxX+12, y: (self.contentView.frame.height-40)/2.0, width: 40, height: 40)).contentMode(.scaleAspectFill).backgroundColor(.clear).cornerRadius(Appearance.avatarRadius)
     }()
     
     lazy var nickName: UILabel = {
@@ -41,6 +41,7 @@ import UIKit
         self.checkbox.frame = CGRect(x: 16, y: (self.contentView.frame.height-28)/2.0, width: 28, height: 28)
         self.avatar.frame = CGRect(x: self.checkbox.frame.maxX+12, y: (self.contentView.frame.height-40)/2.0, width: 40, height: 40)
         self.nickName.frame = CGRect(x: self.avatar.frame.maxX+12, y: (self.contentView.frame.height-16)/2.0, width: self.contentView.frame.width-self.avatar.frame.maxX-12-30, height: 16)
+        self.separatorLine.frame = CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5)
     }
     
     func refresh(profile: EaseProfileProtocol,keyword: String) {

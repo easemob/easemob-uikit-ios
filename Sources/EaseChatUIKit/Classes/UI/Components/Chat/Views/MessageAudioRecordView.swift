@@ -102,6 +102,11 @@ import UIKit
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        AudioTools.shared.stopRecording()
+        AudioTools.shared.stopPlaying()
+    }
+    
     private func buildTimer() {
         self.timer = nil
         self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] timer in

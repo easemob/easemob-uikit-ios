@@ -406,7 +406,7 @@ extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
     @objc open func operationReaction(emoji: String,message: ChatMessage) {
         self.chatService?.reaction(reaction: emoji, message: message, completion: { error in
             if error == nil {
-                self.driver?.reloadReaction(message: message)
+                self.driver?.reloadReaction(message: ChatClient.shared().chatManager?.getMessageWithMessageId(message.messageId) ?? message)
             } else {
                 consoleLogInfo("reaction error:\(error?.errorDescription ?? "")", type: .error)
             }

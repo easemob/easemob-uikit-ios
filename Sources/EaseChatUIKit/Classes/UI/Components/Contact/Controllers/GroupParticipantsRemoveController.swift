@@ -9,13 +9,13 @@ import UIKit
 
 @objc open class GroupParticipantsRemoveController: UIViewController {
     
-    private let service: GroupService = GroupServiceImplement()
+    public let service: GroupService = GroupServiceImplement()
     
     private var deleteClosure: (([String]) -> Void)?
     
     public private(set) var chatGroup = ChatGroup()
     
-    public private(set) var participants: [EaseProfileProtocol] = []
+    public var participants: [EaseProfileProtocol] = []
     
     public private(set) lazy var navigation: EaseChatNavigationBar = {
         self.createNavigation()
@@ -26,7 +26,7 @@ import UIKit
     }
     
     public private(set) lazy var participantsList: UITableView = {
-        UITableView(frame: CGRect(x: 0, y: NavigationHeight, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).rowHeight(60).backgroundColor(.clear)
+        UITableView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-self.navigation.frame.maxY), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).rowHeight(60).backgroundColor(.clear).separatorStyle(.none)
     }()
     
     @objc required public init(group: ChatGroup,profiles: [EaseProfileProtocol],removeClosure: @escaping ([String]) -> Void) {

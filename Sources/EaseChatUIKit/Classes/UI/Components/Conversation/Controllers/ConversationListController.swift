@@ -218,8 +218,9 @@ extension ConversationListController {
         - info: Additional information about the chat.
      */
     @objc open func createChat(profile: EaseProfileProtocol, type: ChatConversationType, info: String) {
-        if let info = self.viewModel?.loadIfNotExistCreate(profile: profile, type: type, text: info) {
-            let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: info.id , chatType: info.type == .chat ? .chat:.group)
+        EaseChatUIKitContext.shared?.conversationsCache?[profile.id] = profile
+        if let conversation = self.viewModel?.loadIfNotExistCreate(profile: profile, type: type, text: info) {
+            let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: conversation.id , chatType: conversation.type == .chat ? .chat:.group)
             vc.modalPresentationStyle = .fullScreen
             ControllerStack.toDestination(vc: vc)
         }

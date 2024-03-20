@@ -36,6 +36,8 @@ public let reactionHeight = CGFloat(30)
 
 public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar) ? ScreenWidth-48*2:40
 
+public let callMessage = "rtcCallWithAgora"
+
 @objcMembers open class MessageEntity: NSObject {
     
     required public override init() {
@@ -376,15 +378,15 @@ public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar)
                     if let threadName = self.message.ext?["threadName"] as? String {
                         let range = something.chat.rangeOfString(threadName)
                         text.append(NSAttributedString {
-                            AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall).lineHeight(minimum: 0.98)
+                            AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall).lineHeight(minimum: 0.98).alignment(.center)
                         })
                         text.addAttribute(NSAttributedString.Key.foregroundColor, value: Theme.style == .dark ? Color.theme.primaryColor6:Color.theme.primaryColor5, range: range)
                     } else {
                         text.append(NSMutableAttributedString {
-                            AttributedText(self.message.user?.nickname ?? self.message.from).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.labelSmall).lineHeight(minimum: 0.98)
+                            AttributedText(self.message.user?.nickname ?? self.message.from).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.labelSmall).lineHeight(minimum: 0.98).alignment(.center)
                         })
                         text.append(NSAttributedString {
-                            AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall).lineHeight(minimum: 0.98)
+                            AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall).lineHeight(minimum: 0.98).alignment(.center)
                         })
                     }
                     

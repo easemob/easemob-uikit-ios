@@ -32,7 +32,7 @@ extension ChatServiceImplement: ChatService {
     
     
     public func reaction(reaction: String, message: ChatMessage, completion: @escaping (ChatError?) -> Void) {
-        let messageReaction = message.reactionList?.first(where: { $0.reaction ?? "" == reaction })
+        let messageReaction = ChatClient.shared().chatManager?.getMessageWithMessageId(message.messageId)?.reactionList?.first(where: { $0.reaction ?? "" == reaction })
         if messageReaction == nil {
             ChatClient.shared().chatManager?.addReaction(reaction, toMessage: message.messageId, completion: { error in
                 completion(error)

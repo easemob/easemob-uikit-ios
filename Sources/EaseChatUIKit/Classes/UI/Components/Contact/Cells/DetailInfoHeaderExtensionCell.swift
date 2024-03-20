@@ -10,7 +10,7 @@ import UIKit
 @objc open class DetailInfoHeaderExtensionCell: UICollectionViewCell {
     
     public private(set) lazy var icon: UIImageView = {
-        UIImageView(frame: .zero).backgroundColor(.clear).contentMode(.scaleAspectFit)
+        UIImageView(frame: .zero).backgroundColor(.clear).contentMode(.scaleAspectFill)
     }()
     
     public private(set) lazy var title: UILabel = {

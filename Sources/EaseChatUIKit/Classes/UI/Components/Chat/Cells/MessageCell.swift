@@ -95,7 +95,7 @@ let message_bubble_space = CGFloat(1)
      - Returns: An instance of `ImageView` configured with the necessary properties.
      */
     @objc open func createAvatar() -> ImageView {
-        ImageView(frame: .zero).contentMode(.scaleAspectFit).backgroundColor(.clear).tag(avatarTag)
+        ImageView(frame: .zero).contentMode(.scaleAspectFill).backgroundColor(.clear).tag(avatarTag)
     }
     
     public private(set) lazy var nickName: UILabel = {

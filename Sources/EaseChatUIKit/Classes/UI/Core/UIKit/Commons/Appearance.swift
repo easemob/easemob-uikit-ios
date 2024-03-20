@@ -210,18 +210,18 @@ import UIKit
     public var videoPlaceHolder = UIImage(named: "video_message_placeHolder", in: .chatBundle, with: nil)
     
     /// The maximum time limit for message withdrawal needs to be adjusted from the console before adjusting this configuration of the client.
-    var recallExpiredTime = UInt(120)
+    public var recallExpiredTime = UInt(120)
     
     /// New message tone audio path
-    var newMessageSoundPath = "/System/Library/Audio/UISounds/sms-received1.caf"
+    public var newMessageSoundPath = "/System/Library/Audio/UISounds/sms-received1.caf"
     
-    var groupParticipantsLimitCount = 1000
+    public var groupParticipantsLimitCount = 1000
     
-    var commonReactions = ["👍", "❤️", "😄", "😱", "😡", "🎉"]
+    public var commonReactions = ["👍", "❤️", "😄", "😱", "😡", "🎉"]
     
-    var commonReactionMap = ["👍":UIImage(named: "👍", in: .chatBundle, with: nil), "❤️":UIImage(named: "❤️", in: .chatBundle, with: nil), "😄":UIImage(named: "😄", in: .chatBundle, with: nil), "😱":UIImage(named: "😱", in: .chatBundle, with: nil), "😡":UIImage(named: "😡", in: .chatBundle, with: nil), "🎉":UIImage(named: "🎉", in: .chatBundle, with: nil)]
+    public var commonReactionMap = ["👍":UIImage(named: "👍", in: .chatBundle, with: nil), "❤️":UIImage(named: "❤️", in: .chatBundle, with: nil), "😄":UIImage(named: "😄", in: .chatBundle, with: nil), "😱":UIImage(named: "😱", in: .chatBundle, with: nil), "😡":UIImage(named: "😡", in: .chatBundle, with: nil), "🎉":UIImage(named: "🎉", in: .chatBundle, with: nil)]
     
-    var moreMessageAlertPosition = MoreMessagePosition.center
+    public var moreMessageAlertPosition = MoreMessagePosition.center
     
 }
 
@@ -241,7 +241,7 @@ import UIKit
     ]
     
     /// The contact info header extension items.
-    public var detailExtensionActionItems: [ContactListHeaderItemProtocol] = [ContactListHeaderItem(featureIdentify: "Chat", featureName: "Chat".chat.localize, featureIcon: UIImage(named: "chatTo", in: .chatBundle, with: nil)),ContactListHeaderItem(featureIdentify: "SearchMessages", featureName: "Search Messages".chat.localize, featureIcon: UIImage(named: "search_history_messages", in: .chatBundle, with: nil))]
+    public var detailExtensionActionItems: [ContactListHeaderItemProtocol] = [ContactListHeaderItem(featureIdentify: "Chat", featureName: "Chat".chat.localize, featureIcon: UIImage(named: "chatTo", in: .chatBundle, with: nil)),ContactListHeaderItem(featureIdentify: "SearchMessages", featureName: "SearchMessages".chat.localize, featureIcon: UIImage(named: "search_history_messages", in: .chatBundle, with: nil))]
 //    ,ContactListHeaderItem(featureIdentify: "AudioCall", featureName: "AudioCall".chat.localize, featureIcon: UIImage(named: "voice_call", in: .chatBundle, with: nil)),ContactListHeaderItem(featureIdentify: "VideoCall", featureName: "VideoCall".chat.localize, featureIcon: UIImage(named: "video_call", in: .chatBundle, with: nil))
     
     /// ActionSheet menu configuration items after clicking more buttons in a single session side sliding menu.

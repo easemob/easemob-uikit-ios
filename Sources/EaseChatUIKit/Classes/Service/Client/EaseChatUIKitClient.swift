@@ -16,13 +16,13 @@ public let EaseChatUIKit_VERSION = "1.0.0"
 @objcMembers public class ChatOptions: ChatSDKOptions {
     
     /// Whether to store session avatars and nicknames in EaseChatUIKit.
-    var saveConversationInfo = true
+    public var saveConversationInfo = true
     
     /// Whether to play a sound when new messages are received
-    var soundOnReceivedNewMessage = true
+    public var soundOnReceivedNewMessage = true
     
     /// Whether load messages from local database.
-    var loadLocalHistoryMessages = true
+    public var loadLocalHistoryMessages = true
 }
 
 @objcMembers public class UIOptions: NSObject {
@@ -41,14 +41,10 @@ public let EaseChatUIKit_VERSION = "1.0.0"
     
     /// Initializes the chat room UIKit.
     /// - Parameters:
-    ///   - appKey: The unique identifier that Chat assigns to each app.
+    ///   - option: The unique identifier that Chat assigns to each app.``ChatOptions``
     /// Returns the initialization success or an error that includes the description of the cause of the failure.
-    @objc(setupWithAppkey:option:)
-    public func setup(appKey: String,option: ChatOptions = ChatOptions()) -> ChatError? {
-        let option = ChatOptions(appkey: appKey)
-        option.enableConsoleLog = true
-        option.isAutoLogin = false
-        option.deleteMessagesOnLeaveGroup = false
+    @objc(setupWithOption:)
+    public func setup(option: ChatOptions) -> ChatError? {
         return ChatClient.shared().initializeSDK(with: option)
     }
     

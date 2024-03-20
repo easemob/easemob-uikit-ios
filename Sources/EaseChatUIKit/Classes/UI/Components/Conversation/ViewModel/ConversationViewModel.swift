@@ -114,7 +114,7 @@ import AudioToolbox
         if let conversation = self.service?.loadIfNotExistCreate(conversationId: profile.id,type: type) {
             if let info = self.mapper(objects: [conversation]).first,!info.id.isEmpty {
                 if conversation.type == .groupChat {
-                    let content = "Group".chat.localize + " [\(text)] " + "has been created.".chat.localize
+                    let content = "Group".chat.localize + " \(text) " + "has been created.".chat.localize
                     conversation.insert(self.welcomeMessage(conversationId: info.id,text: content), error: nil)
                 }
                 self.loadExistLocalDataIfEmptyFetchServer()
@@ -313,6 +313,18 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         ChatClient.shared().chatManager?.ackConversationRead(info.id)
         self.driver?.swipeMenuOperation(info: info, type: .read)
         self.toChat?(indexPath,info)
+        if let conversationService = self.service {
+            if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
+                let items = self.mapper(objects: infos)
+                var count = UInt(0)
+                for item in items where item.doNotDisturb == false {
+                    count += item.unreadCount
+                }
+                self.service?.notifyUnreadCount(count: count)
+            }
+
+        }
+        
     }
     
     public func onConversationLongPressed(indexPath: IndexPath, info: ConversationInfo) {

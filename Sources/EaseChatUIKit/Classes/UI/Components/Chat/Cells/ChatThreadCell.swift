@@ -53,9 +53,9 @@ import UIKit
     }
 
     
-    open func refresh(chatThread: GroupChatThread) {
-        self.threadName.text = chatThread.threadName
-        self.messageCount.setTitle("\(chatThread.messageCount)", for: .normal)
+    open func refresh(chatThread: EaseChatThread) {
+        self.threadName.text = chatThread.thread.threadName
+        self.messageCount.setTitle("\(chatThread.thread.messageCount)", for: .normal)
         self.latestMessage.attributedText = self.renderMessageContent(message: chatThread.lastMessage)
     }
     
