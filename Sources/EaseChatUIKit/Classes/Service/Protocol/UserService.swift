@@ -49,7 +49,7 @@ import Foundation
     
     /// Logout SDK
     /// - Parameter completion: Callback,success or failure
-    func logout(completion: @escaping (Bool,ChatError?) -> Void)
+    func logout(unbindNotificationDeviceToken: Bool,completion: @escaping (Bool,ChatError?) -> Void)
     
     
 }

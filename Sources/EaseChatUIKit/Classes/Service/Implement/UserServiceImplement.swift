@@ -18,7 +18,7 @@ import UIKit
     ///   - completion: Callback,login successful or failure.
     @objc public init(userInfo: EaseProfileProtocol,token: String,completion: @escaping (ChatError?) -> Void) {
         super.init()
-        ChatClient.shared().add(self, delegateQueue: nil)
+        self.registerEventListener()
         self.login(userId: userInfo.id.lowercased(), token: token) { success, error in
             if !success {
                 let errorInfo = error?.errorDescription ?? ""
@@ -29,7 +29,21 @@ import UIKit
         }
     }
     
+    @objc public override init() {
+        super.init()
+        self.registerEventListener()
+    }
+    
+    @objc public func registerEventListener() {
+        ChatClient.shared().add(self, delegateQueue: nil)
+    }
+    
+    @objc public func removeEventListener() {
+        ChatClient.shared().removeDelegate(self)
+    }
+    
     deinit {
+        removeEventListener()
         consoleLogInfo("\(self.swiftClassName ?? "") deinit", type: .debug)
     }
 
@@ -93,9 +107,10 @@ extension UserServiceImplement:UserServiceProtocol {
         }
     }
     
-    public func logout(completion: @escaping (Bool, ChatError?) -> Void) {
-        ChatClient.shared().logout(false)
-        completion(true,nil)
+    public func logout(unbindNotificationDeviceToken: Bool = false, completion: @escaping (Bool, ChatError?) -> Void) {
+        ChatClient.shared().logout(unbindNotificationDeviceToken) { error in
+            completion(error == nil,error)
+        }
     }
     
     private func convertToUser(info: UserInfo) -> EaseProfile {
@@ -160,6 +175,12 @@ extension UserServiceImplement: ChatClientListener {
     public func userAccountDidForced(toLogout aError: ChatError?) {
         for response in self.responseDelegates.allObjects {
             response.userAccountDidForcedToLogout(error: aError)
+        }
+    }
+    
+    public func autoLoginDidCompleteWithError(_ aError: ChatError?) {
+        for response in self.responseDelegates.allObjects {
+            response.onUserAutoLoginCompletion(error: aError)
         }
     }
 }

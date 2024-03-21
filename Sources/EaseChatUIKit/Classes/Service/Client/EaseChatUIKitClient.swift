@@ -45,6 +45,7 @@ public let EaseChatUIKit_VERSION = "1.0.0"
     /// Returns the initialization success or an error that includes the description of the cause of the failure.
     @objc(setupWithOption:)
     public func setup(option: ChatOptions) -> ChatError? {
+        
         return ChatClient.shared().initializeSDK(with: option)
     }
     
@@ -60,8 +61,10 @@ public let EaseChatUIKit_VERSION = "1.0.0"
     }
     
     /// Logout user
-    @objc public func logout() {
-        self.userService?.logout(completion: { _, _ in })
+    @objc public func logout(unbindNotificationDeviceToken: Bool = false,completion: @escaping (ChatError?) -> Void) {
+        ChatClient.shared().logout(unbindNotificationDeviceToken) { error in
+            completion(error)
+        }
     }
     
     /// Register a user to listen for callbacks that monitor user status changes.
