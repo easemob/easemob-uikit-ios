@@ -90,8 +90,8 @@ extension UserServiceImplement:UserServiceProtocol {
             EaseChatUIKitContext.shared?.currentUser = userInfo
         } else {
             EaseChatUIKitContext.shared?.updateCache(type: .chat, profile: userInfo)
-            EaseChatUIKitContext.shared?.updateCache(type: .contact, profile: userInfo)
-            EaseChatUIKitContext.shared?.updateCache(type: .conversation, profile: userInfo)
+            EaseChatUIKitContext.shared?.updateCache(type: .user, profile: userInfo)
+            EaseChatUIKitContext.shared?.updateCache(type: .group, profile: userInfo)
         }
     }
     

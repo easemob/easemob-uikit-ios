@@ -14,7 +14,7 @@ import UIKit
     }()
     
     lazy var avatar: ImageView = {
-        ImageView(frame: CGRect(x: self.checkbox.frame.maxX+12, y: (self.contentView.frame.height-40)/2.0, width: 40, height: 40)).contentMode(.scaleAspectFill).backgroundColor(.clear).cornerRadius(Appearance.avatarRadius)
+        ImageView(frame: CGRect(x: self.checkbox.frame.maxX+12, y: (self.contentView.frame.height-40)/2.0, width: 40, height: 40)).contentMode(.scaleAspectFill).backgroundColor(.clear).cornerRadius(Appearance.avatarRadius).contentMode(.scaleAspectFill)
     }()
     
     lazy var nickName: UILabel = {

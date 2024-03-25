@@ -451,7 +451,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        //TODO: - thread此处需要回调到ViewModel加载更多消息
+        
         if self.showType == .thread {
             if indexPath.row > self.messages.count - 4,!self.threadMessagesLoadFinished {
                 for handler in self.eventHandlers.allObjects {

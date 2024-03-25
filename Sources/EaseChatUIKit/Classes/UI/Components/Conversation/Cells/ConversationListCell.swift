@@ -8,7 +8,7 @@ import UIKit
     }()
     
     @objc open func createAvatar() -> ImageView {
-        ImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-50)/2.0, width: 50, height: 50))
+        ImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-50)/2.0, width: 50, height: 50)).contentMode(.scaleAspectFill)
     }
     
     public private(set) lazy var nickName: UIButton = {

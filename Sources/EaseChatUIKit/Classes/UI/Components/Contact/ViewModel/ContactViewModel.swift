@@ -16,26 +16,10 @@ import UIKit
     
     @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Double>()) private var newFriends
     
-    private weak var provider_OC: EaseProfileProviderOC?
-    
-    private var provider: EaseProfileProvider?
-    
     /// ``ContactViewModel`` init method.
-    /// - Parameter providerOC: Only available in Objective-C language.
     ///   -  ignoreIds: Array of contact ids that already exist in the group.
-    @objc(initWithProviderOC:ignoreIds:)
-    public required init(providerOC: EaseProfileProviderOC?,ignoreIds: [String] = []) {
-        self.provider_OC = providerOC
-        self.ignoreContacts = ignoreIds
-        super.init()
-        NotificationCenter.default.addObserver(self, selector: #selector(loadAllContacts), name: Notification.Name("New Friend Chat"), object: nil)
-    }
-    
-    /// ``ContactViewModel`` init method.
-    /// - Parameter providerOC: Only available in Swift language.
-    ///   - ignoreIds: Array of contact ids that already exist in the group.
-    public required init(provider: EaseProfileProvider?,ignoreIds: [String] = []) {
-        self.provider = provider
+    @objc(ignoreIds:)
+    public required init(ignoreIds: [String] = []) {
         self.ignoreContacts = ignoreIds
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(loadAllContacts), name: Notification.Name("New Friend Chat"), object: nil)
@@ -76,7 +60,12 @@ import UIKit
     @objc open func loadAllContacts() {
         self.service?.contacts(completion: { [weak self] error, contacts in
             if error == nil {
-                self?.driver?.refreshList(infos: self?.filterContacts(contacts: contacts) ?? [])
+                if let infos = self?.filterContacts(contacts: contacts) {
+                    self?.driver?.refreshList(infos: infos)
+                    if infos.count < 10 {
+                        self?.requestDisplayInfos(ids: infos.map({ $0.id }))
+                    }
+                }
             } else {
                 self?.driver?.occurError()
                 consoleLogInfo("loadAllContacts error:\(error?.errorDescription ?? "")", type: .error)
@@ -98,8 +87,8 @@ import UIKit
         let infos = users.map({
             let profile = EaseProfile()
             profile.id = $0.userId
-            profile.nickname = EaseChatUIKitContext.shared?.contactsCache?[$0.userId]?.nickname ?? ""
-            profile.avatarURL = EaseChatUIKitContext.shared?.contactsCache?[$0.userId]?.avatarURL ?? ""
+            profile.nickname = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
+            profile.avatarURL = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
             return profile
         })
         return infos
@@ -202,29 +191,31 @@ extension ContactViewModel: ContactListActionEventsDelegate {
     }
     
     public func onContactListEndScrollNeededDisplayInfos(ids: [String]) {
-        if self.provider_OC != nil {
-            let infoMap_OC = [2:ids]
-            self.provider_OC?.fetchProfiles(profilesMap: infoMap_OC, completion: { [weak self] profiles in
-                for profile in profiles {
-                    EaseChatUIKitContext.shared?.contactsCache?[profile.id] = profile
-                }
-                self?.driver?.refreshProfiles(infos: profiles)
-            })
-        }
-        if self.provider != nil {
-            let infoMap = [EaseProfileProviderType.contact:ids]
+        self.requestDisplayInfos(ids: ids)
+    }
+    
+    @objc open func requestDisplayInfos(ids: [String]) {
+        if EaseChatUIKitContext.shared?.userProfileProvider != nil {
             Task(priority: .background) {
-                let profiles = await self.provider?.fetchProfiles(profilesMap: infoMap) ?? []
+                let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: ids) ?? []
                 for profile in profiles {
-                    EaseChatUIKitContext.shared?.contactsCache?[profile.id] = profile
+                    EaseChatUIKitContext.shared?.userCache?[profile.id] = profile
                 }
                 DispatchQueue.main.async {
                     self.driver?.refreshProfiles(infos: profiles)
                 }
             }
         }
+        if EaseChatUIKitContext.shared?.userProfileProviderOC != nil {
+            EaseChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: ids, completion: {[weak self] profiles in
+                for profile in profiles {
+                    EaseChatUIKitContext.shared?.userCache?[profile.id] = profile
+                }
+                self?.driver?.refreshProfiles(infos: profiles)
+            })
+
+        }
     }
-    
     
     public func didSelected(indexPath: IndexPath, profile: EaseProfileProtocol) {
          self.viewContact?(profile)

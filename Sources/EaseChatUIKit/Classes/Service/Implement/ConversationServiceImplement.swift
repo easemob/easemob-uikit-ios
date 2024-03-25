@@ -296,17 +296,44 @@ extension ConversationServiceImplement: ConversationService {
         objects.map {
             let conversation = ComponentsRegister.shared.Conversation.init()
             conversation.id = $0.conversationId
-            conversation.nickname = EaseChatUIKitContext.shared?.conversationsCache?[$0.conversationId]?.nickname ?? ""
+            var nickname = ""
+            var profile: EaseProfileProtocol?
+            if $0.type == .chat {
+                profile = EaseChatUIKitContext.shared?.userCache?[$0.conversationId]
+            } else {
+                profile = EaseChatUIKitContext.shared?.groupCache?[$0.conversationId]
+                if EaseChatUIKitContext.shared?.groupProfileProvider == nil,EaseChatUIKitContext.shared?.groupProfileProviderOC == nil {
+                    profile?.nickname = ChatGroup(id: $0.conversationId).groupName ?? ""
+                }
+            }
+            if nickname.isEmpty {
+                nickname = profile?.remark ?? ""
+            }
+            if nickname.isEmpty {
+                nickname = profile?.nickname ?? ""
+            }
+            if nickname.isEmpty {
+                nickname = $0.conversationId
+            }
             conversation.unreadCount = UInt($0.unreadMessagesCount)
             conversation.lastMessage = $0.latestMessage
             conversation.type = EaseProfileProviderType(rawValue: UInt($0.type.rawValue)) ?? .chat
             conversation.pinned = $0.isPinned
             if EaseChatUIKitClient.shared.option.option_chat.saveConversationInfo {
-                if let nickName = EaseChatUIKitContext.shared?.conversationsCache?[$0.conversationId]?.nickname as? String {
-                    conversation.nickname = nickName
-                }
-                if let avatarURL = EaseChatUIKitContext.shared?.conversationsCache?[$0.conversationId]?.avatarURL as? String {
-                    conversation.avatarURL = avatarURL
+                if $0.type == .chat {
+                    if let nickName = EaseChatUIKitContext.shared?.userCache?[$0.conversationId]?.nickname as? String {
+                        conversation.nickname = nickName
+                    }
+                    if let avatarURL = EaseChatUIKitContext.shared?.userCache?[$0.conversationId]?.avatarURL as? String {
+                        conversation.avatarURL = avatarURL
+                    }
+                } else {
+                    if let nickName = EaseChatUIKitContext.shared?.groupCache?[$0.conversationId]?.nickname as? String {
+                        conversation.nickname = nickName
+                    }
+                    if let avatarURL = EaseChatUIKitContext.shared?.groupCache?[$0.conversationId]?.avatarURL as? String {
+                        conversation.avatarURL = avatarURL
+                    }
                 }
             }
             conversation.doNotDisturb = false

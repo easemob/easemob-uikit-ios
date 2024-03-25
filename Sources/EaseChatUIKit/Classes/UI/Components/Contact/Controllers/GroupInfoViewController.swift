@@ -62,7 +62,7 @@ import UIKit
     @UserDefault("EaseChatUIKit_conversation_mute_map", defaultValue: Dictionary<String,Dictionary<String,Int>>()) private var muteMap
     
     private lazy var jsons: [[Dictionary<String,Any>]] = {
-        [[["title":"group_details_button_alias".chat.localize,"detail":"","withSwitch": false,"switchValue":false],["title":"group_details_button_members".chat.localize,"detail":"\(self.chatGroup.occupantsCount)","withSwitch": false,"switchValue":false],["title":"contact_details_switch_donotdisturb".chat.localize,"detail":"","withSwitch": true,"switchValue":self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.chatGroup.groupId] ?? 0 == 1],["title":"contact_details_button_clearchathistory".chat.localize,"detail":"","withSwitch": false,"switchValue":false]],[["title":"group_details_button_name".chat.localize,"detail":"\(String(describing: self.chatGroup.groupName ?? ""))","withSwitch": false,"switchValue":false],["title":"group_details_button_description".chat.localize,"detail":self.chatGroup.description ?? "group_details_button_description".chat.localize,"withSwitch": false,"switchValue":false]]]
+        [[["title":"group_details_button_members".chat.localize,"detail":"\(self.chatGroup.occupantsCount)","withSwitch": false,"switchValue":false],["title":"contact_details_switch_donotdisturb".chat.localize,"detail":"","withSwitch": true,"switchValue":self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.chatGroup.groupId] ?? 0 == 1],["title":"contact_details_button_clearchathistory".chat.localize,"detail":"","withSwitch": false,"switchValue":false]],[["title":"group_details_button_name".chat.localize,"detail":"\(String(describing: self.chatGroup.groupName ?? ""))","withSwitch": false,"switchValue":false],["title":"group_details_button_description".chat.localize,"detail":self.chatGroup.description ?? "group_details_button_description".chat.localize,"withSwitch": false,"switchValue":false]]]
     }()
     
     public private(set) lazy var datas: [[DetailInfo]] = {
@@ -135,15 +135,7 @@ import UIKit
             self.menuList.reloadData()
         }
         
-        // Fetch the user's nickname from the group member attribute cache
-        let userId = EaseChatUIKitContext.shared?.currentUserId ?? ""
-        EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheValue(groupId: groupId, userIds: [userId], key: "nickname", completion: { [weak self] error, attributes in
-            if error == nil, let nickname = attributes?.first {
-                self?.fillAlias(nickname: nickname)
-            } else {
-                consoleLogInfo("fetchMembersAttribute  nickname error:\(error?.errorDescription ?? "")", type: .error)
-            }
-        })
+        
     }
     
     /**
@@ -193,13 +185,7 @@ import UIKit
         self.headerActions()
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
-        if let currentUserId = EaseChatUIKitContext.shared?.currentUserId {
-            EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheValue(groupId: self.chatGroup.groupId, userIds: [currentUserId], key: "nickName", completion: { error, nicknames in
-                if error != nil {
-                    consoleLogInfo("fetchMembersAttribute  nickname error:\(error?.errorDescription ?? "")", type: .error)
-                }
-            })
-        }
+        
     }
     
     /**

@@ -167,7 +167,7 @@ import UIKit
     }
     
     @objc open func toAdd() {
-        let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .addGroupParticipant,provider: nil,ignoreIds: self.ignoreContacts())
+        let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .addGroupParticipant,ignoreIds: self.ignoreContacts())
         vc.confirmClosure = { [weak self] users in
             guard let `self` = self else { return }
             self.service
@@ -205,15 +205,16 @@ import UIKit
                             self.participants.removeAll()
                             self.participants = list.map({
                                 let profile = EaseProfile()
-                                profile.id = $0 as String
-                                profile.nickname = $0 as String
+                                let id = $0 as String
+                                profile.id = id
+                                profile.nickname = EaseChatUIKitContext.shared?.chatCache?[id]?.nickname ?? id
                                 return profile
                             })
                             if list.count <= self.pageSize {
                                 if self.operation != .transferOwner {
                                     let profile = EaseProfile()
                                     profile.id = self.chatGroup.owner
-                                    profile.nickname = self.chatGroup.owner
+                                    profile.nickname = EaseChatUIKitContext.shared?.chatCache?[self.chatGroup.owner]?.nickname ?? profile.id
                                     self.participants.insert(profile, at: 0)
                                 }
                             }
@@ -281,13 +282,7 @@ extension GroupParticipantsController: UITableViewDelegate,UITableViewDataSource
                 }
             }
         }
-        if !unknownInfoIds.isEmpty {
-            EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheValue(groupId: self.chatGroup.groupId, userIds: unknownInfoIds, key: "nickName") { [weak self] error, values in
-                if error == nil,let values = values {
-                    self?.processCacheInfos(values: values)
-                }
-            }
-        }
+        
     }
     
     private func processCacheInfos(values: [String]) {

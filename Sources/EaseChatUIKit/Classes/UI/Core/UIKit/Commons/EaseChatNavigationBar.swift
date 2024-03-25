@@ -89,7 +89,7 @@ import UIKit
     }()
     
     public private(set) lazy var avatar: ImageView = {
-        ImageView(frame: CGRect(x: self.showLeft ? self.leftItem.frame.maxX:CGFloat(10), y: self.frame.height-38, width: 32, height: 32)).backgroundColor(.clear).cornerRadius(Appearance.avatarRadius).tag(1)
+        ImageView(frame: CGRect(x: self.showLeft ? self.leftItem.frame.maxX:CGFloat(10), y: self.frame.height-38, width: 32, height: 32)).backgroundColor(.clear).cornerRadius(Appearance.avatarRadius).tag(1).contentMode(.scaleAspectFill)
     }()
     
     public private(set) lazy var status: UIImageView = {

@@ -17,6 +17,9 @@ import UIKit
     
     private var service: ChatService?
     
+    private var type: ChatConversationType = .chat
+    
+    
     public private(set) var searchResults = [ChatMessage]()
     
     public private(set) lazy var searchController: UISearchController = {
@@ -47,6 +50,7 @@ import UIKit
     @objc public required init(conversationId: String,action: @escaping (ChatMessage) -> Void) {
         self.service = ChatServiceImplement(to: conversationId)
         self.selectClosure = action
+        self.type = ChatClient.shared().chatManager?.getConversationWithConvId(conversationId)?.type ?? .chat
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -105,7 +109,8 @@ import UIKit
             cell = SearchHistoryMessageCell(style: .default, reuseIdentifier: "EaseUIKit_SearchHistoryMessageCell")
         }
         if let item = self.searchResults[safe: indexPath.row] {
-            let conversation = EaseChatUIKitContext.shared?.conversationsCache?[item.conversationId]
+            
+            let conversation = (self.type == .chat ? EaseChatUIKitContext.shared?.userCache:EaseChatUIKitContext.shared?.groupCache)?[item.conversationId]
             let info = ConversationInfo()
             info.id = item.conversationId
             info.nickname = conversation?.nickname ?? item.conversationId

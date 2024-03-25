@@ -238,7 +238,7 @@ import AVFoundation
      - Returns: None
      */
     @objc open func selectContact() {
-        let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .shareContact,provider: nil)
+        let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .shareContact)
         vc.confirmClosure = { profiles in
             vc.dismiss(animated: true) {
                 if let user = profiles.first {

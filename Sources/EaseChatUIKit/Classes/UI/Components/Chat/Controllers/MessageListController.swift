@@ -72,7 +72,7 @@ import AVFoundation
      */
     @objc(initWithConversationId:chatType:)
     public required init(conversationId: String,chatType: ChatType = .chat) {
-        if let info = EaseChatUIKitContext.shared?.conversationsCache?[conversationId] {
+        if let info = chatType == .chat ? EaseChatUIKitContext.shared?.groupCache?[conversationId]:EaseChatUIKitContext.shared?.userCache?[conversationId] {
             self.profile = info
         } else {
             self.profile.id = conversationId
@@ -736,7 +736,7 @@ extension MessageListController: MessageListDriverEventsListener {
      - Returns: None
      */
     @objc open func selectContact() {
-        let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .shareContact,provider: nil)
+        let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .shareContact)
         vc.confirmClosure = { profiles in
             vc.dismiss(animated: true) {
                 if let user = profiles.first {

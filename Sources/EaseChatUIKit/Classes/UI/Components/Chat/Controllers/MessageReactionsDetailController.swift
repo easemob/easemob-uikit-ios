@@ -89,7 +89,7 @@ import UIKit
                         let profile = EaseProfile()
                         profile.id = $0
                         if self.message.chatType == .groupChat {
-                            var user = EaseChatUIKitContext.shared?.groupMemberAttributeCache?.profiles[self.message.conversationId]?[$0]
+                            var user = EaseChatUIKitContext.shared?.chatCache?[self.message.from]
                             if $0 == EaseChatUIKitContext.shared?.currentUserId ?? "" {
                                 user = EaseChatUIKitContext.shared?.currentUser
                             }
@@ -101,9 +101,9 @@ import UIKit
                                 user = EaseChatUIKitContext.shared?.currentUser
                             } else {
                                 if user == nil {
-                                    user = EaseChatUIKitContext.shared?.conversationsCache?[$0]
+                                    user = EaseChatUIKitContext.shared?.userCache?[$0]
                                     if user == nil {
-                                        user = EaseChatUIKitContext.shared?.contactsCache?[$0]
+                                        user = EaseChatUIKitContext.shared?.userCache?[$0]
                                     }
                                 }
                             }
@@ -143,13 +143,7 @@ import UIKit
                 }
             }
         }
-        if !unknownInfoIds.isEmpty,self.message.chatType == .groupChat {
-            EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheValue(groupId: self.message.conversationId, userIds: unknownInfoIds, key: "nickName") { [weak self] error, values in
-                if error == nil,let values = values {
-                    self?.processCacheInfos(values: values)
-                }
-            }
-        }
+        
     }
     
     private func processCacheInfos(values: [String]) {

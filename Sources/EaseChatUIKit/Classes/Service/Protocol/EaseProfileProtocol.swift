@@ -40,6 +40,8 @@ import Foundation
         
     public var selected: Bool = false
     
+    public var modifyTime: Int64 = 0
+    
     public override func setValue(_ value: Any?, forUndefinedKey key: String) {
         
     }
@@ -49,94 +51,39 @@ import Foundation
 /// Profile provider of the EaseChatUIKit.Only available in Swift language.
 public protocol EaseProfileProvider {
     
-    /// Synchronously obtain user information.
-    /// - Parameters:
-    ///   - id: Conversation's id.
-    ///   - type: ``EaseProfileProviderType``
-    /// - Returns: ``EaseProfileProtocol``
-//    func getProfile(id: String, type: EaseProfileProviderType) -> EaseProfileProtocol
-    
     /// Coroutine obtains user information asynchronously.
-    /// - Parameter profilesMap: The map parameter key is the conversation type value is the corresponding conversation id string array.
+    /// - Parameter profileIds: The corresponding conversation id string array.
     /// - Returns: Array of the conform``EaseProfileProtocol`` object.
-    func fetchProfiles(profilesMap: [EaseProfileProviderType:[String]]) async -> [EaseProfileProtocol]
+    func fetchProfiles(profileIds: [String]) async -> [EaseProfileProtocol]
 }
-
-//public extension EaseProfileProvider {
-//    func getProfile(id: String, type: EaseProfileProviderType) -> EaseProfileProtocol {
-//        EaseProfile()
-//    }
-//}
-
 
 /// /// Profile provider of the EaseChatUIKit.Only available in Objective-C language.
 @objc public protocol EaseProfileProviderOC: NSObjectProtocol {
-    /// Synchronously obtain user information.
-    /// - Parameters:
-    ///   - id: Conversation's id.
-    ///   - type: ``ChatConversationType``
-    /// - Returns: ``EaseProfileProtocol``
-//    @objc optional func getProfile(id: String, type: EaseProfileProviderType) -> EaseProfileProtocol
     
     /// Need to obtain the list display information on the current screen.
     /// - Parameters:
-    ///   - profilesMap: The map parameter key is the conversation type value is the corresponding conversation id string array.
+    ///   - profileIds: The corresponding conversation id string array.
     ///   - completion: Callback,obtain Array of the ``EaseProfileProtocol`` object.
-    func fetchProfiles(profilesMap: [Int:[String]],completion: @escaping ([EaseProfileProtocol]) -> Void)
+    func fetchProfiles(profileIds: [String],completion: @escaping ([EaseProfileProtocol]) -> Void)
 }
 
-public protocol EaseGroupMemberProfileProvider {
-    
-    /// Get member to render user nick name and avatar.
-    /// - Parameters:
-    ///   - groupId: The id of the group.
-    ///   - userId: The id of the user.
-    /// - Returns: The object of conform ``EaseProfileProtocol``.
-    func getMember(groupId:String ,userId: String ) -> EaseProfileProtocol
-    
-    
+public protocol EaseGroupProfileProvider {
     /// Coroutine obtains user information asynchronously.
-    /// - Parameters:
-    ///   - groupId: The id of the group.
-    ///   - userIds: The id of the user.
-    /// - Returns: Callback,obtain Array  of conform ``EaseProfileProtocol`` object.
-    func fetchMembers(groupId:String, userIds:[String]) async -> [EaseProfileProtocol]
+    /// - Parameter profileIds: The corresponding conversation id string array.
+    /// - Returns: Array of the conform``EaseProfileProtocol`` object.
+    func fetchGroupProfiles(profileIds: [String]) async -> [EaseProfileProtocol]
     
-    /// Update cache user info of group participant.
-    /// - Parameters:
-    ///   - groupId: The ID of group
-    ///   - profiles: The profile array you want to update.
-    func updateMember(groupId: String,profiles:[EaseProfileProtocol])
- 
 }
 
-public extension EaseGroupMemberProfileProvider {
-    func getMember(groupId: String, userId: String) -> EaseProfileProtocol {
-        EaseProfile()
-    }
-}
 
-@objc public protocol EaseGroupMemberProfileProviderOC: NSObjectProtocol {
-    /// Get member to render user nick name and avatar.
-    /// - Parameters:
-    ///   - groupId: The id of the group.
-    ///   - userId: The id of the user.
-    /// - Returns: The object of conform ``EaseProfileProtocol``.
-    @objc optional func getMember(groupId:String ,userId: String ) -> EaseProfileProtocol
+
+@objc public protocol EaseGroupProfileProviderOC: NSObjectProtocol {
     
-    
-    /// Coroutine obtains user information asynchronously.
+    /// Need to obtain the list display information on the current screen.
     /// - Parameters:
-    ///   - groupId: The id of the group.
-    ///   - userIds: The id of the user.
-    /// - Returns: Callback,obtain Array  of conform ``EaseProfileProtocol`` object.
-    func fetchMembers(groupId:String, userIds:[String], completion: @escaping ([EaseProfileProtocol]) -> Void)
-    
-    /// Update cache user info of group participant.
-    /// - Parameters:
-    ///   - groupId: The ID of group
-    ///   - profiles: The profile array you want to update.
-    func updateMember(groupId: String,profiles:[EaseProfileProtocol])
+    ///   - profileIds: The corresponding conversation id string array.
+    ///   - completion: Callback,obtain Array of the ``EaseProfileProtocol`` object.
+    func fetchGroupProfiles(profileIds: [String],completion: @escaping ([EaseProfileProtocol]) -> Void)
 }
 
 

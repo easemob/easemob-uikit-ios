@@ -60,23 +60,11 @@ import UIKit
     /// ``ContactListController`` init method.Only available in Objective-C language.
     /// - Parameters:
     ///   - headerStyle: ``ContactListHeaderStyle``
-    ///   - providerOC: The object of conform ``EaseProfileProviderOC``.
     ///   - ignoreIds: Array of contact ids that already exist in the group.
-    @objc(initWithHeaderStyle:providerOC:ignoreIds:)
-    public required init(headerStyle: ContactListHeaderStyle = .contact,providerOC: EaseProfileProviderOC? = nil,ignoreIds: [String] = []) {
+    @objc(initWithHeaderStyle:ignoreIds:)
+    public required init(headerStyle: ContactListHeaderStyle = .contact,ignoreIds: [String] = []) {
         self.style = headerStyle
-        self.viewModel = ComponentsRegister.shared.ContactViewService.init(providerOC: providerOC,ignoreIds: ignoreIds)
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    /// ``ContactListController`` init method.Only available in Swift language.
-    /// - Parameters:
-    ///   - headerStyle: ``ContactListHeaderStyle``.
-    ///   - provider: The object of conform ``EaseProfileProvider``.
-    ///   - ignoreIds: Array of contact ids that already exist in the group.   
-    public required init(headerStyle: ContactListHeaderStyle = .contact,provider: EaseProfileProvider? = nil,ignoreIds: [String] = []) {
-        self.style = headerStyle
-        self.viewModel = ComponentsRegister.shared.ContactViewService.init(provider: provider,ignoreIds: ignoreIds)
+        self.viewModel = ComponentsRegister.shared.ContactViewService.init(ignoreIds: ignoreIds)
         super.init(nibName: nil, bundle: nil)
     }
     

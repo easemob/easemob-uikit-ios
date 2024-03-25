@@ -10,8 +10,8 @@ import UIKit
 @objc public enum EaseChatUIKitCacheType: UInt {
     case all
     case chat
-    case contact
-    case conversation
+    case user
+    case group
     case groupMemberAttribute
 }
 
@@ -29,17 +29,22 @@ import UIKit
         ChatClient.shared().currentUsername ?? ""
     }
     
-    /// The cache of user information on the side of the message in the chat page. The key is the user ID and the value is an object that complies with the ``EaseProfileProtocol`` protocol.
+    /// The cache of user information on the side of the message in the chat page. The key is the user ID and the value is an object that complies with the ``EaseProfileProtocol`` protocol.Display the info on chat page.
     public var chatCache: Dictionary<String,EaseProfileProtocol>? = [:]
     
-    /// The cache of user information on contact page. The key is the user ID and the value is an object that complies with the ``EaseProfileProtocol`` protocol.
-    public var contactsCache: Dictionary<String,EaseProfileProtocol>? = [:]
+    /// The cache of user information on user. Display the info on contact-list&single-chat-conversation-item&user-profile page .
+    public var userCache: Dictionary<String,EaseProfileProtocol>? = [:]
     
-    /// The cache of user information on conversatoins page. The key is the user ID and the value is an object that complies with the ``EaseProfileProtocol`` protocol.
-    public var conversationsCache: Dictionary<String,EaseProfileProtocol>? = [:]
+    /// The cache of user information on group-conversation-item. The key is the user ID and the value is an object that complies with the ``EaseProfileProtocol`` protocol.
+    public var groupCache: Dictionary<String,EaseProfileProtocol>? = [:]
     
-    /// Cache object of group member's display properties
-    public var groupMemberAttributeCache: GroupMemberAttributesCache? = GroupMemberAttributesCache()
+    public var userProfileProvider: EaseProfileProvider?
+    
+    public var userProfileProviderOC: EaseProfileProviderOC?
+    
+    public var groupProfileProvider: EaseGroupProfileProvider?
+    
+    public var groupProfileProviderOC: EaseGroupProfileProviderOC?
     
     /// The first parameter is the group id and the second parameter is the group name.
     public var onGroupNameUpdated: ((String,String) -> Void)?
@@ -52,14 +57,13 @@ import UIKit
         switch type {
         case .all:
             self.chatCache = nil
-            self.contactsCache = nil
-            self.conversationsCache = nil
-            self.groupMemberAttributeCache = nil
+            self.userCache = nil
+            self.groupCache = nil
         case .chat:
             self.chatCache = nil
-        case .contact: self.contactsCache = nil
-        case .conversation: self.conversationsCache = nil
-        case .groupMemberAttribute: self.groupMemberAttributeCache = nil
+        case .user: self.userCache = nil
+        case .group: self.groupCache = nil
+        default: break
         }
     }
     
@@ -73,10 +77,10 @@ import UIKit
         switch type {
         case .chat:
             self.chatCache?[profile.id] = profile
-        case .contact:
-            self.contactsCache?[profile.id] = profile
-        case .conversation:
-            self.conversationsCache?[profile.id] = profile
+        case .user:
+            self.userCache?[profile.id] = profile
+        case .group:
+            self.groupCache?[profile.id] = profile
         default:
             break
         }

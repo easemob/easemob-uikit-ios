@@ -597,7 +597,15 @@ extension ChatMessage {
     
     /// ``EaseProfileProtocol``
     @objc public var user: EaseProfileProtocol? {
-        EaseChatUIKitContext.shared?.chatCache?[self.from]
+        if self.chatType == .chat {
+            return EaseChatUIKitContext.shared?.userCache?[self.from]
+        } else {
+            let cacheUser = EaseChatUIKitContext.shared?.userCache?[self.from]
+            if (cacheUser?.remark ?? "").isEmpty {
+                return cacheUser
+            }
+            return EaseChatUIKitContext.shared?.chatCache?[self.from]
+        }
     }
     
     /// Whether message edited or not.

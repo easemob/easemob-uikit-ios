@@ -10,7 +10,7 @@ import UIKit
 @objcMembers open class GroupListCell: UITableViewCell {
 
     public private(set) lazy var avatar: ImageView = {
-        ImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-40)/2.0, width: 40, height: 40)).cornerRadius(Appearance.avatarRadius).backgroundColor(.clear)
+        ImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-40)/2.0, width: 40, height: 40)).cornerRadius(Appearance.avatarRadius).backgroundColor(.clear).contentMode(.scaleAspectFill)
     }()
     
     public private(set) lazy var nickName: UILabel = {

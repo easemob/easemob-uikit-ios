@@ -10,7 +10,7 @@ import UIKit
 @objc open class ConversationSearchCell: UITableViewCell {
     
     public private(set) lazy var avatar: ImageView = {
-        ImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-50)/2.0, width: 50, height: 50)).cornerRadius(Appearance.avatarRadius).backgroundColor(.clear)
+        ImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-50)/2.0, width: 50, height: 50)).cornerRadius(Appearance.avatarRadius).backgroundColor(.clear).contentMode(.scaleAspectFill)
     }()
     
     public private(set) lazy var nickName: UILabel = {

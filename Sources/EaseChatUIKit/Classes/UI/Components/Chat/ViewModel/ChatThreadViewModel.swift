@@ -669,6 +669,7 @@ extension ChatThreadViewModel: ChatResponseListener {
                 let profile = EaseProfile()
                 profile.setValuesForKeys(dic)
                 profile.id = message.from
+                profile.modifyTime = message.timestamp
                 EaseChatUIKitContext.shared?.chatCache?[message.from] = profile
             }
             let entity = message

@@ -143,13 +143,7 @@ extension ChatThreadParticipantsController: UITableViewDelegate,UITableViewDataS
             }
         }
 
-        if !unknownInfoIds.isEmpty {
-            EaseChatUIKitContext.shared?.groupMemberAttributeCache?.fetchCacheValue(groupId: self.profile.parentId, userIds: unknownInfoIds, key: "nickName") { [weak self] error, values in
-                if error == nil,let values = values {
-                    self?.processCacheInfos(values: values)
-                }
-            }
-        }
+        
     }
     
     private func processCacheInfos(values: [String]) {

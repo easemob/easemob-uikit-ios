@@ -66,7 +66,7 @@ import UIKit
     
     @objc public func refresh(info: DetailInfo) {
         self.switchMenu.isHidden = !info.withSwitch
-        self.accessoryType = (info.withSwitch && !info.detail.isEmpty) ? .disclosureIndicator:.none
+        self.accessoryType = !info.withSwitch ? .disclosureIndicator:.none
         self.titleLabel.text = info.title
         self.detailLabel.text = info.detail
         if self.accessoryType == .disclosureIndicator {

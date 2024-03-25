@@ -20,22 +20,9 @@ import UIKit
     
     public private(set) var viewModel: ConversationViewModel?
     
-    /// ``ConversationListController`` init method.Only available in Objective-C language.
-    /// - Parameters:
-    ///   - providerOC: The object of conform ``EaseProfileProviderOC``.
-    @objc(initWithProviderOC:)
-    public required init(providerOC: EaseProfileProviderOC? = nil) {
-        self.viewModel = ComponentsRegister.shared.ConversationViewService.init(providerOC: providerOC)
+    @objc public required init() {
         super.init(nibName: nil, bundle: nil)
-    }
-    
-    /// ``ConversationListController`` init method.Only available in Swift language.
-    /// - Parameters:
-    ///   - id: The id of the conversation.
-    ///   - provider: The object of conform ``EaseProfileProvider``.
-    public required init(provider: EaseProfileProvider? = nil) {
-        self.viewModel = ComponentsRegister.shared.ConversationViewService.init(provider: provider)
-        super.init(nibName: nil, bundle: nil)
+        self.viewModel = ComponentsRegister.shared.ConversationViewService.init()
     }
     
     public required init?(coder: NSCoder) {
@@ -185,7 +172,7 @@ extension ConversationListController {
      This method presents a view controller that displays a list of contacts. The user can select a contact, and the selected contact's profile is passed to the `chatToContact` method.
      */
     @objc open func selectContact() {
-        let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .newChat,provider: nil)
+        let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .newChat)
         vc.confirmClosure = { [weak self] users in
             if let profile = users.first {
                 vc.dismiss(animated: true) {
@@ -218,7 +205,11 @@ extension ConversationListController {
         - info: Additional information about the chat.
      */
     @objc open func createChat(profile: EaseProfileProtocol, type: ChatConversationType, info: String) {
-        EaseChatUIKitContext.shared?.conversationsCache?[profile.id] = profile
+        if type == .chat {
+            EaseChatUIKitContext.shared?.userCache?[profile.id] = profile
+        } else {
+            EaseChatUIKitContext.shared?.groupCache?[profile.id] = profile
+        }
         if let conversation = self.viewModel?.loadIfNotExistCreate(profile: profile, type: type, text: info) {
             let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: conversation.id , chatType: conversation.type == .chat ? .chat:.group)
             vc.modalPresentationStyle = .fullScreen
@@ -243,7 +234,7 @@ extension ConversationListController {
     }
     
     @objc open func createGroup() {
-        let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .newGroup,provider: nil)
+        let vc = ComponentsRegister.shared.ContactsController.init(headerStyle: .newGroup)
         vc.confirmClosure = { [weak self] profiles in
             vc.dismiss(animated: false)
             self?.create(profiles: profiles)
