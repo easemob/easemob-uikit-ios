@@ -132,7 +132,7 @@ extension NewContactRequestController: UITableViewDelegate,UITableViewDataSource
                 let ext = ["something":("You have added".chat.localize+" "+userId+" "+"to say hello".chat.localize)]
                 let message = ChatMessage(conversationID: userId, body: ChatCustomMessageBody(event: EaseChatUIKit_alert_message, customExt: nil), ext: ext)
                 conversation?.insert(message, error: nil)
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "New Friend Chat") , object: nil, userInfo: nil)
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "New Friend Chat") , object: nil, userInfo: nil)
                 self.datas.removeAll()
                 self.datas = self.fillDatas()
                 self.datas.sort { $0.time > $1.time }
@@ -141,10 +141,20 @@ extension NewContactRequestController: UITableViewDelegate,UITableViewDataSource
                 } else {
                     self.requestList.backgroundView = nil
                 }
-                
+                self.requestFriendInfo(userId: userId)
                 self.requestList.reloadData()
             }
         }
+    }
+    
+    @objc open func requestFriendInfo(userId: String) {
+        ChatClient.shared().userInfoManager?.fetchUserInfo(byId: [userId], type: [0,1],completion: { infoMap, error in
+            if error == nil,let info = infoMap?[userId] {
+                
+            } else {
+                consoleLogInfo("requestFriendInfo error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        })
     }
 }
 

@@ -224,8 +224,8 @@ extension ConversationListController {
      */
     @objc open func addContact() {
         DialogManager.shared.showAlert(title: "new_chat_button_click_menu_addcontacts".chat.localize, content:
-                                        "add_contacts_subtitle".chat.localize, showCancel: true, showConfirm: true,showTextFiled: true,placeHolder: "contactID".chat.localize) { [weak self] text in
-            self?.viewModel?.contactService?.addContact(userId: text, invitation: "", completion: { error, userId in
+                                        "add_contacts_subtitle".chat.localize, showCancel: true, showConfirm: true,showTextFiled: true,placeHolder: "contactID".chat.localize) { text in
+            ChatClient.shared().contactManager?.addContact(text, message: "", completion: {  userId,error  in
                 if let error = error {
                     consoleLogInfo("add contact error:\(error.errorDescription ?? "")", type: .error)
                 }

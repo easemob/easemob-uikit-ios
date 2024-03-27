@@ -133,6 +133,9 @@ public let callMessage = "rtcCallWithAgora"
     }
     
     open func reactionMenuWidth() -> CGFloat {
+        if self.message.messageId.isEmpty {
+            return 0
+        }
         if !Appearance.chat.contentStyle.contains(.withMessageReaction) {
             return 0
         }
@@ -157,12 +160,18 @@ public let callMessage = "rtcCallWithAgora"
     }
     
     open func topicContentHeight() -> CGFloat {
+        if self.message.messageId.isEmpty {
+            return 0
+        }
         let realHeight = self.message.chatThread != nil ? topicHeight:CGFloat(0)
         let topic_height = Appearance.chat.contentStyle.contains(.withMessageTopic) ? realHeight:0
         return topic_height
     }
     
     open func reactionContentHeight() -> CGFloat {
+        if self.message.messageId.isEmpty {
+            return 0
+        }
         let realHeight = (self.message.reactionList?.count ?? 0) > 0 ? reactionHeight:CGFloat(0)
         let reaction_height = (Appearance.chat.contentStyle.contains(.withMessageReaction) ? realHeight:CGFloat(0))
         return reaction_height
@@ -251,9 +260,12 @@ public let callMessage = "rtcCallWithAgora"
 
         let translateSize = Appearance.chat.enableTranslation ? self.translationSize():.zero
         if width < translateSize.width {
-            width = translateSize.width
+            width = translateSize.width+16
         }
         let height = 6.5+textHeight+(self.message.edited ? 20:6)+(self.showTranslation ? translateSize.height+24:0)
+        if self.message.edited {
+            width += 44
+        }
         return CGSize(width: width, height: height)
     }
     
@@ -261,9 +273,9 @@ public let callMessage = "rtcCallWithAgora"
         if self.showTranslation {
             let label = UILabel().numberOfLines(0)
             label.attributedText = self.convertTextTranslationAttribute()
-            let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-24, height: 9999))
+            let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-24-16, height: 9999))
             let width = size.width+24
-            return CGSize(width: width < 86 ? 86:width, height: size.height)
+            return CGSize(width: width < 86 ? 86:width, height: size.height+16)
         } else {
             return .zero
         }
@@ -354,20 +366,28 @@ public let callMessage = "rtcCallWithAgora"
     
     /// Converts the message text into an attributed string, including the user's nickname, message text, and emojis.
     open func convertTextAttribute() -> NSAttributedString? {
+        if self.message.messageId.isEmpty {
+            return nil
+        }
         var text = NSMutableAttributedString()
+        if self.message.messageId.isEmpty {
+            return NSMutableAttributedString {
+                AttributedText("No Messages".chat.localize).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.labelSmall).lineHeight(minimum: 0.98)
+            }
+        }
         var textColor = self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor
         if self.historyMessage {
             textColor = Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
         }
         if self.message.body.type != .text, self.message.body.type != .custom {
             text.append(NSAttributedString {
-                AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(minimum: 0.98)
+                AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(minimum: 0.98).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping)
             })
             return text
         }
         if self.historyMessage,self.message.body.type == .custom {
             text.append(NSAttributedString {
-                AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge)
+                AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping)
             })
             return text
         }
@@ -394,7 +414,7 @@ public let callMessage = "rtcCallWithAgora"
                 
             default:
                 text.append(NSAttributedString {
-                    AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(minimum: 0.98)
+                    AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(minimum: 0.98).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping)
                 })
                 break
             }
@@ -407,7 +427,7 @@ public let callMessage = "rtcCallWithAgora"
             }
             if self.message.mention.isEmpty {
                 text.append(NSAttributedString {
-                    AttributedText(result).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(minimum: 0.98)
+                    AttributedText(result).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(minimum: 0.98).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping)
                 })
             } else {
                 if self.message.mention == EaseChatUIKitContext.shared?.currentUserId ?? "" {
@@ -424,7 +444,7 @@ public let callMessage = "rtcCallWithAgora"
                     let mentionRange = content.lowercased().chat.rangeOfString(nickname ?? "")
                     let range = NSMakeRange(mentionRange.location-1, mentionRange.length+1)
                     let mentionAttribute = NSMutableAttributedString {
-                        AttributedText(content).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(minimum: 0.98)
+                        AttributedText(content).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(minimum: 0.98).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping)
                     }
                     if mentionRange.location != NSNotFound,mentionRange.length != NSNotFound {
                         mentionAttribute.addAttribute(.foregroundColor, value: (Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5), range: range)
@@ -436,7 +456,7 @@ public let callMessage = "rtcCallWithAgora"
                     let mentionRange = content.lowercased().chat.rangeOfString(self.message.mention.lowercased())
                     let range = NSMakeRange(mentionRange.location-1, mentionRange.length+1)
                     let mentionAttribute = NSMutableAttributedString {
-                        AttributedText(content).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(minimum: 0.98)
+                        AttributedText(content).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(minimum: 0.98).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping)
                     }
                     if mentionRange.location != NSNotFound,mentionRange.length != NSNotFound {
                         mentionAttribute.addAttribute(.foregroundColor, value: (Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5), range: range)
@@ -459,6 +479,9 @@ public let callMessage = "rtcCallWithAgora"
     }
     
     open func convertTopicContent() -> NSAttributedString? {
+        if self.message.messageId.isEmpty {
+            return nil
+        }
         var text = NSMutableAttributedString()
         guard let topicMessage = self.message.chatThread?.lastMessage else {
             text.append(NSAttributedString {
@@ -496,6 +519,9 @@ public let callMessage = "rtcCallWithAgora"
     }
     
     open func convertTextTranslationAttribute() -> NSAttributedString? {
+        if self.message.messageId.isEmpty {
+            return nil
+        }
         var text = NSMutableAttributedString()
         if self.message.body.type != .text {
             text.append(NSAttributedString {
@@ -519,7 +545,7 @@ public let callMessage = "rtcCallWithAgora"
                     text.addAttribute(.font, value: UIFont.theme.bodyLarge, range: range)
                     text.addAttribute(.foregroundColor, value: self.message.direction == .send ? Appearance.chat.sendTranslationColor:Appearance.chat.receiveTranslationColor, range: range)
                     let paragraphStyle = NSMutableParagraphStyle()
-                    paragraphStyle.lineBreakMode = .byWordWrapping
+                    paragraphStyle.lineBreakMode = Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping
                     paragraphStyle.lineHeightMultiple = 0.98
                     text.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
                 }
@@ -529,23 +555,33 @@ public let callMessage = "rtcCallWithAgora"
     }
     
     open func updateReplySize() -> CGSize {
-        if let attributeContent = self.convertToReply(),let attributeTitle = self.replyTitle,attributeContent.length > 0 {
-            let labelTitle = UILabel().numberOfLines(1).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
-            let labelContent = UILabel().numberOfLines(2).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
-            labelTitle.attributedText = attributeTitle
-            labelContent.attributedText = attributeContent
-            let titleSize = labelTitle.sizeThatFits(CGSize(width: limitBubbleWidth, height: 16))
-            let contentSize = labelContent.sizeThatFits(CGSize(width: limitBubbleWidth, height: 36))
-            if self.message.quoteMessage!.body.type == .image || self.message.quoteMessage!.body.type == .video {
-                return CGSize(width: (titleSize.width > contentSize.width ? titleSize.width:contentSize.width)+78, height: 36+16)
+        if let attributeContent = self.convertToReply() {
+            if let attributeTitle = self.replyTitle,attributeContent.length > 0,attributeContent.string != "message doesn't exist".chat.localize {
+                let labelTitle = UILabel().numberOfLines(1).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
+                let labelContent = UILabel().numberOfLines(2).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
+                labelTitle.attributedText = attributeTitle
+                labelContent.attributedText = attributeContent
+                let titleSize = labelTitle.sizeThatFits(CGSize(width: limitBubbleWidth, height: 16))
+                let contentSize = labelContent.sizeThatFits(CGSize(width: limitBubbleWidth, height: 36))
+                if self.message.quoteMessage!.body.type == .image || self.message.quoteMessage!.body.type == .video {
+                    return CGSize(width: (titleSize.width > contentSize.width ? titleSize.width:contentSize.width)+78, height: 36+16)
+                } else {
+                    return CGSize(width: (titleSize.width > contentSize.width ? titleSize.width:contentSize.width)+24, height: contentSize.height+34)
+                }
             } else {
-                return CGSize(width: (titleSize.width > contentSize.width ? titleSize.width:contentSize.width)+24, height: contentSize.height+34)
+                let labelContent = UILabel().numberOfLines(2).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping)
+                labelContent.attributedText = attributeContent
+                let contentSize = labelContent.sizeThatFits(CGSize(width: limitBubbleWidth, height: 36))
+                return CGSize(width: contentSize.width+10, height: contentSize.height+10)
             }
         }
         return .zero
     }
         
     open func convertToReply() -> NSAttributedString? {
+        if self.message.messageId.isEmpty {
+            return nil
+        }
         if let quoteMessage = self.message.quoteMessage {
             if let msgSender = self.message.quoteMessage?.from,!msgSender.isEmpty  {
 //                let showName = quoteMessage.user?.nickName ?? msgSender
@@ -558,37 +594,48 @@ public let callMessage = "rtcCallWithAgora"
                 switch quoteMessage.body.type {
                 case .text:
                     reply.append(NSAttributedString {
-                        AttributedText(quoteMessage.showType).font(Font.theme.labelMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5)
+                        AttributedText(quoteMessage.showType).font(Font.theme.labelMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping)
                     })
                 case .image,.video,.combine,.location:
                     reply.append(NSAttributedString {
-                        AttributedText(quoteMessage.showType).font(Font.theme.labelMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5)
+                        AttributedText(quoteMessage.showType).font(Font.theme.labelMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping)
                     })
                 case .file,.voice:
                     reply.append(NSAttributedString {
-                        AttributedText(quoteMessage.showType).font(Font.theme.labelMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5)
-                        AttributedText(quoteMessage.showContent).font(Font.theme.bodyMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5)
+                        AttributedText(quoteMessage.showType).font(Font.theme.labelMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping)
+                        AttributedText(quoteMessage.showContent).font(Font.theme.bodyMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping)
                     })
                 case .custom:
                     if let body = quoteMessage.body as? ChatCustomMessageBody,body.event == EaseChatUIKit_user_card_message {
                         reply.append(NSAttributedString {
-                            AttributedText(quoteMessage.showType).font(Font.theme.labelMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5)
-                            AttributedText(quoteMessage.showContent).font(Font.theme.bodyMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5)
+                            AttributedText(quoteMessage.showType).font(Font.theme.labelMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping)
+                            AttributedText(quoteMessage.showContent).font(Font.theme.bodyMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping)
+                        })
+                    } else {
+                        reply.append(NSAttributedString {
+                            AttributedText("message doesn't exist".chat.localize).font(Font.theme.bodyMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping)
                         })
                     }
                 default:
                     reply.append(NSAttributedString {
-                        AttributedText(quoteMessage.showType).font(Font.theme.labelMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5)
+                        AttributedText("message doesn't exist".chat.localize).font(Font.theme.bodyMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping)
                     })
                 }
                 return reply
             } else {
                 return NSAttributedString {
-                    AttributedText("message doesn't exist".chat.localize).font(Font.theme.bodyMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5)
+                    AttributedText("message doesn't exist".chat.localize).font(Font.theme.bodyMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byCharWrapping)
                 }
             }
+        } else {
+            if self.message.hasQuote {
+                return NSAttributedString {
+                    AttributedText("message doesn't exist".chat.localize).font(Font.theme.bodyMedium).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor5)
+                }
+            } else {
+                return nil
+            }
         }
-        return nil
     }
 }
 
@@ -597,15 +644,9 @@ extension ChatMessage {
     
     /// ``EaseProfileProtocol``
     @objc public var user: EaseProfileProtocol? {
-        if self.chatType == .chat {
-            return EaseChatUIKitContext.shared?.userCache?[self.from]
-        } else {
-            let cacheUser = EaseChatUIKitContext.shared?.userCache?[self.from]
-            if (cacheUser?.remark ?? "").isEmpty {
-                return cacheUser
-            }
-            return EaseChatUIKitContext.shared?.chatCache?[self.from]
-        }
+        let cacheUser = EaseChatUIKitContext.shared?.userCache?[self.from]
+        EaseChatUIKitContext.shared?.chatCache?[self.from]?.remark = cacheUser?.remark ?? ""
+        return EaseChatUIKitContext.shared?.chatCache?[self.from]
     }
     
     /// Whether message edited or not.
@@ -746,6 +787,12 @@ extension ChatMessage {
             return ChatMessage()
         }
         return ChatClient.shared().chatManager?.getMessageWithMessageId(quoteMessageId)
+    }
+    
+    /// When you send a text message. Quote the message.
+    @objc public var hasQuote: Bool {
+        guard let quoteInfo = self.ext?["msgQuote"] as? Dictionary<String,Any>,let messageId = quoteInfo["msgID"] as? String else { return false }
+        return !messageId.isEmpty
     }
     
     @objc open var contentSize: CGSize {

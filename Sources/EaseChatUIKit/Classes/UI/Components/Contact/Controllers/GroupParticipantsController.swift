@@ -101,6 +101,16 @@ import UIKit
         
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshList), name: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil)
+    }
+    
+    @objc private func refreshList() {
+        for participant in participants {
+            if let remark = EaseChatUIKitContext.shared?.userCache?[participant.id] as? String {
+                participant.remark = remark
+            }
+        }
+        self.participantsList.reloadData()
     }
     
     private func setupTitle() {
@@ -207,14 +217,25 @@ import UIKit
                                 let profile = EaseProfile()
                                 let id = $0 as String
                                 profile.id = id
-                                profile.nickname = EaseChatUIKitContext.shared?.chatCache?[id]?.nickname ?? id
+                                if let user = EaseChatUIKitContext.shared?.userCache?[id] {
+                                    profile.nickname = user.nickname
+                                }
+                                if let user = EaseChatUIKitContext.shared?.chatCache?[id] {
+                                    profile.nickname = user.nickname
+                                }
+                                
                                 return profile
                             })
                             if list.count <= self.pageSize {
                                 if self.operation != .transferOwner {
                                     let profile = EaseProfile()
                                     profile.id = self.chatGroup.owner
-                                    profile.nickname = EaseChatUIKitContext.shared?.chatCache?[self.chatGroup.owner]?.nickname ?? profile.id
+                                    if let user = EaseChatUIKitContext.shared?.userCache?[self.chatGroup.owner] {
+                                        profile.nickname = user.nickname
+                                    }
+                                    if let user = EaseChatUIKitContext.shared?.chatCache?[self.chatGroup.owner] {
+                                        profile.nickname = user.nickname
+                                    }
                                     self.participants.insert(profile, at: 0)
                                 }
                             }

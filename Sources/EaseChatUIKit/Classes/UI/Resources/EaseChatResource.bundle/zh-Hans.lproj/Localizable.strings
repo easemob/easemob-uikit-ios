@@ -8,8 +8,6 @@
 "Post Failed" = "发布失败";
 
 
-"to " = "给 ";
-
 "Welcome to " = "欢迎来到";
 
 "Joined successful!" = "加入成功";
@@ -188,3 +186,4 @@
 "AudioCall" = "音频通话";
 "VideoCall" = "视频通话";
 "SearchMessages" = "搜索消息";
+" to " = "给";

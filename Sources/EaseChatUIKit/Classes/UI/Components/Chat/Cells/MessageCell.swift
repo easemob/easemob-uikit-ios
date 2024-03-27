@@ -230,6 +230,7 @@ let message_bubble_space = CGFloat(1)
     @objc public func longPressGestureTo(view: UIView,target: Any?) {
         view.isUserInteractionEnabled = true
         let longPress = UILongPressGestureRecognizer(target: target, action: #selector(longPressAction(gesture:)))
+        longPress.minimumPressDuration = 1.0
         view.addGestureRecognizer(longPress)
     }
     
@@ -256,11 +257,8 @@ let message_bubble_space = CGFloat(1)
     
     @objc open func longPressAction(gesture: UILongPressGestureRecognizer) {
         if let tag = gesture.view?.tag {
-            if self.longGestureEnabled {
-                self.longGestureEnabled = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        self.longGestureEnabled = true
-                }
+            switch gesture.state {
+            case .began:
                 switch tag {
                 case bubbleTag:
                     self.longPressAction?(.bubble,self.entity)
@@ -269,6 +267,8 @@ let message_bubble_space = CGFloat(1)
                 default:
                     break
                 }
+            default:
+                break
             }
         }
     }
@@ -312,8 +312,6 @@ let message_bubble_space = CGFloat(1)
             } else {
                 self.avatar.image = Appearance.avatarPlaceHolder
             }
-            let nickName = user.nickname.isEmpty ? user.id:user.nickname
-            self.nickName.text = nickName
         }
         //message status
         self.status.image = entity.stateImage

@@ -84,5 +84,26 @@ import UIKit
         default:
             break
         }
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil, userInfo: nil)
+    }
+    
+    public func updateCaches(type: EaseChatUIKitCacheType,profiles: [EaseProfileProtocol]) {
+        switch type {
+        case .chat:
+            profiles.forEach { profile in
+                self.chatCache?[profile.id] = profile
+            }
+        case .user:
+            profiles.forEach { profile in
+                self.userCache?[profile.id] = profile
+            }
+        case .group:
+            profiles.forEach { profile in
+                self.groupCache?[profile.id] = profile
+            }
+        default:
+            break
+        }
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil, userInfo: nil)
     }
 }

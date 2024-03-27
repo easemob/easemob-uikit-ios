@@ -14,6 +14,8 @@ import UIKit
     
     @objc public var viewContact: ((EaseProfileProtocol) -> Void)?
     
+    public var notifySelf = false
+    
     @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Double>()) private var newFriends
     
     /// ``ContactViewModel`` init method.
@@ -23,13 +25,14 @@ import UIKit
         self.ignoreContacts = ignoreIds
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(loadAllContacts), name: Notification.Name("New Friend Chat"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(loadAllContacts), name: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil)
     }
     
     public private(set) weak var driver: IContactListDriver?
         
-    public private(set) var service: ContactServiceProtocol? = ContactServiceImplement()
+    public private(set) var service: ContactServiceProtocol?
     
-    public private(set) var multiService: MultiDeviceService?  = MultiDeviceServiceImplement()
+    public private(set) var multiService: MultiDeviceService?
         
     /// Bind UI driver and service
     /// - Parameters:
@@ -37,6 +40,12 @@ import UIKit
     @objc(bindWithDriver:)
     open func bind(driver: IContactListDriver) {
         self.driver = driver
+        if self.service == nil {
+            self.service = ContactServiceImplement()
+        }
+        if self.multiService == nil {
+            self.multiService = MultiDeviceServiceImplement()
+        }
         self.service?.unbindContactEventListener(listener: self)
         self.service?.bindContactEventListener(listener: self)
         self.multiService?.unbindMultiDeviceListener(listener: self)
@@ -48,22 +57,34 @@ import UIKit
     /// Register to monitor when certain emergencies occur
     /// - Parameter listener: ``ContactEmergencyListener``
     @objc public func registerEventsListener(_ listener: ContactEmergencyListener) {
+        if self.service == nil {
+            self.service = ContactServiceImplement()
+        }
         self.service?.registerEmergencyListener(listener: listener)
     }
     
     /// When you don’t want to listen to the registered events above, you can use this method to clear the registration.
     /// - Parameter listener: ``ContactEmergencyListener``
     @objc public func unregisterEventsListener(_ listener: ContactEmergencyListener) {
+        if self.service == nil {
+            self.service = ContactServiceImplement()
+        }
         self.service?.unregisterEmergencyListener(listener: listener)
     }
     
     @objc open func loadAllContacts() {
+        if self.notifySelf {
+            return
+        }
         self.service?.contacts(completion: { [weak self] error, contacts in
             if error == nil {
                 if let infos = self?.filterContacts(contacts: contacts) {
                     self?.driver?.refreshList(infos: infos)
                     if infos.count < 10 {
                         self?.requestDisplayInfos(ids: infos.map({ $0.id }))
+                    }
+                    DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {
+                        self?.notifySelf = false
                     }
                 }
             } else {
@@ -89,8 +110,16 @@ import UIKit
             profile.id = $0.userId
             profile.nickname = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
             profile.avatarURL = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
+            var remark = $0.remark ?? ""
+            if remark.isEmpty {
+                remark = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.remark ?? ""
+            }
+            profile.remark = remark
+            EaseChatUIKitContext.shared?.userCache?[$0.userId]?.remark = remark
             return profile
         })
+        self.notifySelf = true
+        EaseChatUIKitContext.shared?.updateCaches(type: .user, profiles: infos)
         return infos
     }
 }
@@ -198,9 +227,6 @@ extension ContactViewModel: ContactListActionEventsDelegate {
         if EaseChatUIKitContext.shared?.userProfileProvider != nil {
             Task(priority: .background) {
                 let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: ids) ?? []
-                for profile in profiles {
-                    EaseChatUIKitContext.shared?.userCache?[profile.id] = profile
-                }
                 DispatchQueue.main.async {
                     self.driver?.refreshProfiles(infos: profiles)
                 }
@@ -208,9 +234,6 @@ extension ContactViewModel: ContactListActionEventsDelegate {
         }
         if EaseChatUIKitContext.shared?.userProfileProviderOC != nil {
             EaseChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: ids, completion: {[weak self] profiles in
-                for profile in profiles {
-                    EaseChatUIKitContext.shared?.userCache?[profile.id] = profile
-                }
                 self?.driver?.refreshProfiles(infos: profiles)
             })
 

@@ -332,7 +332,9 @@ import UIKit
         self.editBottomBar.operationClosure = { [weak self] in
             self?.bottomMultiSelectedBarEvents(operation: $0)
         }
-        
+        if showType == .thread {
+            self.editBottomBar.trash.isHidden = true
+        }
         NotificationCenter.default.addObserver(forName: Notification.Name("EaseChatUIKit_clean_history_messages"), object: nil, queue: .main) { [weak self] notification in
             if let conversationId = notification.object as? String {
                 if self?.messages.first?.message.conversationId ?? "" == conversationId {
@@ -342,6 +344,10 @@ import UIKit
                     self?.messageList.reloadData()
                 }
             }
+        }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil, queue: .main) {  [weak self] notification in
+            self?.messageList.reloadData()
         }
     }
     
@@ -388,7 +394,7 @@ import UIKit
     }
     
     @objc public func scrollTableViewToBottom() {
-        if !self.threadMessagesLoadFinished {
+        if !self.threadMessagesLoadFinished,self.showType == .thread {
             return
         }
         self.moreMessagesCount = 0
@@ -398,7 +404,7 @@ import UIKit
         }
         if self.messages.count  > 1 {
             self.messageList.reloadData()
-            let lastIndexPath = IndexPath(row: self.messageList.numberOfRows(inSection: 0) - 1, section: 0)
+            let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
             if lastIndexPath.row >= 0 {
                 self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
             }
@@ -706,7 +712,11 @@ extension MessageListView: IMessageListViewDriver {
     
     
     public var scrolledBottom: Bool {
-        (self.messageList.indexPathsForVisibleRows?.contains(IndexPath(row: self.messages.count-1, section: 0))) ?? false
+        let contentHeight = self.messageList.contentSize.height
+        let tableViewHeight = self.messageList.bounds.size.height
+        let yOffset = self.messageList.contentOffset.y
+        let result = Int(ceilf(Float(yOffset))) >= Int(ceilf(Float(contentHeight - tableViewHeight)))
+        return result
     }
     
     
@@ -716,14 +726,14 @@ extension MessageListView: IMessageListViewDriver {
     
     public func reloadReaction(message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
-            if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }) {
+            if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }),indexPath.row > 0 {
                 let entity = self.convertMessage(message: message)
                 let reactionWidth = entity.reactionMenuWidth()
                 if reactionWidth < reactionMaxWidth-30 {
                     if let reactions = message.reactionList {
                         if (reactions.count == 1 && reactions.count > entity.visibleReactionToIndex) || reactions.count <= 0 {
                             self.messages.replaceSubrange(index...index, with: [entity])
-                            self.messageList.reloadData()
+                            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
                         } else {
                             if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
                                 if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }){
@@ -743,7 +753,7 @@ extension MessageListView: IMessageListViewDriver {
     
     public func reloadTopic(message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
-            if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }) {
+            if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }),indexPath.row > 0 {
                 self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
                 self.messageList.reloadData()
             }
@@ -802,7 +812,7 @@ extension MessageListView: IMessageListViewDriver {
                 self.messageList.scrollToRow(at: firstIndexPath, at: .top, animated: true)
             } else {
                 if self.showType == .normal {
-                    let lastIndexPath = IndexPath(row: self.messageList.numberOfRows(inSection: 0) - 1, section: 0)
+                    let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
                     if lastIndexPath.row >= 0 {
                         self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
                     }
@@ -863,7 +873,12 @@ extension MessageListView: IMessageListViewDriver {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages[safe: index]?.message = message
             self.messages[safe: index]?.state = status
-            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .fade)
+            if self.messageList.numberOfRows(inSection: 0) > 0 {
+                self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            } else {
+                self.messageList.reloadData()
+            }
+            
         }
     }
     
@@ -911,10 +926,10 @@ extension MessageListView: IMessageListViewDriver {
         }
         self.messageList.refreshControl?.endRefreshing()
         self.messages.append(self.convertMessage(message: message))
-        self.messageList.reloadData()
         if self.messages.count > 1 {
             if message.direction == .send {
-                let lastIndexPath = IndexPath(row: self.messageList.numberOfRows(inSection: 0) - 1, section: 0)
+                let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
+                self.messageList.reloadData()
                 if lastIndexPath.row > 0 {
                     self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
                 }
@@ -923,7 +938,8 @@ extension MessageListView: IMessageListViewDriver {
                 }
             } else {
                 if self.scrolledBottom {
-                    let lastIndexPath = IndexPath(row: self.messageList.numberOfRows(inSection: 0) - 1, section: 0)
+                    let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
+                    self.messageList.reloadData()
                     if lastIndexPath.row > 0 {
                         self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
                     }
@@ -934,6 +950,11 @@ extension MessageListView: IMessageListViewDriver {
             }
             
         }
+    }
+    
+    @objc open func scrollToBottom() {
+        let bottomOffset = CGPoint(x: 0, y: self.messageList.contentSize.height - self.messageList.bounds.size.height + self.messageList.contentInset.bottom + 52)
+        self.messageList.setContentOffset(bottomOffset, animated: true)
     }
     
     public func processMessage(operation: MessageOperation,message: ChatMessage) {
@@ -1022,6 +1043,13 @@ extension MessageListView: IMessageListViewDriver {
     private func recallAction(_ message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.timestamp == message.timestamp }) {
             self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
+            if let quoteIndex = self.messages.firstIndex(where: { $0.message.quoteMessage?.messageId ?? "" == message.messageId }) {
+                if ((self.messageList.indexPathsForVisibleRows?.contains(IndexPath(row: quoteIndex, section: 0))) != nil) {
+                    if let entity = self.messages[safe: quoteIndex] {
+                        self.messages.replaceSubrange(quoteIndex...quoteIndex, with: [self.convertMessage(message: entity.message)])
+                    }
+                }
+            }
             self.messageList.reloadData()
         }
     }

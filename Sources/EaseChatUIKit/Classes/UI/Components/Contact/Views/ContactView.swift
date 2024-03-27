@@ -335,6 +335,8 @@ extension ContactView: ThemeSwitchProtocol {
 //MARK: - ContactSorter
 struct ContactSorter {
     static func sort(contacts: [EaseProfileProtocol]) -> ([[EaseProfileProtocol]],[String]) {
+        var contactMap = [String:EaseProfileProtocol]()
+        
         if contacts.count == 0 {
             return ([], [])
         }
@@ -350,28 +352,38 @@ struct ContactSorter {
         }
         var _: [String] = []
         var userInfos: [EaseProfileProtocol] = []
-        userInfos.append(contentsOf: contacts)
-        for info in userInfos {
-            if info.nickname.isEmpty {
-                info.nickname = info.id
+        for contact in contacts {
+            contactMap[contact.id] = contact
+            let profile = EaseProfile()
+            profile.id = contact.id
+            var showName = contact.remark
+            if showName.isEmpty {
+                showName = contact.nickname
             }
+            if showName.isEmpty {
+                showName = contact.id
+            }
+            profile.nickname = showName
+            userInfos.append(profile)
         }
         userInfos.sort {
             $0.nickname.caseInsensitiveCompare($1.nickname) == .orderedAscending
         }
-        
         for user in userInfos {
-            if let firstLetter = user.nickname.first?.uppercased() {
+            if let firstLetter = user.nickname.chat.pinYin.first?.uppercased() {
                 if let sectionIndex = sectionTitles.firstIndex(of: firstLetter) {
                     let contact = EaseProfile()
                     contact.id = user.id
-                    contact.nickname = user.nickname
+                    contact.nickname = contactMap[contact.id]?.nickname ?? ""
                     contact.avatarURL = user.avatarURL
-                    contact.selected = user.selected
+                    contact.remark = contactMap[contact.id]?.remark ?? ""
                     result[sectionIndex].append(contact)
                 } else {
                     let contact = EaseProfile()
                     contact.id = user.id
+                    contact.nickname = contactMap[contact.id]?.nickname ?? ""
+                    contact.avatarURL = user.avatarURL
+                    contact.remark = contactMap[contact.id]?.remark ?? ""
                     result[sectionTitles.count-1].append(contact)
                 }
             }

@@ -113,7 +113,9 @@ import AVFoundation
         self.navigation.clickClosure = { [weak self] in
             self?.navigationClick(type: $0, indexPath: $1)
         }
-        
+        EaseChatUIKitContext.shared?.onGroupNameUpdated = { [weak self] _,_ in
+            self?.setupTitle()
+        }
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
         self.view.addSubview(self.loadingView)
@@ -399,6 +401,8 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
                 messageActions.removeAll { $0.tag == "Recall" }
             }
         }
+        messageActions.removeAll { $0.tag == "Recall" }
+        messageActions.removeAll { $0.tag == "Delete" }
         return messageActions
     }
     
@@ -439,6 +443,7 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
     @objc open func showReactionDetailsController(message: MessageEntity) {
         let vc = MessageReactionsDetailController(message: message.message) { [weak self] in
             self?.viewModel.driver?.reloadReaction(message: message.message)
+            UIViewController.currentController?.dismiss(animated: true)
         }
         self.presentViewController(vc)
     }

@@ -306,13 +306,16 @@ import UIKit
     }
     
     @objc open func deleteMessage(message: ChatMessage) {
-        ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.removeMessages(fromServerMessageIds: [message.messageId], completion: { [weak self] error in
-            if error != nil {
-                consoleLogInfo("delete message error:\(error?.errorDescription ?? "")", type: .error)
-            } else {
-                self?.driver?.processMessage(operation: .delete, message: message)
-            }
-        })
+        if let conversation = ChatClient.shared().chatManager?.getConversation(self.to, type: .groupChat, createIfNotExist: true, isThread: true) {
+            ChatClient.shared().chatManager?.removeMessagesFromServer(with: conversation, messageIds: [message.messageId], completion: { [weak self] error in
+                if error != nil {
+                    consoleLogInfo("delete message error:\(error?.errorDescription ?? "")", type: .error)
+                } else {
+                    self?.driver?.processMessage(operation: .delete, message: message)
+                }
+            })
+        }
+        
     }
     
     open func operationTopic(option: ChatTopicOptions,completion: @escaping (Bool) -> Void) {
@@ -343,17 +346,19 @@ import UIKit
     open func deleteMessages(messages: [ChatMessage]) {
         
         if var dataSource = self.driver?.dataSource {
-            var deleteIds = messages.map { $0.messageId }
-            ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.removeMessages(fromServerMessageIds: deleteIds, completion: { [weak self] error in
-                if error == nil {
-                    for message in messages {
-                        dataSource.removeAll(where: { $0.messageId == message.messageId })
+            let deleteIds = messages.map { $0.messageId }
+            if let conversation = ChatClient.shared().chatManager?.getConversation(self.to, type: .groupChat, createIfNotExist: true, isThread: true) {
+                ChatClient.shared().chatManager?.removeMessagesFromServer(with: conversation, messageIds: messages.map({ $0.messageId }),completion: { [weak self] error in
+                    if error == nil {
+                        for message in messages {
+                            dataSource.removeAll(where: { $0.messageId == message.messageId })
+                        }
+                        self?.driver?.refreshMessages(messages: dataSource)
+                    } else {
+                        consoleLogInfo("delete topic messages error:\(error?.errorDescription ?? "")", type: .error)
                     }
-                    self?.driver?.refreshMessages(messages: dataSource)
-                } else {
-                    consoleLogInfo("delete topic messages error:\(error?.errorDescription ?? "")", type: .error)
-                }
-            })
+                })
+            }
             self.driver?.refreshMessages(messages: dataSource)
         }
     }

@@ -57,6 +57,7 @@ public let EaseChatUIKit_VERSION = "1.0.0"
     public func login(user: EaseProfileProtocol,token: String,completion: @escaping (ChatError?) -> Void) {
         EaseChatUIKitContext.shared?.currentUser = user
         EaseChatUIKitContext.shared?.chatCache?[user.id] = user
+        EaseChatUIKitContext.shared?.userCache?[user.id] = user
         self.userService = UserServiceImplement(userInfo: user, token: token, completion: completion)
     }
     
@@ -70,6 +71,9 @@ public let EaseChatUIKit_VERSION = "1.0.0"
     /// Register a user to listen for callbacks that monitor user status changes.
     /// - Parameter listener: ``UserStateChangedListener``
     @objc public func registerUserStateListener(_ listener: UserStateChangedListener) {
+        if self.userService == nil {
+            self.userService = UserServiceImplement()
+        }
         self.userService?.bindUserStateChangedListener(listener: listener)
     }
     

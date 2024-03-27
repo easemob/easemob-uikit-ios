@@ -35,7 +35,7 @@ import UIKit
     open override func layoutSubviews() {
         super.layoutSubviews()
         self.avatar.center = CGPoint(x: self.avatar.center.x, y: self.contentView.center.y)
-        self.nickName.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX+4, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 16)
+        self.nickName.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX+4, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 18)
         self.nickName.center = CGPoint(x: self.nickName.center.x, y: self.contentView.center.y)
         self.separateLine.frame = CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5)
     }
@@ -50,7 +50,7 @@ import UIKit
     
     func highlightKeywords(keyword: String, in string: String) -> NSAttributedString {
         let attributedString = NSMutableAttributedString {
-            AttributedText(string).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
+            AttributedText(string).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1).font(Font.theme.bodyLarge)
         }
         if !keyword.isEmpty {
             var range = (string as NSString).range(of: keyword, options: .caseInsensitive)

@@ -7,7 +7,6 @@
 "Post Success" = "Post Success";
 "Post Failed" = "Post Failed";
 
-"to " = "to ";
 
 "Welcome to" = "Welcome to";
 
@@ -187,3 +186,4 @@
 "AudioCall" = "Call";
 "VideoCall" = "Video";
 "SearchMessages" = "Search";
+" to " = " to ";

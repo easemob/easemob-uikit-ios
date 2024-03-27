@@ -116,11 +116,24 @@ extension ChatServiceImplement: ChatService {
             ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.loadMessagesStart(fromId: messageId, count: Int32(pageSize), searchDirection: searchMessage ? .down:.up,completion: { messages, error in
                 if error == nil,let messages = messages {
                     for message in messages {
-                        if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any>,let user = EaseChatUIKitContext.shared?.chatCache?[message.from] as? EaseProfile,user.modifyTime < message.timestamp {
-                            let user = EaseProfile()
-                            user.setValuesForKeys(dic)
-                            user.modifyTime = message.timestamp
-                            EaseChatUIKitContext.shared?.chatCache?[message.from] = user
+                        if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
+                            if let user = EaseChatUIKitContext.shared?.chatCache?[message.from] as? EaseProfile,user.modifyTime < message.timestamp {
+                                let user = EaseProfile()
+                                user.setValuesForKeys(dic)
+                                if user.id.isEmpty {
+                                    user.id = message.from
+                                }
+                                user.modifyTime = message.timestamp
+                                EaseChatUIKitContext.shared?.chatCache?[message.from] = user
+                            } else {
+                                let user = EaseProfile()
+                                user.setValuesForKeys(dic)
+                                if user.id.isEmpty {
+                                    user.id = message.from
+                                }
+                                user.modifyTime = message.timestamp
+                                EaseChatUIKitContext.shared?.chatCache?[message.from] = user
+                            }
                         }
                     }
                 }
@@ -132,10 +145,23 @@ extension ChatServiceImplement: ChatService {
                 if error == nil,let messages = result?.list {
                     for message in messages {
                         if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-                            let user = EaseProfile()
-                            user.setValuesForKeys(dic)
-                            user.modifyTime = message.timestamp
-                            EaseChatUIKitContext.shared?.chatCache?[message.from] = user
+                            if let user = EaseChatUIKitContext.shared?.chatCache?[message.from] as? EaseProfile,user.modifyTime < message.timestamp {
+                                let user = EaseProfile()
+                                user.setValuesForKeys(dic)
+                                if user.id.isEmpty {
+                                    user.id = message.from
+                                }
+                                user.modifyTime = message.timestamp
+                                EaseChatUIKitContext.shared?.chatCache?[message.from] = user
+                            } else {
+                                let user = EaseProfile()
+                                user.setValuesForKeys(dic)
+                                if user.id.isEmpty {
+                                    user.id = message.from
+                                }
+                                user.modifyTime = message.timestamp
+                                EaseChatUIKitContext.shared?.chatCache?[message.from] = user
+                            }
                         }
                     }
                 }

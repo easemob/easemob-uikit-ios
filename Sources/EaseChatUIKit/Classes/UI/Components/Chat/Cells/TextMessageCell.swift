@@ -68,6 +68,9 @@ import UIKit
             }
             self.addGestureTo(view: self.bubbleMultiCorners, target: self)
         }
+        self.translation.isScrollEnabled = false
+        self.translation.showsVerticalScrollIndicator = false
+        self.translation.showsHorizontalScrollIndicator = false
         self.edit.contentHorizontalAlignment = .right
         self.translateSymbol.contentHorizontalAlignment = .right
         self.translation.isEditable = false 
@@ -107,7 +110,7 @@ import UIKit
             self.separatorLine.isHidden = false
             self.translation.isHidden = false
             self.translateSymbol.isHidden = false
-            self.separatorLine.frame = CGRect(x: 12, y: self.content.frame.maxY+(entity.message.edited ? 12:6), width: entity.bubbleSize.width-24, height: 0.5)
+            self.separatorLine.frame = CGRect(x: 12, y: (entity.message.edited ? self.edit.frame.maxY:self.content.frame.maxY), width: entity.bubbleSize.width-24, height: 0.5)
             self.translation.frame = CGRect(x: 12, y: self.separatorLine.frame.maxY+4, width: entity.bubbleSize.width-24, height: translationSize.height)
             self.translateSymbol.frame = CGRect(x: 12, y: self.translation.frame.maxY+4, width: entity.bubbleSize.width-24, height: 16)
             self.translateSymbol.setTitle("Translated".chat.localize, for: .normal)

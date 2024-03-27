@@ -14,11 +14,11 @@ import UIKit
     }()
     
     public private(set) lazy var title: UILabel = {
-        UILabel(frame: CGRect(x: self.icon.frame.maxX+2, y: 8, width: self.frame.width-62, height: 16)).font(UIFont.theme.labelSmall).backgroundColor(.clear)
+        UILabel(frame: CGRect(x: self.icon.frame.maxX+2, y: 8, width: self.frame.width-82, height: 16)).font(UIFont.theme.labelSmall).backgroundColor(.clear)
     }()
     
     public private(set) lazy var messageCount: UILabel = {
-        UILabel(frame: CGRect(x: self.frame.width-60, y: 8, width: 36, height: 16)).font(UIFont.theme.labelSmall).backgroundColor(.clear).textAlignment(.right)
+        UILabel(frame: CGRect(x: self.frame.width-80, y: 8, width: 56, height: 16)).font(UIFont.theme.labelSmall).backgroundColor(.clear).textAlignment(.right)
     }()
     
     public private(set) lazy var indicator: UIImageView = {
@@ -41,8 +41,8 @@ import UIKit
     }
     
     @objc open func resetFrame() {
-        self.title.frame = CGRect(x: self.icon.frame.maxX+2, y: 8, width: self.frame.width-62, height: 16)
-        self.messageCount.frame = CGRect(x: self.frame.width-60, y: 8, width: 36, height: 16)
+        self.title.frame = CGRect(x: self.icon.frame.maxX+2, y: 8, width: self.frame.width-82, height: 16)
+        self.messageCount.frame = CGRect(x: self.frame.width-80, y: 8, width: 56, height: 16)
         self.indicator.frame = CGRect(x: self.frame.width-24, y: 8, width: 16, height: 16)
         self.lastMessage.frame = CGRect(x: 12, y: self.title.frame.maxY+6, width: self.frame.width-24, height: 16)
     }
@@ -55,9 +55,9 @@ import UIKit
         if let count = entity.message.chatThread?.messageCount {
             self.indicator.isHidden = false
             if count > 99 {
-                self.messageCount.text = "99+"
+                self.messageCount.text = "99+"+"barrage_long_press_menu_reply".chat.localize
             } else {
-                self.messageCount.text = "\(count)"
+                self.messageCount.text = "\(count)"+"barrage_long_press_menu_reply".chat.localize
             }
         } else {
             self.indicator.isHidden = true
@@ -76,7 +76,7 @@ extension MessageTopicView: ThemeSwitchProtocol {
         }
         self.icon.image = image
         self.title.textColor = textColor
-        self.messageCount.textColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5
+        self.messageCount.textColor = style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
         var indicatorImage = UIImage(named: "topic_indicator", in: .chatBundle, with: nil)
         if style == .light {
             indicatorImage = indicatorImage?.withTintColor(UIColor.theme.primaryColor5)

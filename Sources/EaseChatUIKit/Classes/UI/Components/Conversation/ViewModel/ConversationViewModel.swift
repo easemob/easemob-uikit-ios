@@ -23,6 +23,14 @@ import AudioToolbox
     public required override init() {
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(loadExistLocalDataIfEmptyFetchServer), name: Notification.Name("New Friend Chat"), object: nil)
+        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil, queue: .main) { [weak self] notify in
+            guard let `self` = self else { return }
+            if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
+                self.driver?.refreshList(infos: self.mapper(objects: infos))
+            }
+        }
+        
+        
         NotificationCenter.default.addObserver(forName: Notification.Name("EaseUIKit_do_not_disturb_changed"), object: nil, queue: .main) { [weak self] notify in
             if let userInfo = notify.userInfo {
                 if let id = userInfo["id"] as? String {
@@ -34,13 +42,19 @@ import AudioToolbox
                 }
             }
         }
+        
+        NotificationCenter.default.addObserver(forName: Notification.Name("EaseChatUIKitUnreadCountChanged"), object: nil, queue: .main) { _ in
+            if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(self.chatId), let info  = self.mapper(objects: [conversation]).first  {
+                self.calculateUnreadCount(info: info)
+            }
+
+        }
     }
     
     public private(set) weak var driver: IConversationListDriver?
     
     public private(set) var service: ConversationServiceImplement? = ConversationServiceImplement()
     
-    public private(set) var contactService: ContactServiceProtocol? = ContactServiceImplement()
     
     public private(set) var multiService: MultiDeviceService?  = MultiDeviceServiceImplement()
     
@@ -51,7 +65,6 @@ import AudioToolbox
         self.driver = driver
         self.service?.unbindConversationEventsListener(listener: self)
         self.service?.bindConversationEventsListener(listener: self)
-        _ = self.contactService
         self.multiService?.unbindMultiDeviceListener(listener: self)
         self.multiService?.bindMultiDeviceListener(listener: self)
         self.driver?.addActionHandler(actionHandler: self)
@@ -140,24 +153,18 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
             }
         }
         if EaseChatUIKitContext.shared?.userProfileProvider != nil {
-            let ids = privateChats
+            let userIds = privateChats.map { $0 }
             Task(priority: .background) {
-                let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: ids) ?? []
-                for profile in profiles {
-                    EaseChatUIKitContext.shared?.userCache?[profile.id] = profile
-                }
+                let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: userIds) ?? []
                 DispatchQueue.main.async {
                     self.renderDriver(infos: profiles)
                 }
             }
         }
         if EaseChatUIKitContext.shared?.groupProfileProvider != nil {
-            let ids = groupChats
+            let groupIds = groupChats
             Task(priority: .background) {
-                let profiles = await EaseChatUIKitContext.shared?.groupProfileProvider?.fetchGroupProfiles(profileIds: ids) ?? []
-                for profile in profiles {
-                    EaseChatUIKitContext.shared?.groupCache?[profile.id] = profile
-                }
+                let profiles = await EaseChatUIKitContext.shared?.groupProfileProvider?.fetchGroupProfiles(profileIds: groupIds) ?? []
                 DispatchQueue.main.async {
                     self.driver?.refreshProfiles(infos: profiles)
                 }
@@ -165,9 +172,6 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         }
         if EaseChatUIKitContext.shared?.userProfileProviderOC != nil {
             EaseChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: privateChats, completion: { [weak self] profiles in
-                for profile in profiles {
-                    EaseChatUIKitContext.shared?.userCache?[profile.id] = profile
-                }
                 DispatchQueue.main.async {
                     self?.driver?.refreshProfiles(infos: profiles)
                 }
@@ -175,9 +179,6 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         }
         if EaseChatUIKitContext.shared?.groupProfileProviderOC != nil {
             EaseChatUIKitContext.shared?.groupProfileProviderOC?.fetchGroupProfiles(profileIds: groupChats, completion: { [weak self] profiles in
-                for profile in profiles {
-                    EaseChatUIKitContext.shared?.groupCache?[profile.id] = profile
-                }
                 DispatchQueue.main.async {
                     self?.driver?.refreshProfiles(infos: profiles)
                 }
@@ -355,6 +356,10 @@ extension ConversationViewModel: ConversationServiceListener {
     }
     
     @objc open func conversationLastMessageUpdate(message: ChatMessage, info: ConversationInfo) {
+        self.calculateUnreadCount(info: info)
+    }
+    
+    @objc open func calculateUnreadCount(info: ConversationInfo) {
         if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
             let items = self.mapper(objects: infos)
             var count = UInt(0)
@@ -453,37 +458,9 @@ extension ConversationViewModel: MultiDeviceListener {
             conversation.lastMessage = $0.latestMessage
             conversation.type = EaseProfileProviderType(rawValue: UInt($0.type.rawValue)) ?? .chat
             conversation.pinned = $0.isPinned
-            if EaseChatUIKitClient.shared.option.option_chat.saveConversationInfo {
-                if let nickName = $0.ext?["EaseChatUIKit_nickName"] as? String {
-                    conversation.nickname = nickname
-                } else {
-                    $0.ext = ["EaseChatUIKit_nickName": nickname]
-                }
-                if let avatarURL = $0.ext?["EaseChatUIKit_avatarURL"] as? String {
-                    conversation.avatarURL = avatarURL
-                } else {
-                    if let avatarURL = profile?.avatarURL {
-                        $0.ext = ["EaseChatUIKit_avatarURL": avatarURL]
-                    }
-                }
-            }
-            if EaseChatUIKitClient.shared.option.option_chat.saveConversationInfo {
-                if $0.type == .chat {
-                    if let nickName = EaseChatUIKitContext.shared?.userCache?[$0.conversationId]?.nickname as? String {
-                        conversation.nickname = nickName
-                    }
-                    if let avatarURL = EaseChatUIKitContext.shared?.userCache?[$0.conversationId]?.avatarURL as? String {
-                        conversation.avatarURL = avatarURL
-                    }
-                } else {
-                    if let nickName = EaseChatUIKitContext.shared?.groupCache?[$0.conversationId]?.nickname as? String {
-                        conversation.nickname = nickName
-                    }
-                    if let avatarURL = EaseChatUIKitContext.shared?.groupCache?[$0.conversationId]?.avatarURL as? String {
-                        conversation.avatarURL = avatarURL
-                    }
-                }
-            }
+            conversation.nickname = profile?.nickname ?? ""
+            conversation.remark = profile?.remark ?? ""
+            conversation.avatarURL = profile?.avatarURL ?? ""
             conversation.doNotDisturb = false
             if let silentMode = self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[$0.conversationId] {
                 conversation.doNotDisturb = silentMode != 0

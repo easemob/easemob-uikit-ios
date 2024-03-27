@@ -133,6 +133,11 @@ import UIKit
             self.header.userState = .offline
             self.header.detailText = groupId
             self.menuList.reloadData()
+            let profile = EaseProfile()
+            profile.id = self.chatGroup.groupId
+            profile.nickname = self.chatGroup.groupName
+            profile.avatarURL = self.chatGroup.settings.ext
+            EaseChatUIKitContext.shared?.updateCache(type: .group, profile: profile)
         }
         
         
@@ -551,6 +556,16 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
     @objc open func handleEditCallback(text: String, type: GroupInfoEditType) {
         if type == .name {
             self.nameClosure?(self.chatGroup.groupId, text)
+            if let profile = EaseChatUIKitContext.shared?.groupCache?[self.chatGroup.groupId] {
+                profile.nickname = text
+                EaseChatUIKitContext.shared?.updateCache(type: .group, profile: profile)
+            } else {
+                let profile = EaseProfile()
+                profile.id = self.chatGroup.groupId
+                profile.nickname = text
+                profile.avatarURL = self.chatGroup.settings.ext
+                EaseChatUIKitContext.shared?.updateCache(type: .group, profile: profile)
+            }
             EaseChatUIKitContext.shared?.onGroupNameUpdated?(self.chatGroup.groupId, text)
             self.header.nickName.text = text
         }

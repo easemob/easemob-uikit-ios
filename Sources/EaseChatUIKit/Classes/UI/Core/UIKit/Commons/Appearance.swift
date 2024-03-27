@@ -84,7 +84,7 @@ import UIKit
     public var dateFormatToday = "HH:mm"
     
     /// Setting this property changes the date format displayed on conversation last message updated.
-    public var dateFormatOtherDay = "MMM dd"
+    public var dateFormatOtherDay = "MM/dd"
     
     /// ActionSheet menu configuration items after clicking more buttons in a single session side sliding menu.
     /// How to use?

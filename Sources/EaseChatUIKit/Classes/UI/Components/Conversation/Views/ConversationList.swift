@@ -240,11 +240,10 @@ extension ConversationList: IConversationListDriver {
         self.datas.removeAll()
         self.datas.append(contentsOf: infos)
         self.updateIndexMap()
-        self.reloadDataSafe()
+        self.reloadData()
     }
     
     public func refreshProfiles(infos: [EaseProfileProtocol]) {
-        var indexPaths = [IndexPath]()
         
         for info in infos {
             if let index = self.indexMap[info.id], let item = self.datas[safe: index] {
@@ -254,10 +253,9 @@ extension ConversationList: IConversationListDriver {
                 if !info.avatarURL.isEmpty {
                     item.avatarURL = info.avatarURL
                 }
-                indexPaths.append(IndexPath(row: index, section: 0))
             }
         }
-        self.reloadRows(at: indexPaths, with: .automatic)
+        self.reloadData()
     }
     
     public func swipeMenuOperation(info: ConversationInfo, type: UIContextualActionType) {

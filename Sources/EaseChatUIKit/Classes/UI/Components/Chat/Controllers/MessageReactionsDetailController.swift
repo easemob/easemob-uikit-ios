@@ -81,6 +81,9 @@ import UIKit
             consoleLogInfo("selected reaction can't be empty", type: .error)
             return
         }
+        if self.cursor.isEmpty {
+            self.users.removeAll()
+        }
         ChatClient.shared().chatManager?.getReactionDetail(self.message.messageId, reaction: self.selectedReaction, cursor: self.cursor, pageSize: 20, completion: { [weak self] reaction, cursor, error in
             guard let `self` = self else { return }
             if error == nil {
@@ -237,7 +240,6 @@ extension MessageReactionsDetailController:UITableViewDelegate,UITableViewDataSo
                 guard let `self` = self else { return }
                 if error == nil {
                     self.users.removeAll { $0.id == EaseChatUIKitContext.shared?.currentUserId ?? "" }
-                    self.reactionUserList.reloadData()
                     self.needRefresh?()
                 } else {
                     consoleLogInfo("removeReaction error:\(error?.errorDescription ?? "")", type: .error)

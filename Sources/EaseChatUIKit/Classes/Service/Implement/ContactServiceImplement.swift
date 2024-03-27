@@ -163,7 +163,9 @@ extension ContactServiceImplement: ContactEventsListener {
         for listener in self.responseDelegates.allObjects {
             listener.friendRequestDidReceive(by: aUsername)
         }
-        self.handleResult(error: nil, type: .add, operatorId: aUsername)
+        DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {
+            self.handleResult(error: nil, type: .add, operatorId: aUsername)
+        }
     }
     
     func handleResult(error: ChatError?,type: ContactEmergencyType,operatorId: String) {

@@ -94,9 +94,15 @@ import UIKit
         self.contentView.backgroundColor =  contentColor
         self.avatar.cornerRadius(Appearance.avatarRadius)
         self.avatar.image(with: info.avatarURL, placeHolder: info.type == .chat ? Appearance.conversation.singlePlaceHolder:Appearance.conversation.groupPlaceHolder)
-        let name = info.nickname.isEmpty ? info.id:info.nickname
+        var nickName = info.id
+        if !info.nickname.isEmpty {
+            nickName = info.nickname
+        }
+        if !info.remark.isEmpty {
+            nickName = info.remark
+        }
         let nameAttribute = NSMutableAttributedString {
-            AttributedText(name).font(UIFont.theme.titleMedium).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
+            AttributedText(nickName).font(UIFont.theme.titleMedium).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
             
         }
         let image = UIImage(named: "bell_slash", in: .chatBundle, with: nil)
@@ -125,7 +131,7 @@ import UIKit
                     badgeWidth = 32
                 }
             }
-            self.badge.frame = CGRect(x: Int(self.date.frame.maxX)-badgeWidth, y: Int(self.nickName.frame.maxY)+5, width: badgeWidth, height: 18)
+            self.badge.frame = CGRect(x: Int(ScreenWidth)-16-badgeWidth, y: Int(self.nickName.frame.maxY)+5, width: badgeWidth, height: 18)
         }
     }
     
@@ -235,7 +241,7 @@ extension ConversationListCell: ThemeSwitchProtocol {
                     from = message.from
                 }
                 let showText = NSMutableAttributedString {
-                    AttributedText(from + ": ").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(Font.theme.bodyMedium)
+                    AttributedText(message.chatType != .chat ? from + ": ":"").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(Font.theme.bodyMedium)
                 }
                 showText.append(text)
                 showText.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor6, range: NSRange(location: 0, length: showText.length))

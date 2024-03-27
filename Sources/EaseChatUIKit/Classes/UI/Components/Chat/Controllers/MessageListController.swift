@@ -30,8 +30,13 @@ import AVFoundation
     
     @objc open func rightImages() -> [UIImage] {
         var images = [UIImage(named: "message_action_topic", in: .chatBundle, with: nil)!]
+        if self.chatType == .chat {
+            images = []
+        }
         if !Appearance.chat.contentStyle.contains(.withMessageTopic) {
-            images.remove(at: 0)
+            if images.count > 0 {
+                images.remove(at: 0)
+            }
         }
         return images
     }
@@ -77,6 +82,21 @@ import AVFoundation
         } else {
             self.profile.id = conversationId
         }
+        if chatType == .chat {
+            if let info = EaseChatUIKitContext.shared?.userCache?[conversationId] {
+                self.profile.id = conversationId
+                self.profile.nickname = info.nickname
+                self.profile.remark = info.remark
+                self.profile.avatarURL = info.avatarURL
+            }
+        } else {
+            if let info = EaseChatUIKitContext.shared?.groupCache?[conversationId] {
+                self.profile.id = conversationId
+                self.profile.nickname = info.nickname
+                self.profile.remark = info.remark
+                self.profile.avatarURL = info.avatarURL
+            }
+        }
         switch chatType {
         case .group:
             self.chatType = .group
@@ -112,8 +132,17 @@ import AVFoundation
     open override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor.theme.neutralColor98
-        self.navigation.subtitle = "online"
-        self.navigation.title = self.profile.nickname.isEmpty ? self.profile.id:self.profile.nickname
+        self.navigation.subtitle = nil
+        self.navigation.status.isHidden = true
+        self.navigation.avatar.image(with: self.profile.avatarURL, placeHolder: self.chatType == .chat ? Appearance.conversation.singlePlaceHolder:Appearance.conversation.groupPlaceHolder)
+        var nickname = self.profile.remark
+        if nickname.isEmpty {
+            nickname = self.profile.nickname
+        }
+        if nickname.isEmpty {
+            nickname = self.profile.id
+        }
+        self.navigation.title = nickname
         self.view.addSubViews([self.messageContainer,self.navigation])
         self.navigation.clickClosure = { [weak self] in
             self?.navigationClick(type: $0, indexPath: $1)
@@ -432,6 +461,7 @@ extension MessageListController: MessageListDriverEventsListener {
     @objc open func showReactionDetailsController(message: MessageEntity) {
         let vc = MessageReactionsDetailController(message: message.message) { [weak self] in
             self?.viewModel.driver?.reloadReaction(message: message.message)
+            UIViewController.currentController?.dismiss(animated: true)
         }
         self.presentViewController(vc)
     }
@@ -740,7 +770,14 @@ extension MessageListController: MessageListDriverEventsListener {
         vc.confirmClosure = { profiles in
             vc.dismiss(animated: true) {
                 if let user = profiles.first {
-                    DialogManager.shared.showAlert(title: "Share Contact".chat.localize, content: "Share Contact".chat.localize+"`\(user.nickname.isEmpty ? user.id:user.nickname)`?", showCancel: true, showConfirm: true) { [weak self] _ in
+                    var sender = user.id
+                    if sender.isEmpty,!user.remark.isEmpty {
+                        sender = user.remark
+                    }
+                    if sender.isEmpty,!user.nickname.isEmpty {
+                        sender = user.nickname
+                    }
+                    DialogManager.shared.showAlert(title: "Share Contact".chat.localize, content: "Share Contact".chat.localize+"`\(user.nickname.isEmpty ? user.id:user.nickname)`?"+" to ".chat.localize+"`\(sender)`", showCancel: true, showConfirm: true) { [weak self] _ in
                         self?.viewModel.sendMessage(text: EaseChatUIKit_user_card_message, type: .contact,extensionInfo: ["uid":user.id,"avatar":user.avatarURL,"nickname":user.nickname])
                     }
                     

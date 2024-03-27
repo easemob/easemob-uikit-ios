@@ -390,9 +390,11 @@ extension ConversationServiceImplement: ChatEventsListener {
                 listener.onConversationLastMessageUpdate(message: message, info: info)
             }
         }
-        for handler in self.eventsNotifiers.allObjects {
-            if let info = list.first {
-                handler.onConversationLastMessageUpdate(message: message, info: info)
+        DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.5) {
+            for handler in self.eventsNotifiers.allObjects {
+                if let info = list.first {
+                    handler.onConversationLastMessageUpdate(message: message, info: info)
+                }
             }
         }
     }

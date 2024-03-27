@@ -15,7 +15,7 @@ import UIKit
     
     private var index = 0
     
-    private var page = 1
+    private var page = 0
     
     private var pageSize = 20
     
@@ -107,7 +107,7 @@ import UIKit
             if self.index == 0 {
                 self.fetchContacts()
             } else {
-                self.page = 1
+                self.page = 0
                 self.datas.removeAll()
                 self.fetchGroups()
             }
@@ -229,7 +229,7 @@ extension ForwardTargetViewController: UITableViewDelegate,UITableViewDataSource
     @objc open func forwardMessages(indexPath: IndexPath) {
         var body = self.messages.first?.body ?? ChatMessageBody()
         if self.combineForward {
-            body = ChatCombineMessageBody(title: "Chat History".chat.localize, summary: self.forwardSummary(), compatibleText: "[Chat History]", messageIdList: self.messages.map({ $0.messageId }))
+            body = ChatCombineMessageBody(title: "Chat History".chat.localize, summary: self.forwardSummary(), compatibleText: "[Chat History]", messageIdList: self.messages.filter({ChatClient.shared().chatManager?.getMessageWithMessageId($0.messageId)?.status == .succeed}).map({ $0.messageId }))
         }
         
         var conversationId = ""

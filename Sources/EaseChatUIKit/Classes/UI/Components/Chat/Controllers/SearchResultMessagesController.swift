@@ -33,7 +33,7 @@ import UIKit
     open override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor.theme.neutralColor98
-        self.navigation.subtitle = "online"
+        self.navigation.subtitle = nil
         self.navigation.title = self.profile.nickname.isEmpty ? self.profile.id:self.profile.nickname
         self.view.addSubViews([self.messageContainer,self.navigation])
         self.navigation.clickClosure = { [weak self] in
@@ -48,6 +48,10 @@ import UIKit
     }
     
     open override func viewDetail() {
+        
+    }
+    
+    public override func onMessageAvatarClicked(user: any EaseProfileProtocol) {
         
     }
     

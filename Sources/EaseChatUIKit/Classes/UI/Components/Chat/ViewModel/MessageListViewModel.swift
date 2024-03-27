@@ -140,7 +140,7 @@ import UIKit
     @objc open func loadMessages() {
         if let start = self.driver?.firstMessageId {
             self.chatService?.loadMessages(start: start, pageSize: 20, searchMessage: false, completion: { [weak self] error, messages in
-                if error == nil {
+                if error == nil,messages.count > 0 {
                     if (self?.driver?.firstMessageId ?? "").isEmpty {
                         self?.driver?.refreshMessages(messages: messages)
                     } else {
@@ -333,6 +333,7 @@ import UIKit
     
     @objc open func recallAction(message: ChatMessage) {
         if let recall = self.constructMessage(text: "recalled a message".chat.localize, type: .alert, extensionInfo: [:]) {
+            recall.messageId = message.messageId
             recall.timestamp = message.timestamp
             recall.from = message.from
             ChatClient.shared().chatManager?.getConversationWithConvId(message.conversationId)?.insert(recall, error: nil)
@@ -381,6 +382,10 @@ import UIKit
                 self.driver?.refreshMessages(messages: dataSource)
             }
         }
+    }
+    
+    @objc open func notifyUnreadCountChanged() {
+        NotificationCenter.default.post(name: Notification.Name("EaseChatUIKitUnreadCountChanged"), object: nil)
     }
 }
 
@@ -448,6 +453,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
     @objc open func messageVisibleMark(entity: MessageEntity) {
         let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)
         if !entity.message.isRead {
+            
             conversation?.markMessageAsRead(withId: entity.message.messageId, error: nil)
             if conversation?.type ?? .chat == .chat {
                 switch entity.message.body.type {
@@ -871,7 +877,7 @@ extension MessageListViewModel: GroupChatThreadEventListener {
                 if error === nil,let message = messages?.first {
                     message.ext?["remark"] = attributes["nickName"]
                     ChatClient.shared().chatManager?.update(message)
-                    EaseChatUIKitContext.shared?.chatCache?[userId]?.remark = attributes["nickName"] ?? userId
+                    EaseChatUIKitContext.shared?.chatCache?[userId]?.remark = attributes["nickName"] ?? ""
                 } else {
                     consoleLogInfo("onAttributesChangedOfGroupMember loadMessages user:\(userId)'s latest message error:\(error?.errorDescription ?? "")", type: .error)
                 }

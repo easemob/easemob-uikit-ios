@@ -43,16 +43,34 @@ import UIKit
     
     @MainActor
     @objc public func refresh(entity: MessageEntity) {
-        guard let message = entity.message.quoteMessage else { return }
-        if message.body.type == .image || message.body.type == .video {
-            self.replyUser.frame = CGRect(x: 12, y: 8, width: self.frame.width-24-36-8, height: 16)
-        } else {
-            self.replyUser.frame = CGRect(x: 12, y: 8, width: self.frame.width-24, height: 16)
+        guard let message = entity.message.quoteMessage else {
+            self.replyIcon.isHidden = true
+            self.replyUser.isHidden = true
+            self.replyUser.frame = .zero
+            self.replyContent.frame = CGRect(x: 5, y: 5, width: self.frame.width-10, height: self.frame.height-10)
+            self.replyContent.attributedText = entity.replyContent
+            return
         }
-        self.replyContent.frame = CGRect(x: 12, y: self.replyUser.frame.maxY, width: self.replyUser.frame.width, height: self.frame.height - 34)
-        self.replyUser.attributedText = entity.replyTitle
-        self.replyContent.attributedText = entity.replyContent
-        self.constructIcon(message: message)
+        if let content = entity.replyContent,content.string != "message doesn't exist".chat.localize {
+            self.replyUser.isHidden = false
+            self.replyIcon.isHidden = false
+            if message.body.type == .image || message.body.type == .video {
+                self.replyUser.frame = CGRect(x: 12, y: 8, width: self.frame.width-24-36-8, height: 16)
+            } else {
+                self.replyUser.frame = CGRect(x: 12, y: 8, width: self.frame.width-24, height: 16)
+            }
+            self.replyContent.frame = CGRect(x: 12, y: self.replyUser.frame.maxY, width: self.replyUser.frame.width, height: self.frame.height - 34)
+            
+            self.replyUser.attributedText = entity.replyTitle
+            self.replyContent.attributedText = entity.replyContent
+            self.constructIcon(message: message)
+        } else {
+            self.replyIcon.isHidden = true
+            self.replyUser.isHidden = true
+            self.replyUser.frame = .zero
+            self.replyContent.frame = CGRect(x: 5, y: 5, width: self.frame.width-10, height: self.frame.height-10)
+            self.replyContent.attributedText = entity.replyContent
+        }
     }
     
     required public init?(coder: NSCoder) {
@@ -115,7 +133,7 @@ extension MessageReplyView: ThemeSwitchProtocol {
         self.replyIcon.layerProperties(style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor8, 0.5)
         self.replyIcon.backgroundColor(style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor9)
         self.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
-        
+        self.backgroundColor = .orange
     }
 }
 
