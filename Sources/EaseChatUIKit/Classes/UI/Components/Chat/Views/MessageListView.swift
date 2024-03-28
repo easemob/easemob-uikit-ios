@@ -1041,17 +1041,14 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     private func recallAction(_ message: ChatMessage) {
-        if let index = self.messages.firstIndex(where: { $0.message.timestamp == message.timestamp }) {
-            self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
-            if let quoteIndex = self.messages.firstIndex(where: { $0.message.quoteMessage?.messageId ?? "" == message.messageId }) {
-                if ((self.messageList.indexPathsForVisibleRows?.contains(IndexPath(row: quoteIndex, section: 0))) != nil) {
-                    if let entity = self.messages[safe: quoteIndex] {
-                        self.messages.replaceSubrange(quoteIndex...quoteIndex, with: [self.convertMessage(message: entity.message)])
-                    }
+        for (index,entity) in self.messages.enumerated() {
+            if entity.message.quoteMessageId == message.messageId {
+                if let entity = self.messages[safe: index] {
+                    self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: entity.message)])
                 }
             }
-            self.messageList.reloadData()
         }
+        self.messageList.reloadData()
     }
     
     

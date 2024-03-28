@@ -795,6 +795,12 @@ extension ChatMessage {
         return !messageId.isEmpty
     }
     
+    /// When you send a text message. Quote the message.
+    @objc public var quoteMessageId: String {
+        guard let quoteInfo = self.ext?["msgQuote"] as? Dictionary<String,Any>,let messageId = quoteInfo["msgID"] as? String else { return "" }
+        return messageId
+    }
+    
     @objc open var contentSize: CGSize {
         switch self.body.type {
         case .custom:
