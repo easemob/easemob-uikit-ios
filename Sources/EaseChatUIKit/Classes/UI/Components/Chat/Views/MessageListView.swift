@@ -153,6 +153,8 @@ import UIKit
     /// Update state on chat thread load messages finished.
     /// - Parameter finished: Bool
     func updateThreadLoadMessagesFinished(finished: Bool)
+    
+    func endRefreshing()
 }
 
 @objc public enum MessageListType: UInt8 {
@@ -453,7 +455,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
             self?.processReactionEmojiClick(reaction: $0, entity: $1)
         }
         cell?.selectionStyle = .none
-        return cell ?? MessageCell()
+        return cell ?? UITableViewCell(style: .default, reuseIdentifier: "defaulteCell")
     }
     
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -706,6 +708,10 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
 }
 
 extension MessageListView: IMessageListViewDriver {
+    public func endRefreshing() {
+        self.messageList.refreshControl?.endRefreshing()
+    }
+    
     public func updateThreadLoadMessagesFinished(finished: Bool) {
         self.threadMessagesLoadFinished = finished
     }
@@ -715,8 +721,7 @@ extension MessageListView: IMessageListViewDriver {
         let contentHeight = self.messageList.contentSize.height
         let tableViewHeight = self.messageList.bounds.size.height
         let yOffset = self.messageList.contentOffset.y
-        let result = Int(ceilf(Float(yOffset))) >= Int(ceilf(Float(contentHeight - tableViewHeight)))
-        return result
+        return Int(ceilf(Float(yOffset))) >= Int(ceilf(Float(contentHeight - tableViewHeight)))
     }
     
     
@@ -841,8 +846,8 @@ extension MessageListView: IMessageListViewDriver {
     
     public func updateMessageAttachmentStatus(message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
-            self.messages[index] = self.convertMessage(message: message)
-            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .fade)
+            self.messages[index].state = self.convertStatus(message: message)
+            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
         }
     }
     
@@ -873,12 +878,7 @@ extension MessageListView: IMessageListViewDriver {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages[safe: index]?.message = message
             self.messages[safe: index]?.state = status
-            if self.messageList.numberOfRows(inSection: 0) > 0 {
-                self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
-            } else {
-                self.messageList.reloadData()
-            }
-            
+            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
         }
     }
     
@@ -926,10 +926,11 @@ extension MessageListView: IMessageListViewDriver {
         }
         self.messageList.refreshControl?.endRefreshing()
         self.messages.append(self.convertMessage(message: message))
+        let scrolledBottom = self.scrolledBottom
+        self.messageList.reloadData()
         if self.messages.count > 1 {
             if message.direction == .send {
                 let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
-                self.messageList.reloadData()
                 if lastIndexPath.row > 0 {
                     self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
                 }
@@ -937,9 +938,8 @@ extension MessageListView: IMessageListViewDriver {
                     handler.onMoreMessagesClicked()
                 }
             } else {
-                if self.scrolledBottom {
+                if scrolledBottom {
                     let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
-                    self.messageList.reloadData()
                     if lastIndexPath.row > 0 {
                         self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
                     }
@@ -1041,6 +1041,9 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     private func recallAction(_ message: ChatMessage) {
+        if let index = self.messages.firstIndex(where: { $0.message.timestamp == message.timestamp }) {
+            self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
+        }
         for (index,entity) in self.messages.enumerated() {
             if entity.message.quoteMessageId == message.messageId {
                 if let entity = self.messages[safe: index] {

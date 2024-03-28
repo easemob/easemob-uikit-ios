@@ -749,7 +749,7 @@ extension ChatMessage {
             if let body = self.body as? ChatCustomMessageBody {
                 if body.event == EaseChatUIKit_user_card_message {
                     let userId = body.customExt["uid"] ?? ""
-                    text = body.customExt["nickname"] ?? userId
+                    text = body.customExt["nickname"] ?? ""
                 }
                 if body.event == EaseChatUIKit_alert_message {
                     text = (self.ext?["something"] as? String) ?? ""

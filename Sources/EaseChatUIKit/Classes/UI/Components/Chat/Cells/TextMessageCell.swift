@@ -64,7 +64,7 @@ import UIKit
         } else {
             self.bubbleMultiCorners.addSubViews([self.content,self.edit])
             if Appearance.chat.enableTranslation {
-                self.bubbleWithArrow.addSubViews([self.separatorLine,self.translation,self.translateSymbol])
+                self.bubbleMultiCorners.addSubViews([self.separatorLine,self.translation,self.translateSymbol])
             }
             self.addGestureTo(view: self.bubbleMultiCorners, target: self)
         }

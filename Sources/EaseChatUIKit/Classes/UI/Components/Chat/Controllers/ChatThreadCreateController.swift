@@ -108,7 +108,7 @@ import AVFoundation
             guard let `self` = self else { return  }
             if error == nil,let thread = chatThread {
                 self.viewModel = ChatThreadViewModel(chatThread: thread)
-                if let firstMessage = self.viewModel.constructMessage(text: text, type: .text, extensionInfo: extensionInfo) {
+                if let firstMessage = self.viewModel.constructMessage(text: text, type: type, extensionInfo: extensionInfo) {
                     self.toChatThread(thread: thread, firstMessage: firstMessage)
                 }
             } else {
@@ -132,8 +132,10 @@ import AVFoundation
     open func toChatThread(thread: GroupChatThread,firstMessage: ChatMessage) {
         if self.navigationController != nil {
             self.navigationController?.popViewController(animated: false)
-            let vc = ChatThreadViewController(chatThread: thread,firstMessage: firstMessage,parentMessageId: self.message.messageId)
-            ControllerStack.toDestination(vc: vc)
+            DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.25) {
+                let vc = ChatThreadViewController(chatThread: thread,firstMessage: firstMessage,parentMessageId: self.message.messageId)
+                ControllerStack.toDestination(vc: vc)
+            }
         } else {
             self.dismiss(animated: false) {
                 let vc = ChatThreadViewController(chatThread: thread,firstMessage: firstMessage,parentMessageId: self.message.messageId)
@@ -284,6 +286,9 @@ extension ChatThreadCreateController: MessageListViewActionEventsDelegate {
             if let text = attributeText?.toString() {
                 self.createChatThread(text: text,type: .text)
             }
+        }
+        if type == .attachment {
+            self.attachmentDialog()
         }
     }
     

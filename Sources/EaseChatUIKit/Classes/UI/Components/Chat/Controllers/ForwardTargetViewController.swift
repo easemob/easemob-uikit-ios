@@ -128,7 +128,9 @@ import UIKit
                         self?.datas = contacts.map {
                             let profile = EaseProfile()
                             profile.id = $0.userId
-                            profile.nickname = $0.remark ?? ""
+                            profile.nickname = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
+                            profile.remark = $0.remark ?? ""
+                            profile.avatarURL = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
                             return profile
                         }
                         self?.targetsList.reloadData()
@@ -143,7 +145,9 @@ import UIKit
             self.datas = contacts.map {
                 let profile = EaseProfile()
                 profile.id = $0.userId
-                profile.nickname = $0.remark ?? ""
+                profile.nickname = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
+                profile.remark = $0.remark ?? ""
+                profile.avatarURL = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
                 return profile
             }
             self.targetsList.reloadData()
@@ -161,6 +165,7 @@ import UIKit
                         let profile = EaseProfile()
                         profile.id = $0.groupId
                         profile.nickname = $0.groupName
+                        profile.avatarURL = EaseChatUIKitContext.shared?.groupCache?[$0.groupId]?.avatarURL ?? ""
                         return profile
                     })
                     self?.targetsList.reloadData()

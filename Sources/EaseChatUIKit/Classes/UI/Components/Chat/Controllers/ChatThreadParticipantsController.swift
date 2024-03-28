@@ -91,14 +91,29 @@ import UIKit
                         self.participants.removeAll()
                         self.participants = list.map({
                             let profile = EaseProfile()
-                            profile.id = $0 as String
-                            profile.nickname = $0 as String
+                            let id = $0 as String
+                            profile.id = id
+                            if let user = EaseChatUIKitContext.shared?.userCache?[id] {
+                                profile.nickname = user.nickname
+                            }
+                            if let user = EaseChatUIKitContext.shared?.chatCache?[id] {
+                                profile.nickname = user.nickname
+                            }
+                            
                             return profile
                         })
                     } else {
                         self.participants.append(contentsOf: list.map({
                             let profile = EaseProfile()
-                            profile.id = $0 as String
+                            let id = $0 as String
+                            profile.id = id
+                            if let user = EaseChatUIKitContext.shared?.userCache?[id] {
+                                profile.nickname = user.nickname
+                            }
+                            if let user = EaseChatUIKitContext.shared?.chatCache?[id] {
+                                profile.nickname = user.nickname
+                            }
+                            
                             return profile
                         }))
                     }

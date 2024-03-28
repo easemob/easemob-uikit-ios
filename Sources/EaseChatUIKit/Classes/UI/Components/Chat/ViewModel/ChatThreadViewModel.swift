@@ -63,7 +63,7 @@ import UIKit
     
     @objc open func threadCreateAlert() {
         let id = self.chatThread?.owner ?? ""
-        let nickname = EaseChatUIKitContext.shared?.chatCache?[id]?.nickname ?? id
+        let nickname = EaseChatUIKitContext.shared?.chatCache?[id]?.nickname ?? ""
         if let createMessage = self.constructMessage(text: "\(nickname)"+"CreateThreadAlert".chat.localize, type: .alert) {
             var threadMessages = self.driver?.dataSource ?? []
             createMessage.localTime = Int64(self.chatThread?.createAt ?? Int(Date().timeIntervalSince1970))
@@ -498,7 +498,7 @@ extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
                     if let path = body?.localPath,FileManager.default.fileExists(atPath: path) {
                         if AudioTools.canPlay(url: URL(fileURLWithPath: path)) {
                             AudioTools.shared.stopPlaying()
-                            self.driver?.updateAudioMessageStatus(message: message.message, play: message.playing)
+                            self.driver?.updateAudioMessageStatus(message: message.message, play: true)
                             AudioTools.shared.playRecording(path: path) { [weak self] in
                                 if let body = message.message.body as? ChatFileMessageBody {
                                     if body.localPath == $0 {
@@ -516,7 +516,7 @@ extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
                         }
                     }
                 } else {
-                    self.driver?.updateAudioMessageStatus(message: message.message, play: message.playing)
+                    self.driver?.updateAudioMessageStatus(message: message.message, play: false)
                     AudioTools.shared.stopPlaying()
                 }
             }

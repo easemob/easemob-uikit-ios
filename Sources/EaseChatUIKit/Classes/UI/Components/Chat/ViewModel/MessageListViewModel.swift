@@ -140,6 +140,7 @@ import UIKit
     @objc open func loadMessages() {
         if let start = self.driver?.firstMessageId {
             self.chatService?.loadMessages(start: start, pageSize: 20, searchMessage: false, completion: { [weak self] error, messages in
+                self?.driver?.endRefreshing()
                 if error == nil,messages.count > 0 {
                     if (self?.driver?.firstMessageId ?? "").isEmpty {
                         self?.driver?.refreshMessages(messages: messages)
@@ -204,9 +205,9 @@ import UIKit
             if let duration = extensionInfo["duration"] as? Int {
                 body.duration = Int32(duration)
             }
-            return ChatMessage(conversationID: self.to, body: body, ext: ext)
+            chatMessage = ChatMessage(conversationID: self.to, body: body, ext: ext)
         case .file:
-            return ChatMessage(conversationID: self.to, body: ChatFileMessageBody(localPath: text, displayName: text.components(separatedBy: "/").last ?? "\(Date().timeIntervalSince1970)"), ext: ext)
+            chatMessage = ChatMessage(conversationID: self.to, body: ChatFileMessageBody(localPath: text, displayName: text.components(separatedBy: "/").last ?? "\(Date().timeIntervalSince1970)"), ext: ext)
         case .contact:
             var ext = extensionInfo
             var customExt = [String:String]()
@@ -527,7 +528,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
                     if let path = body?.localPath,FileManager.default.fileExists(atPath: path) {
                         if AudioTools.canPlay(url: URL(fileURLWithPath: path)) {
                             AudioTools.shared.stopPlaying()
-                            self.driver?.updateAudioMessageStatus(message: message.message, play: message.playing)
+                            self.driver?.updateAudioMessageStatus(message: message.message, play: true)
                             AudioTools.shared.playRecording(path: path) { [weak self] in
                                 if let body = message.message.body as? ChatFileMessageBody {
                                     if body.localPath == $0 {
@@ -545,7 +546,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
                         }
                     }
                 } else {
-                    self.driver?.updateAudioMessageStatus(message: message.message, play: message.playing)
+                    self.driver?.updateAudioMessageStatus(message: message.message, play: false)
                     AudioTools.shared.stopPlaying()
                 }
             }
@@ -708,6 +709,7 @@ extension MessageListViewModel: ChatResponseListener {
             }
             let entity = message
             entity.direction = message.direction
+            self.driver?.showMessage(message: entity)
             if let scrolledBottom = self.driver?.scrolledBottom,scrolledBottom {
                 let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)
                 conversation?.markMessageAsRead(withId: message.messageId, error: nil)
@@ -720,7 +722,6 @@ extension MessageListViewModel: ChatResponseListener {
                     }
                 }
             }
-            self.driver?.showMessage(message: entity)
         }
     }
     

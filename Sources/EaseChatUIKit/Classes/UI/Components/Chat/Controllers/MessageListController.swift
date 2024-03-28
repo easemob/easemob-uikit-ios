@@ -619,7 +619,7 @@ extension MessageListController: MessageListDriverEventsListener {
         if body.event == EaseChatUIKit_user_card_message {
             let profile = EaseProfile()
             profile.id = userId ?? ""
-            profile.nickname = nickname ?? profile.id
+            profile.nickname = nickname ?? ""
             profile.avatarURL = avatarURL ?? ""
             let vc = ComponentsRegister.shared.ContactInfoController.init(profile: profile)
             vc.modalPresentationStyle = .fullScreen

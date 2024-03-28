@@ -441,11 +441,14 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
     }
     
     @objc open func showReactionDetailsController(message: MessageEntity) {
-        let vc = MessageReactionsDetailController(message: message.message) { [weak self] in
-            self?.viewModel.driver?.reloadReaction(message: message.message)
-            UIViewController.currentController?.dismiss(animated: true)
+        if let reactionMessage = ChatClient.shared().chatManager?.getMessageWithMessageId(message.message.messageId) {
+            let vc = MessageReactionsDetailController(message: reactionMessage) { [weak self] in
+                self?.viewModel.driver?.reloadReaction(message: reactionMessage)
+                UIViewController.currentController?.dismiss(animated: true)
+            }
+            self.presentViewController(vc)
         }
-        self.presentViewController(vc)
+        
     }
     
     /**
@@ -572,7 +575,7 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
         if body.event == EaseChatUIKit_user_card_message {
             let profile = EaseProfile()
             profile.id = userId ?? ""
-            profile.nickname = nickname ?? profile.id
+            profile.nickname = nickname ?? ""
             profile.avatarURL = avatarURL ?? ""
             let vc = ComponentsRegister.shared.ContactInfoController.init(profile: profile)
             vc.modalPresentationStyle = .fullScreen

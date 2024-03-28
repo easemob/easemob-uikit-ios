@@ -14,7 +14,7 @@ import UIKit
      */
     private var editIndex = IndexPath(row: 1, section: 0)
     
-    public private(set) var chatGroup = ChatGroup()
+    public var chatGroup = ChatGroup()
     
     public private(set) var service: GroupService = GroupServiceImplement()
     
@@ -136,7 +136,9 @@ import UIKit
             let profile = EaseProfile()
             profile.id = self.chatGroup.groupId
             profile.nickname = self.chatGroup.groupName
-            profile.avatarURL = self.chatGroup.settings.ext
+            if !self.chatGroup.groupName.isEmpty {
+                profile.avatarURL = self.chatGroup.settings.ext
+            }
             EaseChatUIKitContext.shared?.updateCache(type: .group, profile: profile)
         }
         
@@ -173,6 +175,12 @@ import UIKit
     
     open override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
+    }
+    
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.datas.first?.first?.detail = "\(self.chatGroup.occupantsCount)"
+        self.menuList.reloadData()
     }
 
     open override func viewDidLoad() {

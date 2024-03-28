@@ -56,6 +56,7 @@ import UIKit
     open func refresh(chatThread: EaseChatThread) {
         self.threadName.text = chatThread.thread.threadName
         self.messageCount.setTitle("\(chatThread.thread.messageCount)", for: .normal)
+        self.messageCount.isHidden = chatThread.thread.messageCount <= 0 
         self.latestMessage.attributedText = self.renderMessageContent(message: chatThread.lastMessage)
     }
     

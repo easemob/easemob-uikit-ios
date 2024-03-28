@@ -30,6 +30,10 @@ import UIKit
         super.init(conversationId: conversationId, chatType: chatType)
     }
     
+    open override func rightImages() -> [UIImage] {
+        []
+    }
+    
     open override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor.theme.neutralColor98

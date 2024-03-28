@@ -40,7 +40,7 @@ import UIKit
     }()
     
     public private(set) lazy var reactionsList: UICollectionView = {
-        UICollectionView(frame: CGRect(x: 0, y: self.indicator.frame.maxY+13, width: self.view.frame.width, height: 28), collectionViewLayout: self.layout).backgroundColor(.clear).registerCell(ReactionDetailCell.self, forCellReuseIdentifier: "ReactionDetailCell").dataSource(self).delegate(self)
+        UICollectionView(frame: CGRect(x: 0, y: self.indicator.frame.maxY+13, width: self.view.frame.width, height: 28), collectionViewLayout: self.layout).backgroundColor(.clear).registerCell(ReactionDetailCell.self, forCellReuseIdentifier: "ReactionDetailCell").dataSource(self).delegate(self).showsHorizontalScrollIndicator(false).showsVerticalScrollIndicator(false)
     }()
     
     public private(set) lazy var reactionUserList: UITableView = {
