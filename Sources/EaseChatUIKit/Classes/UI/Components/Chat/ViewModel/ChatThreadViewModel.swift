@@ -188,9 +188,9 @@ import UIKit
             if let duration = extensionInfo["duration"] as? Int {
                 body.duration = Int32(duration)
             }
-            return ChatMessage(conversationID: self.to, body: body, ext: ext)
+            chatMessage = ChatMessage(conversationID: self.to, body: body, ext: ext)
         case .file:
-            return ChatMessage(conversationID: self.to, body: ChatFileMessageBody(localPath: text, displayName: text.components(separatedBy: "/").last ?? "\(Date().timeIntervalSince1970)"), ext: ext)
+            chatMessage = ChatMessage(conversationID: self.to, body: ChatFileMessageBody(localPath: text, displayName: text.components(separatedBy: "/").last ?? "\(Date().timeIntervalSince1970)"), ext: ext)
         case .contact:
             var ext = extensionInfo
             var customExt = [String:String]()

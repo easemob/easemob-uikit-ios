@@ -645,7 +645,9 @@ extension ChatMessage {
     /// ``EaseProfileProtocol``
     @objc public var user: EaseProfileProtocol? {
         let cacheUser = EaseChatUIKitContext.shared?.userCache?[self.from]
-        EaseChatUIKitContext.shared?.chatCache?[self.from]?.remark = cacheUser?.remark ?? ""
+        if cacheUser != nil,let remark = cacheUser?.remark,!remark.isEmpty {
+            EaseChatUIKitContext.shared?.chatCache?[self.from]?.remark = remark
+        }
         return EaseChatUIKitContext.shared?.chatCache?[self.from]
     }
     

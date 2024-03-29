@@ -23,7 +23,7 @@ import Foundation
 
 // MARK: - ArrayExtension
 public extension Array {
-    var chatroom: ChatWrapper<Array<Element>> {
+    var chat: ChatWrapper<Array<Element>> {
         return ChatWrapper.init(self)
     }
     

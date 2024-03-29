@@ -787,12 +787,19 @@ extension MessageListView: IMessageListViewDriver {
             self.messages.append(contentsOf: messages.map({
                 self.convertMessage(message: $0)
             }))
+            self.messageList.reloadData()
         } else {
+            let pullBeforeMessageId = self.messages.first?.message.messageId ?? ""
             self.messages.insert(contentsOf: messages.map({
                 self.convertMessage(message: $0)
             }), at: 0)
+            self.messageList.reloadData()
+            self.messageList.layoutIfNeeded()
+            if let beforeIndex = self.messages.firstIndex(where: { $0.message.messageId == pullBeforeMessageId }) {
+                self.messageList.scrollToRow(at: IndexPath(row: beforeIndex, section: 0), at: .top, animated: false)
+            }
+            
         }
-        self.messageList.reloadData()
     }
     
     
