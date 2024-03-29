@@ -226,8 +226,10 @@ extension ContactView: UITableViewDelegate,UITableViewDataSource {
         var unknownInfoIds = [String]()
         if let visiblePaths = self.contactList.indexPathsForVisibleRows {
             for indexPath in visiblePaths {
-                if let item = self.contacts[safe: indexPath.section]?[safe: indexPath.row],item.nickname.isEmpty {
-                    unknownInfoIds.append(item.id)
+                if let item = self.contacts[safe: indexPath.section]?[safe: indexPath.row] {
+                    if item.nickname.isEmpty || item.avatarURL.isEmpty {
+                        unknownInfoIds.append(item.id)
+                    }
                 }
             }
         }
@@ -364,6 +366,7 @@ struct ContactSorter {
                 showName = contact.id
             }
             profile.nickname = showName
+            profile.avatarURL = contact.avatarURL
             userInfos.append(profile)
         }
         userInfos.sort {

@@ -275,7 +275,7 @@ public let callMessage = "rtcCallWithAgora"
             label.attributedText = self.convertTextTranslationAttribute()
             let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-24-16, height: 9999))
             let width = size.width+24
-            return CGSize(width: width < 86 ? 86:width, height: size.height+16)
+            return CGSize(width: width < 86 ? 86:width, height: size.height+8)
         } else {
             return .zero
         }
@@ -648,7 +648,11 @@ extension ChatMessage {
         if cacheUser != nil,let remark = cacheUser?.remark,!remark.isEmpty {
             EaseChatUIKitContext.shared?.chatCache?[self.from]?.remark = remark
         }
-        return EaseChatUIKitContext.shared?.chatCache?[self.from]
+        let chatUser = EaseChatUIKitContext.shared?.chatCache?[self.from]
+        if chatUser == nil,cacheUser != nil {
+            return cacheUser
+        }
+        return chatUser
     }
     
     /// Whether message edited or not.
