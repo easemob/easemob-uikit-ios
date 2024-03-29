@@ -508,7 +508,10 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
                         handler.onMessageBubbleClicked(message: message)
                     }
                 } else {
-                    self.audioMessagePlay(message: message)
+                    if bodyType == .voice {
+                        self.driver?.stopAudioMessagesPlay()
+                        self.audioMessagePlay(message: message)
+                    }
                 }
             }
         } else {
@@ -537,6 +540,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
                                 }
                             }
                         } else {
+                            self.driver?.stopAudioMessagesPlay()
                             let tuple = MediaConvertor.convertAMRToWAV(url: URL(fileURLWithPath: path))
                             if tuple.0 != nil,tuple.1 != nil {
                                 body?.localPath = tuple.1
@@ -569,6 +573,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
                     self.cacheFrame(attachMessage: message.message)
                 }
                 if attachment.body.type == .voice {
+                    self.driver?.stopAudioMessagesPlay()
                     self.audioMessagePlay(message: message)
                 }
                 if message.message.body.type == .image {

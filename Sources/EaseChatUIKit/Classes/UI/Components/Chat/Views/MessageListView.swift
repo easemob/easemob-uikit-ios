@@ -155,6 +155,8 @@ import UIKit
     func updateThreadLoadMessagesFinished(finished: Bool)
     
     func endRefreshing()
+    
+    func stopAudioMessagesPlay()
 }
 
 @objc public enum MessageListType: UInt8 {
@@ -708,6 +710,21 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
 }
 
 extension MessageListView: IMessageListViewDriver {
+    public func stopAudioMessagesPlay() {
+        var indexPaths = [IndexPath]()
+        for (index,entity) in self.messages.enumerated() {
+            if entity.playing,entity.message.body.type == .voice {
+                let audioIndex = IndexPath(row: index, section: 0)
+                if let visibleIndexes = self.messageList.indexPathsForVisibleRows,visibleIndexes.contains(audioIndex) {
+                    indexPaths.append(audioIndex)
+                }
+            }
+        }
+        if indexPaths.count > 0 {
+            self.messageList.reloadRows(at: indexPaths, with: .automatic)
+        }
+    }
+    
     public func endRefreshing() {
         self.messageList.refreshControl?.endRefreshing()
     }
@@ -835,19 +852,12 @@ extension MessageListView: IMessageListViewDriver {
     
     public func updateAudioMessageStatus(message: ChatMessage, play: Bool) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
-            var indexPaths = [IndexPath]()
-            indexPaths.append(IndexPath(row: index, section: 0))
-            for entity in self.messages {
-                if let otherIndex = self.messages.firstIndex(where: { $0.playing }) {
-                    indexPaths.append(IndexPath(row: otherIndex, section: 0))
-                }
-                if entity.message.messageId != message.messageId {
-                    entity.playing = false
+            if let entity = self.messages[safe: index] {
+                entity.playing = play
+                if let cell = self.messageList.cellForRow(at: IndexPath(row: index, section: 0)) as? AudioMessageCell {
+                    (cell.content as? AudioMessageView)?.refresh(entity: entity)
                 }
             }
-            self.messages[safe: index]?.message = message
-            self.messages[safe: index]?.playing = play
-            self.messageList.reloadRows(at: indexPaths, with: .none)
         }
     }
     
