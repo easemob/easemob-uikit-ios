@@ -635,12 +635,6 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
             if ComponentViewsActionHooker.shared.chat.bubbleClicked != nil {
                 ComponentViewsActionHooker.shared.chat.bubbleClicked?(entity)
             } else {
-                if entity.message.body.type == .voice {
-                    for message in self.messages {
-                        message.playing = false
-                    }
-                    self.messageList.reloadData()
-                }
                 for handler in self.eventHandlers.allObjects {
                     handler.onMessageContentClicked(message: entity)
                 }
@@ -714,6 +708,7 @@ extension MessageListView: IMessageListViewDriver {
         var indexPaths = [IndexPath]()
         for (index,entity) in self.messages.enumerated() {
             if entity.playing,entity.message.body.type == .voice {
+                entity.playing = false
                 let audioIndex = IndexPath(row: index, section: 0)
                 if let visibleIndexes = self.messageList.indexPathsForVisibleRows,visibleIndexes.contains(audioIndex) {
                     indexPaths.append(audioIndex)
