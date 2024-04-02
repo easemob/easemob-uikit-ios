@@ -187,3 +187,5 @@
 "VideoCall" = "视频通话";
 "SearchMessages" = "搜索消息";
 " to " = "给";
+
+"UserId" = "用户ID：";

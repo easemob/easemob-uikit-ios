@@ -61,6 +61,10 @@ import UIKit
         self.switchTheme(style: Theme.style)
         self.requestGroups()
         NotificationCenter.default.addObserver(self, selector: #selector(removeGroup(notification:)), name: Notification.Name("EaseChatUIKit_leaveGroup"), object: nil)
+        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil, queue: .main) { [weak self] notify in
+            guard let `self` = self else { return }
+            self.groupList.reloadData()
+        }
     }
     
     @objc open func removeGroup(notification: Notification) {
@@ -95,6 +99,7 @@ import UIKit
                             let profile = EaseProfile()
                             profile.id = $0.groupId
                             profile.nickname = $0.groupName
+                            profile.avatarURL = EaseChatUIKitContext.shared?.groupCache?[$0.groupId]?.avatarURL ?? ""
                             return profile
                         }))
                         self.groupList.reloadData()
