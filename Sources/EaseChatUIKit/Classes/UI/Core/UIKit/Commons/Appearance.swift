@@ -137,7 +137,7 @@ import UIKit
     public var targetLanguage: LanguageType = .English
     
     /// You need to enable the translation function from the console first, and then set this property to true to experience the translation function.
-    public var enableTranslation = true
+    public var enableTranslation = false
     
     /// The label for message reporting types.
     public var reportSelectionTags: [String] = ["tag1","tag2","tag3","tag4","tag5","tag6","tag7","tag8","tag9"]
