@@ -188,7 +188,7 @@ import UIKit
     public var sendBubbleColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
     
     /// The color of the recipient of the text message.
-    public var receiveTextColor = Theme.style == .light ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
+    public var receiveTextColor = Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
     
     /// The color of the sender of the text message.
     public var sendTextColor = Theme.style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98

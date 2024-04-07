@@ -246,7 +246,7 @@ extension MessageAudioRecordView: ThemeSwitchProtocol {
         self.recordCover.backgroundColor(style == .dark ? UIColor.theme.primaryColor2:UIColor.theme.primaryColor95)
         self.recordIcon.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
         self.send.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
-        self.trash.backgroundColor(style == .light ? UIColor.theme.neutralColor9:UIColor.theme.neutralColor2)
+        self.trash.backgroundColor(style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9)
         self.trashIcon = self.trashIcon?.withTintColor(style == .dark ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor5)
         self.trash.setImage(self.trashIcon, for: .normal)
     }

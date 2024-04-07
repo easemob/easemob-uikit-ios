@@ -56,7 +56,7 @@ import UIKit
         self.fileIcon.cornerRadius(.extraSmall)
         self.switchTheme(style: Theme.style)
         if self.towards == .right {
-            self.content.textColor = Theme.style == .light ? UIColor.theme.neutralColor95:UIColor.theme.neutralColor2
+            self.content.textColor = Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
             self.fileSize.textColor = self.fileSizeSendColor
         } else {
             self.content.textColor = Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5
