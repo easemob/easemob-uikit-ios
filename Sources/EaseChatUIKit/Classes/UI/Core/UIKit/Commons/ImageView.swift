@@ -32,7 +32,7 @@ import Combine
         }
         ImageLoader.shared.loadImage(from: imageURL)
             .sink(receiveValue: { [weak self] url_image in
-                if url_image != nil {
+                if url_image != nil,url_image?.size ?? .zero != .zero {
                     self?.image = url_image
                 }
             })
@@ -51,7 +51,7 @@ import Combine
         }
         ImageLoader.shared.loadImage(from: imageURL)
             .sink(receiveValue: { [weak self] url_image in
-                if url_image != nil {
+                if url_image != nil,url_image?.size ?? .zero != .zero  {
                     self?.image = url_image
                     loadFinished(url_image)
                 }

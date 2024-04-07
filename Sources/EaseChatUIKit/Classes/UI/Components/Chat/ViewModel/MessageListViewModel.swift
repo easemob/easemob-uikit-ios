@@ -344,8 +344,8 @@ import UIKit
     
     @objc open func deleteMessage(message: ChatMessage) {
         if EaseChatUIKitClient.shared.option.option_chat.loadLocalHistoryMessages {
-            self.driver?.processMessage(operation: .delete, message: message)
             self.chatService?.removeLocalMessage(messageId: message.messageId)
+            self.driver?.processMessage(operation: .delete, message: message)
         } else {
             ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.removeMessages(fromServerMessageIds: [message.messageId], completion: { error in
                 if error == nil {
@@ -863,7 +863,25 @@ extension MessageListViewModel: GroupChatThreadEventListener {
                 }
                 if type == .created {
                     let topicName = event.chatThread?.threadName ?? ""
-                    if let alertMessage = self.constructMessage(text: "[\(event.from ?? "")] \("Create".chat.localize) \("Topic".chat.localize): \(topicName)", type: .alert,extensionInfo: ["threadId":event.chatThread.threadId ?? "","threadName":topicName,"messageId":event.chatThread.messageId ?? "","parentId":event.chatThread.parentId ?? ""]) {
+                    let owner = event.chatThread.owner ?? ""
+                    var showUserName = EaseChatUIKitContext.shared?.chatCache?[owner]?.remark ?? ""
+                    if showUserName.isEmpty {
+                        showUserName = EaseChatUIKitContext.shared?.chatCache?[owner]?.nickname ?? ""
+                    }
+                    if showUserName.isEmpty {
+                        showUserName = EaseChatUIKitContext.shared?.userCache?[owner]?.remark ?? ""
+                    }
+                    if showUserName.isEmpty {
+                        showUserName = EaseChatUIKitContext.shared?.userCache?[owner]?.nickname ?? ""
+                    }
+                    if showUserName.isEmpty {
+                        showUserName = owner
+                    }
+                    if !showUserName.isEmpty {
+                        showUserName = "[\(showUserName)]"
+                    }
+                    if let alertMessage = self.constructMessage(text: showUserName+" \("Create".chat.localize) \("Topic".chat.localize):\(topicName)", type: .alert,extensionInfo: ["threadId":event.chatThread.threadId ?? "","threadName":topicName,"messageId":event.chatThread.messageId ?? "","parentId":event.chatThread.parentId ?? ""]) {
+                        ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.insert(alertMessage, error: nil)
                         self.driver?.showMessage(message: alertMessage)
                     }
                 }

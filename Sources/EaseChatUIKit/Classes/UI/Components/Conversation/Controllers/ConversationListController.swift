@@ -38,7 +38,7 @@ import UIKit
     }
     
     @objc open func createList() -> ConversationList {
-        ConversationList(frame: CGRect(x: 0, y: self.search.frame.maxY+5, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight-49-(self.tabBarController?.tabBar.frame.height ?? 0)), style: .plain)
+        ConversationList(frame: CGRect(x: 0, y: self.search.frame.maxY+5, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight-BottomBarHeight-(self.tabBarController?.tabBar.frame.height ?? 49)), style: .plain)
     }
     
     /// Update navigation avatar url.
@@ -51,8 +51,13 @@ import UIKit
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.viewModel?.chatId = ""
+        self.view.window?.backgroundColor = .white
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
+    }
+    
+    open override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
     }
     
     open override func viewDidLoad() {
@@ -180,6 +185,7 @@ extension ConversationListController {
                 }
             }
         }
+        self.view.window?.backgroundColor = .black
         self.present(vc, animated: true)
     }
     
@@ -239,6 +245,7 @@ extension ConversationListController {
             vc.dismiss(animated: false)
             self?.create(profiles: profiles)
         }
+        self.view.window?.backgroundColor = .black
         self.present(vc, animated: true)
     }
     

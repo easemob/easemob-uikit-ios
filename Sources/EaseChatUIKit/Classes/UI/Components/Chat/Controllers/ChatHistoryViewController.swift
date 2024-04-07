@@ -118,7 +118,7 @@ extension ChatHistoryViewController: UITableViewDelegate,UITableViewDataSource {
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         guard let message = self.messages[safe: indexPath.row] else { return 62 }
         if message.message.body.type == .text || message.message.body.type == .image || message.message.body.type == .video {
-            return message.bubbleSize.height+(message.message.body.type != .text ? 40:35)
+            return message.bubbleSize.height+(message.message.body.type != .text ? 40:30)
         } else {
             return 62
         }

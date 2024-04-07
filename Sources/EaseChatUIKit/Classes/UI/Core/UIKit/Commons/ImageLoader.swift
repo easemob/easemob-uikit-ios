@@ -35,12 +35,21 @@ struct ImageLoader {
             return Just(cachedImage).eraseToAnyPublisher()
         } else {
             return URLSession.shared.dataTaskPublisher(for: url)
-                .map({ UIImage(data: $0.data) ?? UIImage() })
-                .map({ image in
-                    self.cache.cacheImage(image, for: url.absoluteString)
-                    return image
+                .map({
+                    if ($0.response as? HTTPURLResponse)?.statusCode ?? 0 != 200 {
+                        return Appearance.chat.imagePlaceHolder ?? UIImage()
+                    } else {
+                        return UIImage(data: $0.data) ?? UIImage()
+                    }
                 })
-                .replaceError(with: nil)
+                .map({ image in
+                    if image.size != .zero {
+                        self.cache.cacheImage(image, for: url.absoluteString)
+                        return image
+                    }
+                    return UIImage()
+                })
+                .replaceError(with: Appearance.chat.imagePlaceHolder)
                 .receive(on: DispatchQueue.main)
                 .eraseToAnyPublisher()
         }

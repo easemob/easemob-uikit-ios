@@ -30,13 +30,13 @@ import UIKit
     }
     
     /// The cache of user information on the side of the message in the chat page. The key is the user ID and the value is an object that complies with the ``EaseProfileProtocol`` protocol.Display the info on chat page.
-    public var chatCache: Dictionary<String,EaseProfileProtocol>? = [:]
+    public var chatCache: Dictionary<String,EaseProfileProtocol>? = Dictionary<String,EaseProfileProtocol>()
     
     /// The cache of user information on user. Display the info on contact-list&single-chat-conversation-item&user-profile page .
-    public var userCache: Dictionary<String,EaseProfileProtocol>? = [:]
+    public var userCache: Dictionary<String,EaseProfileProtocol>? = Dictionary<String,EaseProfileProtocol>()
     
     /// The cache of user information on group-conversation-item. The key is the user ID and the value is an object that complies with the ``EaseProfileProtocol`` protocol.
-    public var groupCache: Dictionary<String,EaseProfileProtocol>? = [:]
+    public var groupCache: Dictionary<String,EaseProfileProtocol>? = Dictionary<String,EaseProfileProtocol>()
     
     public var userProfileProvider: EaseProfileProvider?
     

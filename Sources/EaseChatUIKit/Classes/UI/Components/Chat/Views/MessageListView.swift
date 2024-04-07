@@ -565,7 +565,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                     let identifier = String(describing: Class.self)
                     cell = tableView.dequeueReusableCell(with: Class, reuseIdentifier: identifier)
                     if cell == nil {
-                        cell = ComponentsRegister.shared.ChatCustomMessageCell.init(towards: towards, reuseIdentifier: identifier)
+                        cell = ComponentsRegister.shared.ChatMessageBaseCell.init(towards: towards, reuseIdentifier: identifier)
                     }
                     break
                 }
@@ -939,7 +939,7 @@ extension MessageListView: IMessageListViewDriver {
         self.messageList.refreshControl?.endRefreshing()
         self.messages.append(self.convertMessage(message: message))
         let scrolledBottom = self.scrolledBottom
-        self.messageList.reloadData()
+        self.messageList.insertRows(at: [IndexPath(row: self.messages.count-1, section: 0)], with: .automatic)
         if self.messages.count > 1 {
             if message.direction == .send {
                 let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
@@ -999,7 +999,7 @@ extension MessageListView: IMessageListViewDriver {
             _ = entity.height
             _ = entity.replySize
             self.messages.replaceSubrange(index...index, with: [entity])
-            self.messageList.reloadData()
+            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
         }
     }
     
@@ -1018,7 +1018,7 @@ extension MessageListView: IMessageListViewDriver {
             _ = entity.height
             _ = entity.replySize
             self.messages.replaceSubrange(index...index, with: [entity])
-            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
         }
     }
     
@@ -1034,7 +1034,7 @@ extension MessageListView: IMessageListViewDriver {
     private func editAction(_ message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
-            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
         }
     }
     
@@ -1048,22 +1048,34 @@ extension MessageListView: IMessageListViewDriver {
     private func deleteAction(_ message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages.remove(at: index)
-            self.messageList.deleteRows(at: [IndexPath(row: index, section: 0)], with: .fade)
+            self.messageList.deleteRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
         }
+        var indexPaths = [IndexPath]()
+        for (index,entity) in self.messages.enumerated() {
+            if entity.message.quoteMessageId == message.messageId {
+                if let entity = self.messages[safe: index], let message = ChatClient.shared().chatManager?.getMessageWithMessageId(entity.message.messageId) {
+                    self.messages[index] = self.convertMessage(message: message)
+                    indexPaths.append(IndexPath(row: index, section: 0))
+                }
+            }
+        }
+        self.messageList.reloadRows(at: indexPaths, with: .automatic)
     }
     
     private func recallAction(_ message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.timestamp == message.timestamp }) {
             self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
         }
+        var indexPaths = [IndexPath]()
         for (index,entity) in self.messages.enumerated() {
             if entity.message.quoteMessageId == message.messageId {
-                if let entity = self.messages[safe: index] {
-                    self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: entity.message)])
+                if let entity = self.messages[safe: index] ,let message = ChatClient.shared().chatManager?.getMessageWithMessageId(entity.message.messageId) {
+                    self.messages[index] = self.convertMessage(message: message)
+                    indexPaths.append(IndexPath(row: index, section: 0))
                 }
             }
         }
-        self.messageList.reloadData()
+        self.messageList.reloadRows(at: indexPaths, with: .automatic)
     }
     
     

@@ -196,7 +196,7 @@ extension ActionSheet: UITableViewDelegate,UITableViewDataSource {
         } else {
             cell?.textLabel?.textColor = self.items[indexPath.row].type == .destructive ? UIColor.theme.errorColor6 : UIColor.theme.primaryColor6
         }
-        cell?.selectionStyle = .none
+        cell?.selectionStyle = .default
         return cell ?? ActionSheetCell()
     }
     

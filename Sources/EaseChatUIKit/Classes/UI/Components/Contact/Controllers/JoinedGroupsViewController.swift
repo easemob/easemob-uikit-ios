@@ -162,15 +162,12 @@ extension JoinedGroupsViewController: UITableViewDelegate,UITableViewDataSource 
     }
     
     @objc open func refreshGroup(groupId: String,name: String) {
-        var idx = 0
         for (index,profile) in self.datas.enumerated() {
             if profile.id == groupId {
-                idx = index
                 profile.nickname = name
                 break
             }
         }
-        self.datas.remove(at: idx)
         self.groupList.reloadData()
     }
 }

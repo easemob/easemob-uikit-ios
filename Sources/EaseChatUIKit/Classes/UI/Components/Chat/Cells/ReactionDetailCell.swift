@@ -61,14 +61,13 @@ extension MessageReaction {
             var attribute = NSMutableAttributedString()
             if image == nil {
                 attribute  = NSMutableAttributedString {
-                    AttributedText(" ").font(Font.theme.labelMedium)
                     AttributedText("\(content)").font(.systemFont(ofSize: 22))
                     AttributedText(" \(self.count)").font(Font.theme.labelMedium).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor3)
                 }
             } else {
                 attribute = NSMutableAttributedString {
-                    AttributedText(" ").font(Font.theme.labelMedium)
                     ImageAttachment(image, bounds: CGRect(x: 0, y: -5, width: 22, height: 22))
+                    AttributedText(" ").font(Font.theme.labelMedium)
                     AttributedText(" \(self.count)").font(Font.theme.labelMedium).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor3)
                 }
             }

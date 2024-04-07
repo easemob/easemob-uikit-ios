@@ -25,7 +25,7 @@ import UIKit
     @objc public var valueChanged: ((Bool,IndexPath) -> ())?
     
     lazy var titleLabel: UILabel = {
-        UILabel(frame: CGRect(x: 16, y: 16, width: (self.frame.width/2.0-22), height: 22)).font(UIFont.theme.labelMedium).backgroundColor(.clear)
+        UILabel(frame: CGRect(x: 16, y: 16, width: (self.frame.width/2.0-22), height: 22)).font(UIFont.theme.titleMedium).backgroundColor(.clear)
     }()
     
     lazy var detailLabel: UILabel = {
@@ -89,8 +89,8 @@ extension DetailInfoListCell: ThemeSwitchProtocol {
         self.titleLabel.textColor = style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
         self.detailLabel.textColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5
         self.switchMenu.onTintColor = style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
-        self.accessoryView?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor5
-        self.accessoryView?.subviews.first?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor5
+        self.accessoryView?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor3
+        self.accessoryView?.subviews.first?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor3
         
         self.separatorLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
     }

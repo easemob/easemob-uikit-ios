@@ -194,10 +194,10 @@ import UIKit
     public var sendTextColor = Theme.style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
         
     /// The color of the recipient of the text message.
-    public var receiveTranslationColor = Theme.style == .light ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor5
+    public var receiveTranslationColor = Theme.style == .dark ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor5
     
     /// The color of the sender of the text message.
-    public var sendTranslationColor = Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
+    public var sendTranslationColor = Theme.style == .dark ? UIColor.theme.neutralSpecialColor2:UIColor.theme.neutralSpecialColor95
     
 
     /// The corner of the image message.
@@ -236,8 +236,8 @@ import UIKit
     
     /// The header items of the contact list.
     public var listHeaderExtensionActions: [ContactListHeaderItemProtocol] = [
-        ContactListHeaderItem(featureIdentify: "NewFriendRequest", featureName: "New Request", featureIcon: nil),
-        ContactListHeaderItem(featureIdentify: "GroupChats", featureName: "Joined Groups", featureIcon: nil)
+        ContactListHeaderItem(featureIdentify: "NewFriendRequest", featureName: "New Request".chat.localize, featureIcon: nil),
+        ContactListHeaderItem(featureIdentify: "GroupChats", featureName: "Joined Groups".chat.localize, featureIcon: nil)
     ]
     
     /// The contact info header extension items.

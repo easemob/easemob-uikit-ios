@@ -90,7 +90,7 @@ import AVFoundation
             if showTitle.count > 16 {
                 showTitle = showTitle.chat.subStringTo(16)
             }
-            self.navigation.subtitle = group.groupName.isEmpty ? group.groupId:group.groupName
+            self.navigation.subtitle = "#"+(group.groupName.isEmpty ? group.groupId:group.groupName)
             self.navigation.title = showTitle
         }
     }
@@ -122,7 +122,7 @@ import AVFoundation
     open func messageHeight() -> CGFloat {
         var height = CGFloat(0)
         if self.message.body.type == .text || self.message.body.type == .image || self.message.body.type == .video {
-            height = self.entity.bubbleSize.height+(self.message.body.type != .text ? 40:35)
+            height = self.entity.bubbleSize.height+(self.message.body.type != .text ? 40:30)
         } else {
             height = 62
         }

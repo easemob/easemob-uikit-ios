@@ -90,7 +90,15 @@ import UIKit
             }
         }
         if let body = message.body as? ChatImageMessageBody {
-            self.replyIcon.image(with: body.thumbnailRemotePath ?? "", placeHolder: Theme.style == .dark ? self.icon(message: message)?.withTintColor(UIColor.theme.neutralColor7):self.icon(message: message)?.withTintColor(UIColor.theme.neutralColor5))
+            if message.from == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+                if FileManager.default.fileExists(atPath: body.localPath) {
+                    self.replyIcon.image = UIImage(contentsOfFile: body.localPath)
+                } else {
+                    self.replyIcon.image(with: body.remotePath, placeHolder: Theme.style == .dark ? self.icon(message: message)?.withTintColor(UIColor.theme.neutralColor7):self.icon(message: message)?.withTintColor(UIColor.theme.neutralColor5))
+                }
+            } else {
+                self.replyIcon.image(with: body.thumbnailRemotePath ?? "", placeHolder: Theme.style == .dark ? self.icon(message: message)?.withTintColor(UIColor.theme.neutralColor7):self.icon(message: message)?.withTintColor(UIColor.theme.neutralColor5))
+            }
         }
         if message.body.type == .image || message.body.type == .video {
             self.replyIcon.isHidden = false

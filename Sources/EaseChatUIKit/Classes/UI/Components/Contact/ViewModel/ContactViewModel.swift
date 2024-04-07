@@ -24,7 +24,7 @@ import UIKit
     public required init(ignoreIds: [String] = []) {
         self.ignoreContacts = ignoreIds
         super.init()
-        NotificationCenter.default.addObserver(self, selector: #selector(loadAllContacts), name: Notification.Name("New Friend Chat"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(addFriendRefreshList), name: Notification.Name("New Friend Chat"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(loadAllContacts), name: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil)
     }
     
@@ -70,6 +70,25 @@ import UIKit
             self.service = ContactServiceImplement()
         }
         self.service?.unregisterEmergencyListener(listener: listener)
+    }
+    
+    @objc open func addFriendRefreshList() {
+        self.service?.contacts(completion: { [weak self] error, contacts in
+            if error == nil {
+                if let infos = self?.filterContacts(contacts: contacts) {
+                    self?.driver?.refreshList(infos: infos)
+                    if infos.count < 10 {
+                        self?.requestDisplayInfos(ids: infos.map({ $0.id }))
+                    }
+                    DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {
+                        self?.notifySelf = false
+                    }
+                }
+            } else {
+                self?.driver?.occurError()
+                consoleLogInfo("loadAllContacts error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        })
     }
     
     @objc open func loadAllContacts() {
@@ -205,7 +224,7 @@ extension ContactViewModel: MultiDeviceListener {
             }
             self.driver?.refreshHeader(info: item)
         }
-        self.loadAllContacts()
+        self.addFriendRefreshList()
     }
     
 }

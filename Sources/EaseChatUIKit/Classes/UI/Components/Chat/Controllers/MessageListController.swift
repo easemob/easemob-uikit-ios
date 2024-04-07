@@ -131,6 +131,7 @@ import AVFoundation
     
     open override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.window?.backgroundColor = .black
         self.view.backgroundColor = UIColor.theme.neutralColor98
         self.navigation.subtitle = nil
         self.navigation.status.isHidden = true

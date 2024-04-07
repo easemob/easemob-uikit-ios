@@ -112,6 +112,9 @@ extension ChatServiceImplement: ChatService {
     }
     
     public func loadMessages(start messageId: String, pageSize: UInt, searchMessage: Bool, completion: @escaping (ChatError?, [ChatMessage]) -> Void) {
+        if EaseChatUIKitContext.shared?.chatCache == nil {
+            EaseChatUIKitContext.shared?.chatCache = [String:EaseProfileProtocol]()
+        }
         if EaseChatUIKitClient.shared.option.option_chat.loadLocalHistoryMessages {
             ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.loadMessagesStart(fromId: messageId, count: Int32(pageSize), searchDirection: searchMessage ? .down:.up,completion: { messages, error in
                 if error == nil,let messages = messages {

@@ -18,7 +18,7 @@ import UIKit
     }()
     
     lazy var stateView: UIImageView = {
-        UIImageView(frame: CGRect(x: self.contentView.frame.width-44, y: (self.contentView.frame.height-32)/2.0, width: 32, height: 32)).backgroundColor(.clear)
+        UIImageView(frame: CGRect(x: self.contentView.frame.width-44, y: (self.contentView.frame.height-28)/2.0, width: 28, height: 28)).backgroundColor(.clear)
     }()
     
     lazy var separatorLine: UIView = {
@@ -41,7 +41,7 @@ import UIKit
     open override func layoutSubviews() {
         super.layoutSubviews()
         self.content.frame = CGRect(x: 16, y: (self.contentView.frame.height-22)/2.0, width: self.contentView.frame.width-72, height: 22)
-        self.stateView.frame = CGRect(x: self.contentView.frame.width-44, y: (self.contentView.frame.height-32)/2.0, width: 32, height: 32)
+        self.stateView.frame = CGRect(x: self.contentView.frame.width-44, y: (self.contentView.frame.height-28)/2.0, width: 28, height: 28)
         self.separatorLine.frame = CGRect(x:self.content.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.content.frame.minX, height: 0.5)
     }
     

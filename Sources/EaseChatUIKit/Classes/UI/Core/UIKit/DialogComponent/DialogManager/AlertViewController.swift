@@ -69,7 +69,7 @@ import UIKit
         let label = UILabel()
         label.text = ""
         label.textColor = UIColor(red: 27/255.0, green: 16/255.0, blue: 103/255.0, alpha: 1.0)
-        label.font = UIFont.systemFont(ofSize: 17)
+        label.font = UIFont.theme.titleLarge
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -77,13 +77,13 @@ import UIKit
         let label = UILabel()
         label.text = ""
         label.numberOfLines = 0
-        label.textColor = UIColor(red: 27/255.0, green: 16/255.0, blue: 103/255.0, alpha: 0.5)
-        label.font = UIFont.systemFont(ofSize: 14)
+        label.textColor = Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5
+        label.font = UIFont.theme.labelMedium
         label.translatesAutoresizingMaskIntoConstraints = false
         label.isHidden = true
         return label
     }()
-    private lazy var textField: UITextField = {
+    public private(set) lazy var textField: UITextField = {
        let textField = UITextField()
         textField.placeholder = "Aa"
         textField.translatesAutoresizingMaskIntoConstraints = false
@@ -116,7 +116,7 @@ import UIKit
         let button = UIButton()
         button.setTitle("barrage_long_press_menu_cancel".chat.localize, for: .normal)
         button.setTitleColor(UIColor(red: 120/255.0, green: 0/255.0, blue: 255/255.0, alpha: 1.0), for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 17)
+        button.titleLabel?.font = UIFont.theme.headlineSmall
         button.layer.cornerRadius = 25
         button.layer.borderColor = UIColor(red: 120/255.0, green: 0/255.0, blue: 255/255.0, alpha: 1.0).cgColor
         button.layer.borderWidth = 1
@@ -129,7 +129,7 @@ import UIKit
         let button = UIButton()
         button.setTitle("Confirm".chat.localize, for: .normal)
         button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 17)
+        button.titleLabel?.font = UIFont.theme.headlineSmall
         button.layer.cornerRadius = 25
         button.backgroundColor = UIColor(red: 120/255.0, green: 0/255.0, blue: 255/255.0, alpha: 1.0)
         button.translatesAutoresizingMaskIntoConstraints = false

@@ -202,10 +202,28 @@ public let callMessage = "rtcCallWithAgora"
     
     open func convertReplyTitle() -> NSAttributedString? {
         if let quoteMessage = self.message.quoteMessage {
-            return NSAttributedString {
-                AttributedText(quoteMessage.user?.nickname ?? quoteMessage.from).font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5)
+            var showUserName = ""
+            if showUserName.isEmpty {
+                showUserName = quoteMessage.user?.remark ?? ""
             }
-        } else { return nil }
+            if showUserName.isEmpty {
+                showUserName = quoteMessage.user?.nickname ?? ""
+            }
+            if showUserName.isEmpty {
+                showUserName = quoteMessage.from
+            }
+            return NSAttributedString {
+                AttributedText(showUserName).font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5)
+            }
+        } else {
+            if self.message.quoteMessageId.isEmpty {
+                return nil
+            } else {
+                return NSAttributedString {
+                    AttributedText("message doesn't exist".chat.localize).font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5)
+                }
+            }
+        }
     }
     
     public private(set) lazy var replyContent: NSAttributedString? = {
@@ -262,7 +280,7 @@ public let callMessage = "rtcCallWithAgora"
         if width < translateSize.width {
             width = translateSize.width+16
         }
-        let height = 6.5+textHeight+(self.message.edited ? 20:6)+(self.showTranslation ? translateSize.height+24:0)
+        let height = 6.5+textHeight+(self.message.edited ? 20:6)+(self.showTranslation ? translateSize.height+28:0)
         if self.message.edited {
             width += 44
         }
@@ -273,9 +291,9 @@ public let callMessage = "rtcCallWithAgora"
         if self.showTranslation {
             let label = UILabel().numberOfLines(0)
             label.attributedText = self.convertTextTranslationAttribute()
-            let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-24-16, height: 9999))
+            let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-24, height: 9999))
             let width = size.width+24
-            return CGSize(width: width < 86 ? 86:width, height: size.height+8)
+            return CGSize(width: width < 86 ? 86:width, height: size.height)
         } else {
             return .zero
         }
@@ -398,7 +416,7 @@ public let callMessage = "rtcCallWithAgora"
                     if let threadName = self.message.ext?["threadName"] as? String {
                         let range = something.chat.rangeOfString(threadName)
                         text.append(NSAttributedString {
-                            AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall).lineHeight(multiple: 0.98, minimum: 14).alignment(.center)
+                            AttributedText(something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall).lineHeight(multiple: 0.98, minimum: 14).alignment(.center)
                         })
                         text.addAttribute(NSAttributedString.Key.foregroundColor, value: Theme.style == .dark ? Color.theme.primaryColor6:Color.theme.primaryColor5, range: range)
                     } else {
@@ -489,8 +507,13 @@ public let callMessage = "rtcCallWithAgora"
             })
             return text
         }
-        let nickname = topicMessage.user?.nickname ?? topicMessage.from
-        
+        var nickname = topicMessage.user?.remark ?? ""
+        if nickname.isEmpty {
+            nickname = topicMessage.user?.nickname ?? ""
+        }
+        if nickname.isEmpty {
+            nickname = topicMessage.from
+        }
         if topicMessage.body.type != .text {
             text.append(NSAttributedString {
                 AttributedText(nickname+":"+topicMessage.showType).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.labelSmall).lineHeight(multiple: 0.98, minimum: 14)
@@ -579,7 +602,7 @@ public let callMessage = "rtcCallWithAgora"
     }
         
     open func convertToReply() -> NSAttributedString? {
-        if self.message.messageId.isEmpty {
+        if self.message.quoteMessageId.isEmpty {
             return nil
         }
         if let quoteMessage = self.message.quoteMessage {
@@ -797,8 +820,7 @@ extension ChatMessage {
     
     /// When you send a text message. Quote the message.
     @objc public var hasQuote: Bool {
-        guard let quoteInfo = self.ext?["msgQuote"] as? Dictionary<String,Any>,let messageId = quoteInfo["msgID"] as? String else { return false }
-        return !messageId.isEmpty
+        return !self.quoteMessageId.isEmpty
     }
     
     /// When you send a text message. Quote the message.

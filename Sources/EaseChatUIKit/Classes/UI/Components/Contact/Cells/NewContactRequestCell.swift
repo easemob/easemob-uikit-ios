@@ -8,8 +8,10 @@
 import UIKit
 
 @objcMembers open class NewContactRequest: NSObject {
-    var userId: String = ""
-    var time: TimeInterval = 0
+    public var userId: String = ""
+    public var time: TimeInterval = 0
+    public var avatarURL: String = ""
+    public var nickname: String = ""
 }
 
 @objcMembers open class NewContactRequestCell: UITableViewCell {

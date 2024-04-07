@@ -162,7 +162,7 @@ import UIKit
             } else {
                 self.addSubViews([self.leftItem,self.avatar,self.status,self.titleLabel,self.detail,self.rightItems,self.separateLine,self.cancel])
             }
-            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+4, y: StatusBarHeight+4, width: ScreenWidth - width*2 - 4, height: 22)
+            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: StatusBarHeight+4, width: ScreenWidth - width*2 - 4, height: 22)
             if textAlignment == .center {
                 self.titleLabel.center = CGPoint(x: self.center.x, y: self.titleLabel.center.y)
             }
@@ -174,7 +174,7 @@ import UIKit
                 self.addSubViews([self.avatar,self.status,self.titleLabel,self.detail,self.rightItems,self.separateLine,self.cancel])
             }
             
-            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+4, y: StatusBarHeight+4, width: ScreenWidth - CGFloat(self.rightImages.count*36)*2, height: 22)
+            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: StatusBarHeight+4, width: ScreenWidth - CGFloat(self.rightImages.count*36)*2, height: 22)
             if textAlignment == .center {
                 self.titleLabel.center = CGPoint(x: self.center.x, y: self.titleLabel.center.y)
             }
@@ -298,7 +298,7 @@ extension EaseChatNavigationBar: ThemeSwitchProtocol {
         }
         self.titleLabel.textColor = style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
         self.detail.textColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5
-        self.leftItem.setImage(self.backImage?.withTintColor(Theme.style == .light ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor98), for: .normal)
+        self.leftItem.setImage(self.backImage?.withTintColor(Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor3), for: .normal)
         self.rightItem.setTitleColor(style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor7, for: .disabled)
         self.rightItem.setTitleColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, for: .normal)
         self.separateLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9

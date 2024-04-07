@@ -123,7 +123,7 @@ import AVFoundation
     
     open func setupTitle() {
         if let group = ChatGroup(id: self.profile.parentId) {
-            self.navigation.subtitle = group.groupName.isEmpty ? self.profile.parentId:group.groupName
+            self.navigation.subtitle = "#"+(group.groupName.isEmpty ? self.profile.parentId:group.groupName)
         }
         self.navigation.title = self.profile.threadName.isEmpty ? self.profile.threadId:self.profile.threadName
     }

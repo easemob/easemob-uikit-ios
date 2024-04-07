@@ -42,7 +42,7 @@ import UIKit
     @objc public var detailText: String? {
         didSet {
             if let string = self.detailText {
-                let text = NSMutableAttributedString(string: "UserId".chat.localize+string,attributes: [.font:UIFont.theme.bodySmall,.foregroundColor:(Theme.style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor6)])
+                let text = NSMutableAttributedString(string: ("UserId".chat.localize+string),attributes: [.font:UIFont.theme.bodySmall,.foregroundColor:(Theme.style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor6)])
                 let imageAttachment = NSTextAttachment()
                 imageAttachment.image = UIImage(named: "copy", in: .chatBundle, with: nil)?.withTintColor(Theme.style == .dark ? UIColor.theme.neutralColor4:UIColor.theme.neutralColor6)
                 imageAttachment.bounds = CGRect(x: 0, y: -3, width: imageAttachment.image?.size.width ?? 0, height: imageAttachment.image?.size.height ?? 0)
@@ -53,10 +53,10 @@ import UIKit
         }
     }
     
-    private let itemWidth = Appearance.contact.detailExtensionActionItems.count > 3 ? ((ScreenWidth-8*CGFloat(Appearance.contact.detailExtensionActionItems.count-1))/CGFloat(Appearance.contact.detailExtensionActionItems.count)):(114*ScreenWidth/390.0)
+    private let itemWidth = Appearance.contact.detailExtensionActionItems.count > 3 ? ((ScreenWidth-8*CGFloat(Appearance.contact.detailExtensionActionItems.count-1)-40)/CGFloat(Appearance.contact.detailExtensionActionItems.count)):(114*ScreenWidth/390.0)
     
     public private(set) lazy var avatar: ImageView = {
-        ImageView(frame: CGRect(x: self.frame.width/2.0-50, y: 20, width: 100, height: 100)).cornerRadius(Appearance.avatarRadius).backgroundColor(.clear)
+        ImageView(frame: CGRect(x: self.frame.width/2.0-50, y: NavigationHeight, width: 100, height: 100)).cornerRadius(Appearance.avatarRadius).backgroundColor(.clear)
     }()
     
     public private(set) lazy var status: UIImageView = {
@@ -68,7 +68,7 @@ import UIKit
     }()
     
     public private(set) lazy var nickName: UILabel = {
-        UILabel(frame: CGRect(x: 50, y: self.avatar.frame.maxY+12, width: self.frame.width-100, height: 28)).textAlignment(.center)
+        UILabel(frame: CGRect(x: 50, y: self.avatar.frame.maxY+12, width: self.frame.width-100, height: 28)).textAlignment(.center).font(UIFont.theme.headlineLarge)
     }()
     
     public private(set) lazy var detail: UIButton = {
@@ -88,7 +88,8 @@ import UIKit
     }()
     
     public private(set) lazy var itemList: UICollectionView = {
-        UICollectionView(frame: CGRect(x: 20, y: self.detail.frame.maxY+20, width: CGFloat((Int(self.itemWidth)*Appearance.contact.detailExtensionActionItems.count)+(Appearance.contact.detailExtensionActionItems.count-1)*8), height: 62), collectionViewLayout: self.layout).delegate(self).dataSource(self).registerCell(DetailInfoHeaderExtensionCell.self, forCellReuseIdentifier: "DetailInfoHeaderExtensionCell").backgroundColor(.clear).showsHorizontalScrollIndicator(false)
+        let width = CGFloat((Int(self.itemWidth)*Appearance.contact.detailExtensionActionItems.count)+(Appearance.contact.detailExtensionActionItems.count-1)*8)
+        return UICollectionView(frame: CGRect(x: 15, y: self.detail.frame.maxY+20, width: width+10, height: 62), collectionViewLayout: self.layout).delegate(self).dataSource(self).registerCell(DetailInfoHeaderExtensionCell.self, forCellReuseIdentifier: "DetailInfoHeaderExtensionCell").backgroundColor(.clear).showsHorizontalScrollIndicator(false)
     }()
 
     internal override init(frame: CGRect) {

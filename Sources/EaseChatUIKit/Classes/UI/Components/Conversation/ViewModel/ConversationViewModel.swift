@@ -13,7 +13,7 @@ import AudioToolbox
 @objc open class ConversationViewModel: NSObject {
     
     /// Map to store session settings do not disturb.
-    @UserDefault("EaseChatUIKit_conversation_mute_map", defaultValue: Dictionary<String,Dictionary<String,Int>>()) private var muteMap
+    @UserDefault("EaseChatUIKit_conversation_mute_map", defaultValue: Dictionary<String,Dictionary<String,Int>>()) public private(set) var muteMap
     
     /// When conversation clicked.
     @objc public var toChat: ((IndexPath,ConversationInfo) -> Void)?

@@ -74,7 +74,7 @@ import UIKit
         self.edit.contentHorizontalAlignment = .right
         self.translateSymbol.contentHorizontalAlignment = .right
         self.translation.isEditable = false 
-        self.translation.contentInset = UIEdgeInsets(top: -8, left: 0, bottom: 0, right: 0)
+        self.translation.contentInset = UIEdgeInsets(top: -8, left: -6, bottom: -8, right: -6)
     }
     
     required public init?(coder: NSCoder) {
@@ -111,8 +111,8 @@ import UIKit
             self.translation.isHidden = false
             self.translateSymbol.isHidden = false
             self.separatorLine.frame = CGRect(x: 12, y: (entity.message.edited ? self.edit.frame.maxY+8:self.content.frame.maxY+6), width: entity.bubbleSize.width-24, height: 0.5)
-            self.translation.frame = CGRect(x: 12, y: self.separatorLine.frame.maxY+4, width: entity.bubbleSize.width-24, height: translationSize.height)
-            self.translateSymbol.frame = CGRect(x: 12, y: self.translation.frame.maxY, width: entity.bubbleSize.width-24, height: 16)
+            self.translation.frame = CGRect(x: 12, y: self.separatorLine.frame.maxY+8, width: entity.bubbleSize.width-24, height: translationSize.height)
+            self.translateSymbol.frame = CGRect(x: 12, y: entity.bubbleSize.height-20, width: entity.bubbleSize.width-24, height: 16)
             self.translateSymbol.setTitle("Translated".chat.localize, for: .normal)
             let image = UIImage(named: "text_message_translated", in: .chatBundle, with: nil)
             self.translateSymbol.image(image?.withTintColor(stateColor), .normal)

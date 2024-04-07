@@ -43,10 +43,16 @@ public let EaseChatUIKit_VERSION = "1.0.0"
     /// - Parameters:
     ///   - option: The unique identifier that Chat assigns to each app.``ChatOptions``
     /// Returns the initialization success or an error that includes the description of the cause of the failure.
-    @objc(setupWithOption:)
-    public func setup(option: ChatOptions) -> ChatError? {
-        
-        return ChatClient.shared().initializeSDK(with: option)
+    @objc(setupWithAppKey:option:)
+    public func setup(appKey: String? = nil,option: ChatOptions? = nil) -> ChatError? {
+        if let options = option {
+            return ChatClient.shared().initializeSDK(with: options)
+        } else {
+            if let key = appKey {
+                return ChatClient.shared().initializeSDK(with: ChatOptions(appkey: key))
+            }
+            return ChatError(description: "App key can't nil", code: .invalidAppkey)
+        }
     }
     
     /// Login user.

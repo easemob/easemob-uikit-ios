@@ -47,11 +47,11 @@ import UIKit
         bubblePath.usesEvenOddFillRule = true
         bubblePath.lineWidth = 1
         // 气泡的圆角半径
-        let cornerRadius: CGFloat = 10
+        let cornerRadius: CGFloat = 4
         
         // 气泡的尖角宽度和高度
-        let arrowWidth: CGFloat = 5.0
-        let arrowHeight: CGFloat = 5.0
+        let arrowWidth: CGFloat = 6.0
+        let arrowHeight: CGFloat = 6.0
         
         let bounds = self.bounds
         let width = CGFloat(ceilf(Float(bounds.width)))
@@ -62,9 +62,9 @@ import UIKit
             bubblePath.move(to: CGPoint(x: width - cornerRadius, y: 0))
             bubblePath.addLine(to: CGPoint(x: cornerRadius, y: 0))
             bubblePath.addArc(withCenter: CGPoint(x: cornerRadius, y: cornerRadius), radius: cornerRadius, startAngle: CGFloat(3 * Double.pi / 2), endAngle: CGFloat(Double.pi), clockwise: false)
-            bubblePath.addLine(to: CGPoint(x: 0, y: height - cornerRadius - arrowHeight - 5))
-            bubblePath.addLine(to: CGPoint(x: -arrowWidth, y: height - cornerRadius - 5))
-            bubblePath.addLine(to: CGPoint(x: 0, y: height - cornerRadius + arrowHeight - 5))
+            bubblePath.addLine(to: CGPoint(x: 0, y: height - cornerRadius - arrowHeight - 8))
+            bubblePath.addLine(to: CGPoint(x: -arrowWidth, y: height - cornerRadius - 8))
+            bubblePath.addLine(to: CGPoint(x: 0, y: height - cornerRadius + arrowHeight - 8))
             bubblePath.addLine(to: CGPoint(x: 0, y: height - cornerRadius))
             bubblePath.addArc(withCenter: CGPoint(x: cornerRadius, y: height - cornerRadius), radius: cornerRadius, startAngle: CGFloat(Double.pi), endAngle: CGFloat(Double.pi / 2), clockwise: false)
             bubblePath.addLine(to: CGPoint(x: width - cornerRadius, y: height))
@@ -75,9 +75,9 @@ import UIKit
             bubblePath.move(to: CGPoint(x: cornerRadius, y: 0))
             bubblePath.addLine(to: CGPoint(x: width - cornerRadius, y: 0))
             bubblePath.addArc(withCenter: CGPoint(x: width - cornerRadius, y: cornerRadius), radius: cornerRadius, startAngle: CGFloat(3 * Double.pi / 2), endAngle: 0, clockwise: true)
-            bubblePath.addLine(to: CGPoint(x: width, y: height - cornerRadius - arrowHeight-5))
-            bubblePath.addLine(to: CGPoint(x: width + arrowWidth, y: height - cornerRadius-5))
-            bubblePath.addLine(to: CGPoint(x: width, y: height - cornerRadius + arrowHeight-5))
+            bubblePath.addLine(to: CGPoint(x: width, y: height - cornerRadius - arrowHeight-8))
+            bubblePath.addLine(to: CGPoint(x: width + arrowWidth, y: height - cornerRadius-8))
+            bubblePath.addLine(to: CGPoint(x: width, y: height - cornerRadius + arrowHeight-8))
             bubblePath.addLine(to: CGPoint(x: width, y: height - cornerRadius))
             bubblePath.addArc(withCenter: CGPoint(x: width - cornerRadius, y: height - cornerRadius), radius: cornerRadius, startAngle: 0, endAngle: CGFloat(Double.pi / 2), clockwise: true)
             bubblePath.addLine(to: CGPoint(x: cornerRadius, y: height))

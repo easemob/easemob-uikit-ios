@@ -230,7 +230,6 @@ let message_bubble_space = CGFloat(1)
     @objc public func longPressGestureTo(view: UIView,target: Any?) {
         view.isUserInteractionEnabled = true
         let longPress = UILongPressGestureRecognizer(target: target, action: #selector(longPressAction(gesture:)))
-        longPress.minimumPressDuration = 1.0
         view.addGestureRecognizer(longPress)
     }
     
@@ -295,8 +294,17 @@ let message_bubble_space = CGFloat(1)
         if !self.checkbox.isHidden {
             self.checkbox.image = UIImage(named: entity.selected ? "select":"unselect", in: .chatBundle, with: nil)
         }
-        //remark > nickname > userId
-        self.nickName.text = entity.showUserName
+        if entity.message.direction == .send {
+            self.nickName.isHidden = true
+        } else {
+            if entity.message.chatType == .groupChat {
+                //remark > nickname > userId
+                self.nickName.text = entity.showUserName
+                self.nickName.isHidden = false
+            } else {
+                self.nickName.isHidden = true
+            }
+        }
         //reply
         self.replyContent.isHidden = entity.replyContent == nil
         self.replyContent.isHidden = entity.replySize.height <= 0
@@ -350,7 +358,7 @@ let message_bubble_space = CGFloat(1)
             }
             self.avatar.frame = CGRect(x: self.editMode ? self.checkbox.frame.maxX+12:12, y: entity.height - 8 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - 34 - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageTopic }) ? (self.topicView.isHidden ? 0:topicHeight):0) - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageReaction }) ? reactionContentHeight:0), width: 28, height: 28)
             self.nickName.frame = CGRect(x:  Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+12:(self.editMode ? self.checkbox.frame.maxX+12:12), y: 10, width: limitBubbleWidth, height: 16)
-            self.messageDate.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+12:(self.editMode ? self.checkbox.frame.maxX+12:12), y: entity.height-20, width: 120, height: 16)
+            self.messageDate.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.maxX+12:(self.editMode ? self.checkbox.frame.maxX+12:12), y: entity.height-16, width: 120, height: 16)
             self.messageDate.textAlignment = .left
             self.nickName.textAlignment = .left
             if Appearance.chat.contentStyle.contains(.withReply) {
@@ -380,7 +388,7 @@ let message_bubble_space = CGFloat(1)
             }
             self.avatar.frame = CGRect(x: ScreenWidth-40, y: entity.height - 8 - (Appearance.chat.contentStyle.contains(where: { $0 == .withDateAndTime }) ? 16:2) - 34 - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageTopic }) ? (self.topicView.isHidden ? 0:topicHeight):0) - (Appearance.chat.contentStyle.contains(where: { $0 == .withMessageReaction }) ? reactionContentHeight:0), width: 28, height: 28)
             self.nickName.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? self.avatar.frame.minX-limitBubbleWidth-12:ScreenWidth-limitBubbleWidth-12, y: 10, width: limitBubbleWidth, height: 16)
-            self.messageDate.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? (self.avatar.frame.minX-12-120):(ScreenWidth-132), y: entity.height-20, width: 120, height: 16)
+            self.messageDate.frame = CGRect(x: Appearance.chat.contentStyle.contains(where: { $0 == .withAvatar }) ? (self.avatar.frame.minX-12-120):(ScreenWidth-132), y: entity.height-16, width: 120, height: 16)
             self.messageDate.textAlignment = .right
             self.nickName.textAlignment = .right
             if Appearance.chat.contentStyle.contains(.withReply) {

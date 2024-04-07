@@ -18,9 +18,9 @@ import Foundation
 }
 
 
-let EaseChatUIKit_alert_message = "chatUIKit_alert_message"
+public let EaseChatUIKit_alert_message = "chatUIKit_alert_message"
 
-let EaseChatUIKit_user_card_message = "userCard"
+public let EaseChatUIKit_user_card_message = "userCard"
 
 @objc public protocol ChatService: NSObjectProtocol {
     

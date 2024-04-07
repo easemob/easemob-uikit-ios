@@ -132,7 +132,7 @@ import UIKit
         var text = ""
         switch self.style {
         case .newGroup:
-            text = "new_chat_button_click_menu_creategroup".chat.localize
+            text = "Create".chat.localize
             self.navigation.rightItem.title("Create".chat.localize, .normal)
         case .newChat:
             text = "new_chat_button_click_menu_selectcontacts".chat.localize
@@ -262,7 +262,7 @@ import UIKit
         case .addGroupParticipant,.newGroup:
             let count = self.contactList.rawData.filter { $0.selected }.count
             self.navigation.rightItem.isEnabled = count > 0
-            var title = self.style == .newGroup ? "new_chat_button_click_menu_creategroup".chat.localize:"Add".chat.localize
+            var title = self.style == .newGroup ? "Create".chat.localize:"Add".chat.localize
             if count > 0 {
                 title += "(\(count))"
             }

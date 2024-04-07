@@ -155,14 +155,14 @@ extension MessageReaction {
             var attribute = NSMutableAttributedString()
             if image == nil {
                 attribute  = NSMutableAttributedString {
-                    AttributedText(" ").font(Font.theme.labelSmall)
+                    AttributedText("").font(Font.theme.labelSmall)
                     AttributedText("\(content)").font(.systemFont(ofSize: 24))
                     AttributedText(" \(self.count)").font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
                 }
             } else {
                 attribute = NSMutableAttributedString {
-                    AttributedText(" ").font(Font.theme.labelSmall)
                     ImageAttachment(image, bounds: CGRect(x: 0, y: -6.5, width: 24, height: 24))
+                    AttributedText(" ").font(Font.theme.labelSmall)
                     AttributedText(" \(self.count)").font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
                 }
             }

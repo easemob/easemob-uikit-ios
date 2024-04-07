@@ -22,11 +22,11 @@ import UIKit
     }()
     
     lazy var cancel: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: 16, y: Appearance.pageContainerConstraintsSize.height - 60 - 40  - BottomBarHeight, width: (self.view.frame.width-44)/2.0, height: 40)).layerProperties(UIColor.theme.neutralColor7, 1).textColor(UIColor.theme.neutralColor3, .normal).title("report_button_click_menu_button_cancel".chat.localize, .normal).font(UIFont.theme.headlineSmall).cornerRadius(.large).addTargetFor(self, action: #selector(cancelAction), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: 16, y: Appearance.pageContainerConstraintsSize.height - 60 - 40  - BottomBarHeight, width: (self.view.frame.width-44)/2.0, height: 40)).layerProperties(UIColor.theme.neutralColor7, 1).textColor(UIColor.theme.neutralColor3, .normal).title("report_button_click_menu_button_cancel".chat.localize, .normal).font(UIFont.theme.headlineSmall).cornerRadius(Appearance.avatarRadius).addTargetFor(self, action: #selector(cancelAction), for: .touchUpInside)
     }()
     
     lazy var confirm: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.cancel.frame.maxX+12, y: Appearance.pageContainerConstraintsSize.height - 60 - 40  - BottomBarHeight, width: (self.view.frame.width-44)/2.0, height: 40)).title("barrage_long_press_menu_report".chat.localize, .normal).textColor(UIColor.theme.neutralColor98, .normal).backgroundColor(UIColor.theme.primaryColor5).cornerRadius(.large).addTargetFor(self, action: #selector(report), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: self.cancel.frame.maxX+12, y: Appearance.pageContainerConstraintsSize.height - 60 - 40  - BottomBarHeight, width: (self.view.frame.width-44)/2.0, height: 40)).title("barrage_long_press_menu_report".chat.localize, .normal).textColor(UIColor.theme.neutralColor98, .normal).backgroundColor(UIColor.theme.primaryColor5).cornerRadius(Appearance.avatarRadius).addTargetFor(self, action: #selector(report), for: .touchUpInside)
     }()
     
     /// Init method

@@ -40,7 +40,7 @@
 "barrage_long_press_menu_copy" = "Copy";
 "Copied" = "Copied";
 "report_button_click_menu_button_cancel" = "Cancel";
-"Confirm" = "Confirm";
+"Confirm" = "Done";
 "participant_list_title" = "Participants";
 "Ban List" = "Ban List";
 "Editing" = "Editing";
@@ -72,6 +72,7 @@
 "NewRequestDetail" = "request to add you as a friend";
 "Groups" = "Groups";
 "NewRequest" = "New Request";
+"Joined Groups" = "Joined Groups";
 "Create" = "Create";
 "contactID" = "Contact ID";
 "add_group_members" = "Add Participants";

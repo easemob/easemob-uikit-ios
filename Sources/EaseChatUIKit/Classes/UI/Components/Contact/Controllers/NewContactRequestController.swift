@@ -9,11 +9,11 @@ import UIKit
 
 @objc open class NewContactRequestController: UIViewController {
         
-    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Double>()) private var newFriends
+    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Double>()) public var newFriends
     
-    private let contactService = ContactServiceImplement()
+    public let contactService = ContactServiceImplement()
     
-    public private(set) lazy var datas: [NewContactRequest] = {
+    public lazy var datas: [NewContactRequest] = {
         self.fillDatas()
     }()
     
@@ -78,6 +78,8 @@ import UIKit
             let request = NewContactRequest()
             request.userId = $0.key
             request.time = $0.value
+            request.avatarURL = EaseChatUIKitContext.shared?.userCache?[$0.key]?.avatarURL ?? ""
+            request.nickname = EaseChatUIKitContext.shared?.userCache?[$0.key]?.nickname ?? ""
             return request
         }
     }
@@ -110,6 +112,48 @@ extension NewContactRequestController: UITableViewDelegate,UITableViewDataSource
         return cell ?? NewContactRequestCell()
     }
     
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        var unknownInfoIds = [String]()
+        var unknownInfoMaps = [String:IndexPath]()
+        if let visiblePaths = self.requestList.indexPathsForVisibleRows {
+            for indexPath in visiblePaths {
+                if let nickName = self.datas[safe: indexPath.row]?.nickname,nickName.isEmpty {
+                    unknownInfoIds.append(self.self.datas[safe: indexPath.row]?.userId ?? "")
+                    unknownInfoMaps[self.datas[safe: indexPath.row]?.userId ?? ""] = indexPath
+                }
+                if let avatarURL = self.datas[safe: indexPath.row]?.avatarURL,avatarURL.isEmpty {
+                    unknownInfoIds.append(self.self.datas[safe: indexPath.row]?.userId ?? "")
+                    unknownInfoMaps[self.datas[safe: indexPath.row]?.userId ?? ""] = indexPath
+                }
+            }
+        }
+        
+        if EaseChatUIKitContext.shared?.userProfileProvider != nil {
+            Task(priority: .background) {
+                let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: unknownInfoIds) ?? []
+                self.refreshProfiles(profiles: profiles, unknownInfoMaps: unknownInfoMaps)
+            }
+        } else {
+            EaseChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: unknownInfoIds, completion: { [weak self] profiles in
+                self?.refreshProfiles(profiles: profiles, unknownInfoMaps: unknownInfoMaps)
+            })
+        }
+    }
+    
+    @objc open func refreshProfiles(profiles: [EaseProfileProtocol],unknownInfoMaps: [String:IndexPath]) {
+        var refreshIndexPaths = [IndexPath]()
+        for profile in profiles {
+            if let indexPath = unknownInfoMaps[profile.id] {
+                self.datas[indexPath.row].nickname = profile.nickname
+                self.datas[indexPath.row].avatarURL = profile.avatarURL
+                refreshIndexPaths.append(indexPath)
+            }
+        }
+        DispatchQueue.main.async {
+            self.requestList.reloadRows(at: refreshIndexPaths, with: .none)
+        }
+    }
+    
     /**
      Agrees to a friend request from a user.
 
@@ -123,7 +167,8 @@ extension NewContactRequestController: UITableViewDelegate,UITableViewDataSource
      - Parameter userId: The ID of the user who sent the friend request.
      */
     @objc open func agreeFriendRequest(userId: String) {
-        self.contactService.agreeFriendRequest(from: userId) { error, userId in
+        self.contactService.agreeFriendRequest(from: userId) { [weak self] error, userId in
+            guard let self = self else { return }
             if error != nil,error?.code == .userAlreadyLoginAnother {
                 consoleLogInfo("agreeFriendRequest error: \(error?.errorDescription ?? "")", type: .error)
             } else {
@@ -132,7 +177,7 @@ extension NewContactRequestController: UITableViewDelegate,UITableViewDataSource
                 let ext = ["something":("You have added".chat.localize+" "+userId+" "+"to say hello".chat.localize)]
                 let message = ChatMessage(conversationID: userId, body: ChatCustomMessageBody(event: EaseChatUIKit_alert_message, customExt: nil), ext: ext)
                 conversation?.insert(message, error: nil)
-                NotificationCenter.default.post(name: Notification.Name(rawValue: "New Friend Chat") , object: nil, userInfo: nil)
+                
                 self.datas.removeAll()
                 self.datas = self.fillDatas()
                 self.datas.sort { $0.time > $1.time }
