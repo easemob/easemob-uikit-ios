@@ -80,9 +80,7 @@ import UIKit
     public var ChatLocationCell: LocationMessageCell.Type = LocationMessageCell.self
     
     public var ChatCombineCell: CombineMessageCell.Type = CombineMessageCell.self
-    
-    public var ChatMessageBaseCell: MessageCell.Type = MessageCell.self
-    
+        
     public var MessagesViewModel: MessageListViewModel.Type = MessageListViewModel.self
     
     /// Message cell render entity.
