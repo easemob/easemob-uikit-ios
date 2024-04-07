@@ -30,7 +30,7 @@ extension UIButton {
         return super.point(inside: point, with: event)
     }
     
-    open func setHitTestEdgeInsets(_ edgeInsets: UIEdgeInsets) {
+    public func setHitTestEdgeInsets(_ edgeInsets: UIEdgeInsets) {
         self.hitTestEdgeInsets = edgeInsets
     }
 }

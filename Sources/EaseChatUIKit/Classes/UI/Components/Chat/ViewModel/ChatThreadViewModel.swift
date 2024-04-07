@@ -348,7 +348,7 @@ import UIKit
         if var dataSource = self.driver?.dataSource {
             let deleteIds = messages.map { $0.messageId }
             if let conversation = ChatClient.shared().chatManager?.getConversation(self.to, type: .groupChat, createIfNotExist: true, isThread: true) {
-                ChatClient.shared().chatManager?.removeMessagesFromServer(with: conversation, messageIds: messages.map({ $0.messageId }),completion: { [weak self] error in
+                ChatClient.shared().chatManager?.removeMessagesFromServer(with: conversation, messageIds: deleteIds,completion: { [weak self] error in
                     if error == nil {
                         for message in messages {
                             dataSource.removeAll(where: { $0.messageId == message.messageId })

@@ -194,9 +194,7 @@ extension NewContactRequestController: UITableViewDelegate,UITableViewDataSource
     
     @objc open func requestFriendInfo(userId: String) {
         ChatClient.shared().userInfoManager?.fetchUserInfo(byId: [userId], type: [0,1],completion: { infoMap, error in
-            if error == nil,let info = infoMap?[userId] {
-                
-            } else {
+            if error != nil {
                 consoleLogInfo("requestFriendInfo error:\(error?.errorDescription ?? "")", type: .error)
             }
         })

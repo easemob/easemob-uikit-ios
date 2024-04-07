@@ -317,7 +317,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
                 for item in items where item.doNotDisturb == false {
                     count += item.unreadCount
                 }
-                self.service?.notifyUnreadCount(count: count)
+                conversationService.notifyUnreadCount(count: count)
             }
 
         }
