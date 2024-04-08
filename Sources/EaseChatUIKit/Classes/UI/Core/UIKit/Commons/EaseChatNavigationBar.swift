@@ -105,7 +105,7 @@ import UIKit
     }
     
     public private(set) lazy var titleLabel: UILabel = {
-        UILabel(frame: CGRect(x: self.avatar.frame.maxX+4, y: StatusBarHeight+2, width: ScreenWidth-self.avatar.frame.maxX*2-8*3, height: 22)).font(UIFont.theme.titleMedium).textColor(UIColor.theme.neutralColor1).backgroundColor(.clear).tag(2)
+        UILabel(frame: CGRect(x: self.avatar.frame.maxX+4, y: StatusBarHeight+2, width: ScreenWidth-self.avatar.frame.maxX*2-8*3, height: 22)).font(UIFont.theme.headlineSmall).textColor(UIColor.theme.neutralColor1).backgroundColor(.clear).tag(2)
     }()
     
     public private(set) lazy var detail: UILabel = {
@@ -117,7 +117,7 @@ import UIKit
         flow.itemSize = CGSize(width: 36, height: 36)
         flow.scrollDirection = .horizontal
         flow.minimumLineSpacing = 0
-        flow.minimumInteritemSpacing = 0
+        flow.minimumInteritemSpacing = 4
         return flow
     }()
     
@@ -312,7 +312,7 @@ extension EaseChatNavigationBar: ThemeSwitchProtocol {
 @objc open class EaseChatNavigationBarRightCell: UICollectionViewCell {
     
     lazy var imageView: UIImageView = {
-        UIImageView(frame: CGRect(x: 4, y: 4, width: self.contentView.frame.width-8, height: self.contentView.frame.height-8)).contentMode(.scaleAspectFill).backgroundColor(.clear)
+        UIImageView(frame: CGRect(x: 6, y: 6, width: self.contentView.frame.width-12, height: self.contentView.frame.height-12)).contentMode(.scaleAspectFill).backgroundColor(.clear)
     }()
     
     @objc public override init(frame: CGRect) {

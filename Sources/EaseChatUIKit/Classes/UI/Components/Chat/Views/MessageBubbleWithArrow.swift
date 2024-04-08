@@ -25,9 +25,6 @@ import UIKit
     @objc required public init(frame: CGRect, forward: BubbleTowards) {
         self.towards = forward
         super.init(frame: frame)
-
-        self.bubbleLayer.fillColor = (self.towards == .left ? Appearance.chat.receiveBubbleColor:Appearance.chat.sendBubbleColor).cgColor
-        self.bubbleLayer.strokeColor = (self.towards == .left ? Appearance.chat.receiveBubbleColor:Appearance.chat.sendBubbleColor).cgColor
         self.bubbleLayer.lineWidth = 1
         self.bubbleLayer.lineJoin = .round
         self.bubbleLayer.lineCap = .round
@@ -40,8 +37,10 @@ import UIKit
     
     open override func draw(_ rect: CGRect) {
         super.draw(rect)
-        self.bubbleLayer.fillColor = (self.towards == .left ? Appearance.chat.receiveBubbleColor:Appearance.chat.sendBubbleColor).cgColor
-        self.bubbleLayer.strokeColor = (self.towards == .left ? Appearance.chat.receiveBubbleColor:Appearance.chat.sendBubbleColor).cgColor
+        let receiveColor = Theme.style == .dark ? UIColor.theme.primaryColor2:UIColor.theme.primaryColor95
+        let sendColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        self.bubbleLayer.fillColor = (self.towards == .left ? receiveColor:sendColor).cgColor
+        self.bubbleLayer.strokeColor = (self.towards == .left ? receiveColor:sendColor).cgColor
         // 重新设置气泡路径
         let bubblePath = UIBezierPath()
         bubblePath.usesEvenOddFillRule = true

@@ -134,7 +134,7 @@ import UIKit
     ]
     
     /// The mirror type of the language code of LanguageType.``LanguageType``
-    public var targetLanguage: LanguageType = .English
+    public var targetLanguage: LanguageType = .Chinese
     
     /// You need to enable the translation function from the console first, and then set this property to true to experience the translation function.
     public var enableTranslation = false
@@ -180,12 +180,6 @@ import UIKit
         UIImage(named: Theme.style == .dark ? "audio_play_right_dark02":"audio_play_right_light02", in: .chatBundle, with: nil)!,
         UIImage(named: Theme.style == .dark ? "audio_play_right_dark03":"audio_play_right_light03", in: .chatBundle, with: nil)!
     ]
-    
-    /// The bubble color of the recipient of the message.
-    public var receiveBubbleColor = Theme.style == .dark ? UIColor.theme.primaryColor2:UIColor.theme.primaryColor95
-    
-    /// The bubble color of the sender of the message.
-    public var sendBubbleColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
     
     /// The color of the recipient of the text message.
     public var receiveTextColor = Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1

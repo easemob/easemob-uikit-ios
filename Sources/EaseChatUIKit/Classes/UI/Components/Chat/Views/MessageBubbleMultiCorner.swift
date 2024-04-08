@@ -49,8 +49,10 @@ import UIKit
     
     open override func draw(_ rect: CGRect) {
         super.draw(rect)
-        self.shapeLayer.fillColor = (self.towards == .left ? Appearance.chat.receiveBubbleColor:Appearance.chat.sendBubbleColor).cgColor
-        self.shapeLayer.strokeColor = (self.towards == .left ? Appearance.chat.receiveBubbleColor:Appearance.chat.sendBubbleColor).cgColor
+        let receiveColor = Theme.style == .dark ? UIColor.theme.primaryColor2:UIColor.theme.primaryColor95
+        let sendColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        self.shapeLayer.fillColor = (self.towards == .left ? receiveColor:sendColor).cgColor
+        self.shapeLayer.strokeColor = (self.towards == .left ? receiveColor:sendColor).cgColor
         let path = self.roundedRect(bounds: self.bounds)
         self.shapeLayer.path = path
     }
