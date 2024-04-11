@@ -21,7 +21,7 @@ Pod::Spec.new do |s|
 TODO: Add long description of the pod here.
                        DESC
 
-  s.homepage         = 'https://github.com/zjc19891106/EaseChatUIKit'
+  s.homepage         = 'https://github.com/easemob/chatuikit-ios/EaseChatUIKit'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'zjc19891106' => '984065974@qq.com' }
@@ -35,7 +35,7 @@ TODO: Add long description of the pod here.
   
   s.source_files = [ 'Sources/EaseChatUIKit/Classes/**/*.{h,swift}' ]
   s.resources = ['Sources/EaseChatUIKit/Classes/UI/**/*.bundle']
-  s.dependency 'HyphenateChat', '~> 4.5.0'
+  s.dependency 'HyphenateChat','~> 4.5.0'
   s.static_framework = true
   
   s.swift_version = '5.0'
