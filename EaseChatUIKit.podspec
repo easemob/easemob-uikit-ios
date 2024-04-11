@@ -33,7 +33,7 @@ TODO: Add long description of the pod here.
   s.xcconfig = {'ENABLE_BITCODE' => 'NO'}
   
   
-  s.source_files = [ 'Sources/EaseChatUIKit/Classes/**/*.{h,swift}' ]
+#  s.source_files = [ 'Sources/EaseChatUIKit/Classes/**/*.{h,swift}' ]
   s.exclude_files = ['Sources/EaseChatUIKit/Classes/UI/Core/Foundation/ConvertAMR.swift','Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*']
   s.resources = ['Sources/EaseChatUIKit/Classes/UI/**/*.bundle']
   s.dependency 'HyphenateChat','~> 4.5.0'
