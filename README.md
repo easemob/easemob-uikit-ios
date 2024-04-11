@@ -235,50 +235,20 @@ Provider是一个数据提供者，当会话列表展示并且滑动减速时候
         `let conversations = EaseChatUIKit.ComponentsRegister.shared.ConversationsController.init(provider: self)`  or `let conversations = EaseChatUIKit.ComponentsRegister.shared.ConversationsController.init(providerOC: self)`
         //继承注册后的自定义类还可以调用ViewModel的registerEventsListener方法监听相关事件
 
-//如果是EaseProfileProviderOC 即实现EaseProfileProviderOC即可
-extension YourViewController: EaseProfileProvider {
-
-    func fetchProfiles(profilesMap: [EaseChatUIKit.EaseProfileProviderType : [String]]) async -> [EaseChatUIKit.EaseProfileProtocol] {
-        //Create a task group
+//MARK: - EaseProfileProvider for conversations&contacts usage.
+//For example using conversations controller,as follows.
+extension MainViewController: EaseProfileProvider,EaseGroupProfileProvider {
+    //MARK: - EaseProfileProvider
+    func fetchProfiles(profileIds: [String]) async -> [any EaseChatUIKit.EaseProfileProtocol] {
         return await withTaskGroup(of: [EaseChatUIKit.EaseProfileProtocol].self, returning: [EaseChatUIKit.EaseProfileProtocol].self) { group in
             var resultProfiles: [EaseChatUIKit.EaseProfileProtocol] = []
-            for (type,profileIds) in profilesMap {
-                //According to condition,add task execute
-                if type == .chat {
-                    group.addTask {
-                        var resultProfiles: [EaseChatUIKit.EaseProfileProtocol] = []
-                        let result = await ChatClient.shared().userInfoManager?.fetchUserInfo(byId: profileIds, type: [NSNumber(integerLiteral: UserInfoType.avatarURL.rawValue),NSNumber(integerLiteral: UserInfoType.nickName.rawValue)])
-                        if result?.1 != nil {
-                            return resultProfiles
-                        } else {
-                            let userInfoMap = result?.0 ?? [:]
-                            for (key, value) in userInfoMap {
-                                let profile = EaseProfile()
-                                profile.id = key
-                                profile.nickname = value.nickname ?? ""
-                                profile.avatarURL = value.avatarUrl ?? ""
-                                resultProfiles.append(profile)
-                            }
-                            return resultProfiles
-                        }
-                    }
-                } else {
-                    group.addTask {
-                        var resultProfiles: [EaseChatUIKit.EaseProfileProtocol] = []
-                        //此处仅仅是示例 批量请求要展示的所有群的群头像群昵称
-                        let result = await ChatClient.shared().groupManager?.groupSpecificationFromServer(withId: profileIds.first ?? "")
-                        if result?.1 != nil {
-                            return resultProfiles
-                        } else {
-                            let group = result?.0
-                            let profile = EaseProfile()
-                            profile.id = profileIds.first ?? ""
-                            profile.nickname = group?.groupName ?? ""
-                            resultProfiles.append(profile)
-                            return resultProfiles
-                        }
-                    }
+            group.addTask {
+                var resultProfiles: [EaseChatUIKit.EaseProfileProtocol] = []
+                let result = await self.requestUserInfos(profileIds: profileIds)
+                if let infos = result {
+                    resultProfiles.append(contentsOf: infos)
                 }
+                return resultProfiles
             }
             //Await all task were executed.Return values.
             for await result in group {
@@ -286,8 +256,84 @@ extension YourViewController: EaseProfileProvider {
             }
             return resultProfiles
         }
-
+    }
+    //MARK: - EaseGroupProfileProvider
+    func fetchGroupProfiles(profileIds: [String]) async -> [any EaseChatUIKit.EaseProfileProtocol] {
         
+        return await withTaskGroup(of: [EaseChatUIKit.EaseProfileProtocol].self, returning: [EaseChatUIKit.EaseProfileProtocol].self) { group in
+            var resultProfiles: [EaseChatUIKit.EaseProfileProtocol] = []
+            group.addTask {
+                var resultProfiles: [EaseChatUIKit.EaseProfileProtocol] = []
+                let result = await self.requestGroupsInfo(groupIds: profileIds)
+                if let infos = result {
+                    resultProfiles.append(contentsOf: infos)
+                }
+                return resultProfiles
+            }
+            //Await all task were executed.Return values.
+            for await result in group {
+                resultProfiles.append(contentsOf: result)
+            }
+            return resultProfiles
+        }
+    }
+    
+    private func requestUserInfos(profileIds: [String]) async -> [EaseProfileProtocol]? {
+        var unknownIds = [String]()
+        var resultProfiles = [EaseProfileProtocol]()
+        for profileId in profileIds {
+            if let profile = EaseChatUIKitContext.shared?.userCache?[profileId] {
+                if profile.nickname.isEmpty {
+                    unknownIds.append(profile.id)
+                } else {
+                    resultProfiles.append(profile)
+                }
+            } else {
+                unknownIds.append(profileId)
+            }
+        }
+        if unknownIds.isEmpty {
+            return resultProfiles
+        }
+        let result = await ChatClient.shared().userInfoManager?.fetchUserInfo(byId: unknownIds)
+        if result?.1 == nil,let infoMap = result?.0 {
+            for (userId,info) in infoMap {
+                let profile = EaseChatProfile()
+                let nickname = info.nickname ?? ""
+                profile.id = userId
+                profile.nickname = nickname
+                if let remark = ChatClient.shared().contactManager?.getContact(userId)?.remark {
+                    profile.remark = remark
+                }
+                profile.avatarURL = info.avatarUrl ?? ""
+                resultProfiles.append(profile)
+                if (EaseChatUIKitContext.shared?.userCache?[userId]) != nil {
+                    profile.updateFFDB()
+                } else {
+                    profile.insert()
+                }
+                EaseChatUIKitContext.shared?.userCache?[userId] = profile
+            }
+            return resultProfiles
+        }
+        return []
+    }
+    
+    private func requestGroupsInfo(groupIds: [String]) async -> [EaseProfileProtocol]? {
+        var resultProfiles = [EaseProfileProtocol]()
+        let groups = ChatClient.shared().groupManager?.getJoinedGroups() ?? []
+        for groupId in groupIds {
+            if let group = groups.first(where: { $0.groupId == groupId }) {
+                let profile = EaseChatProfile()
+                profile.id = groupId
+                profile.nickname = group.groupName
+                profile.avatarURL = group.settings.ext
+                resultProfiles.append(profile)
+                EaseChatUIKitContext.shared?.groupCache?[groupId] = profile
+            }
+
+        }
+        return resultProfiles
     }
 }
 
