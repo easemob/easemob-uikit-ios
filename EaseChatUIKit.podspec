@@ -21,11 +21,11 @@ Pod::Spec.new do |s|
 TODO: Add long description of the pod here.
                        DESC
 
-  s.homepage         = 'https://github.com/easemob/chatuikit-ios/EaseChatUIKit'
+  s.homepage         = 'https://doc.easemob.com/uikit/chatuikit/ios/chatuikit_overview.html'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'zjc19891106' => '984065974@qq.com' }
-  s.source           = { :git => 'https://github.com/zjc19891106/EaseChatUIKit.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/easemob/chatuikit-ios/EaseChatUIKit.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '13.0'
