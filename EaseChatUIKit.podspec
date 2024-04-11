@@ -35,7 +35,7 @@ TODO: Add long description of the pod here.
   
   s.source_files = [ 'Sources/EaseChatUIKit/Classes/**/*.{h,swift}' ]
   s.resources = ['Sources/EaseChatUIKit/Classes/UI/**/*.bundle']
-  s.dependency 'HyphenateChat', '>= 4.5.0'
+  s.dependency 'HyphenateChat', '~> 4.5.0'
   s.static_framework = true
   
   s.swift_version = '5.0'
