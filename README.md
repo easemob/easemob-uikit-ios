@@ -151,22 +151,19 @@ class AppDelegate：UIResponder，UIApplicationDelegate {
 ``` Swift
 public final class YourAppUser: NSObject, EaseProfileProtocol {
 
-        public func toJsonObject() -> Dictionary<String, Any>? {
-        ["ease_chat_uikit_info":["nickname":self.nickname,"avatarURL":self.avatarURL,"userId":self.id]]
+    var id: String = ""
+    
+    var remark: String = ""
+    
+    var selected: Bool = false
+    
+    var nickname: String = ""
+    
+    var avatarURL: String = ""
+    
+    public func toJsonObject() -> Dictionary<String, Any>? {
+        ["ease_chat_uikit_user_info":["nickname":self.nickname,"avatarURL":self.avatarURL,"userId":self.id,"remark":self.remark]]
     }
-    
-    
-    public var id: String = ""
-        
-    public var nickname: String = ""
-        
-    public var selected: Bool = false
-    
-    public override func setValue(_ value: Any?, forUndefinedKey key: String) {
-        
-    }
-
-    public var avatarURL: String = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/sample_avatar/sample_avatar_1.png"
 
 }
 // 使用当前用户对象符合`EaseProfileProtocol`协议的用户信息登录EaseChatUIKit。
