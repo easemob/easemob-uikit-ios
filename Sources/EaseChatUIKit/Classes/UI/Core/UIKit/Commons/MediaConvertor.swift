@@ -8,7 +8,8 @@
 import UIKit
 import AVFoundation
 import Photos
-import AssetsLibrary
+//import AssetsLibrary
+import AVFAudio
 
 final class MediaConvertor: NSObject {
 

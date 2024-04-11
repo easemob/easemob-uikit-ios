@@ -62,10 +62,7 @@ import UIKit
         self.navigationController?.navigationBar.isHidden = true
     }
     
-    open override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-        self.navigationController?.navigationBar.isHidden = true        
-    }
+
     
     open override func viewDidLoad() {
         super.viewDidLoad()

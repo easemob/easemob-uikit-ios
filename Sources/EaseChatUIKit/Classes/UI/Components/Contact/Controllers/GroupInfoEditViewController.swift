@@ -42,10 +42,7 @@ import UIKit
         self.raw = rawText
         self.modifySuccess = modifyClosure
     }
-    
-    open override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-    }
+
 
     open override func viewDidLoad() {
         super.viewDidLoad()

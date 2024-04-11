@@ -35,9 +35,6 @@ import UIKit
         }).backgroundColor(.clear)
     }()
     
-    open override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-    }
 
     open override func viewDidLoad() {
         super.viewDidLoad()

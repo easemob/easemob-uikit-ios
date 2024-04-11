@@ -82,9 +82,7 @@ import UIKit
         fatalError("init(coder:) has not been implemented")
     }
     
-    open override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-    }
+
 
     open override func viewDidLoad() {
         super.viewDidLoad()

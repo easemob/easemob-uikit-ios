@@ -31,10 +31,10 @@ TODO: Add long description of the pod here.
   s.ios.deployment_target = '13.0'
 
   s.xcconfig = {'ENABLE_BITCODE' => 'NO'}
-  
+  s.public_header_files = ['Sources/EaseChatUIKit/Classes/*/*.h']
   
   s.source_files = [ 'Sources/EaseChatUIKit/Classes/**/*.{h,swift}' ]
-  s.private_header_files = ['Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*']
+#  s.private_header_files = ['Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*']
   s.resources = ['Sources/EaseChatUIKit/Classes/UI/**/*.bundle']
   s.dependency 'HyphenateChat','~> 4.5.0'
   s.static_framework = true
@@ -59,5 +59,5 @@ TODO: Add long description of the pod here.
   s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
   s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 
-  s.frameworks = 'UIKit', 'Foundation', 'Combine', 'AudioToolbox', 'AVFoundation'
+  s.frameworks = 'UIKit', 'Foundation', 'Combine', 'AudioToolbox', 'AVFoundation','AVFAudio','Photos'
 end

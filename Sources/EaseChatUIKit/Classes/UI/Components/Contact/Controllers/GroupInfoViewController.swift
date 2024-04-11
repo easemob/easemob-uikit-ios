@@ -173,9 +173,7 @@ import UIKit
         self.header.userState = state
     }
     
-    open override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-    }
+
     
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
