@@ -56,7 +56,7 @@ import UIKit
     private let itemWidth = Appearance.contact.detailExtensionActionItems.count > 3 ? ((ScreenWidth-8*CGFloat(Appearance.contact.detailExtensionActionItems.count-1)-40)/CGFloat(Appearance.contact.detailExtensionActionItems.count)):(114*ScreenWidth/390.0)
     
     public private(set) lazy var avatar: ImageView = {
-        ImageView(frame: CGRect(x: self.frame.width/2.0-50, y: NavigationHeight, width: 100, height: 100)).cornerRadius(Appearance.avatarRadius).backgroundColor(.clear)
+        ImageView(frame: CGRect(x: self.frame.width/2.0-50, y: 20, width: 100, height: 100)).cornerRadius(Appearance.avatarRadius).backgroundColor(.clear)
     }()
     
     public private(set) lazy var status: UIImageView = {

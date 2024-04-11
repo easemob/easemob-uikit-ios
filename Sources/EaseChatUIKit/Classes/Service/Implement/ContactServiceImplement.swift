@@ -76,7 +76,7 @@ extension ContactServiceImplement: ContactServiceProtocol {
         })
     }
     
-    public func removeContact(userId: String, removeChannel: Bool, completion: @escaping (ChatError?, String) -> Void) {
+    public func removeContact(userId: String, removeChannel: Bool = false, completion: @escaping (ChatError?, String) -> Void) {
         ChatClient.shared().contactManager?.deleteContact(userId, isDeleteConversation: removeChannel, completion: { [weak self] userId, error in
             completion(error,userId ?? "")
             self?.handleResult(error: error, type: .remove, operatorId: EaseChatUIKitContext.shared?.currentUserId ?? "")

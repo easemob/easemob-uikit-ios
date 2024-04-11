@@ -44,6 +44,8 @@ import UIKit
     
     /// The corner radius of the avatar image view of ``ChatInputBar``.
     public static var avatarRadius: CornerRadius = .extraSmall
+    
+    public static var hiddenPresence = true
         
     /// ActionSheet row height.
     public static var actionSheetRowHeight: CGFloat = 56
@@ -116,7 +118,7 @@ import UIKit
     public var bubbleStyle: MessageBubbleDisplayStyle = .withArrow
     
     /// Message content display style.You can use these four styles to combine a style array you want. Bubbles are all provided by default, except for picture messages and video messages.``ContentDisplayStyle``
-    public var contentStyle: [MessageContentDisplayStyle] = [.withReply,.withAvatar,.withNickName,.withDateAndTime,.withMessageTopic,.withMessageReaction]
+    public var contentStyle: [MessageContentDisplayStyle] = [.withReply,.withAvatar,.withNickName,.withDateAndTime]
             
     /// ActionSheet data source of the message being long pressed.``ActionSheetItemProtocol``
     public var messageLongPressedActions: [ActionSheetItemProtocol] = [

@@ -192,6 +192,7 @@ import UIKit
         self.cancel.isHidden = true
         self.leftItem.center = CGPoint(x: self.leftItem.center.x, y: self.leftItem.center.y-2)
         self.updateRightItems(images: rightImages)
+        self.status.isHidden = Appearance.hiddenPresence
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
     }
@@ -216,6 +217,7 @@ import UIKit
         self.detail.textAlignment = textAlignment
         self.addGesture()
         self.cancel.isHidden = true
+        self.status.isHidden = Appearance.hiddenPresence
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
     }

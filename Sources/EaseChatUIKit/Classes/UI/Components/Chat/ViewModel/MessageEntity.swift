@@ -164,7 +164,7 @@ public let callMessage = "rtcCallWithAgora"
             return 0
         }
         let realHeight = self.message.chatThread != nil ? topicHeight:CGFloat(0)
-        let topic_height = Appearance.chat.contentStyle.contains(.withMessageTopic) ? realHeight:0
+        let topic_height = Appearance.chat.contentStyle.contains(.withMessageThread) ? realHeight:0
         return topic_height
     }
     

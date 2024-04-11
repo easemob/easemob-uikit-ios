@@ -75,6 +75,7 @@ import UIKit
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: false)
+        self.navigation.avatarURL = EaseChatUIKitContext.shared?.currentUser?.avatarURL
     }
     
     open override func viewDidLoad() {

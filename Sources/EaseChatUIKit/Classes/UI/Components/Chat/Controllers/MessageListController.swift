@@ -33,7 +33,7 @@ import AVFoundation
         if self.chatType == .chat {
             images = []
         }
-        if !Appearance.chat.contentStyle.contains(.withMessageTopic) {
+        if !Appearance.chat.contentStyle.contains(.withMessageThread) {
             if images.count > 0 {
                 images.remove(at: 0)
             }
@@ -120,6 +120,16 @@ import AVFoundation
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: false)
+        guard let info = (self.chatType == .chat ? EaseChatUIKitContext.shared?.userCache:EaseChatUIKitContext.shared?.groupCache)?[self.profile.id] else { return }
+        self.profile.remark = info.remark
+        var nickname = self.profile.remark
+        if nickname.isEmpty {
+            nickname = self.profile.nickname
+        }
+        if nickname.isEmpty {
+            nickname = self.profile.id
+        }
+        self.navigation.title = nickname
     }
     
     open override func viewWillDisappear(_ animated: Bool) {
@@ -127,6 +137,8 @@ import AVFoundation
         AudioTools.shared.stopPlaying()
         self.messageContainer.messages.forEach { $0.playing = false }
         self.messageContainer.messageList.reloadData()
+        ChatClient.shared().chatManager?.getConversationWithConvId(self.profile.id)?.markAllMessages(asRead: nil)
+        self.viewModel.notifyUnreadCountChanged()
     }
     
     open override func viewDidLoad() {
@@ -134,7 +146,6 @@ import AVFoundation
         self.view.window?.backgroundColor = .black
         self.view.backgroundColor = UIColor.theme.neutralColor98
         self.navigation.subtitle = nil
-        self.navigation.status.isHidden = true
         self.navigation.avatar.image(with: self.profile.avatarURL, placeHolder: self.chatType == .chat ? Appearance.conversation.singlePlaceHolder:Appearance.conversation.groupPlaceHolder)
         var nickname = self.profile.remark
         if nickname.isEmpty {
@@ -411,7 +422,7 @@ extension MessageListController: MessageListDriverEventsListener {
         if !Appearance.chat.contentStyle.contains(.withReply) {
             messageActions.removeAll { $0.tag == "Reply" }
         }
-        if !Appearance.chat.contentStyle.contains(.withMessageTopic) || message.message.chatType == .chat || message.message.chatThread != nil {
+        if !Appearance.chat.contentStyle.contains(.withMessageThread) || message.message.chatType == .chat || message.message.chatThread != nil {
             messageActions.removeAll { $0.tag == "Topic" }
         }
         if message.message.direction != .send {

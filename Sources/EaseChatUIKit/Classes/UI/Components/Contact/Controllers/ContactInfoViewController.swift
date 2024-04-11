@@ -41,11 +41,25 @@ import UIKit
     /// Can override 
     /// - Returns: <#description#>
     @objc open func dataSource() -> [DetailInfo] {
-        [["title":"contact_details_switch_donotdisturb".chat.localize,"detail":"","withSwitch": true,"switchValue":self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],["title":"contact_details_button_clearchathistory".chat.localize,"detail":"","withSwitch": false,"switchValue":false]].map {
-            let info = DetailInfo()
-            info.setValuesForKeys($0)
-            return info
+        [
+            ["title":"contact_details_switch_donotdisturb".chat.localize,
+             "detail":"",
+             "withSwitch": true,
+             "switchValue":self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
+         
+            ["title":"contact_details_button_clearchathistory".chat.localize,
+             "detail":"",
+             "withSwitch": false,
+             "switchValue":false]
+        ].map {
+            self.dictionaryMapToInfo(json: $0)
         }
+    }
+    
+    @objc open func dictionaryMapToInfo(json: Dictionary<String,Any>) -> DetailInfo {
+        let info = DetailInfo()
+        info.setValuesForKeys(json)
+        return info
     }
     
     public private(set) lazy var navigation: EaseChatNavigationBar = {
@@ -71,7 +85,7 @@ import UIKit
      - Returns: An instance of DetailInfoHeader.
      */
     @objc open func createHeader() -> DetailInfoHeader {
-        DetailInfoHeader(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 304), showMenu: self.showMenu, placeHolder: UIImage(named: "single", in: .chatBundle, with: nil)).backgroundColor(.clear)
+        DetailInfoHeader(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 284), showMenu: self.showMenu, placeHolder: UIImage(named: "single", in: .chatBundle, with: nil)).backgroundColor(.clear)
     }
     
     lazy var showMenu: Bool = {
@@ -322,7 +336,7 @@ import UIKit
         case 0:
             DialogManager.shared.showActions(actions: Appearance.contact.moreActions) { [weak self] item  in
                 guard let `self` = self else { return }
-                self.service.removeContact(userId: self.profile.id, removeChannel: true) { [weak self] error, userId in
+                self.service.removeContact(userId: self.profile.id) { [weak self] error, userId in
                     if error == nil {
                         self?.removeContact?()
                         self?.pop()
