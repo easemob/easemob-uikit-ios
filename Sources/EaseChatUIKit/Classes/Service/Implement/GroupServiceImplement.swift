@@ -17,7 +17,7 @@ import UIKit
     public override init() {
         super.init()
         ChatClient.shared().groupManager?.add(self, delegateQueue: .main)
-        if Appearance.chat.contentStyle.contains(.withMessageTopic) {
+        if Appearance.chat.contentStyle.contains(.withMessageThread) {
             ChatClient.shared().threadManager?.add(self, delegateQueue: .main)
         }
     }

@@ -91,7 +91,7 @@ import UIKit
     /// Creates a detail header view for the group info.
     /// - Returns: A `DetailInfoHeader` instance.
     @objc open func createDetailHeader() -> DetailInfoHeader {
-        DetailInfoHeader(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 304), showMenu: true, placeHolder: UIImage(named: "group", in: .chatBundle, with: nil)).backgroundColor(.clear)
+        DetailInfoHeader(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 284), showMenu: true, placeHolder: UIImage(named: "group", in: .chatBundle, with: nil)).backgroundColor(.orange)
     }
     
     public private(set) lazy var menuList: UITableView = {

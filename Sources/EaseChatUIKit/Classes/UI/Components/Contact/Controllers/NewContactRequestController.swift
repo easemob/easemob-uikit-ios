@@ -54,8 +54,41 @@ import UIKit
         } else {
             self.requestList.backgroundView = nil
         }
+        self.requestProfiles()
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
+    }
+    
+    @objc open func requestProfiles() {
+        if EaseChatUIKitContext.shared?.userProfileProvider != nil {
+            let userIds = self.datas.map { $0.userId }
+            Task(priority: .background) {
+                let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: userIds) ?? []
+                for profile in profiles {
+                    if let info = self.datas.first(where: { $0.userId == profile.id }) {
+                        info.nickname = profile.nickname
+                        info.avatarURL = profile.avatarURL
+                    }
+                }
+                DispatchQueue.main.async {
+                    self.requestList.reloadData()
+                }
+            }
+        } else {
+            if EaseChatUIKitContext.shared?.userProfileProviderOC != nil {
+                EaseChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: self.datas.map { $0.userId }, completion: { [weak self] profiles in
+                    for profile in profiles {
+                        if let info = self?.datas.first(where: { $0.userId == profile.id }) {
+                            info.nickname = profile.nickname
+                            info.avatarURL = profile.avatarURL
+                        }
+                    }
+                    DispatchQueue.main.async {
+                        self?.requestList.reloadData()
+                    }
+                })
+            }
+        }
     }
     
     @objc open func navigationClick(type: EaseChatNavigationBarClickEvent,indexPath: IndexPath?) {

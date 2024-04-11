@@ -887,7 +887,7 @@ extension MessageListView: IMessageListViewDriver {
     
     
     public func updateMessageStatus(message: ChatMessage, status: ChatMessageStatus) {
-        if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
+        if let index = self.messages.firstIndex(where: { $0.message.localTime == message.localTime }) {
             self.messages[safe: index]?.message = message
             self.messages[safe: index]?.state = status
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)

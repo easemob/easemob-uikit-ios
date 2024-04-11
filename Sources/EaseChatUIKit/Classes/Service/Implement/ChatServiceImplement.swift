@@ -83,7 +83,7 @@ extension ChatServiceImplement: ChatService {
     public func send(message: ChatMessage, completion: @escaping (ChatError?, ChatMessage?) -> Void) {
         let message = message
         ChatClient.shared().chatManager?.send(message, progress: nil, completion: { [weak self] message, error in
-            self?.pushSendNotification(message: message)
+//            self?.pushSendNotification(message: message)
             completion(error,message)
         })
     }
