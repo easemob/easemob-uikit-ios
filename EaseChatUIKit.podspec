@@ -31,7 +31,7 @@ TODO: Add long description of the pod here.
   s.ios.deployment_target = '13.0'
 
   s.xcconfig = {'ENABLE_BITCODE' => 'NO'}
-  s.public_header_files = ['Sources/EaseChatUIKit/Classes/*/*.h']
+#  s.public_header_files = ['Sources/EaseChatUIKit/Classes/*/*.h']
   
   s.source_files = [ 'Sources/EaseChatUIKit/Classes/**/*.{h,swift}' ]
 #  s.private_header_files = ['Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*']
@@ -56,7 +56,10 @@ TODO: Add long description of the pod here.
 
   s.xcconfig = { 'LIBRARY_SEARCH_PATHS' => '$(PODS_ROOT)/Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*' } #
 
-  s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+  
+  s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
+                            'VALID_ARCHS' => 'arm64 armv7 x86_64'
+                          }
   s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 
   s.frameworks = 'UIKit', 'Foundation', 'Combine', 'AudioToolbox', 'AVFoundation','AVFAudio','Photos'
