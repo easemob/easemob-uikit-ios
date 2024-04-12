@@ -52,6 +52,7 @@ import UIKit
         super.viewWillAppear(animated)
         self.viewModel?.chatId = ""
         self.view.window?.backgroundColor = .white
+        self.navigation.avatarURL = EaseChatUIKitContext.shared?.currentUser?.avatarURL
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
     }
