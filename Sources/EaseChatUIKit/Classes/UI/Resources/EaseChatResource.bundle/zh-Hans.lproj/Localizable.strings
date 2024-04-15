@@ -39,7 +39,7 @@
 "barrage_long_press_menu_copy" = "复制";
 "barrage_long_press_menu_cancel" = "取消";
 "report_button_click_menu_button_cancel" = "取消";
-"Confirm" = "完成";
+"Confirm" = "确认";
 "Editing" = "编辑中";
 "Edited" = "已编辑";
 "Translated" = "已翻译";
@@ -111,7 +111,7 @@
 "Please input" = "请输入";
 "New Message" = "新消息";
 "New Request" = "新请求";
-"Joined Groups" = "已加入的群组";
+"Joined Groups" = "群组";
 
 
 "add_contacts_subtitle" = "通过用户ID添加联系人";
@@ -189,4 +189,4 @@
 "SearchMessages" = "搜索消息";
 " to " = "给";
 
-"UserId" = "用户ID:";
+"UserId" = "ID:";

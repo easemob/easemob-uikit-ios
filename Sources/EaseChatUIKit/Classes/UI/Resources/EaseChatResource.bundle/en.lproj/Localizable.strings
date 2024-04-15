@@ -40,7 +40,7 @@
 "barrage_long_press_menu_copy" = "Copy";
 "Copied" = "Copied";
 "report_button_click_menu_button_cancel" = "Cancel";
-"Confirm" = "Done";
+"Confirm" = "Confirm";
 "participant_list_title" = "Participants";
 "Ban List" = "Ban List";
 "Editing" = "Editing";
@@ -72,7 +72,7 @@
 "NewRequestDetail" = "request to add you as a friend";
 "Groups" = "Groups";
 "NewRequest" = "New Request";
-"Joined Groups" = "Joined Groups";
+"Joined Groups" = "Groups";
 "Create" = "Create";
 "contactID" = "Contact ID";
 "add_group_members" = "Add Participants";
@@ -80,7 +80,7 @@
 "group members" = "group participants";
 "new_chat_button_click_menu_addcontacts" = "Add Contacts";
 "new_chat_button_click_menu_creategroup" = "Create a Group";
-"new_chat_button_click_menu_selectcontacts" = "Select Contacts";
+"new_chat_button_click_menu_selectcontacts" = "New Chat";
 "New Message" = "New Message";
 
 "remove_participants" = "Remove participants";
@@ -188,4 +188,4 @@
 "VideoCall" = "Video";
 "SearchMessages" = "Search";
 " to " = " to ";
-"UserId" = "UserID:";
+"UserId" = "ID:";

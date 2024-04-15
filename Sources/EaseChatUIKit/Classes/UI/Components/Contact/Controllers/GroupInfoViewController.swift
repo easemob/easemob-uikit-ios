@@ -32,7 +32,7 @@ import UIKit
      ]
      ```
      */
-    public var ownerOptions = [ActionSheetItem(title: "group_details_extend_button_disband".chat.localize, type: .destructive, tag: "disband_group"),ActionSheetItem(title: "group_details_extend_button_transfer".chat.localize, type: .destructive, tag: "transfer_owner")]
+    public var ownerOptions = [ActionSheetItem(title: "group_details_extend_button_transfer".chat.localize, type: .destructive, tag: "transfer_owner"),ActionSheetItem(title: "group_details_extend_button_disband".chat.localize, type: .destructive, tag: "disband_group")]
     
     /**
      A private array that stores the member options for the group.
@@ -99,7 +99,7 @@ import UIKit
     /// Creates a detail header view for the group info.
     /// - Returns: A `DetailInfoHeader` instance.
     @objc open func createDetailHeader() -> DetailInfoHeader {
-        DetailInfoHeader(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 284), showMenu: true, placeHolder: UIImage(named: "group", in: .chatBundle, with: nil)).backgroundColor(.orange)
+        DetailInfoHeader(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 284), showMenu: true, placeHolder: UIImage(named: "group", in: .chatBundle, with: nil)).backgroundColor(.clear)
     }
     
     public private(set) lazy var menuList: UITableView = {
