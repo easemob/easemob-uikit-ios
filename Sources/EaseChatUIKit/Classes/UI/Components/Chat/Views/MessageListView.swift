@@ -911,6 +911,9 @@ extension MessageListView: IMessageListViewDriver {
     private func convertStatus(message: ChatMessage) -> ChatMessageStatus {
         switch message.status {
         case .succeed:
+            if message.isReadAcked {
+                return .read
+            }
             return .succeed
         case .pending:
             return .sending
