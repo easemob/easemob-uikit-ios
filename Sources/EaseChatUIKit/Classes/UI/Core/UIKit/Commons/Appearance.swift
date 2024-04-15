@@ -12,7 +12,7 @@ import UIKit
     /// You can change the width of a single option with ``PageContainerTitleBar`` in the popup container by setting the current property.
     public static var pageContainerTitleBarItemWidth: CGFloat = (ScreenWidth-32)/2.0
     
-    /// The size of ``PageContainersDialogC ontroller`` constraints.
+    /// The size of ``PageContainersDialogController`` constraints.
     public static var pageContainerConstraintsSize = CGSize(width: ScreenWidth, height: ScreenHeight*(3.0/5.0))
     
     /// The size of alert container constraints.``AlertViewController``
@@ -114,10 +114,10 @@ import UIKit
     /// The corner radius of ``MessageInputBar``.
     public var inputBarCorner: CornerRadius = .extraSmall
     
-    /// Message bubble display style.``BubbleDisplayStyle``
+    /// Message bubble display style.``MessageBubbleDisplayStyle``
     public var bubbleStyle: MessageBubbleDisplayStyle = .withArrow
     
-    /// Message content display style.You can use these four styles to combine a style array you want. Bubbles are all provided by default, except for picture messages and video messages.``ContentDisplayStyle``
+    /// Message content display style.You can use these four styles to combine a style array you want. Bubbles are all provided by default, except for picture messages and video messages.``MessageContentDisplayStyle``
     public var contentStyle: [MessageContentDisplayStyle] = [.withReply,.withAvatar,.withNickName,.withDateAndTime]
             
     /// ActionSheet data source of the message being long pressed.``ActionSheetItemProtocol``
@@ -211,12 +211,16 @@ import UIKit
     /// New message tone audio path
     public var newMessageSoundPath = "/System/Library/Audio/UISounds/sms-received1.caf"
     
+    /// The maximum number of participants in the group chat.
     public var groupParticipantsLimitCount = 1000
     
+    /// Commonly used reaction emoticon responses
     public var commonReactions = ["👍", "❤️", "😄", "😱", "😡", "🎉"]
     
+    /// Commonly used reaction emoticon responses map.
     public var commonReactionMap = ["👍":UIImage(named: "👍", in: .chatBundle, with: nil), "❤️":UIImage(named: "❤️", in: .chatBundle, with: nil), "😄":UIImage(named: "😄", in: .chatBundle, with: nil), "😱":UIImage(named: "😱", in: .chatBundle, with: nil), "😡":UIImage(named: "😡", in: .chatBundle, with: nil), "🎉":UIImage(named: "🎉", in: .chatBundle, with: nil)]
     
+    /// The alert position on received lots of messages.
     public var moreMessageAlertPosition = MoreMessagePosition.center
     
 }

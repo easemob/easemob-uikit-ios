@@ -23,11 +23,13 @@ import AVFoundation
     }()
     
     /// Creates a navigation bar for the MessageListController.
-    /// - Returns: An instance of EaseChatNavigationBar.
+    /// - Returns: An instance of ``EaseChatNavigationBar``.
     @objc open func createNavigation() -> EaseChatNavigationBar {
         EaseChatNavigationBar(showLeftItem: true,textAlignment: .left,rightImages: self.rightImages()).backgroundColor(.clear)
     }
     
+    /// Right images of the ``EaseChatNavigationBar``.
+    /// - Returns: ``[UIImage]``
     @objc open func rightImages() -> [UIImage] {
         var images = [UIImage(named: "message_action_topic", in: .chatBundle, with: nil)!]
         if self.chatType == .chat {
