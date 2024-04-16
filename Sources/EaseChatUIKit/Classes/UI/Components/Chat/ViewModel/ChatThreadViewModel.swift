@@ -675,6 +675,9 @@ extension ChatThreadViewModel: ChatResponseListener {
      */
     @objc open func messageDidReceived(message: ChatMessage) {
         if message.conversationId == self.to {
+            if let alreadyShow = self.driver?.dataSource.contains(where: { $0.messageId == message.messageId }),alreadyShow {
+                return
+            }
             if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
                 let profile = EaseProfile()
                 profile.setValuesForKeys(dic)

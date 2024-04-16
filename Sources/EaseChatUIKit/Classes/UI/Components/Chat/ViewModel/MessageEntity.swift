@@ -293,7 +293,7 @@ public let callMessage = "rtcCallWithAgora"
             label.attributedText = self.convertTextTranslationAttribute()
             let size = label.sizeThatFits(CGSize(width: limitBubbleWidth-24, height: 9999))
             let width = size.width+24
-            return CGSize(width: width < 86 ? 86:width, height: size.height)
+            return CGSize(width: width < 86 ? 86:width, height: size.height+10)
         } else {
             return .zero
         }
