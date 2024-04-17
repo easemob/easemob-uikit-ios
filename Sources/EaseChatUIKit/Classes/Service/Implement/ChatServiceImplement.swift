@@ -243,5 +243,16 @@ extension ChatServiceImplement: ChatEventsListener {
             listener.onMessageDidEdited(message: message)
         }
     }
+    
+    public func onConversationRead(_ from: String, to: String) {
+        if EaseChatUIKitContext.shared?.currentUserId ?? "" != from {
+            for listener in self.responseDelegates.allObjects {
+                listener.messagesAlreadyRead(conversationId: from)
+            }
+        } else {
+           //如果是多设备服务端会投递对方已读的状态给其他设备
+        }
+    }
+    
 }
 

@@ -133,4 +133,9 @@ public let EaseChatUIKit_user_card_message = "userCard"
     /// When reaction of message changed.
     /// - Parameter changes: ``MessageReactionChange``
     func onMessageReactionChanged(changes: [MessageReactionChange])
+    
+    
+    /// Update messages read state on received channel ack.
+    /// - Parameter conversationId: The ID of the conversation.
+    func messagesAlreadyRead(conversationId: String)
 }

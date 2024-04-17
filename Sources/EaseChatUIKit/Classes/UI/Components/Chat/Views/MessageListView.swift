@@ -157,6 +157,8 @@ import UIKit
     func endRefreshing()
     
     func stopAudioMessagesPlay()
+    
+    func readAllMessages()
 }
 
 @objc public enum MessageListType: UInt8 {
@@ -704,6 +706,11 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
 }
 
 extension MessageListView: IMessageListViewDriver {
+    public func readAllMessages() {
+        self.messages.forEach { $0.state = .read }
+        self.messageList.reloadData()
+    }
+    
     public func stopAudioMessagesPlay() {
         var indexPaths = [IndexPath]()
         for (index,entity) in self.messages.enumerated() {
@@ -914,15 +921,13 @@ extension MessageListView: IMessageListViewDriver {
             if message.isReadAcked {
                 return .read
             }
+            if message.isDeliverAcked {
+                return .delivered
+            }
             return .succeed
         case .pending:
             return .sending
-        case .delivering:
-            return .delivered
         default:
-            if message.isReadAcked {
-                return .read
-            }
             return .failure
         }
     }

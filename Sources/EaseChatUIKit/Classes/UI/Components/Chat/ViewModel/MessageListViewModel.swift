@@ -823,6 +823,10 @@ extension MessageListViewModel: ChatResponseListener {
             }
         }
     }
+    
+    public func messagesAlreadyRead(conversationId: String) {
+        self.driver?.readAllMessages()
+    }
 }
 
 extension MessageListViewModel: GroupServiceListener {

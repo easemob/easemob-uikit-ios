@@ -793,6 +793,10 @@ extension ChatThreadViewModel: ChatResponseListener {
             }
         }
     }
+    
+    public func messagesAlreadyRead(conversationId: String) {
+        self.driver?.readAllMessages()
+    }
 }
 
 extension ChatThreadViewModel: GroupChatThreadEventListener {
