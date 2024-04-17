@@ -318,6 +318,7 @@ extension MessageInputBar: UITextViewDelegate {
             }
             self.rightView.isSelected = true
             self.inputField.resignFirstResponder()
+            self.showEmojiKeyboard()
         } else {
             self.inputField.becomeFirstResponder()
         }
@@ -342,18 +343,23 @@ extension MessageInputBar: UITextViewDelegate {
         let frame = notification.chat.keyboardEndFrame
         let duration = notification.chat.keyboardAnimationDuration
         self.hiddenDuration = duration ?? 0
-//        self.keyboardHeight = frame!.height
+        self.keyboardHeight = frame!.height
         self.showEmojiKeyboard()
         self.textViewFirstResponder?(true)
     }
     
     @objc open func showEmojiKeyboard() {
         if self.rightView.isSelected {
+            if self.keyboardHeight <= 52 {
+                self.keyboardHeight = 256+BottomBarHeight
+            }
             self.frame = CGRect(x: 0, y: self.frame.origin.y, width: self.frame.width, height: self.keyboardHeight + self.rawFrame.height)
             if self.emoji == nil{
                 let emoji = MessageInputEmojiView(frame: CGRect(x: 0, y: self.rawFrame.height, width: self.frame.width, height: self.keyboardHeight)).tag(124).backgroundColor(.clear)
                 self.emoji = emoji
                 self.addSubview(emoji)
+            } else {
+                self.emoji?.frame = CGRect(x: 0, y: self.rawFrame.height, width: self.frame.width, height: self.keyboardHeight)
             }
             self.updateHeight()
             self.emoji?.sendClosure = { [weak self] in

@@ -47,6 +47,14 @@ import UIKit
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
     }
+    
+    open override func layoutSubviews() {
+        super.layoutSubviews()
+        self.deleteEmoji.frame = CGRect(x: self.frame.width - 92, y: self.frame.height - 56, width: 36, height: 36)
+        self.sendEmoji.frame = CGRect(x: self.frame.width - 48, y: self.frame.height - 56, width: 36, height: 36)
+        self.separaLine.frame = CGRect(x: 0, y: 10, width: self.frame.width, height: 1)
+        self.emojiList.frame = CGRect(x: 0, y: 10, width: self.frame.width, height: self.frame.height - 10)
+    }
 
     @available(*, unavailable)
     required public init?(coder: NSCoder) {
