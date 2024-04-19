@@ -431,7 +431,7 @@ ComponentsRegister.shared.ChatLocationCell = CustomLocationMessageCell.self
     }
 ```
 
-详情请参见[ComponentsRegister](./Documentation/ComponentRegister.md)
+详情请参见[ComponentsRegister](./Documentation/ComponentsRegister.md)
 
 ## 3.拦截原有组件点击事件
 
