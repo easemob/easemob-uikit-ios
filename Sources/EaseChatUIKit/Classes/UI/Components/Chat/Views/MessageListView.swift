@@ -1083,7 +1083,7 @@ extension MessageListView: IMessageListViewDriver {
                 }
             }
         }
-        self.messageList.reloadRows(at: indexPaths, with: .automatic)
+        self.messageList.reloadData()
     }
     
     
