@@ -140,7 +140,7 @@ import AVFoundation
                 }
                 self.messageHeader.reloadData()
                 if let group = ChatGroup(id: chatThread.parentId) {
-                    self.navigation.subtitle = group.groupName.isEmpty ? group.groupId:group.groupName
+                    self.navigation.subtitle = "#"+(group.groupName.isEmpty ? group.groupId:group.groupName)
                     self.navigation.title = chatThread.threadName
                 }
             } else {
