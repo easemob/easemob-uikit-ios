@@ -116,6 +116,7 @@ import Foundation
     case agree
     case decline
     case fetchContacts
+    case cleanFriendBadge
 }
 
 @objc public protocol ContactEmergencyListener: NSObjectProtocol {

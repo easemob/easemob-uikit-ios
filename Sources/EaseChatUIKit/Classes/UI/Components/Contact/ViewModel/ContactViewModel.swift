@@ -16,7 +16,8 @@ import UIKit
     
     public var notifySelf = false
     
-    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Double>()) private var newFriends
+    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Array<Dictionary<String,Any>>()) private var newFriends
+    
     
     /// ``ContactViewModel`` init method.
     ///   -  ignoreIds: Array of contact ids that already exist in the group.
@@ -141,6 +142,18 @@ import UIKit
         EaseChatUIKitContext.shared?.updateCaches(type: .user, profiles: infos)
         return infos
     }
+    
+    @objc open func notifyCleanNewFriendRequestBadge() {
+        var friends = [Dictionary<String,Any>]()
+        for friend in self.newFriends {
+            let requestInfo: [String:Any] = ["userId":friend["userId"] ?? "","timestamp":Date().timeIntervalSince1970*1000,"groupApply":0,"read":1]
+            friends.append(requestInfo)
+        }
+        self.newFriends = friends
+        if let implement = self.service as? ContactServiceImplement {
+            implement.handleResult(error: nil, type: .cleanFriendBadge, operatorId: EaseChatUIKitContext.shared?.currentUserId ?? "")
+        }
+    }
 }
 
 extension ContactViewModel: ContactEventsResponse {
@@ -185,11 +198,16 @@ extension ContactViewModel: ContactEventsResponse {
     }
     
     @objc open func processFriendRequestDidReceive(userId: String) {
-        self.newFriends[userId] = Date().timeIntervalSince1970
+        var requestInfo: [String:Any] = ["userId":userId,"timestamp":Date().timeIntervalSince1970*1000,"groupApply":0,"read":0]
+        let exist = self.newFriends.first(where: { $0["userId"] as? String == userId })
+        if exist == nil {
+            self.newFriends.append(requestInfo)
+        }
         if let index = Appearance.contact.listHeaderExtensionActions.firstIndex(where: { $0.featureIdentify == "NewFriendRequest" }) {
             let item = Appearance.contact.listHeaderExtensionActions[index]
             item.showBadge = true
-            item.numberCount = UInt(self.newFriends.count)
+            let unreadCount = self.newFriends.filter({ $0["read"] as? Int == 0 }).count
+            item.numberCount = UInt(unreadCount)
             self.driver?.refreshHeader(info: item)
         }
     }
@@ -215,13 +233,11 @@ extension ContactViewModel: MultiDeviceListener {
     }
     
     @objc open func addContact(userId: String) {
-        if self.newFriends.count > 0,let _ = self.newFriends[userId] {
-            self.newFriends.removeValue(forKey: userId)
-        }
+        self.newFriends.removeAll { ($0["userId"] as? String) ?? "" == userId }
+        
         if let item = Appearance.contact.listHeaderExtensionActions.first(where: { $0.featureIdentify == "NewFriendRequest" }) {
-            if item.numberCount > 1 {
-                item.numberCount -= 1
-            }
+            let unreadCount = self.newFriends.filter { $0["read"] as? Int == 0 }.count
+            item.numberCount = UInt(unreadCount)
             self.driver?.refreshHeader(info: item)
         }
         self.addFriendRefreshList()

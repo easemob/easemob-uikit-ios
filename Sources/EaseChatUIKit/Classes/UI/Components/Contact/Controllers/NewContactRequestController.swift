@@ -9,7 +9,7 @@ import UIKit
 
 @objc open class NewContactRequestController: UIViewController {
         
-    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Double>()) public var newFriends
+    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue:  Array<Dictionary<String,Any>>()) public var newFriends
     
     public let contactService = ContactServiceImplement()
     
@@ -106,10 +106,10 @@ import UIKit
     @objc open func fillDatas() -> [NewContactRequest] {
         self.newFriends.map {
             let request = NewContactRequest()
-            request.userId = $0.key
-            request.time = $0.value
-            request.avatarURL = EaseChatUIKitContext.shared?.userCache?[$0.key]?.avatarURL ?? ""
-            request.nickname = EaseChatUIKitContext.shared?.userCache?[$0.key]?.nickname ?? ""
+            request.userId = ($0["userId"] as? String) ?? ""
+            request.time = ($0["timestamp"] as? TimeInterval) ?? 0
+            request.avatarURL = EaseChatUIKitContext.shared?.userCache?[request.userId]?.avatarURL ?? ""
+            request.nickname = EaseChatUIKitContext.shared?.userCache?[request.userId]?.nickname ?? ""
             return request
         }
     }
@@ -202,7 +202,7 @@ extension NewContactRequestController: UITableViewDelegate,UITableViewDataSource
             if error != nil,error?.code == .userAlreadyLoginAnother {
                 consoleLogInfo("agreeFriendRequest error: \(error?.errorDescription ?? "")", type: .error)
             } else {
-                self.newFriends.removeValue(forKey: userId)
+                self.newFriends.removeAll { ($0["userId"] as? String) ?? "" == userId }
                 let conversation = ChatClient.shared().chatManager?.getConversation(userId, type: .chat, createIfNotExist: true)
                 let ext = ["something":("You have added".chat.localize+" "+userId+" "+"to say hello".chat.localize)]
                 let message = ChatMessage(conversationID: userId, body: ChatCustomMessageBody(event: EaseChatUIKit_alert_message, customExt: nil), ext: ext)

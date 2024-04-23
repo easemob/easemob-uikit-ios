@@ -279,6 +279,8 @@ import UIKit
     @objc open func viewNewFriendRequest() {
         let vc = ComponentsRegister.shared.NewFriendRequestController.init()
         vc.modalPresentationStyle = .fullScreen
+        self.viewModel?.notifyCleanNewFriendRequestBadge()
+        self.contactList.header.refresh()
         ControllerStack.toDestination(vc: vc)
     }
     

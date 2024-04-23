@@ -80,10 +80,16 @@ import UIKit
         }
         if item.numberCount > 0 {
             self.badge.text = "\(item.numberCount)"
+        } else {
+            self.badge.text = nil
         }
         let badgeWidth = item.numberCount > 9 ? 32:18
         self.badge.frame = CGRect(x: Int(ScreenWidth)-38-badgeWidth, y: Int(Appearance.contact.headerRowHeight/2.0)-9, width: badgeWidth, height: 18)
-        self.badge.isHidden = !item.showNumber
+        if item.showNumber {
+            self.badge.isHidden = item.numberCount <= 0
+        } else {
+            self.badge.isHidden = false
+        }
     }
     
     required public init?(coder: NSCoder) {

@@ -9,7 +9,7 @@ import UIKit
 
 @objc open class ContactListHeader: UITableView {
         
-    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Double>()) private var newFriends
+    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Array<Dictionary<String,Any>>()) private var newFriends
     
     override init(frame: CGRect, style: UITableView.Style) {
         super.init(frame: frame, style: style)
@@ -24,13 +24,11 @@ import UIKit
     }
     
     @objc public func refresh() {
-        for item in Appearance.contact.listHeaderExtensionActions {
-            if item.featureIdentify == "NewFriendRequest" {
-                item.showBadge = !self.newFriends.isEmpty
-                item.showNumber = !self.newFriends.isEmpty
-                item.numberCount = UInt(self.newFriends.count)
-            }
-        }
+        let unreadCount = self.newFriends.filter { $0["read"] as? Int == 0 }.count
+        let newRequest = Appearance.contact.listHeaderExtensionActions.first { $0.featureIdentify == "NewFriendRequest" }
+        newRequest?.numberCount = UInt(unreadCount)
+        newRequest?.showBadge = true
+        newRequest?.showNumber = true
         self.reloadData()
     }
 }
