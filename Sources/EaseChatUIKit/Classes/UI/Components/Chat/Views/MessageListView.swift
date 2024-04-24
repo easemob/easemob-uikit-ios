@@ -327,8 +327,15 @@ import UIKit
             guard let `self` = self else { return }
             UIView.animate(withDuration: 0.22) {
                 let oldFrame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-52)
-                if firstResponder,self.messageList.frame.minY <= 0 {
-                    self.messageList.frame = CGRect(x: 0, y: -self.inputBar.keyboardHeight, width: self.messageList.frame.width, height: self.messageList.frame.height)
+                if firstResponder {
+                    if self.inputBar.keyboardHeight >= 216 {
+                        self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.messageList.frame.height-self.inputBar.keyboardHeight)
+                        let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
+                        if lastIndexPath.row >= 0 {
+                            self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
+                        }
+                    }
+                
                 } else {
                     self.messageList.frame = oldFrame
                 }
