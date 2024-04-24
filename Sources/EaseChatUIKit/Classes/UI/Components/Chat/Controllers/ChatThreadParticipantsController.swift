@@ -13,6 +13,8 @@ import UIKit
         
     private var pageSize = 20
     
+    private var owner = false
+    
     public private(set) var profile = GroupChatThread()
     /**
      The array of participants in the group.
@@ -52,11 +54,23 @@ import UIKit
         self.navigation.clickClosure = { [weak self] in
             self?.navigationClick(type: $0, indexPath: $1)
         }
+        self.requestGroupDetail()
         self.fetchParticipants()
-        
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
         // Do any additional setup after loading the view.
+    }
+    
+    @objc open func requestGroupDetail() {
+        ChatClient.shared().groupManager?.getGroupSpecificationFromServer(withId: self.profile.parentId, completion: { [weak self] group, error in
+            if error == nil {
+                if group?.owner ?? "" == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+                    self?.owner = true
+                }
+            } else {
+                consoleLogInfo("requestGroupDetail error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        })
     }
     
     /**
@@ -186,9 +200,11 @@ extension ChatThreadParticipantsController: UITableViewDelegate,UITableViewDataS
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        DialogManager.shared.showActions(actions: [ActionSheetItem(title: "remove_participants".chat.localize, type: .destructive, tag: "RemoveMember")]) { [weak self] item in
-            if item.tag == "RemoveMember" {
-                self?.removeMember(user: self?.participants[safe: indexPath.row] ?? EaseProfile())
+        if self.owner {
+            DialogManager.shared.showActions(actions: [ActionSheetItem(title: "remove_participants".chat.localize, type: .destructive, tag: "RemoveMember")]) { [weak self] item in
+                if item.tag == "RemoveMember" {
+                    self?.removeMember(user: self?.participants[safe: indexPath.row] ?? EaseProfile())
+                }
             }
         }
     }
