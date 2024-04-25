@@ -744,8 +744,15 @@ extension MessageListViewModel: ChatResponseListener {
         - recallInfo: The recall information containing the recalled message.
      */
     @objc open func messageDidRecalled(recallInfo: RecallInfo) {
-        if recallInfo.recallMessage.conversationId == self.to {
-            self.recallAction(message: recallInfo.recallMessage)
+        if let recallMessage = recallInfo.recallMessage,recallMessage.conversationId == self.to {
+            self.recallAction(message: recallMessage)
+        } else {
+            if let recall = self.constructMessage(text: "recalled a message".chat.localize, type: .alert, extensionInfo: [:]) {
+                recall.messageId = recallInfo.recallMessageId
+                recall.timestamp = Int64(Date().timeIntervalSince1970*1000)
+                recall.from = recallInfo.recallBy
+                self.driver?.processMessage(operation: .recall, message: recall)
+            }
         }
     }
     

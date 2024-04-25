@@ -1,6 +1,6 @@
 import Foundation
 
-public let EaseChatUIKit_VERSION = "1.0.0"
+public let EaseChatUIKit_VERSION = "4.6.0"
 
 @objcMembers public class EaseChatUIKitOptions: NSObject {
     
