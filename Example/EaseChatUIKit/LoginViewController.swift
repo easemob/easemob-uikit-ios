@@ -44,7 +44,8 @@ extension LoginViewController {
     
     @objc private func loginAction() {
         self.view.endEditing(true)
-        EaseChatUIKitClient.shared.logout()
+        EaseChatUIKitClient.shared.logout(unbindNotificationDeviceToken: false) { _ in
+        }
         guard let userName = self.userNameField.text,let passWord = self.passWordField.text,!userName.isEmpty,!passWord.isEmpty else { return }
         self.userName = userName.lowercased()
         self.passWord = passWord

@@ -46,7 +46,9 @@ class SettingViewController: UIViewController {
     
     @IBAction func logoutAction(_ sender: UIButton) {
         print("logout begin :\(Date().timeIntervalSince1970*1000)")
-        EaseChatUIKitClient.shared.logout()
+        EaseChatUIKitClient.shared.logout(unbindNotificationDeviceToken: false) { error in
+            consoleLogInfo("logout error:\(error?.errorDescription ?? "")", type: .error)
+        }
         print("logout end :\(Date().timeIntervalSince1970*1000)")
         
         EaseChatUIKitContext.shared?.cleanCache(type: .all)
