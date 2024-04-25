@@ -64,7 +64,7 @@ import UIKit
     open override func viewDidLoad() {
         super.viewDidLoad()
         self.view.addSubViews([self.navigation,self.search,self.conversationList])
-        self.navigation.title = "Chats"
+        self.navigation.title = "Chats".chat.localize
         //Bind UI driver and service
         self.viewModel?.bind(driver: self.conversationList)
         //Conversation list click push to message list controller.
