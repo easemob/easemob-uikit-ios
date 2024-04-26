@@ -23,7 +23,7 @@ final class LoginViewController: UIViewController,UITextFieldDelegate {
     }()
     
     private lazy var passWordField: UITextField = {
-        UITextField(frame: CGRect(x: 20, y: self.userNameField.frame.maxY+10, width: ScreenWidth - 40, height: 40)).cornerRadius(5).placeholder("password").delegate(self).tag(112).layerProperties(UIColor(0xf5f7f9), 1).leftView(UIView(frame: CGRect(x: 0, y: 0, width: 20, height: 40)), .always)
+        UITextField(frame: CGRect(x: 20, y: self.userNameField.frame.maxY+10, width: ScreenWidth - 40, height: 40)).cornerRadius(5).placeholder("token").delegate(self).tag(112).layerProperties(UIColor(0xf5f7f9), 1).leftView(UIView(frame: CGRect(x: 0, y: 0, width: 20, height: 40)), .always)
     }()
     
     private lazy var login: UIButton = {
@@ -53,17 +53,11 @@ extension LoginViewController {
         profile.id = userName.lowercased()
         profile.nickname = "Tester 001"
         profile.avatarURL = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/sample_avatar/sample_avatar_1.png"
-        ChatClient.shared().fetchToken(withUsername: userName.lowercased(), password: passWord) { token, error in
-            if error == nil,let token = token {
-                EaseChatUIKitClient.shared.login(user: profile, token: token) { error in
-                    if error == nil {
-                        UIApplication.shared.chat.keyWindow?.rootViewController = MainViewController()
-                    } else {
-                        self.showToast(toast: "login error:\(error?.errorDescription ?? "")",duration: 3)
-                    }
-                }
+        EaseChatUIKitClient.shared.login(user: profile, token: passWord) { error in
+            if error == nil {
+                UIApplication.shared.chat.keyWindow?.rootViewController = MainViewController()
             } else {
-                self.showToast(toast: "fetch token error:\(error?.errorDescription ?? "")",duration: 3)
+                self.showToast(toast: "login error:\(error?.errorDescription ?? "")",duration: 3)
             }
         }
         
