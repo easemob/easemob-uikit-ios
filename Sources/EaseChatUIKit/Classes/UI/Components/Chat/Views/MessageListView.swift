@@ -1078,7 +1078,7 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     private func recallAction(_ message: ChatMessage) {
-        if let index = self.messages.firstIndex(where: { $0.message.timestamp == message.timestamp }) {
+        if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
         }
         var indexPaths = [IndexPath]()

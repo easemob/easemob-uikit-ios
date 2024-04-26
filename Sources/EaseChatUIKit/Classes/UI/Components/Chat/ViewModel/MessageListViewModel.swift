@@ -745,6 +745,7 @@ extension MessageListViewModel: ChatResponseListener {
      */
     @objc open func messageDidRecalled(recallInfo: RecallInfo) {
         if let recallMessage = recallInfo.recallMessage,recallMessage.conversationId == self.to {
+            recallMessage.from = recallInfo.recallBy
             self.recallAction(message: recallMessage)
         } else {
             if let recall = self.constructMessage(text: "recalled a message".chat.localize, type: .alert, extensionInfo: [:]) {
