@@ -60,6 +60,7 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
     end
   end
 end
@@ -226,13 +227,19 @@ public final class YourAppUser: NSObject, EaseProfileProtocol {
  }
 ```
 
-## 3.会话列表页面及Provider
+## 3.EaseChatUIKitContext中的Provider
 
 Provider是一个数据提供者，当会话列表展示并且滑动减速时候，EaseChatUIKit会向你请求一些当前屏幕上要显示会话的展示信息例如头像昵称等。下面是Provider的具体示例以及用法。
 
 ```Swift
-        //前者仅限于Swift下使用，是使用协程异步返回。后者Swift OC均可使用使用闭包返回即可此处不做示例仅做协程示例
-        `let conversations = EaseChatUIKit.ComponentsRegister.shared.ConversationsController.init(provider: self)`  or `let conversations = EaseChatUIKit.ComponentsRegister.shared.ConversationsController.init(providerOC: self)`
+            private func setupDataProvider() {
+        //userProfileProvider为用户数据的提供者，使用协程实现与userProfileProviderOC不能同时存在userProfileProviderOC使用闭包实现
+        EaseChatUIKitContext.shared?.userProfileProvider = self
+        EaseChatUIKitContext.shared?.userProfileProviderOC = nil
+        //groupProvider原理同上
+        EaseChatUIKitContext.shared?.groupProfileProvider = self
+        EaseChatUIKitContext.shared?.groupProfileProviderOC = nil
+    }
         //继承注册后的自定义类还可以调用ViewModel的registerEventsListener方法监听相关事件
 
 //MARK: - EaseProfileProvider for conversations&contacts usage.
@@ -336,37 +343,9 @@ extension MainViewController: EaseProfileProvider,EaseGroupProfileProvider {
         return resultProfiles
     }
 }
-
 ```
 
-## 4.联系人及其后续页面Provider
-
-### 4.1 联系人列表页Provider
-
-Provider是一个数据提供者，当列表展示并且滑动减速时候，EaseChatUIKit会向你请求一些当前屏幕上要显示联系人的展示信息例如头像昵称等。下面是Provider的具体示例以及用法。
-
-```Swift
-        //前者仅限于Swift下使用，是使用协程异步返回。后者Swift OC均可使用使用闭包返回即可。
-        `let vc = EaseChatUIKit.ComponentsRegister.shared.ContactsController.init(provider: self)`  or `let conversations = EaseChatUIKit.ComponentsRegister.shared.ConversationsController.init(providerOC: self)`
-        
-        //继承注册后的自定义类还可以调用ViewModel的registerEventsListener方法监听相关事件
-        
-        //扩展类似上面会话列表实现EaseProfileProvider协议后，使用协程异步返回您要显示的联系人信息。如果是EaseProfileProviderOC 即实现EaseProfileProviderOC即可。
-```
-
-### 4.2 群成员列表页Provider
-
-类同与上述Provider  协议名为`EaseGroupMemberProfileProvider` or `EaseGroupMemberProfileProviderOC`
-
-实现Provider方式略不同与上面Controller
-```Swift
-                `EaseChatUIKitContext.shared?.groupMemberAttributeCache?.provider = self` or `EaseChatUIKitContext.shared?.groupMemberAttributeCache?.providerOC = self`
-                
-                扩展实现方式与上面两个功能模块相同
-```
-
-
-## 5.初始化聊天页面
+## 4.初始化聊天页面
 
 聊天页面中大部分对消息的处理以及页面处理逻辑均可override、当然也包括ViewModel
 
@@ -379,7 +358,7 @@ Provider是一个数据提供者，当列表展示并且滑动减速时候，Eas
         ControllerStack.toDestination(vc: vc)
 ```
 
-## 4.监听EaseChatUIKit事件和错误
+## 5.监听EaseChatUIKit事件和错误
 
 您可以调用`registerUserStateListener`方法来监听 EaseChatUIKit中用户相关以及链接状态变更的事件和错误。
 
