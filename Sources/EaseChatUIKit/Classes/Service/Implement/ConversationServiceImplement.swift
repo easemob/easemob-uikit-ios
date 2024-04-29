@@ -319,7 +319,7 @@ extension ConversationServiceImplement: ConversationService {
             conversation.lastMessage = $0.latestMessage
             conversation.type = EaseProfileProviderType(rawValue: UInt($0.type.rawValue)) ?? .chat
             conversation.pinned = $0.isPinned
-            if EaseChatUIKitClient.shared.option.option_chat.saveConversationInfo {
+            if EaseChatUIKitClient.shared.option.option_UI.saveConversationInfo {
                 if $0.type == .chat {
                     if let nickName = EaseChatUIKitContext.shared?.userCache?[$0.conversationId]?.nickname as? String {
                         conversation.nickname = nickName

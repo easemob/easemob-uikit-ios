@@ -115,7 +115,7 @@ extension ChatServiceImplement: ChatService {
         if EaseChatUIKitContext.shared?.chatCache == nil {
             EaseChatUIKitContext.shared?.chatCache = [String:EaseProfileProtocol]()
         }
-        if EaseChatUIKitClient.shared.option.option_chat.loadLocalHistoryMessages {
+        if EaseChatUIKitClient.shared.option.option_UI.loadLocalHistoryMessages {
             ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.loadMessagesStart(fromId: messageId, count: Int32(pageSize), searchDirection: searchMessage ? .down:.up,completion: { messages, error in
                 if error == nil,let messages = messages {
                     for message in messages {

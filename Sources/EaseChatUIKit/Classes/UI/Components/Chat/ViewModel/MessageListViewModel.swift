@@ -343,7 +343,7 @@ import UIKit
     }
     
     @objc open func deleteMessage(message: ChatMessage) {
-        if EaseChatUIKitClient.shared.option.option_chat.loadLocalHistoryMessages {
+        if EaseChatUIKitClient.shared.option.option_UI.loadLocalHistoryMessages {
             self.chatService?.removeLocalMessage(messageId: message.messageId)
             self.driver?.processMessage(operation: .delete, message: message)
         } else {
@@ -359,7 +359,7 @@ import UIKit
     
     open func deleteMessages(messages: [ChatMessage]) {
         
-        if EaseChatUIKitClient.shared.option.option_chat.loadLocalHistoryMessages {
+        if EaseChatUIKitClient.shared.option.option_UI.loadLocalHistoryMessages {
             if var dataSource = self.driver?.dataSource {
                 for message in messages {
                     self.chatService?.removeLocalMessage(messageId: message.messageId)

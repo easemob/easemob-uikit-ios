@@ -368,7 +368,7 @@ extension ConversationViewModel: ConversationServiceListener {
             }
             self.service?.notifyUnreadCount(count: count)
             self.driver?.refreshList(infos: items)
-            if !info.doNotDisturb,EaseChatUIKitClient.shared.option.option_chat.soundOnReceivedNewMessage,UIApplication.shared.applicationState == .active,self.chatId != info.id {
+            if !info.doNotDisturb,EaseChatUIKitClient.shared.option.option_UI.soundOnReceivedNewMessage,UIApplication.shared.applicationState == .active,self.chatId != info.id {
                 self.playNewMessageSound()
             }
         }

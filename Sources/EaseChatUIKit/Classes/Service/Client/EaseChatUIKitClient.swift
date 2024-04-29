@@ -13,7 +13,11 @@ public let EaseChatUIKit_VERSION = "4.6.0"
     
 }
 
-@objcMembers public class ChatOptions: ChatSDKOptions {
+@objcMembers final public class ChatOptions: ChatSDKOptions {
+}
+
+@objcMembers public class UIOptions: NSObject {
+    
     
     /// Whether to store session avatars and nicknames in EaseChatUIKit.
     public var saveConversationInfo = true
@@ -23,10 +27,6 @@ public let EaseChatUIKit_VERSION = "4.6.0"
     
     /// Whether load messages from local database.
     public var loadLocalHistoryMessages = true
-}
-
-@objcMembers public class UIOptions: NSObject {
-    
 }
 
 @objcMembers public class EaseChatUIKitClient: NSObject {
