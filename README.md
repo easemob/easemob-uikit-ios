@@ -192,10 +192,9 @@ public final class YourAppUser: NSObject, EaseProfileProtocol {
 以下是进阶用法的部分示例。会话列表页面、消息列表页、联系人列表均可分开使用。
 
 ## 1.初始化单群聊UIKit
-相比于上面快速开始的单群聊UIKit初始化这里多了ChatOptions的参数，主要是对SDK中是否打印log以及是否自动登录，是否默认使用用户属性的开关配置。
+相比于上面快速开始的单群聊UIKit初始化这里多了ChatOptions的参数，主要是对SDK中是否打印log以及是否自动登录，是否默认使用用户属性的开关配置。ChatOptions即IMSDK的Option类，内中有诸多开关属性可参见环信官网IMSDK文档
 ```Swift
-let error = EaseChatUIKitClient.shared.setup(appkey: "Your appkey",
-    option: EaseChatUIKitInitialOptions.ChatOptions())
+let error = EaseChatUIKitClient.shared.setup(option: ChatOptions(appkey: appKey))
 ```
 
 ## 2.登录
