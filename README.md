@@ -363,7 +363,7 @@ extension MainViewController: EaseProfileProvider,EaseGroupProfileProvider {
 您可以调用`registerUserStateListener`方法来监听 EaseChatUIKit中用户相关以及链接状态变更的事件和错误。
 
 ```Swift
-EaseChatUIKitClient.shared.unregisterUserEventsListener(self)
+EaseChatUIKitClient.shared.unregisterUserStateListener(self)
 ```
 
 # 自定义
