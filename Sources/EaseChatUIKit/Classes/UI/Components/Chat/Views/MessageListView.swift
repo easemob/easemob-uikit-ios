@@ -424,6 +424,15 @@ import UIKit
         }
     }
     
+//    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+//        if let lastIndexPath = self.messageList.indexPathsForVisibleRows?.last, lastIndexPath.row == self.messages.count - 1 {
+//            self.moreMessagesCount = 0
+//            for handler in self.eventHandlers.allObjects {
+//                handler.onMoreMessagesClicked()
+//            }
+//        }
+//    }
+    
 }
 
 extension MessageListView: ThemeSwitchProtocol {
@@ -483,12 +492,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                 listener.onMessageVisible(entity: entity)
             }
         }
-        if indexPath.row == self.messages.count - 1 {
-            self.moreMessagesCount = 0
-            for handler in self.eventHandlers.allObjects {
-                handler.onMoreMessagesClicked()
-            }
-        }
+        
     }
     
     private func registerMessageCell(tableView: UITableView,indexPath: IndexPath) -> MessageCell? {
@@ -961,8 +965,11 @@ extension MessageListView: IMessageListViewDriver {
                 if lastIndexPath.row > 0 {
                     self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
                 }
-                for handler in self.eventHandlers.allObjects {
-                    handler.onMoreMessagesClicked()
+                if self.moreMessagesCount >= 0 {
+                    self.moreMessagesCount = 0
+                    for handler in self.eventHandlers.allObjects {
+                        handler.onMoreMessagesClicked()
+                    }
                 }
             } else {
                 if scrolledBottom {
