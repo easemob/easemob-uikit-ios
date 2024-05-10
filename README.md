@@ -27,6 +27,7 @@
 - [注意事项](#注意事项)
 - [进阶用法](#进阶用法)
 - [自定义](#自定义)
+- [主题](#主题)
 - [文档](#文档)
 - [设计指南](#设计指南)
 - [贡献](#贡献)
@@ -357,7 +358,21 @@ extension MainViewController: EaseProfileProvider,EaseGroupProfileProvider {
         ControllerStack.toDestination(vc: vc)
 ```
 
-## 5.监听EaseChatUIKit事件和错误
+## 5.集成会话列表页面
+```Swift
+        let vc = ConversationListController()
+        vc.modalPresentationStyle = .fullScreen
+        ControllerStack.toDestination(vc: vc)
+```
+
+## 5.集成联系人列表页面
+```Swift
+        let vc = ContactViewController()
+        vc.modalPresentationStyle = .fullScreen
+        ControllerStack.toDestination(vc: vc)
+```
+
+## 7.监听EaseChatUIKit事件和错误
 
 您可以调用`registerUserStateListener`方法来监听 EaseChatUIKit中用户相关以及链接状态变更的事件和错误。
 
@@ -423,7 +438,7 @@ ComponentsRegister.shared.ChatLocationCell = CustomLocationMessageCell.self
 
 ```
 
-## 4.切换原创或自定义主题
+# 主题
 - 切换到 EaseChatUIKit 附带的浅色或深色主题。在初始化单群聊UIKit视图之前切换主题切换主题即可更改默认主题，在视图使用中也可以切换由开发者判断系统当前主题后切换你想对应的主题即可。
 
 ```swift
@@ -498,11 +513,11 @@ python3 -m http.server 8080
 
 ## 4.拦截主要页面点击以及跳转事件
 
-详见[](./Documentation/customize_click_jump.md).
+[详见](./Documentation/customize_click_jump.md).
 
 ## 5.拦截主要页面回调事件监听
 
-详见[](./Documentation/modular_events_listener.md).
+[详见](./Documentation/modular_events_listener.md).
 
 # 设计指南
 
