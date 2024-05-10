@@ -410,10 +410,12 @@ import UIKit
         if !self.threadMessagesLoadFinished,self.showType == .thread {
             return
         }
-        self.moreMessagesCount = 0
         self.inputBar.hiddenInput()
-        for handler in self.eventHandlers.allObjects {
-            handler.onMoreMessagesClicked()
+        if self.moreMessagesCount > 0 {
+            self.moreMessagesCount = 0
+            for handler in self.eventHandlers.allObjects {
+                handler.onMoreMessagesClicked()
+            }
         }
         if self.messages.count  > 1 {
             self.messageList.reloadData()
@@ -424,14 +426,14 @@ import UIKit
         }
     }
     
-//    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-//        if let lastIndexPath = self.messageList.indexPathsForVisibleRows?.last, lastIndexPath.row == self.messages.count - 1 {
-//            self.moreMessagesCount = 0
-//            for handler in self.eventHandlers.allObjects {
-//                handler.onMoreMessagesClicked()
-//            }
-//        }
-//    }
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        if let lastIndexPath = self.messageList.indexPathsForVisibleRows?.last, lastIndexPath.row == self.messages.count - 1,self.moreMessagesCount > 0 {
+            self.moreMessagesCount = 0
+            for handler in self.eventHandlers.allObjects {
+                handler.onMoreMessagesClicked()
+            }
+        }
+    }
     
 }
 
@@ -965,7 +967,7 @@ extension MessageListView: IMessageListViewDriver {
                 if lastIndexPath.row > 0 {
                     self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
                 }
-                if self.moreMessagesCount >= 0 {
+                if self.moreMessagesCount > 0 {
                     self.moreMessagesCount = 0
                     for handler in self.eventHandlers.allObjects {
                         handler.onMoreMessagesClicked()
