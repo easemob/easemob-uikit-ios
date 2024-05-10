@@ -23,7 +23,6 @@ import UIKit
             if !success {
                 let errorInfo = error?.errorDescription ?? ""
                 consoleLogInfo(errorInfo, type: .error)
-                completion(error)
             }
             completion(error)
         }
