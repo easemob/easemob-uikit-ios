@@ -229,6 +229,8 @@ public final class YourAppUser: NSObject, EaseProfileProtocol {
 
 ## 3.EaseChatUIKitContext中的Provider
 
+- 注: 仅用于会话列表以及联系人列表,在只是用快速开始进入聊天页面时不需要实现Provider
+
 Provider是一个数据提供者，当会话列表展示并且滑动减速时候，EaseChatUIKit会向你请求一些当前屏幕上要显示会话的展示信息例如头像昵称等。下面是Provider的具体示例以及用法。
 
 ```Swift
