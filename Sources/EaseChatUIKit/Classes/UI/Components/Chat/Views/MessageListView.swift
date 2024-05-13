@@ -826,7 +826,6 @@ extension MessageListView: IMessageListViewDriver {
                 self.convertMessage(message: $0)
             }), at: 0)
             self.messageList.reloadData()
-            self.messageList.layoutIfNeeded()
             if let beforeIndex = self.messages.firstIndex(where: { $0.message.messageId == pullBeforeMessageId }) {
                 self.messageList.scrollToRow(at: IndexPath(row: beforeIndex, section: 0), at: .top, animated: false)
             }
