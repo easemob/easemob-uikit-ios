@@ -110,15 +110,14 @@ Classes
 ```
 # 运行示例项目
 
-- 注册环信AppKey，详见 https://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E8%8E%B7%E5%8F%96%E7%8E%AF%E4%BF%A1%E5%8D%B3%E6%97%B6%E9%80%9A%E8%AE%AF-im-%E7%9A%84%E4%BF%A1%E6%81%AF
+- [注册环信AppKey](https://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E8%8E%B7%E5%8F%96%E7%8E%AF%E4%BF%A1%E5%8D%B3%E6%97%B6%E9%80%9A%E8%AE%AF-im-%E7%9A%84%E4%BF%A1%E6%81%AF)
 - 在Appdelegate.swift 中找到
 ```Swift
 let option = ChatOptions(appkey: <#环信AppKey#>)
 ```
 将注册的AppKey填入其中。
-- 如果想要自定义的头像昵称显示信息，在LoginViewController.swift中找到loginAction方法后填入您要显示的当前用户id对应的昵称头像`profile.nickname` `profile.avatarURL`信息即可，然后运行项目即可，出现登录界面后需要您去创建用户以及获取用户token // 。 您也可以使用控制台生成的临时Token登录。
-// 在控制台生成用户和临时用户 token，请参见
-// https://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E5%88%9B%E5%BB%BA-im-%E7%94%A8%E6%88%B7。
+- 如果想要自定义的头像昵称显示信息，在LoginViewController.swift中找到loginAction方法后填入您要显示的当前用户id对应的昵称头像`profile.nickname` `profile.avatarURL`信息即可，然后运行项目即可，出现登录界面后需要您去创建用户以及获取用户token // 。 [使用控制台生成的临时Token登录](https://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E5%88%9B%E5%BB%BA-im-%E7%94%A8%E6%88%B7)
+
 
 # 快速开始
 
