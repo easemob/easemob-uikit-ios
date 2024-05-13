@@ -308,6 +308,7 @@ extension ContactView: IContactListDriver {
                 profile.nickname =  info.nickname.isEmpty ? info.id:info.nickname
                 profile.avatarURL = info.avatarURL
                 profile.selected = info.selected
+                profile.remark = info.remark
             }
         }
         self.refreshList(infos: self.rawData)

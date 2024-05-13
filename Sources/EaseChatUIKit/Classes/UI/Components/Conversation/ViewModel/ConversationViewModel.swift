@@ -156,6 +156,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
             let userIds = privateChats.map { $0 }
             Task(priority: .background) {
                 let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: userIds) ?? []
+                self.cacheUser(profiles: profiles)
                 DispatchQueue.main.async {
                     self.renderDriver(infos: profiles)
                 }
@@ -165,6 +166,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
             let groupIds = groupChats
             Task(priority: .background) {
                 let profiles = await EaseChatUIKitContext.shared?.groupProfileProvider?.fetchGroupProfiles(profileIds: groupIds) ?? []
+                self.cacheGroup(profiles: profiles)
                 DispatchQueue.main.async {
                     self.driver?.refreshProfiles(infos: profiles)
                 }
@@ -172,6 +174,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         }
         if EaseChatUIKitContext.shared?.userProfileProviderOC != nil {
             EaseChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: privateChats, completion: { [weak self] profiles in
+                self?.cacheUser(profiles: profiles)
                 DispatchQueue.main.async {
                     self?.driver?.refreshProfiles(infos: profiles)
                 }
@@ -179,12 +182,25 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         }
         if EaseChatUIKitContext.shared?.groupProfileProviderOC != nil {
             EaseChatUIKitContext.shared?.groupProfileProviderOC?.fetchGroupProfiles(profileIds: groupChats, completion: { [weak self] profiles in
+                self?.cacheGroup(profiles: profiles)
                 DispatchQueue.main.async {
                     self?.driver?.refreshProfiles(infos: profiles)
                 }
             })
         }
         
+    }
+    
+    @objc open func cacheUser(profiles: [EaseProfileProtocol]) {
+        for profile in profiles {
+            EaseChatUIKitContext.shared?.userCache?[profile.id] = profile
+        }
+    }
+    
+    @objc open func cacheGroup(profiles: [EaseProfileProtocol]) {
+        for profile in profiles {
+            EaseChatUIKitContext.shared?.groupCache?[profile.id] = profile
+        }
     }
     
     @objc open func renderDriver(infos: [EaseProfileProtocol]) {

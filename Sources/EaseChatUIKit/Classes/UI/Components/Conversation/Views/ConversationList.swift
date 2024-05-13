@@ -250,6 +250,9 @@ extension ConversationList: IConversationListDriver {
                 if !info.nickname.isEmpty {
                     item.nickname = info.nickname
                 }
+                if !info.remark.isEmpty {
+                    item.remark = info.remark
+                }
                 if !info.avatarURL.isEmpty {
                     item.avatarURL = info.avatarURL
                 }

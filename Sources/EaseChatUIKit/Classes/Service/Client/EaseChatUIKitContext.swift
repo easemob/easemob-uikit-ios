@@ -55,13 +55,13 @@ import UIKit
     public func cleanCache(type: EaseChatUIKitCacheType) {
         switch type {
         case .all:
-            self.chatCache = nil
-            self.userCache = nil
-            self.groupCache = nil
+            self.chatCache?.removeAll()
+            self.userCache?.removeAll()
+            self.groupCache?.removeAll()
         case .chat://不需要对外暴露
-            self.chatCache = nil
-        case .user: self.userCache = nil
-        case .group: self.groupCache = nil
+            self.chatCache?.removeAll()
+        case .user: self.userCache?.removeAll()
+        case .group: self.groupCache?.removeAll()
         default: break
         }
     }
