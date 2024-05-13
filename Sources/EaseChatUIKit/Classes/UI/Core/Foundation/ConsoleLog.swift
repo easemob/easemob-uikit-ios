@@ -46,10 +46,10 @@ private func consoleLog<T> (
     let timeString = time.string(from: Date())
     let fileName = (file.description as NSString).lastPathComponent
     let functionName = (function.description as NSString).lastPathComponent
-    debugPrint("\(timeString) \(type.rawValue) \(fileName):\(line) ChatroomUIKit Log:\(message) function Name:\(functionName)")
+    debugPrint("\(timeString) \(type.rawValue) \(fileName):\(line) EaseChatUIKit Log:\(message) function Name:\(functionName)")
     #else
     if type == .error {
-        Log.saveLog(" ChatroomUIKit Log:\(message)",file: file,function: function,line: line)
+        Log.saveLog(" EaseChatUIKit Log:\(message)",file: file,function: function,line: line)
     }
     #endif
 }
