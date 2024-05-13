@@ -661,6 +661,7 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
         imagePickerController.sourceType = .photoLibrary
+        imagePickerController.mediaTypes = [kUTTypeImage as String, kUTTypeMovie as String]
         self.present(imagePickerController, animated: true, completion: nil)
     }
     
