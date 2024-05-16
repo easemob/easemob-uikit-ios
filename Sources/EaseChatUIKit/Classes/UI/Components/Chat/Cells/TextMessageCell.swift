@@ -22,7 +22,7 @@ import UIKit
     }()
     
     @objc open func createContent() -> UILabel {
-        UILabel(frame: .zero).backgroundColor(.clear).lineBreakMode(LanguageConvertor.chineseLanguage() ? .byCharWrapping:.byWordWrapping).numberOfLines(0)
+        UILabel(frame: .zero).backgroundColor(.clear).numberOfLines(0)
     }
     
     public private(set) lazy var edit: UIButton = {
