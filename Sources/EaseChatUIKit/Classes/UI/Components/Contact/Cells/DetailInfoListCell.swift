@@ -61,7 +61,7 @@ import UIKit
         self.titleLabel.frame = CGRect(x: 16, y: 16, width: (self.frame.width/2.0-22), height: 22)
         self.detailLabel.frame = CGRect(x: self.frame.width/2.0, y: 16, width: (self.frame.width/2.0-36), height: 22)
         self.switchMenu.frame = CGRect(x: self.frame.width-62, y: (self.contentView.frame.height-30)/2.0, width: 50, height: 30)
-        self.separatorLine.frame = CGRect(x: 16, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width, height: 0.5)
+        self.separatorLine.frame = CGRect(x: 16, y: self.contentView.frame.height-0.5, width: self.frame.width, height: 0.5)
     }
     
     @objc public func refresh(info: DetailInfo) {
