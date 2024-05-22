@@ -126,7 +126,9 @@ extension ConversationServiceImplement: ConversationService {
     
     public func setSilentMode(conversationId: String, completion: @escaping (SilentModeResult?, ChatError?) -> Void) {
         if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(conversationId) {
-            ChatClient.shared().pushManager?.setSilentModeForConversation(conversationId, conversationType: conversation.type, params: SilentModeParam(paramType: .remindType),completion: { [weak self] result, error in
+            let params = SilentModeParam(paramType: .remindType)
+            params.remindType = (conversation.type == .chat ? .none:.mentionOnly)
+            ChatClient.shared().pushManager?.setSilentModeForConversation(conversationId, conversationType: conversation.type, params: params,completion: { [weak self] result, error in
                 self?.handleResult(error: error, type: .setSilent)
                 completion(result,error)
             })
@@ -135,11 +137,10 @@ extension ConversationServiceImplement: ConversationService {
     
     public func clearSilentMode(conversationId: String, completion: @escaping (SilentModeResult?, ChatError?) -> Void) {
         if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(conversationId) {
-            ChatClient.shared().pushManager?.clearRemindType(forConversation: conversationId, conversationType: conversation.type, completion: { [weak self] result, error in
-                if error == nil {
-                    self?.muteMap.removeValue(forKey: result?.conversationID ?? "")
-                }
-                self?.handleResult(error: error, type: .clearSilent)
+            let params = SilentModeParam(paramType: .remindType)
+            params.remindType = .all
+            ChatClient.shared().pushManager?.setSilentModeForConversation(conversationId, conversationType: conversation.type, params: params,completion: { [weak self] result, error in
+                self?.handleResult(error: error, type: .setSilent)
                 completion(result,error)
             })
         }

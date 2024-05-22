@@ -27,6 +27,9 @@ public let EaseChatUIKit_VERSION = "4.6.0"
     
     /// Whether load messages from local database.
     public var loadLocalHistoryMessages = true
+    
+    /// Whether using contact list module.
+    public var enableContact = true
 }
 
 @objcMembers public class EaseChatUIKitClient: NSObject {
@@ -37,7 +40,9 @@ public let EaseChatUIKit_VERSION = "4.6.0"
     public private(set) lazy var userService: UserServiceProtocol? = nil
     
     /// Options function wrapper.
-    public private(set) lazy var option: EaseChatUIKitOptions = EaseChatUIKitOptions()
+    public var option: EaseChatUIKitOptions = EaseChatUIKitOptions()
+    
+    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Array<Dictionary<String,Any>>()) private var newFriends
     
     /// Initializes the chat room UIKit.
     /// - Parameters:
@@ -61,6 +66,9 @@ public let EaseChatUIKit_VERSION = "4.6.0"
     ///   - token: The user chat token.
     @objc(loginWithUser:token:completion:)
     public func login(user: EaseProfileProtocol,token: String,completion: @escaping (ChatError?) -> Void) {
+        if EaseChatUIKitClient.shared.option.option_UI.enableContact {
+            ChatClient.shared().contactManager?.add(self, delegateQueue: nil)
+        }
         EaseChatUIKitContext.shared?.currentUser = user
         EaseChatUIKitContext.shared?.chatCache?[user.id] = user
         EaseChatUIKitContext.shared?.userCache?[user.id] = user
@@ -113,3 +121,17 @@ public let EaseChatUIKit_VERSION = "4.6.0"
     }
 }
 
+extension EaseChatUIKitClient: ContactEventsListener {
+    public func friendRequestDidReceive(fromUser aUsername: String, message aMessage: String?) {
+        var requestInfo: [String:Any] = ["userId":aUsername,"timestamp":Date().timeIntervalSince1970*1000,"groupApply":0,"read":0]
+        let exist = self.newFriends.first(where: { $0["userId"] as? String == aUsername })
+        if exist == nil {
+            self.newFriends.append(requestInfo)
+        }
+        if let index = Appearance.contact.listHeaderExtensionActions.firstIndex(where: { $0.featureIdentify == "NewFriendRequest" }) {
+            Appearance.contact.listHeaderExtensionActions[index].showBadge = true
+            let unreadCount = self.newFriends.filter({ $0["read"] as? Int == 0 }).count
+            Appearance.contact.listHeaderExtensionActions[index].numberCount = UInt(unreadCount)
+        }
+    }
+}
