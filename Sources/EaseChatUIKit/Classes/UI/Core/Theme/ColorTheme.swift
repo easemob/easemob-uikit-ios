@@ -134,23 +134,23 @@ public extension UIColor {
             }
         }
         
-        /// You can change the hue of the base color, and then change the thirteen UIColor objects of the related color series. The UI components that use the relevant color series in the chat room UIKit will also change accordingly. The default value is 203/360.0.
+        /// You can change the hue of the base color, and then change the thirteen UIColor objects of the related color series. The UI components that use the relevant color series in the ease chat UIKit will also change accordingly. The default value is 203/360.0.
         ///  How to use?
         ///  `ColorTheme.primaryHue = 0.7`
         public static var primaryHue: CGFloat = Appearance.primaryHue
-        /// You can change the hue of the base color, and then change the thirteen UIColor objects of the related color series. The UI components that use the relevant color series in the chat room UIKit will also change accordingly . The default value is 155/360.0.
+        /// You can change the hue of the base color, and then change the thirteen UIColor objects of the related color series. The UI components that use the relevant color series in the ease chat UIKit will also change accordingly . The default value is 155/360.0.
         ///  How to use?
         ///  `ColorTheme.secondaryHue = 0.`7
         public static var secondaryHue: CGFloat = Appearance.secondaryHue
-        /// You can change the hue of the base color, and then change the thirteen UIColor objects of the related color series. The UI components that use the relevant color series in the chat room UIKit will also change accordingly . The default value is 350/360.0.
+        /// You can change the hue of the base color, and then change the thirteen UIColor objects of the related color series. The UI components that use the relevant color series in the ease chat UIKit will also change accordingly . The default value is 350/360.0.
         ///  How to use?
         ///  `ColorTheme.errorHue = 0.7`
         public static var errorHue: CGFloat = Appearance.errorHue
-        /// You can change the hue of the base color, and then change the thirteen UIColor objects of the related color series. The UI components that use the relevant color series in the chat room UIKit will also change accordingly. The default value is 203/360.0.
+        /// You can change the hue of the base color, and then change the thirteen UIColor objects of the related color series. The UI components that use the relevant color series in the ease chat UIKit will also change accordingly. The default value is 203/360.0.
         ///  How to use?
         ///  ColorTheme.neutralHue = 0.7
         public static var neutralHue: CGFloat = Appearance.neutralHue
-        /// You can change the hue of the base color, and then change the thirteen UIColor objects of the related color series. The UI components that use the relevant color series in the chat room UIKit will also change accordingly. The default value is 220/360.0
+        /// You can change the hue of the base color, and then change the thirteen UIColor objects of the related color series. The UI components that use the relevant color series in the ease chat UIKit will also change accordingly. The default value is 220/360.0
         ///  How to use?
         ///  `ColorTheme.neutralSpecialHue = 0.7`
         public static var neutralSpecialHue: CGFloat = Appearance.neutralSpecialHue

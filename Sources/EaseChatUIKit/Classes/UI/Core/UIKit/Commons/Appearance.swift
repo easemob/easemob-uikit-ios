@@ -21,23 +21,23 @@ import UIKit
     /// The corner radius of the alert view.``AlertView``
     public static var alertStyle: AlertStyle = .large
     
-    /// You can change the hue of the base color, and then change the thirteen UIColor objects of the related color series. The UI components that use the relevant color series in the chat room UIKit will also change accordingly. The default value is 203/360.0.
+    /// You can change the hue of the base color, and then change the thirteen UIColor objects of the related color series. The UI components that use the relevant color series in the ease chat UIKit will also change accordingly. The default value is 203/360.0.
     public static var primaryHue: CGFloat = 203/360.0
     
     /// You can change the primary hue. The default value is 203/360.0.
-    /// After the primary hue is changed, thirteen UIColor objects of the related color series will be changed. The color of UI components that use the related color series in the chat room UIKit will also change accordingly.
+    /// After the primary hue is changed, thirteen UIColor objects of the related color series will be changed. The color of UI components that use the related color series in the ease chat UIKit will also change accordingly.
     public static var secondaryHue: CGFloat = 155/360.0
     
     /// You can change the secondary hue. The default value is 155/360.0.
-    /// After the secondary hue is changed, thirteen UIColor objects of the related color series will be changed. The color of UI components that use the related color series in the chat room UIKit will also change accordingly.
+    /// After the secondary hue is changed, thirteen UIColor objects of the related color series will be changed. The color of UI components that use the related color series in the ease chat UIKit will also change accordingly.
     public static var errorHue: CGFloat = 350/360.0
     
     /// You can change the neutral hue. The default value is 203/360.0.
-    /// After the neutral hue is changed, thirteen UIColor objects of the related color series will be changed. The color of UI components that use the related color series in the chat room UIKit will also change accordingly.
+    /// After the neutral hue is changed, thirteen UIColor objects of the related color series will be changed. The color of UI components that use the related color series in the ease chat UIKit will also change accordingly.
     public static var neutralHue: CGFloat = 203/360.0
     
     /// You can change the neutral special hue. The default value is 220/360.0.
-    /// After the neutral special hue is changed, thirteen UIColor objects of the related color series will be changed. The color of UI components that use the relevant color series in the chat room UIKit will also change accordingly.
+    /// After the neutral special hue is changed, thirteen UIColor objects of the related color series will be changed. The color of UI components that use the relevant color series in the ease chat UIKit will also change accordingly.
     public static var neutralSpecialHue: CGFloat = 220/360.0
     
     public static var ease_chat_language = LanguageType.Chinese

@@ -42,7 +42,10 @@ import UIKit
     }
     
     func refresh(message: ChatMessage,info: ConversationInfo,keyword: String) {
-        let nickName = info.nickname.isEmpty ? info.id:info.nickname
+        var nickName = info.nickname.isEmpty ? info.id:info.nickname
+        if !info.remark.isEmpty {
+            nickName = info.remark
+        }
         self.conversationName.text = nickName
         self.messageContent.attributedText = self.highlightKeywords(keyword: keyword, in: message.showType)
         self.avatar.image(with: info.avatarURL, placeHolder: info.type == .chat ? Appearance.conversation.singlePlaceHolder:Appearance.conversation.groupPlaceHolder)

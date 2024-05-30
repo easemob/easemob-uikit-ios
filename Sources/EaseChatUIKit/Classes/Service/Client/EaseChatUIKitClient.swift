@@ -1,6 +1,6 @@
 import Foundation
 
-public let EaseChatUIKit_VERSION = "4.6.0"
+public let EaseChatUIKit_VERSION = "4.7.0"
 
 @objcMembers public class EaseChatUIKitOptions: NSObject {
     
@@ -44,7 +44,7 @@ public let EaseChatUIKit_VERSION = "4.6.0"
     
     @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Array<Dictionary<String,Any>>>()) private var newFriends
     
-    /// Initializes the chat room UIKit.
+    /// Initializes the ease chat UIKit.
     /// - Parameters:
     ///   - option: The unique identifier that Chat assigns to each app.``ChatOptions``
     /// Returns the initialization success or an error that includes the description of the cause of the failure.
