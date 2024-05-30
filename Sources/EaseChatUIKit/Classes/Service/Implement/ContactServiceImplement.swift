@@ -8,9 +8,7 @@
 import UIKit
 
 @objc public class ContactServiceImplement: NSObject {
-    
-    @UserDefault("EaseChatUIKit_contact_fetch_server_finished",defaultValue: false) private var loadFinished
-    
+        
     private var responseDelegates: NSHashTable<ContactEventsResponse> = NSHashTable<ContactEventsResponse>.weakObjects()
     
     private var eventsNotifiers: NSHashTable<ContactEmergencyListener> = NSHashTable<ContactEmergencyListener>.weakObjects()
@@ -55,10 +53,11 @@ extension ContactServiceImplement: ContactServiceProtocol {
     
     public func contacts(completion: @escaping (ChatError?, [Contact]) -> Void) {
         let contacts = ChatClient.shared().contactManager?.getAllContacts()
-        if !self.loadFinished,contacts?.count ?? 0 <= 0 {
+        let loadFinish = UserDefaults.standard.bool(forKey: "EaseChatUIKit_contact_fetch_server_finished"+saveIdentifier)
+        if !loadFinish,contacts?.count ?? 0 <= 0 {
             ChatClient.shared().contactManager?.getAllContactsFromServer(completion: { [weak self] contacts, error in
                 if error == nil {
-                    self?.loadFinished = true
+                    UserDefaults.standard.set(true, forKey: "EaseChatUIKit_contact_fetch_server_finished"+saveIdentifier)
                 }
                 completion(error,contacts ?? [])
                 self?.handleResult(error: error, type: .fetchContacts, operatorId: EaseChatUIKitContext.shared?.currentUserId ?? "")

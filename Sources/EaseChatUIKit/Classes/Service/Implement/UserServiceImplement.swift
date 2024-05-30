@@ -7,6 +7,10 @@
 
 import UIKit
 
+public var saveIdentifier: String {
+    ChatClient.shared().options.appkey+(EaseChatUIKitContext.shared?.currentUserId ?? "")
+}
+
 @objc public final class UserServiceImplement: NSObject {
         
     private var responseDelegates: NSHashTable<UserStateChangedListener> = NSHashTable<UserStateChangedListener>.weakObjects()

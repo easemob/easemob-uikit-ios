@@ -42,7 +42,7 @@ public let EaseChatUIKit_VERSION = "4.6.0"
     /// Options function wrapper.
     public var option: EaseChatUIKitOptions = EaseChatUIKitOptions()
     
-    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Array<Dictionary<String,Any>>()) private var newFriends
+    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Array<Dictionary<String,Any>>>()) private var newFriends
     
     /// Initializes the chat room UIKit.
     /// - Parameters:
@@ -123,14 +123,21 @@ public let EaseChatUIKit_VERSION = "4.6.0"
 
 extension EaseChatUIKitClient: ContactEventsListener {
     public func friendRequestDidReceive(fromUser aUsername: String, message aMessage: String?) {
-        var requestInfo: [String:Any] = ["userId":aUsername,"timestamp":Date().timeIntervalSince1970*1000,"groupApply":0,"read":0]
-        let exist = self.newFriends.first(where: { $0["userId"] as? String == aUsername })
+        let requestInfo: [String:Any] = ["userId":aUsername,"timestamp":Date().timeIntervalSince1970*1000,"groupApply":0,"read":0]
+        var exist = self.newFriends[saveIdentifier]
         if exist == nil {
-            self.newFriends.append(requestInfo)
+            self.newFriends[saveIdentifier] = [requestInfo]
+        } else {
+            if exist?.first(where: { $0["userId"] as? String == aUsername }) == nil {
+                exist?.append(requestInfo)
+                self.newFriends[saveIdentifier] = exist
+            }
         }
         if let index = Appearance.contact.listHeaderExtensionActions.firstIndex(where: { $0.featureIdentify == "NewFriendRequest" }) {
-            Appearance.contact.listHeaderExtensionActions[index].showBadge = true
-            let unreadCount = self.newFriends.filter({ $0["read"] as? Int == 0 }).count
+            let item = Appearance.contact.listHeaderExtensionActions[index]
+            item.showBadge = true
+            let unreadCount = self.newFriends[saveIdentifier]?.filter({ $0["read"] as? Int == 0 }).count ?? 0
+            item.numberCount = UInt(unreadCount)
             Appearance.contact.listHeaderExtensionActions[index].numberCount = UInt(unreadCount)
         }
     }
