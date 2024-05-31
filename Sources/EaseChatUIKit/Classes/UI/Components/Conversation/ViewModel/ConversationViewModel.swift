@@ -154,7 +154,8 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         }
         if EaseChatUIKitContext.shared?.userProfileProvider != nil {
             let userIds = privateChats.map { $0 }
-            Task(priority: .background) {
+            Task(priority: .background) { [weak self] in
+                guard let `self` = self else { return }
                 let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: userIds) ?? []
                 self.cacheUser(profiles: profiles)
                 DispatchQueue.main.async {
@@ -164,7 +165,8 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         }
         if EaseChatUIKitContext.shared?.groupProfileProvider != nil {
             let groupIds = groupChats
-            Task(priority: .background) {
+            Task(priority: .background) { [weak self] in 
+                guard let `self` = self else { return }
                 let profiles = await EaseChatUIKitContext.shared?.groupProfileProvider?.fetchGroupProfiles(profileIds: groupIds) ?? []
                 self.cacheGroup(profiles: profiles)
                 DispatchQueue.main.async {
@@ -193,13 +195,17 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
     
     @objc open func cacheUser(profiles: [EaseProfileProtocol]) {
         for profile in profiles {
-            EaseChatUIKitContext.shared?.userCache?[profile.id] = profile
+            EaseChatUIKitContext.shared?.userCache?[profile.id]?.nickname = profile.nickname
+            EaseChatUIKitContext.shared?.userCache?[profile.id]?.remark = profile.remark
+            EaseChatUIKitContext.shared?.userCache?[profile.id]?.avatarURL = profile.avatarURL
         }
     }
     
     @objc open func cacheGroup(profiles: [EaseProfileProtocol]) {
         for profile in profiles {
-            EaseChatUIKitContext.shared?.groupCache?[profile.id] = profile
+            EaseChatUIKitContext.shared?.groupCache?[profile.id]?.nickname = profile.nickname
+            EaseChatUIKitContext.shared?.groupCache?[profile.id]?.avatarURL = profile.avatarURL
+            EaseChatUIKitContext.shared?.groupCache?[profile.id]?.remark = profile.remark
         }
     }
     

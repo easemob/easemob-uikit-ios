@@ -268,7 +268,8 @@ extension ContactViewModel: ContactListActionEventsDelegate {
     
     @objc open func requestDisplayInfos(ids: [String]) {
         if EaseChatUIKitContext.shared?.userProfileProvider != nil {
-            Task(priority: .background) {
+            Task(priority: .background) { [weak self] in
+                guard let `self` = self else { return }
                 let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: ids) ?? []
                 self.cacheProfiles(profiles: profiles)
                 DispatchQueue.main.async {
@@ -287,7 +288,9 @@ extension ContactViewModel: ContactListActionEventsDelegate {
     
     @objc open func cacheProfiles(profiles: [EaseProfileProtocol]) {
         for profile in profiles {
-            EaseChatUIKitContext.shared?.userCache?[profile.id] = profile
+            EaseChatUIKitContext.shared?.userCache?[profile.id]?.nickname = profile.nickname
+            EaseChatUIKitContext.shared?.userCache?[profile.id]?.remark = profile.remark
+            EaseChatUIKitContext.shared?.userCache?[profile.id]?.avatarURL = profile.avatarURL
         }
     }
     
