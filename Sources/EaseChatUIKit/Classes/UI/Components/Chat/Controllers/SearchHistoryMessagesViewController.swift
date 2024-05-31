@@ -114,7 +114,7 @@ import UIKit
             let info = ConversationInfo()
             info.id = item.from
             info.nickname = conversation?.nickname ?? ""
-            info.remark = conversation?.remark
+            info.remark = conversation?.remark ?? ""
             cell?.refresh(message: item,info: info,keyword: self.searchKeyWord)
         }
         cell?.selectionStyle = .none
