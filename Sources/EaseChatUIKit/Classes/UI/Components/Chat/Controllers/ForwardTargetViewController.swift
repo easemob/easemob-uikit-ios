@@ -76,9 +76,7 @@ import UIKit
 
         }).backgroundColor(.clear)
     }()
-    
-    @UserDefault("EaseChatUIKit_contact_fetch_server_finished",defaultValue: false) private var loadFinished
-    
+        
     private var noMoreGroup = false
     
     public required init(messages: [ChatMessage],combine: Bool = true) {
@@ -119,10 +117,10 @@ import UIKit
     }
    
     open func fetchContacts() {
-        if !self.loadFinished {
+        if !UserDefaults.standard.bool(forKey: "EaseChatUIKit_contact_fetch_server_finished"+saveIdentifier) {
             ChatClient.shared().contactManager?.getAllContactsFromServer(completion: { [weak self] contacts, error in
                 if error == nil {
-                    self?.loadFinished = true
+                    UserDefaults.standard.set(true, forKey: "EaseChatUIKit_contact_fetch_server_finished"+saveIdentifier)
                     if let contacts = ChatClient.shared().contactManager?.getAllContacts() {
                         self?.datas.removeAll()
                         self?.datas = contacts.map {

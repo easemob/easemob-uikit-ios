@@ -54,7 +54,7 @@ import UIKit
         self.contentView.backgroundColor = .clear
         self.backgroundColor = .clear
         self.imageView?.contentMode = .scaleAspectFit
-        self.textLabel?.font = UIFont.theme.labelMedium
+        self.textLabel?.font = UIFont.theme.titleMedium
         self.textLabel?.textColor = UIColor.theme.neutralColor1
         self.contentView.addSubview(self.badge)
         self.contentView.addSubview(self.separatorLine)

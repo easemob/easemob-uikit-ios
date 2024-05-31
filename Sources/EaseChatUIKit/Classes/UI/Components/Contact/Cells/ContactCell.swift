@@ -88,7 +88,7 @@ import UIKit
     
     @objc public func highlightKeywords(keyword: String, in string: String) -> NSAttributedString {
         let attributedString = NSMutableAttributedString {
-            AttributedText(string).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
+            AttributedText(string).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1).font(Font.theme.titleMedium)
         }
         if !keyword.isEmpty {
             var range = (string as NSString).range(of: keyword, options: .caseInsensitive)

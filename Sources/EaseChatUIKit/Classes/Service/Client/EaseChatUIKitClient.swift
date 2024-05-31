@@ -1,6 +1,6 @@
 import Foundation
 
-public let EaseChatUIKit_VERSION = "4.6.0"
+public let EaseChatUIKit_VERSION = "4.7.0"
 
 @objcMembers public class EaseChatUIKitOptions: NSObject {
     
@@ -27,6 +27,9 @@ public let EaseChatUIKit_VERSION = "4.6.0"
     
     /// Whether load messages from local database.
     public var loadLocalHistoryMessages = true
+    
+    /// Whether using contact list module.
+    public var enableContact = true
 }
 
 @objcMembers public class EaseChatUIKitClient: NSObject {
@@ -37,9 +40,11 @@ public let EaseChatUIKit_VERSION = "4.6.0"
     public private(set) lazy var userService: UserServiceProtocol? = nil
     
     /// Options function wrapper.
-    public private(set) lazy var option: EaseChatUIKitOptions = EaseChatUIKitOptions()
+    public var option: EaseChatUIKitOptions = EaseChatUIKitOptions()
     
-    /// Initializes the chat room UIKit.
+    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Array<Dictionary<String,Any>>>()) private var newFriends
+    
+    /// Initializes the ease chat UIKit.
     /// - Parameters:
     ///   - option: The unique identifier that Chat assigns to each app.``ChatOptions``
     /// Returns the initialization success or an error that includes the description of the cause of the failure.
@@ -61,6 +66,9 @@ public let EaseChatUIKit_VERSION = "4.6.0"
     ///   - token: The user chat token.
     @objc(loginWithUser:token:completion:)
     public func login(user: EaseProfileProtocol,token: String,completion: @escaping (ChatError?) -> Void) {
+        if EaseChatUIKitClient.shared.option.option_UI.enableContact {
+            ChatClient.shared().contactManager?.add(self, delegateQueue: nil)
+        }
         EaseChatUIKitContext.shared?.currentUser = user
         EaseChatUIKitContext.shared?.chatCache?[user.id] = user
         EaseChatUIKitContext.shared?.userCache?[user.id] = user
@@ -113,3 +121,24 @@ public let EaseChatUIKit_VERSION = "4.6.0"
     }
 }
 
+extension EaseChatUIKitClient: ContactEventsListener {
+    public func friendRequestDidReceive(fromUser aUsername: String, message aMessage: String?) {
+        let requestInfo: [String:Any] = ["userId":aUsername,"timestamp":Date().timeIntervalSince1970*1000,"groupApply":0,"read":0]
+        var exist = self.newFriends[saveIdentifier]
+        if exist == nil {
+            self.newFriends[saveIdentifier] = [requestInfo]
+        } else {
+            if exist?.first(where: { $0["userId"] as? String == aUsername }) == nil {
+                exist?.append(requestInfo)
+                self.newFriends[saveIdentifier] = exist
+            }
+        }
+        if let index = Appearance.contact.listHeaderExtensionActions.firstIndex(where: { $0.featureIdentify == "NewFriendRequest" }) {
+            let item = Appearance.contact.listHeaderExtensionActions[index]
+            item.showBadge = true
+            let unreadCount = self.newFriends[saveIdentifier]?.filter({ $0["read"] as? Int == 0 }).count ?? 0
+            item.numberCount = UInt(unreadCount)
+            Appearance.contact.listHeaderExtensionActions[index].numberCount = UInt(unreadCount)
+        }
+    }
+}
