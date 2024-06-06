@@ -202,7 +202,7 @@ extension ConversationServiceImplement: ConversationService {
                                 }
                             }
                             completion?(CursorResult(list: self?.mapper(objects: list), andCursor: result?.cursor ?? ""),silentError)
-                            self?.fetchAllConversations(completion: nil)
+                            self?.fetchAllConversations(completion: completion)
                         })
                     } else {
                         guard let `self` = self else { return }
