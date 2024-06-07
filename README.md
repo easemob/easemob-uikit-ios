@@ -395,6 +395,8 @@ EaseChatUIKitClient.shared.unregisterUserStateListener(self)
 
 # 自定义
 
+详细的自定义请参见wiki.
+
 ## 1.修改可配置项
 
 下面示例展示如何更改消息内容显示
