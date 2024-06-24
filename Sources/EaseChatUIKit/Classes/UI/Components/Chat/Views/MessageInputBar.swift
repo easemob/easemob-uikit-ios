@@ -16,6 +16,7 @@ import UIKit
     case textKeyboard
     case emojiKeyboard
     case cancelMention
+    case startTyping
 }
 
 @objcMembers open class MessageInputBar: UIView {
@@ -228,6 +229,10 @@ extension MessageInputBar: UITextViewDelegate {
         self.rightView.isSelected = false
     }
     
+    public func textViewDidChange(_ textView: UITextView) {
+        self.actionClosure?(.startTyping,nil)
+    }
+    
     public func textViewDidEndEditing(_ textView: UITextView) {
         if let emojiView = self.emoji {
             self.textViewFirstResponder?(!emojiView.isHidden)
@@ -236,17 +241,17 @@ extension MessageInputBar: UITextViewDelegate {
     
     /// Update subviews height on text input content changed.
     private func updateHeight() {
-        let textHeight = self.inputField.sizeThatFits(CGSize(width: self.inputField.frame.width-12, height: 9999)).height
-        if textHeight > 38 {
+        let textHeight = self.inputField.sizeThatFits(CGSize(width: self.inputField.frame.width, height: Appearance.chat.maxInputHeight)).height
+        if textHeight > 38.5 {
             let increment = textHeight - self.rawTextHeight
             self.rawTextHeight += increment
             self.rawHeight = self.rawTextHeight + 16
             
-            if textHeight > Appearance.chat.maxInputHeight {
-                self.frame = CGRect(x: 0, y: ScreenHeight - NavigationHeight - (Appearance.chat.maxInputHeight+16) - self.keyboardHeight, width: self.frame.width, height: Appearance.chat.maxInputHeight+16)
+            if textHeight >= Appearance.chat.maxInputHeight {
+                self.frame = CGRect(x: 0, y: self.rawFrame.maxY - (Appearance.chat.maxInputHeight) - self.keyboardHeight, width: self.frame.width, height: Appearance.chat.maxInputHeight+16)
                 self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: Appearance.chat.maxInputHeight)
             } else {
-                self.frame = CGRect(x: 0, y: ScreenHeight - NavigationHeight - self.rawHeight - self.keyboardHeight, width: self.frame.width, height: textHeight+16)
+                self.frame = CGRect(x: 0, y: self.rawFrame.maxY - textHeight - self.keyboardHeight, width: self.frame.width, height: textHeight+16)
                 self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: textHeight+4)
             }
             
@@ -260,7 +265,7 @@ extension MessageInputBar: UITextViewDelegate {
             self.audio.frame = CGRect(x: 12, y: self.inputField.frame.maxY-32, width: 30, height: 30)
             self.rightView.frame = CGRect(x: self.frame.width-80, y: self.inputField.frame.maxY-32, width: 30, height: 30)
             self.attachment.frame = CGRect(x: self.frame.width - 42, y: self.inputField.frame.maxY-32, width: 30, height: 30)
-            self.frame = CGRect(x: 0, y: ScreenHeight - NavigationHeight - self.rawFrame.height - self.keyboardHeight, width: self.frame.width, height: self.rawFrame.height)
+            self.frame = CGRect(x: 0, y: self.rawFrame.maxY - 16 - self.keyboardHeight, width: self.frame.width, height: self.rawFrame.height)
         }
     }
     
@@ -332,8 +337,9 @@ extension MessageInputBar: UITextViewDelegate {
         let frame = notification.chat.keyboardEndFrame
         let duration = notification.chat.keyboardAnimationDuration
         self.keyboardHeight = frame!.height
+        let selfWindowFrame = self.convert(self.frame, to: nil)
         UIView.animate(withDuration: duration!) {
-            self.frame = CGRect(x: 0, y: ScreenHeight - NavigationHeight - self.rawFrame.height - frame!.height, width: self.frame.width, height: self.rawFrame.height)
+            self.frame = CGRect(x: 0, y: self.rawFrame.maxY - 16 - frame!.height, width: self.frame.width, height: self.rawFrame.height)
         }
         self.textViewFirstResponder?(true)
         self.updateHeight()
