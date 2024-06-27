@@ -303,9 +303,6 @@ import UIKit
         if Appearance.chat.enablePinMessage,self.chatType != .chat {
             self.chatService?.pinnedMessages(conversationId: self.to, completion: { [weak self]  messages,error in
                 guard let `self` = self else { return }
-                for handler in self.handlers.allObjects {
-                    handler.onMessageAttachmentLoading(loading: false)
-                }
                 if error == nil {
                     EaseChatUIKitContext.shared?.pinnedCache?[self.to] = true
                 } else {
@@ -320,9 +317,6 @@ import UIKit
         let has = EaseChatUIKitContext.shared?.pinnedCache?[self.to] as? Bool ?? false
         if has {
             let messages = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.pinnedMessages() ?? []
-            for handler in self.handlers.allObjects {
-                handler.onMessageAttachmentLoading(loading: false)
-            }
             return messages.map {
                 let entity = PinnedMessageEntity()
                 entity.message = $0
@@ -560,7 +554,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
                     break
                 }
             }
-        } 
+        }
         
     }
     
@@ -816,6 +810,7 @@ extension MessageListViewModel: ChatResponseListener {
         if message == nil {
             EaseChatUIKitContext.shared?.pinnedCache?.removeValue(forKey: conversationId)
         }
+        self.pinDriver?.refresh(entities: self.showPinnedMessages())
     }
     
     public func onMessageDidReceived(message: ChatMessage) {
@@ -891,6 +886,7 @@ extension MessageListViewModel: ChatResponseListener {
                 recall.timestamp = Int64(Date().timeIntervalSince1970*1000)
                 recall.from = recallInfo.recallBy
                 self.driver?.processMessage(operation: .recall, message: recall)
+                self.pinDriver?.refresh(entities: self.showPinnedMessages())
             }
         }
     }
@@ -914,6 +910,7 @@ extension MessageListViewModel: ChatResponseListener {
         }
         if message.conversationId == self.to {
             self.driver?.processMessage(operation: .edit, message: message)
+            self.pinDriver?.refresh(entities: self.showPinnedMessages())
         }
     }
     
