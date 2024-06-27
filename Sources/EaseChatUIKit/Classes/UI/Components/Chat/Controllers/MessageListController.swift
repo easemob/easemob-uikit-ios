@@ -511,6 +511,9 @@ extension MessageListController: MessageListDriverEventsListener {
                 messageActions.removeAll { $0.tag == "Recall" }
             }
         }
+        if self.chatType == .chat {
+            messageActions.removeAll { $0.tag == "Pin" }
+        }
         return messageActions
     }
     

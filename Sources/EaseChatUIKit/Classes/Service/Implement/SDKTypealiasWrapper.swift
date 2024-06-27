@@ -110,7 +110,7 @@ public typealias Contact = AgoraChatContact
 public typealias UserInfoType = AgoraChatUserInfoType
 public typealias GroupChatThreadListener = AgoraChatThreadManagerDelegate
 public typealias GroupChatThreadEvent = AgoraChatThreadEvent
-public typealias GroupChatThread = AgoraChatChatThread
+public typealias GroupChatThread = AgoraChatThread
 public typealias MessagePinOperation = AgoraChatMessagePinOperation
 public typealias MessagePinInfo = AgoraChatMessagePinInfo
 #endif
