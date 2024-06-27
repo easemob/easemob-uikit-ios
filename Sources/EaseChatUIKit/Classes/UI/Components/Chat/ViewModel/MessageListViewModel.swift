@@ -886,9 +886,9 @@ extension MessageListViewModel: ChatResponseListener {
                 recall.timestamp = Int64(Date().timeIntervalSince1970*1000)
                 recall.from = recallInfo.recallBy
                 self.driver?.processMessage(operation: .recall, message: recall)
-                self.pinDriver?.refresh(entities: self.showPinnedMessages())
             }
         }
+        self.pinDriver?.refresh(entities: self.showPinnedMessages())
     }
     
     public func onMessageDidEdited(message: ChatMessage) {
