@@ -904,7 +904,7 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     public func addMentionUserToField(user: EaseProfileProtocol) {
-        let result = NSMutableAttributedString(attributedString: self.inputBar.inputField.textView.attributedText)
+        let result = NSMutableAttributedString(attributedString: self.inputBar.inputField.attributedText)
         let key = NSAttributedString.Key("mentionInfo")
         var nickName = user.remark
         if nickName.isEmpty {
@@ -913,16 +913,16 @@ extension MessageListView: IMessageListViewDriver {
                 nickName = user.id
             }
         }
-        let newString = NSAttributedString(string: "@\(nickName) ", attributes: [.font: self.inputBar.inputField.textView.font!, key: user, .foregroundColor: (Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)])
+        let newString = NSAttributedString(string: "@\(nickName) ", attributes: [.font: self.inputBar.inputField.font!, key: user, .foregroundColor: (Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)])
         if result.length > 0 && result.string.hasSuffix("@") {
             result.deleteCharacters(in: NSRange(location: result.length - 1, length: 1))
         }
         result.append(newString)
-        let old = self.inputBar.inputField.textView.typingAttributes
-        self.inputBar.inputField.attributeText = result
-        self.inputBar.inputField.textView.typingAttributes = old
-        self.inputBar.inputField.textView.selectedRange = NSRange(location: result.length, length: 0)
-        self.inputBar.inputField.textView.becomeFirstResponder()
+        let old = self.inputBar.inputField.typingAttributes
+        self.inputBar.inputField.attributedText = result
+        self.inputBar.inputField.typingAttributes = old
+        self.inputBar.inputField.selectedRange = NSRange(location: result.length, length: 0)
+        self.inputBar.inputField.becomeFirstResponder()
     }
     
     

@@ -7,57 +7,81 @@
 
 import UIKit
 
-
-@objcMembers open class CustomTextView: UIView {
+@objcMembers open class CustomTextView: UITextView {
     
-    public let textView = PlaceHolderTextView()
+    private var placeholderLabel: UILabel
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    open var placeholder: String? {
+        didSet {
+            placeholderLabel.text = placeholder
+        }
+    }
+    
+    open override var text: String! {
+        didSet {
+            textDidChange()
+        }
+    }
+    
+    override init(frame: CGRect, textContainer: NSTextContainer?) {
+        placeholderLabel = UILabel()
+        super.init(frame: frame, textContainer: textContainer)
         commonInit()
     }
     
     required public init?(coder: NSCoder) {
+        placeholderLabel = UILabel()
         super.init(coder: coder)
         commonInit()
     }
     
     private func commonInit() {
-        addSubview(textView)
-        textView.translatesAutoresizingMaskIntoConstraints = false
-//        textView.backgroundColor = .clear
-        // 设置边距
-        let top: CGFloat = 4
-        let left: CGFloat = 8
-        let bottom: CGFloat = 4
-        let right: CGFloat = 8
+        placeholderLabel.textColor = Theme.style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor6
+        placeholderLabel.numberOfLines = 0
+        placeholderLabel.font = self.font
+        placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(placeholderLabel)
         
+        // 设置 textContainerInset 和 lineFragmentPadding
+        self.textContainerInset = UIEdgeInsets(top: 8, left: 7, bottom: 7, right: 8)
+        self.textContainer.lineFragmentPadding = 0
+        
+        // 设置占位符标签的约束
         NSLayoutConstraint.activate([
-            textView.topAnchor.constraint(equalTo: self.topAnchor, constant: top),
-            textView.leftAnchor.constraint(equalTo: self.leftAnchor, constant: left),
-            textView.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -bottom),
-            textView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -right)
+            placeholderLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: textContainerInset.top),
+            placeholderLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: textContainerInset.left),
+            placeholderLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -textContainerInset.right)
         ])
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(textDidChange), name: UITextView.textDidChangeNotification, object: nil)
+        
+        textDidChange()
     }
     
-    @MainActor public var placeholder: String? {
-        get { return textView.placeholder }
-        set { textView.placeholder = newValue ?? "" }
+    @objc private func textDidChange() {
+        placeholderLabel.isHidden = !text.isEmpty
     }
     
-    @MainActor public var text: String? {
-        get { return textView.text }
-        set { textView.text = newValue }
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
-    @MainActor public var attributeText: NSAttributedString? {
-        get { return textView.attributedText }
-        set { textView.attributedText = newValue }
-    }
-    
-    @MainActor public var placeholderColor: UIColor {
-        get { return textView.placeHolderColor }
-        set { textView.placeHolderColor = newValue }
+    open override func layoutSubviews() {
+        super.layoutSubviews()
+        // 更新 placeholderLabel 的 frame
+        let padding = textContainer.lineFragmentPadding
+        let insets = textContainerInset
+        placeholderLabel.frame = CGRect(
+            x: padding + insets.left,
+            y: insets.top,
+            width: frame.width - padding * 2 - insets.left - insets.right,
+            height: placeholderLabel.sizeThatFits(CGSize(width: frame.width - padding * 2 - insets.left - insets.right, height: CGFloat.greatestFiniteMagnitude)).height
+        )
+        
+        // 在高度变化后强制更新光标位置
+        DispatchQueue.main.async {
+            self.scrollRangeToVisible(self.selectedRange)
+        }
     }
 }
 
