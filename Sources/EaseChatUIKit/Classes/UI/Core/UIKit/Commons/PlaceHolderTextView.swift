@@ -13,83 +13,91 @@ import UIKit
  */
 @objcMembers public class PlaceHolderTextView: UITextView {
     
-    public var placeHolder: String = "" {
+    private var placeholderLabel: UILabel
+    
+    @MainActor public var placeHolderColor: UIColor = UIColor.gray {
         didSet {
-            self.setNeedsDisplay()
+            self.placeholderLabel.textColor = self.placeHolderColor
         }
     }
     
-    public var placeHolderColor: UIColor = UIColor.gray {
+    @MainActor public var placeholder: String? {
         didSet {
-            self.setNeedsDisplay()
+            self.placeholderLabel.text = self.placeholder
+        }
+    }
+        
+    @MainActor public override var text: String! {
+        didSet {
+            self.textDidChange()
         }
     }
     
-    override public var font: UIFont?{
-        didSet {
-            self.setNeedsDisplay()
-        }
-    }
-    
-    override public var text: String? {
-        didSet {
-            self.setNeedsDisplay()
-        }
-    }
-    
-    override public var attributedText: NSAttributedString!{
+    @MainActor override public var attributedText: NSAttributedString!{
         didSet{
-            self.setNeedsDisplay()
+            self.placeholderLabel.attributedText = attributedText
         }
     }
+    
+
     
     override init(frame: CGRect, textContainer: NSTextContainer?) {
+        self.placeholderLabel = UILabel()
         super.init(frame: frame, textContainer: textContainer)
-        if self.font == nil {
-            self.font = UIFont.theme.bodyLarge
-        }
-        NotificationCenter.default.addObserver(self, selector: #selector(textDidChanged(noti:)), name: UITextView.textDidChangeNotification, object: self)
+        self.commonInit()
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    required init?(coder: NSCoder) {
+        self.placeholderLabel = UILabel()
+        super.init(coder: coder)
+        self.commonInit()
     }
     
-    @objc fileprivate func textDidChanged(noti: NSNotification)  {
-        self.setNeedsDisplay()
-        //MARK: - this is ignore emoji
-//        let modes = UITextInputMode.activeInputModes.compactMap {
-//            $0.primaryLanguage == "emoji"
-//        }
-//        if modes.count > 0 {
-//            self.text = String(self.text!.removeLast())
-//        }
-    }
-    
-    public override func draw(_ rect: CGRect) {
-        if self.hasText {
-            return
-        }
-        var newRect = rect
-        let size = self.placeHolder.chat.sizeWithText(font: self.font ?? UIFont.theme.bodyLarge, size: rect.size)
-        newRect.size.width = size.width+20
-        newRect.size.height = size.height
-        newRect.origin.x = self.contentInset.left
-        if rect.height < 70 {
-            newRect.origin.y = (rect.height-size.height)/2.0
-        } else {
-            newRect.origin.y = self.contentInset.top
-        }
-        (self.placeHolder as NSString).draw(in: newRect, withAttributes: [.font: self.font ?? UIFont.theme.bodyLarge,.foregroundColor: self.placeHolderColor])
-    }
-    
+    private func commonInit() {
+           placeholderLabel.textColor = .lightGray
+           placeholderLabel.numberOfLines = 0
+           placeholderLabel.font = self.font
+           placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
+           addSubview(placeholderLabel)
+           
+           // 设置 textContainerInset 以确保光标和文本位置正确
+           self.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+           self.textContainer.lineFragmentPadding = 0
+           
+           // 监听文本变化通知
+           NotificationCenter.default.addObserver(self, selector: #selector(textDidChange), name: UITextView.textDidChangeNotification, object: nil)
+           
+           // 设置约束
+           NSLayoutConstraint.activate([
+               placeholderLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: textContainerInset.top),
+               placeholderLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: textContainerInset.left + self.textContainer.lineFragmentPadding),
+               placeholderLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -(textContainerInset.right + self.textContainer.lineFragmentPadding)),
+               placeholderLabel.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: -textContainerInset.bottom)
+           ])
+           
+           textDidChange()
+       }
+       
+       
     public override func layoutSubviews() {
-        super.layoutSubviews()
-        self.setNeedsDisplay()
+           super.layoutSubviews()
+           // 更新 placeholderLabel 的 frame
+           let padding = textContainer.lineFragmentPadding
+           let insets = textContainerInset
+           placeholderLabel.frame = CGRect(
+               x: padding + insets.left,
+               y: insets.top,
+               width: frame.width - padding * 2 - insets.left - insets.right,
+               height: placeholderLabel.sizeThatFits(CGSize(width: frame.width - padding * 2 - insets.left - insets.right, height: CGFloat.greatestFiniteMagnitude)).height
+           )
+       }
+    
+    @objc private func textDidChange() {
+        self.placeholderLabel.isHidden = !self.text.isEmpty
     }
     
     deinit {
-        NotificationCenter.default.removeObserver(self, name: UITextView.textDidChangeNotification, object: self)
+        NotificationCenter.default.removeObserver(self)
     }
     
 }

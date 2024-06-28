@@ -79,8 +79,8 @@ import UIKit
         UIButton(type: .custom).frame(CGRect(x: 12, y: self.inputField.frame.maxY-32, width: 30, height: 30)).backgroundColor(.clear).image(self.audioImage, .normal).addTargetFor(self, action: #selector(audioAction), for: .touchUpInside)
     }()
     
-    public private(set) lazy var inputField: PlaceHolderTextView = {
-        PlaceHolderTextView(frame: CGRect(x: 50, y: 8, width: self.frame.width-142, height: 36)).delegate(self).font(UIFont.theme.bodyLarge).backgroundColor(.clear).backgroundColor(UIColor.theme.neutralColor95).delegate(self)
+    public private(set) lazy var inputField: CustomTextView = {
+        CustomTextView(frame: CGRect(x: 50, y: 8, width: self.frame.width-142, height: 36)).backgroundColor(.clear)
     }()
     
     public private(set) lazy var attachment: UIButton = {
@@ -110,21 +110,26 @@ import UIKit
         self.addSubViews([self.audio,self.inputField, self.rightView,self.attachment,self.line])
         self.rightView.setImage(UIImage(named: "emojiKeyboard", in: Bundle.chatBundle, with: nil)?.withTintColor(UIColor.theme.neutralColor3), for: .normal)
         self.rightView.setImage(UIImage(named: "textKeyboard", in: Bundle.chatBundle, with: nil)?.withTintColor(UIColor.theme.neutralColor3), for: .selected)
-        self.inputField.returnKeyType = .send
-        self.inputField.typingAttributes = self.typingAttributesText
-        self.inputField.contentInsetAdjustmentBehavior = .never
-        self.inputField.cornerRadius(Appearance.chat.inputBarCorner)
-        self.inputField.placeHolder = Appearance.chat.inputPlaceHolder.chat.localize
-        self.inputField.contentInset = UIEdgeInsets(top: 4, left: 6, bottom: 4, right: 6)
-        self.inputField.tintColor = UIColor.theme.primaryColor5
-        self.inputField.placeHolderColor = UIColor.theme.neutralColor6
-        self.inputField.textColor = UIColor.theme.neutralColor1
-        self.inputField.font = UIFont.theme.bodyLarge
+        self.inputField.textView.delegate = self
+        self.inputField.textView.returnKeyType = .send
+        self.inputField.textView.typingAttributes = self.typingAttributesText
+        self.inputField.textView.contentInsetAdjustmentBehavior = .never
+        self.inputField.textView.cornerRadius(Appearance.chat.inputBarCorner)
+        self.inputField.placeholder = Appearance.chat.inputPlaceHolder.chat.localize
+        self.inputField.textView.tintColor = UIColor.theme.primaryColor5
+        self.inputField.placeholderColor = UIColor.theme.neutralColor6
+        self.inputField.textView.textColor = UIColor.theme.neutralColor1
+        self.inputField.textView.font = UIFont.theme.bodyLarge
+        self.inputField.textView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        
+        self.inputField.textView.bounces = false
+        self.inputField.textView.showsVerticalScrollIndicator = false
+        self.inputField.textView.isScrollEnabled = false
         if text != nil {
-            self.inputField.text = text
+            self.inputField.text = text ?? ""
         }
         if placeHolder != nil {
-            self.inputField.placeHolder = placeHolder ?? "Aa"
+            self.inputField.placeholder = placeHolder ?? "Aa"
         }
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIApplication.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIApplication.keyboardWillHideNotification, object: nil)
@@ -241,18 +246,20 @@ extension MessageInputBar: UITextViewDelegate {
     
     /// Update subviews height on text input content changed.
     private func updateHeight() {
-        let textHeight = self.inputField.sizeThatFits(CGSize(width: self.inputField.frame.width, height: Appearance.chat.maxInputHeight)).height
-        if textHeight > 38.5 {
+        let textHeight = self.inputField.textView.sizeThatFits(CGSize(width: self.inputField.frame.width, height: Appearance.chat.maxInputHeight)).height
+        if textHeight > 18 {
             let increment = textHeight - self.rawTextHeight
             self.rawTextHeight += increment
             self.rawHeight = self.rawTextHeight + 16
             
             if textHeight >= Appearance.chat.maxInputHeight {
+                self.inputField.textView.isScrollEnabled = true
                 self.frame = CGRect(x: 0, y: self.rawFrame.maxY - (Appearance.chat.maxInputHeight) - self.keyboardHeight, width: self.frame.width, height: Appearance.chat.maxInputHeight+16)
-                self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: Appearance.chat.maxInputHeight)
+                self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: Appearance.chat.maxInputHeight+8)
             } else {
+                self.inputField.textView.isScrollEnabled = false
                 self.frame = CGRect(x: 0, y: self.rawFrame.maxY - textHeight - self.keyboardHeight, width: self.frame.width, height: textHeight+16)
-                self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: textHeight+4)
+                self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: textHeight+8)
             }
             
             self.audio.frame = CGRect(x: 12, y: self.inputField.frame.maxY-32, width: 30, height: 30)
@@ -261,6 +268,7 @@ extension MessageInputBar: UITextViewDelegate {
             self.emoji?.frame = CGRect(x: 0, y: self.inputField.frame.maxY+8, width: self.frame.width, height: self.keyboardHeight)
             self.emoji?.backgroundColor(self.backgroundColor ?? UIColor.theme.neutralColor98)
         } else {
+            self.inputField.textView.isScrollEnabled = false
             self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: 36)
             self.audio.frame = CGRect(x: 12, y: self.inputField.frame.maxY-32, width: 30, height: 30)
             self.rightView.frame = CGRect(x: self.frame.width-80, y: self.inputField.frame.maxY-32, width: 30, height: 30)
@@ -274,11 +282,11 @@ extension MessageInputBar: UITextViewDelegate {
      */
     @objc func sendMessage() {
         self.rightView.isSelected = false
-        if !self.inputField.attributedText.toString().isEmpty {
-            self.actionClosure?(.send,self.inputField.attributedText)
+        if !(self.inputField.attributeText?.toString() ?? "").isEmpty {
+            self.actionClosure?(.send,self.inputField.attributeText)
         }
         self.inputField.text = nil
-        self.inputField.attributedText = nil
+        self.inputField.attributeText = nil
         self.frame = self.rawFrame
         self.hiddenInputBar()
         self.frame = CGRect(x: 0, y: self.rawFrame.minY, width: self.frame.width, height: self.rawFrame.height)
@@ -318,28 +326,28 @@ extension MessageInputBar: UITextViewDelegate {
         self.rightView.isSelected = !self.rightView.isSelected
         self.actionClosure?(self.rightView.isSelected ? .emojiKeyboard:.textKeyboard,nil)
         if self.rightView.isSelected {
-            if !self.inputField.isFirstResponder {
-                self.inputField.becomeFirstResponder()
+            if !self.inputField.textView.isFirstResponder {
+                self.inputField.textView.becomeFirstResponder()
             }
             self.rightView.isSelected = true
-            self.inputField.resignFirstResponder()
+            self.inputField.textView.resignFirstResponder()
             self.showEmojiKeyboard()
         } else {
-            self.inputField.becomeFirstResponder()
+            self.inputField.textView.becomeFirstResponder()
         }
         self.textViewFirstResponder?(true)
     }
     
     @objc private func keyboardWillShow(notification: Notification) {
-        if !self.inputField.isFirstResponder {
+        if !self.inputField.textView.isFirstResponder {
             return
         }
         let frame = notification.chat.keyboardEndFrame
         let duration = notification.chat.keyboardAnimationDuration
         self.keyboardHeight = frame!.height
-        let selfWindowFrame = self.convert(self.frame, to: nil)
+        let axisY = self.rawFrame.maxY - 16 - frame!.height
         UIView.animate(withDuration: duration!) {
-            self.frame = CGRect(x: 0, y: self.rawFrame.maxY - 16 - frame!.height, width: self.frame.width, height: self.rawFrame.height)
+            self.frame = CGRect(x: 0, y: axisY, width: self.frame.width, height: self.rawFrame.height)
         }
         self.textViewFirstResponder?(true)
         self.updateHeight()
@@ -375,12 +383,12 @@ extension MessageInputBar: UITextViewDelegate {
                 guard let self = self else { return }
                 self.emoji?.deleteEmoji.isEnabled = true
                 self.emoji?.deleteEmoji.isUserInteractionEnabled = true
-                self.inputField.attributedText = self.convertText(text: self.inputField.attributedText, key: $0)
+                self.inputField.textView.attributedText = self.convertText(text: self.inputField.textView.attributedText, key: $0)
                 self.updateHeight()
             }
             self.emoji?.deleteClosure = { [weak self] in
                 if self?.inputField.text?.count ?? 0 > 0 {
-                    self?.inputField.deleteBackward()
+                    self?.inputField.textView.deleteBackward()
                     self?.emoji?.deleteEmoji.isEnabled = true
                     self?.emoji?.deleteEmoji.isUserInteractionEnabled = true
                 } else {
@@ -399,7 +407,7 @@ extension MessageInputBar: UITextViewDelegate {
     }
     
     @objc public func hiddenInputBar() {
-        self.inputField.resignFirstResponder()
+        self.inputField.textView.resignFirstResponder()
         UIView.animate(withDuration: self.hiddenDuration) {
             self.frame = CGRect(x: 0, y: self.rawFrame.minY, width: self.frame.width, height: self.rawFrame.height)
         }
@@ -410,7 +418,7 @@ extension MessageInputBar: UITextViewDelegate {
     
     /// Raise input bar
     @objc public func show() {
-        self.inputField.becomeFirstResponder()
+        self.inputField.textView.becomeFirstResponder()
     }
     
     /// Hidden input bar
@@ -435,9 +443,9 @@ extension MessageInputBar: UITextViewDelegate {
         attachment.bounds = CGRect(x: 0, y: -3.5, width: 18, height: 18)
         let imageText = NSMutableAttributedString(attachment: attachment)
         if #available(iOS 11.0, *) {
-            if self.inputField.selectedRange.location != NSNotFound,self.inputField.selectedRange.length != NSNotFound {
+            if self.inputField.textView.selectedRange.location != NSNotFound,self.inputField.textView.selectedRange.length != NSNotFound {
                 imageText.addAttributes([.accessibilityTextCustom: key], range: NSMakeRange(0, imageText.length))
-                attribute.replaceCharacters(in: self.inputField.selectedRange, with: imageText)
+                attribute.replaceCharacters(in: self.inputField.textView.selectedRange, with: imageText)
                 
             } else {
                 imageText.addAttributes([.accessibilityTextCustom: key], range: NSMakeRange(0, imageText.length))
@@ -450,8 +458,9 @@ extension MessageInputBar: UITextViewDelegate {
     }
     
     public func dismissKeyboard() {
-        self.inputField.resignFirstResponder()
+        self.inputField.textView.resignFirstResponder()
     }
+    
 }
 
 extension MessageInputBar: ThemeSwitchProtocol {
@@ -468,8 +477,8 @@ extension MessageInputBar: ThemeSwitchProtocol {
         self.viewWithTag(124)?.backgroundColor(style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98)
         self.inputField.backgroundColor(style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95)
         self.inputField.tintColor = style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
-        self.inputField.placeHolderColor = style == .dark ? UIColor.theme.neutralColor4:UIColor.theme.neutralColor6
-        self.inputField.textColor = style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
+        self.inputField.placeholderColor = style == .dark ? UIColor.theme.neutralColor4:UIColor.theme.neutralColor6
+        self.inputField.textView.textColor = style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
         self.emoji?.backgroundColor(style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98)
         self.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
         self.line.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
