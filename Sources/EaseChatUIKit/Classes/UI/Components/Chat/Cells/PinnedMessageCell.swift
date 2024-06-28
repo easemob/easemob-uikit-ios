@@ -51,6 +51,8 @@ import UIKit
         self.contentView.addSubview(self.container)
         self.container.addSubViews([self.pinTitle,self.pinTime,self.pinContent,self.remove,self.confirmRemove])
         self.remove.contentHorizontalAlignment = .right
+        self.remove.setHitTestEdgeInsets(UIEdgeInsets(top: -5, left: -10, bottom: 5, right:10))
+        self.confirmRemove.setHitTestEdgeInsets(UIEdgeInsets(top: -5, left: -10, bottom: 5, right:10))
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
     }

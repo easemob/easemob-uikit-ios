@@ -289,10 +289,8 @@ extension MessageInputBar: UITextViewDelegate {
         }
         self.inputField.text = nil
         self.inputField.attributedText = nil
-        self.frame = self.rawFrame
-        self.hiddenInputBar()
-        self.frame = CGRect(x: 0, y: self.rawFrame.minY, width: self.frame.width, height: self.rawFrame.height)
-        self.recoverInputState()
+        self.updateHeight()
+        self.inputField.isScrollEnabled = false
     }
     
     @objc func attachmentAction() {

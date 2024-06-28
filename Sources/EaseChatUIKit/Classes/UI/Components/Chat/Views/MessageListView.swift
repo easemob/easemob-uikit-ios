@@ -878,7 +878,7 @@ extension MessageListView: IMessageListViewDriver {
                 if self.showType == .normal {
                     let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
                     if lastIndexPath.row >= 0 {
-                        self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
+                        self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: false)
                     }
                 }
             }

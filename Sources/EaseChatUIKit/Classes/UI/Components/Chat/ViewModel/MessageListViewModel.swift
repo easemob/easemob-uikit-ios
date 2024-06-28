@@ -797,7 +797,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
 
 extension MessageListViewModel: ChatResponseListener {
     public func onCMDMessageDidReceived(message: ChatMessage) {
-        if let body = message.body as? ChatCMDMessageBody,body.action == "TypingBegin",message.conversationId == self.to,self.chatType == .chat {
+        if let body = message.body as? ChatCMDMessageBody,body.action == "TypingBegin",message.conversationId == self.to,message.from != EaseChatUIKitContext.shared?.currentUserId ?? "",self.chatType == .chat {
             for handler in self.handlers.allObjects {
                 handler.onOtherPartyTypingText?()
             }
