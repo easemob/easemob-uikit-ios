@@ -24,8 +24,10 @@ public var limitBubbleWidth = CGFloat(ScreenWidth*(3/5.0))
 /// Custom message `default` size exclude Alert&Contact.
 public var extraCustomSize = CGSize(width: limitBubbleWidth, height: 36)
 
+/// Image bubble limited height.
 public let limitImageHeight = CGFloat((300/844)*ScreenHeight)
 
+/// Image bubble limited width.
 public let limitImageWidth = CGFloat((225/390)*ScreenWidth)
 
 public let translationKey = "EaseChatUIKit_force_show_translation"
@@ -35,8 +37,6 @@ public let topicHeight = CGFloat(58)
 public let reactionHeight = CGFloat(30)
 
 public let reactionMaxWidth = Appearance.chat.contentStyle.contains(.withAvatar) ? ScreenWidth-48*2:40
-
-public let callMessage = "rtcCallWithAgora"
 
 public let urlPreviewImageHeight = CGFloat(137)
 
@@ -72,7 +72,7 @@ public let urlPreviewImageHeight = CGFloat(137)
     public var previewURL = ""
     
     /// URL preview result state.
-    public var previewResult = URLPreviewResult.parsing 
+    public var previewResult = URLPreviewResult.parsing
     
     public var previewFinished: ((MessageEntity) -> Void)?
     
@@ -284,8 +284,9 @@ public let urlPreviewImageHeight = CGFloat(137)
         let label = UILabel().numberOfLines(0).lineBreakMode(.byWordWrapping)
         let textAttribute = self.convertTextAttribute()
         label.attributedText = textAttribute
-        var width = label.sizeThatFits(CGSize(width: self.historyMessage ? ScreenWidth-68:limitBubbleWidth-24, height: 9999)).width+(self.historyMessage ? 68:24)
-        let textHeight = label.sizeThatFits(CGSize(width: limitBubbleWidth-24, height: 9999)).height
+        let size = label.sizeThatFits(CGSize(width: self.historyMessage ? ScreenWidth-68:limitBubbleWidth-24, height: 9999))
+        var width = size.width+(self.historyMessage ? 68:24)
+        let textHeight = size.height
         if textAttribute?.string.count ?? 0 <= 1,self.message.body.type == .text {
             width += 8
         }
@@ -480,22 +481,27 @@ public let urlPreviewImageHeight = CGFloat(137)
         var text = NSMutableAttributedString()
         if self.message.messageId.isEmpty {
             return NSMutableAttributedString {
-                AttributedText("No Messages".chat.localize).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.labelSmall).lineHeight(multiple: 0.98, minimum: 18)
+                AttributedText("No Messages".chat.localize).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.labelSmall).lineHeight(multiple: 1.15, minimum: 18)
             }
         }
         var textColor = self.message.direction == .send ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor
+        if self.message.direction == .send {
+            textColor = Theme.style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
+        } else {
+            textColor = Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
+        }
         if self.historyMessage {
             textColor = Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
         }
         if self.message.body.type != .text, self.message.body.type != .custom {
             text.append(NSAttributedString {
-                AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(multiple: 0.98, minimum: 18).lineBreakMode(.byWordWrapping)
+                AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(multiple: 1.15, minimum: self.historyMessage ? 18:16).lineBreakMode(.byWordWrapping)
             })
             return text
         }
         if self.historyMessage,self.message.body.type == .custom {
             text.append(NSAttributedString {
-                AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineBreakMode(.byWordWrapping).lineHeight(multiple: 0.98, minimum: 18)
+                AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineBreakMode(.byWordWrapping).lineHeight(multiple: 1.15, minimum: self.historyMessage ? 18:16)
             })
             return text
         }
@@ -506,15 +512,15 @@ public let urlPreviewImageHeight = CGFloat(137)
                     if let threadName = self.message.ext?["threadName"] as? String {
                         let range = something.chat.rangeOfString(threadName)
                         text.append(NSAttributedString {
-                            AttributedText(something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall).lineHeight(multiple: 0.98, minimum: 14).alignment(.center)
+                            AttributedText(something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall).lineHeight(multiple: 1.15, minimum: 14).alignment(.center)
                         })
                         text.addAttribute(NSAttributedString.Key.foregroundColor, value: Theme.style == .dark ? Color.theme.primaryColor6:Color.theme.primaryColor5, range: range)
                     } else {
                         text.append(NSMutableAttributedString {
-                            AttributedText(self.message.user?.nickname ?? self.message.from).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.labelSmall).lineHeight(multiple: 0.98, minimum: 14).alignment(.center)
+                            AttributedText(self.message.user?.nickname ?? self.message.from).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.labelSmall).lineHeight(multiple: 1.15, minimum: 14).alignment(.center)
                         })
                         text.append(NSAttributedString {
-                            AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall).lineHeight(multiple: 0.98, minimum: 14).alignment(.center)
+                            AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall).lineHeight(multiple: 1.15, minimum: 14).alignment(.center)
                         })
                     }
                     
@@ -522,7 +528,7 @@ public let urlPreviewImageHeight = CGFloat(137)
                 
             default:
                 text.append(NSAttributedString {
-                    AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(multiple: 0.98, minimum: self.historyMessage ? 16:18).lineBreakMode(.byWordWrapping)
+                    AttributedText(self.message.showType+self.message.showContent).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(multiple: 1.15, minimum: self.historyMessage ? 16:18).lineBreakMode(.byWordWrapping)
                 })
                 break
             }
@@ -535,7 +541,7 @@ public let urlPreviewImageHeight = CGFloat(137)
             }
             if self.message.mention.isEmpty {
                 text.append(NSAttributedString {
-                    AttributedText(result).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(multiple: 0.98, minimum: self.historyMessage ? 16:18).lineBreakMode(.byWordWrapping)
+                    AttributedText(result).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(multiple: 1.15, minimum: self.historyMessage ? 16:18).lineBreakMode(.byWordWrapping)
                 })
             } else {
                 if self.message.mention == EaseChatUIKitContext.shared?.currentUserId ?? "" {
@@ -552,7 +558,7 @@ public let urlPreviewImageHeight = CGFloat(137)
                     let mentionRange = content.lowercased().chat.rangeOfString(nickname ?? "")
                     let range = NSMakeRange(mentionRange.location-1, mentionRange.length+1)
                     let mentionAttribute = NSMutableAttributedString {
-                        AttributedText(content).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(multiple: 0.98, minimum: self.historyMessage ? 16:18).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byWordWrapping)
+                        AttributedText(content).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(multiple: 1.15, minimum: self.historyMessage ? 16:18).lineBreakMode(Appearance.chat.targetLanguage == .Chinese ? .byCharWrapping:.byWordWrapping)
                     }
                     if mentionRange.location != NSNotFound,mentionRange.length != NSNotFound {
                         mentionAttribute.addAttribute(.foregroundColor, value: (Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5), range: range)
@@ -564,7 +570,7 @@ public let urlPreviewImageHeight = CGFloat(137)
                     let mentionRange = content.lowercased().chat.rangeOfString(self.message.mention.lowercased())
                     let range = NSMakeRange(mentionRange.location-1, mentionRange.length+1)
                     let mentionAttribute = NSMutableAttributedString {
-                        AttributedText(content).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(multiple: 0.98, minimum: self.historyMessage ? 16:18).lineBreakMode(.byWordWrapping)
+                        AttributedText(content).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(multiple: 1.15, minimum: self.historyMessage ? 16:18).lineBreakMode(.byWordWrapping)
                     }
                     if mentionRange.location != NSNotFound,mentionRange.length != NSNotFound {
                         mentionAttribute.addAttribute(.foregroundColor, value: (Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5), range: range)
@@ -608,7 +614,7 @@ public let urlPreviewImageHeight = CGFloat(137)
 //                    let urlString = url.absoluteString
 //                    let nsText = text.string as NSString
 //                    let range = nsText.range(of: urlString, options: .caseInsensitive)
-//                    
+//
 //                    if range.length > 0 {
 //                        let receiveLinkColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
 //                        text.addAttributes([.link:url,.underlineStyle:NSUnderlineStyle.single,.underlineColor:receiveLinkColor], range: range)
@@ -694,7 +700,7 @@ public let urlPreviewImageHeight = CGFloat(137)
                     text.addAttribute(.foregroundColor, value: self.message.direction == .send ? Appearance.chat.sendTranslationColor:Appearance.chat.receiveTranslationColor, range: range)
                     let paragraphStyle = NSMutableParagraphStyle()
                     paragraphStyle.lineBreakMode = .byWordWrapping
-//                    paragraphStyle.lineHeightMultiple = 0.98
+//                    paragraphStyle.lineHeightMultiple = 1.15
                     text.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
                 }
             }

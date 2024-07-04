@@ -85,7 +85,7 @@ import UIKit
         default:
             break
         }
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil, userInfo: nil)
+        NotificationCenter.default.post(name: Notification.Name(rawValue: cache_update_notification), object: nil, userInfo: nil)
     }
     
     public func updateCaches(type: EaseChatUIKitCacheType,profiles: [EaseProfileProtocol]) {
@@ -105,6 +105,6 @@ import UIKit
         default:
             break
         }
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil, userInfo: nil)
+        NotificationCenter.default.post(name: Notification.Name(rawValue: cache_update_notification), object: nil, userInfo: nil)
     }
 }

@@ -57,7 +57,7 @@ import UIKit
         self.nickname.frame = CGRect(x: self.avatar.frame.maxX+10, y: self.avatar.frame.minY, width: self.contentView.frame.width-self.avatar.frame.maxX-10-132, height: 20)
         self.messageDate.frame =  CGRect(x: self.contentView.frame.width-132, y: 10, width: 120, height: 16)
         self.separatorLine.frame = CGRect(x: self.nickname.frame.minX, y: self.contentView.frame.height - 0.5, width: self.contentView.frame.width, height: 0.5)
-        
+        self.content.frame = CGRect(x: self.nickname.frame.minX, y: self.nickname.frame.maxY, width: ScreenWidth-self.avatar.frame.maxX-10-16, height: self.frame.height - self.nickname.frame.maxY)
     }
     
     @objc open func refresh(entity: MessageEntity) {
@@ -107,9 +107,11 @@ import UIKit
                 }
             }
         default:
-            self.content.frame = CGRect(x: self.nickname.frame.minX, y: self.nickname.frame.maxY, width: ScreenWidth-self.avatar.frame.maxX-10-16, height: 20)
+            let textHeight = entity.textSize().height
+            self.content.frame = CGRect(x: self.nickname.frame.minX, y: self.nickname.frame.maxY, width: ScreenWidth-self.avatar.frame.maxX-10-16, height: textHeight)
             self.play.isHidden = true
             if let container = self.content as? UILabel {
+                container.numberOfLines = 0
                 container.attributedText = entity.content
             }
         }
@@ -126,7 +128,7 @@ extension ChatHistoryCell: ThemeSwitchProtocol {
         self.nickname.textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
         self.separatorLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
         self.messageDate.textColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor7
-        if let container = self.content as? ImageView {
+        if self.content is ImageView {
             self.content.backgroundColor(style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9)
         }
     }

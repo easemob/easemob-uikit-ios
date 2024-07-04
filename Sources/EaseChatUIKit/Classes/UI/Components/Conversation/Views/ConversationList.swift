@@ -117,12 +117,16 @@ extension ConversationList: UITableViewDelegate,UITableViewDataSource {
                 Appearance.conversation.swipeLeftActions[index] = .mute
             }
         }
-        return UISwipeActionsConfiguration(actions: self.actions(leading: false,info: info,indexPath: indexPath))
+        let configuration = UISwipeActionsConfiguration(actions: self.actions(leading: false,info: info,indexPath: indexPath))
+        configuration.performsFirstActionWithFullSwipe = false
+        return configuration
     }
 
     public func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let info = self.datas[safe: indexPath.row] else { return nil }
-        return UISwipeActionsConfiguration(actions: self.actions(leading: true,info: info,indexPath: indexPath))
+        let configuration = UISwipeActionsConfiguration(actions: self.actions(leading: true,info: info,indexPath: indexPath))
+        configuration.performsFirstActionWithFullSwipe = false
+        return configuration
     }
     
     private func actions(leading: Bool,info: ConversationInfo,indexPath: IndexPath) -> [UIContextualActionChatUIKit] {
@@ -287,7 +291,9 @@ extension ConversationList: IConversationListDriver {
         if let index = self.datas.firstIndex(where: { $0.id == info.id }) {
             self.datas[safe: index]?.unreadCount = 0
             if self.indexPathsForVisibleRows?.contains(where: { $0.row == index }) ?? false {
+                self.beginUpdates()
                 self.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+                self.endUpdates()
             }
         }
     }
@@ -305,7 +311,9 @@ extension ConversationList: IConversationListDriver {
         if let index = self.datas.firstIndex(where: { $0.id == info.id }) {
             self.datas[safe: index]?.doNotDisturb = true
             if self.indexPathsForVisibleRows?.contains(where: { $0.row == index }) ?? false {
+                self.beginUpdates()
                 self.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+                self.endUpdates()
             }
         }
     }
@@ -314,14 +322,18 @@ extension ConversationList: IConversationListDriver {
         if let index = self.datas.firstIndex(where: { $0.id == info.id }) {
             self.datas[safe: index]?.doNotDisturb = false
             if self.indexPathsForVisibleRows?.contains(where: { $0.row == index }) ?? false {
+                self.beginUpdates()
                 self.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+                self.endUpdates()
             }
         }
     }
     
     private func delete(info: ConversationInfo) {
         if let index = self.datas.firstIndex(where: { $0.id == info.id }) {
+            self.beginUpdates()
             self.deleteRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.endUpdates()
             self.datas.remove(at: index)
             self.updateIndexMap()
         }

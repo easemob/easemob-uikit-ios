@@ -43,6 +43,7 @@ import UIKit
     
     @MainActor
     @objc public func refresh(entity: MessageEntity) {
+        self.cornerRadius(Appearance.chat.imageMessageCorner)
         guard let message = entity.message.quoteMessage else {
             self.replyIcon.isHidden = true
             self.replyUser.isHidden = true

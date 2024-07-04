@@ -36,11 +36,11 @@ import UIKit
     
     @UserDefault("EaseChatUIKit_contact_block_list_exist", defaultValue: Dictionary<String,Bool>()) public private(set) var blockListExist
     
-    public private(set) lazy var datas: [DetailInfo] = {
+    public lazy var datas: [DetailInfo] = {
         self.dataSource()
     }()
     
-    /// Can override 
+    /// Can override
     /// - Returns: Array<DetailInfo> instance.
     @objc open func dataSource() -> [DetailInfo] {
         (Appearance.contact.enableBlock ? [
@@ -532,6 +532,7 @@ extension ContactInfoViewController: UITableViewDelegate,UITableViewDataSource {
             switch name {
             case "contact_details_switch_donotdisturb".chat.localize:
                 self.operateDisturb(isOn: isOn,name: name)
+                self.datas[indexPath.row].switchValue = isOn
             case "contact_details_switch_block".chat.localize:
                 self.operateBlock(isOn: isOn, name: name)
             default:
@@ -572,13 +573,10 @@ extension ContactInfoViewController: UITableViewDelegate,UITableViewDataSource {
             if nickname.isEmpty {
                 nickname = self.profile.id
             }
-            let alert = AlertView().background(color: Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor98).title(title: "block contact".chat.localize).content(content: "block alert".chat.localize+"'\(nickname)'?").contentTextAlignment(textAlignment: .center).cornerRadius(Appearance.alertStyle == .small ? .extraSmall:.medium).contentColor(color: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).titleColor(color: Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1).leftButton(color: Theme.style == .dark ? UIColor.theme.neutralColor95:UIColor.theme.neutralColor3).leftButtonBorder(color: Theme.style == .dark ? UIColor.theme.neutralColor4:UIColor.theme.neutralColor7).leftButton(title: "report_button_click_menu_button_cancel".chat.localize).leftButtonRadius(cornerRadius: Appearance.alertStyle == .small ? .extraSmall:.large).rightButtonBackground(color: Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).rightButton(color: UIColor.theme.neutralColor98).rightButtonTapClosure { [weak self] _ in
+            DialogManager.shared.showAlert(title: "block contact".chat.localize, content: "block alert".chat.localize+"'\(nickname)'?", showCancel: true, showConfirm: true) { [weak self] _ in
                 self?.blockRequest(isOn: isOn)
-            }.rightButton(title: "Confirm".chat.localize).rightButtonRadius(cornerRadius: Appearance.alertStyle == .small ? .extraSmall:.large)
-            let alertVC = AlertViewController(custom: alert,size: CGSize(width: ScreenWidth-40, height: 300), customPosition: false)
-            let vc = UIViewController.currentController
-            if vc != nil {
-                vc?.presentViewController(alertVC)
+            } cancelClosure: { [weak self] in
+                self?.menuList.reloadData()
             }
         } else {
             self.blockRequest(isOn: isOn)
@@ -614,7 +612,7 @@ extension ContactInfoViewController: UITableViewDelegate,UITableViewDataSource {
             self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""] = [self.profile.id:isOn ? 1:0]
         }
         if name == "contact_details_switch_donotdisturb".chat.localize {
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseUIKit_do_not_disturb_changed"), object: nil,userInfo: ["id":self.profile.id,"value":isOn])
+            NotificationCenter.default.post(name: Notification.Name(rawValue: disturb_change), object: nil,userInfo: ["id":self.profile.id,"value":isOn])
         }
     }
 }

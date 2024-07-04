@@ -26,7 +26,7 @@ import UIKit
         self.ignoreContacts = ignoreIds
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(addFriendRefreshList), name: Notification.Name("New Friend Chat"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(loadAllContacts), name: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(loadAllContacts), name: Notification.Name(rawValue: cache_update_notification), object: nil)
     }
     
     public private(set) weak var driver: IContactListDriver?

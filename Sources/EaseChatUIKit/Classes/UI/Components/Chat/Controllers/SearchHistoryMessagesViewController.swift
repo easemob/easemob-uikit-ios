@@ -78,9 +78,13 @@ import UIKit
         self.tableView.keyboardDismissMode = .onDrag
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
-        self.searchController.searchBar.becomeFirstResponder()
     }
     
+    open override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        self.searchController.searchBar.becomeFirstResponder()
+    }
     
 
     // MARK: - Table view data source
@@ -107,13 +111,14 @@ import UIKit
         }
         if let item = self.searchResults[safe: indexPath.row] {
             
-            var conversation = EaseChatUIKitContext.shared?.chatCache?[item.from]
+            let conversation = EaseChatUIKitContext.shared?.chatCache?[item.from]
             if EaseChatUIKitContext.shared?.userCache?[item.from] != nil {
                 conversation?.remark = EaseChatUIKitContext.shared?.userCache?[item.from]?.remark ?? ""
             }
             let info = ConversationInfo()
             info.id = item.from
             info.nickname = conversation?.nickname ?? ""
+            info.avatarURL = conversation?.avatarURL ?? ""
             info.remark = conversation?.remark ?? ""
             cell?.refresh(message: item,info: info,keyword: self.searchKeyWord)
         }
@@ -125,7 +130,7 @@ import UIKit
     open override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         self.view.endEditing(true)
-//        self.searchController.isActive = false
+        self.searchController.isActive = false
         if let item = self.searchResults[safe: indexPath.row] {
             let vc = SearchResultMessagesController(conversationId: item.conversationId, chatType: item.chatType == .chat ? .chat:.group, searchMessageId: item.messageId)
             self.navigationController?.pushViewController(vc, animated: true)

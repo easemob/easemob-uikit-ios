@@ -82,22 +82,24 @@ import UIKit
     ///   - showTextField: Whether to display the `TextField` .
     ///   - placeHolder: `TextField` placeholder.
     ///   - confirmClosure: Callback upon a click of the `Confirm` button.When text field was shown callback contain input text.
-    @objc public func showAlert(title: String,content: String,showCancel: Bool,showConfirm: Bool,showTextFiled: Bool = false,placeHolder: String = "",confirmClosure: @escaping (String) -> Void) {
-        let size = showTextFiled ? Appearance.alertContainerConstraintsSize:CGSize(width: ScreenWidth-40, height: 300)
+    @objc public func showAlert(title: String,content: String,showCancel: Bool,showConfirm: Bool,showTextFiled: Bool = false,placeHolder: String = "",confirmClosure: @escaping (String) -> Void,cancelClosure: (()->Void)? = nil) {
         let alert = AlertView().background(color: Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor98).title(title: title).content(content: content.isEmpty ? nil:content).contentTextAlignment(textAlignment: .center).cornerRadius(Appearance.alertStyle == .small ? .extraSmall:.medium).contentColor(color: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).titleColor(color: Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
         if showTextFiled {
             alert.textField(font: UIFont.theme.bodyLarge).textField(color: Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1).textFieldPlaceholder(color: Theme.style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor6).textFieldPlaceholder(placeholder: placeHolder).textFieldRadius(cornerRadius: Appearance.alertStyle == .small ? .extraSmall:.medium).textFieldBackground(color: Theme.style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor95)
             alert.textField.becomeFirstResponder()
         }
         if showCancel {
-            alert.leftButton(color: Theme.style == .dark ? UIColor.theme.neutralColor95:UIColor.theme.neutralColor3).leftButtonBorder(color: Theme.style == .dark ? UIColor.theme.neutralColor4:UIColor.theme.neutralColor7).leftButton(title: "report_button_click_menu_button_cancel".chat.localize).leftButtonRadius(cornerRadius: Appearance.alertStyle == .small ? .extraSmall:.large)
+            alert.leftButton(color: Theme.style == .dark ? UIColor.theme.neutralColor95:UIColor.theme.neutralColor3).leftButtonBorder(color: Theme.style == .dark ? UIColor.theme.neutralColor4:UIColor.theme.neutralColor7).leftButton(title: "report_button_click_menu_button_cancel".chat.localize).leftButtonRadius(cornerRadius: Appearance.alertStyle == .small ? .extraSmall:.large).leftButtonTapClosure {
+                cancelClosure?()
+            }
         }
         if showConfirm {
             alert.rightButtonBackground(color: Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).rightButton(color: UIColor.theme.neutralColor98).rightButtonTapClosure {
                 confirmClosure($0 ?? "")
             }.rightButton(title: "Confirm".chat.localize).rightButtonRadius(cornerRadius: Appearance.alertStyle == .small ? .extraSmall:.large)
         }
-        let alertVC = AlertViewController(custom: alert,size: size, customPosition: showTextFiled)
+        alert.layoutIfNeeded()
+        let alertVC = AlertViewController(custom: alert,size: alert.frame.size, customPosition: showTextFiled)
         let vc = UIViewController.currentController
         if vc != nil {
             vc?.presentViewController(alertVC)

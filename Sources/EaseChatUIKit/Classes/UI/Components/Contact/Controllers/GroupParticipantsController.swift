@@ -99,7 +99,7 @@ import UIKit
         
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
-        NotificationCenter.default.addObserver(self, selector: #selector(refreshList), name: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshList), name: Notification.Name(rawValue: cache_update_notification), object: nil)
     }
     
     open override func viewWillAppear(_ animated: Bool) {

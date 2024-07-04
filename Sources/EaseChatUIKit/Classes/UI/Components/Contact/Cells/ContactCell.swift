@@ -39,7 +39,7 @@ import UIKit
         UIView(frame: CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5))
     }
     
-    public private(set) var display = ContactDisplayStyle.normal
+    public var display = ContactDisplayStyle.normal
     
     @objc public required init(displayStyle: ContactDisplayStyle,identifier: String?) {
         super.init(style: .default, reuseIdentifier: identifier)
@@ -69,6 +69,7 @@ import UIKit
         if self.display == .withCheckBox,let item = profile as? EaseProfile {
             self.checkbox.image = UIImage(named: item.selected ? "select":"unselect", in: .chatBundle, with: nil)
         }
+        self.checkbox.isHidden = self.display != .withCheckBox
     }
     
     @objc public func refresh(profile: EaseProfileProtocol,keyword: String) {
@@ -84,6 +85,7 @@ import UIKit
         if self.display == .withCheckBox,let item = profile as? EaseProfile {
             self.checkbox.image = UIImage(named: item.selected ? "select":"unselect", in: .chatBundle, with: nil)
         }
+        self.checkbox.isHidden = self.display != .withCheckBox
     }
     
     @objc public func highlightKeywords(keyword: String, in string: String) -> NSAttributedString {

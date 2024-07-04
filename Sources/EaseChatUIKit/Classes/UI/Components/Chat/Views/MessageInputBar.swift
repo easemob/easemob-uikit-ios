@@ -83,10 +83,6 @@ import UIKit
         PlaceHolderTextView(frame: CGRect(x: 50, y: 8, width: self.frame.width-142, height: 36)).delegate(self).font(UIFont.theme.bodyLarge).backgroundColor(.clear).backgroundColor(UIColor.theme.neutralColor95)
     }()
     
-    let leftSpace = UIView(frame: CGRect(x: 8, y: 0, width: 8, height: 36)).backgroundColor(.clear)
-    
-    let rightSpace = UIView(frame: CGRect(x: 8, y: 0, width: 8, height: 36)).backgroundColor(.clear)
-    
     public private(set) lazy var attachment: UIButton = {
         UIButton(type: .custom).frame(CGRect(x: self.frame.width - 42, y: self.inputField.frame.maxY-32, width: 30, height: 30)).backgroundColor(.clear).image(self.attachmentImage, .normal).addTargetFor(self, action: #selector(attachmentAction), for: .touchUpInside)
     }()
@@ -119,13 +115,15 @@ import UIKit
         self.inputField.contentInsetAdjustmentBehavior = .never
         self.inputField.cornerRadius(Appearance.chat.inputBarCorner)
         self.inputField.placeHolder = Appearance.chat.inputPlaceHolder.chat.localize
-        self.inputField.contentInset = UIEdgeInsets(top: 4, left: 6, bottom: 4, right: 6)
+        self.inputField.contentInset = UIEdgeInsets(top: 4, left: Appearance.chat.inputBarCorner == .large ? 10:6, bottom: 4, right: 6)
         self.inputField.tintColor = UIColor.theme.primaryColor5
         self.inputField.placeHolderColor = UIColor.theme.neutralColor6
         self.inputField.textColor = UIColor.theme.neutralColor1
         self.inputField.font = UIFont.theme.bodyLarge
-        self.inputField.isScrollEnabled = false
         self.inputField.bounces = false
+        self.inputField.isScrollEnabled = false
+        self.inputField.layoutManager.allowsNonContiguousLayout = false
+        self.inputField.adjustsFontForContentSizeCategory = true
         if text != nil {
             self.inputField.text = text
         }
@@ -237,7 +235,6 @@ extension MessageInputBar: UITextViewDelegate {
     
     public func textViewDidChange(_ textView: UITextView) {
         self.actionClosure?(.startTyping,nil)
-        textView.scrollRangeToVisible(textView.selectedRange)
     }
     
     public func textViewDidEndEditing(_ textView: UITextView) {
@@ -250,17 +247,16 @@ extension MessageInputBar: UITextViewDelegate {
     private func updateHeight() {
         let textHeight = self.inputField.sizeThatFits(CGSize(width: self.inputField.frame.width, height: Appearance.chat.maxInputHeight)).height
         if textHeight > 38.5 {
+            self.inputField.isScrollEnabled = true
             let increment = textHeight - self.rawTextHeight
             self.rawTextHeight += increment
             self.rawHeight = self.rawTextHeight + 16
             
             if textHeight >= Appearance.chat.maxInputHeight {
-                self.inputField.isScrollEnabled = true
-                self.frame = CGRect(x: 0, y: self.rawFrame.maxY - (Appearance.chat.maxInputHeight) - self.keyboardHeight, width: self.frame.width, height: Appearance.chat.maxInputHeight+16)
+                self.frame = CGRect(x: 0, y: self.rawFrame.maxY - (Appearance.chat.maxInputHeight) - self.keyboardHeight - (NavigationHeight <= 64 ? 36:0), width: self.frame.width, height: Appearance.chat.maxInputHeight+16)
                 self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: Appearance.chat.maxInputHeight)
             } else {
-                self.inputField.isScrollEnabled = false
-                self.frame = CGRect(x: 0, y: self.rawFrame.maxY - textHeight - self.keyboardHeight, width: self.frame.width, height: textHeight+16)
+                self.frame = CGRect(x: 0, y: self.rawFrame.maxY - textHeight - self.keyboardHeight - (NavigationHeight <= 64 ? 36:0), width: self.frame.width, height: textHeight+16)
                 self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: textHeight+4)
             }
             
@@ -275,7 +271,7 @@ extension MessageInputBar: UITextViewDelegate {
             self.audio.frame = CGRect(x: 12, y: self.inputField.frame.maxY-32, width: 30, height: 30)
             self.rightView.frame = CGRect(x: self.frame.width-80, y: self.inputField.frame.maxY-32, width: 30, height: 30)
             self.attachment.frame = CGRect(x: self.frame.width - 42, y: self.inputField.frame.maxY-32, width: 30, height: 30)
-            self.frame = CGRect(x: 0, y: self.rawFrame.maxY - 16 - self.keyboardHeight, width: self.frame.width, height: self.rawFrame.height)
+            self.frame = CGRect(x: 0, y: self.rawFrame.maxY - 16 - self.keyboardHeight - (NavigationHeight <= 64 ? 36:0), width: self.frame.width, height: self.rawFrame.height)
         }
     }
     
@@ -347,19 +343,21 @@ extension MessageInputBar: UITextViewDelegate {
         self.keyboardHeight = frame!.height
         let selfWindowFrame = self.convert(self.frame, to: nil)
         UIView.animate(withDuration: duration!) {
-            self.frame = CGRect(x: 0, y: self.rawFrame.maxY - 16 - frame!.height, width: self.frame.width, height: self.rawFrame.height)
+            self.frame = CGRect(x: 0, y: self.rawFrame.maxY - 16 - frame!.height - (NavigationHeight <= 64 ? 36:0), width: self.frame.width, height: self.rawFrame.height)
         }
         self.textViewFirstResponder?(true)
         self.updateHeight()
     }
     
     @objc private func keyboardWillHide(notification: Notification) {
-        let frame = notification.chat.keyboardEndFrame
-        let duration = notification.chat.keyboardAnimationDuration
-        self.hiddenDuration = duration ?? 0
-        self.keyboardHeight = frame!.height
-        self.showEmojiKeyboard()
-        self.textViewFirstResponder?(true)
+        if notification.object is MessageInputBar {
+            let frame = notification.chat.keyboardEndFrame
+            let duration = notification.chat.keyboardAnimationDuration
+            self.hiddenDuration = duration ?? 0
+            self.keyboardHeight = frame!.height
+            self.showEmojiKeyboard()
+            self.textViewFirstResponder?(true)
+        }
     }
     
     @objc open func showEmojiKeyboard() {

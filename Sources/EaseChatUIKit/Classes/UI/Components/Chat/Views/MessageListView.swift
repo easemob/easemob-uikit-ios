@@ -155,12 +155,17 @@ import UIKit
     /// - Parameter finished: Bool
     func updateThreadLoadMessagesFinished(finished: Bool)
     
+    /// Update state on chat thread load messages finished.
     func endRefreshing()
     
+    /// Stop audio messages play.
     func stopAudioMessagesPlay()
     
+    /// Update message on message list.
     func readAllMessages()
     
+    /// Highlight message on message list.
+    /// - Parameter message: ``ChatMessage``
     func highlightMessage(message: ChatMessage)
 }
 
@@ -331,8 +336,13 @@ import UIKit
             UIView.animate(withDuration: 0.22) {
                 let oldFrame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-52)
                 if firstResponder {
-                    if self.inputBar.keyboardHeight >= 216 {
-                        self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.messageList.frame.height-self.inputBar.keyboardHeight)
+                    if self.inputBar.keyboardHeight >= 216,self.messageList.frame.height >= oldFrame.height {
+                        if self.getLastVisibleCellCoordinate().maxY > self.inputBar.frame.height+self.inputBar.keyboardHeight {
+                            self.messageList.frame = CGRect(x: 0, y: 0-self.inputBar.keyboardHeight, width: self.messageList.frame.width, height: self.messageList.frame.height)
+                        } else {
+                            self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.messageList.frame.height-self.inputBar.keyboardHeight)
+                        }
+                        
                         let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
                         if lastIndexPath.row >= 0 {
                             self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
@@ -362,9 +372,19 @@ import UIKit
             }
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil, queue: .main) {  [weak self] notification in
+        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: cache_update_notification), object: nil, queue: .main) {  [weak self] notification in
             self?.messageList.reloadData()
         }
+    }
+    
+    func getLastVisibleCellCoordinate() -> CGRect {
+        guard let visibleIndexPaths = self.messageList.indexPathsForVisibleRows else { return .zero }
+        if let lastIndexPath = visibleIndexPaths.last {
+            let cellRect = self.messageList.rectForRow(at: lastIndexPath)
+            let cellCoordinate = self.messageList.convert(cellRect.origin, to: self.messageList)
+            return CGRect(origin: cellCoordinate, size: cellRect.size)
+        }
+        return .zero
     }
     
     required public init?(coder: NSCoder) {
@@ -491,7 +511,6 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
             self.messageList.beginUpdates()
             self.messageList.reloadRows(at: [IndexPath(row: idx, section: 0)], with: .automatic)
             self.messageList.endUpdates()
-            self.messageList.scrollToRow(at: IndexPath(row: idx, section: 0), at: .bottom, animated: false)
         }
     }
     
@@ -723,7 +742,9 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
 extension MessageListView: IMessageListViewDriver {
     public func readAllMessages() {
         self.messages.forEach { $0.state = .read }
+        self.messageList.beginUpdates()
         self.messageList.reloadRows(at: self.messageList.indexPathsForVisibleRows ?? [], with: .automatic)
+        self.messageList.endUpdates()
     }
     
     public func highlightMessage(message: ChatMessage) {
@@ -757,7 +778,9 @@ extension MessageListView: IMessageListViewDriver {
             }
         }
         if indexPaths.count > 0 {
+            self.messageList.beginUpdates()
             self.messageList.reloadRows(at: indexPaths, with: .automatic)
+            self.messageList.endUpdates()
         }
     }
     
@@ -791,7 +814,9 @@ extension MessageListView: IMessageListViewDriver {
                     if let reactions = message.reactionList {
                         if (reactions.count == 1 && reactions.count > entity.visibleReactionToIndex) || reactions.count <= 0 {
                             self.messages.replaceSubrange(index...index, with: [entity])
+                            self.messageList.beginUpdates()
                             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+                            self.messageList.endUpdates()
                         } else {
                             if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
                                 if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }){
@@ -899,7 +924,9 @@ extension MessageListView: IMessageListViewDriver {
     public func updateMessageAttachmentStatus(message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages[index].state = self.convertStatus(message: message)
+            self.messageList.beginUpdates()
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.messageList.endUpdates()
         }
     }
     
@@ -930,12 +957,17 @@ extension MessageListView: IMessageListViewDriver {
         if let index = self.messages.firstIndex(where: { $0.message.localTime == message.localTime }) {
             self.messages[safe: index]?.message = message
             self.messages[safe: index]?.state = status
-            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            if let cell = self.messageList.cellForRow(at: IndexPath(row: index, section: 0)) as? MessageCell {
+                cell.updateMessageStatus(entity: self.messages[index])
+            }
         }
     }
     
     private func convertMessage(message: ChatMessage) -> MessageEntity {
         let entity = ComponentsRegister.shared.MessageRenderEntity.init()
+        if message.status == .pending {
+            message.status = .succeed
+        }
         entity.state = self.convertStatus(message: message)
         entity.message = message
         _ = entity.replyTitle
@@ -1049,6 +1081,7 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     public func processMessage(operation: MessageOperation,message: ChatMessage) {
+        self.inputBar.hiddenInput()
         self.replyBar.isHidden = true
         if message.direction == .send {
             self.replyId = ""
@@ -1135,7 +1168,9 @@ extension MessageListView: IMessageListViewDriver {
     private func deleteAction(_ message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages.remove(at: index)
+            self.messageList.beginUpdates()
             self.messageList.deleteRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.messageList.endUpdates()
         }
         var indexPaths = [IndexPath]()
         for (index,entity) in self.messages.enumerated() {

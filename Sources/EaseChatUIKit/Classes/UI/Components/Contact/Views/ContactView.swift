@@ -170,10 +170,12 @@ extension ContactView: UITableViewDelegate,UITableViewDataSource {
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ContactsCell.self, reuseIdentifier: "EaseUIKit_ContactsCell")
+        let style:ContactDisplayStyle = (self.headerStyle == .newGroup || self.headerStyle == .addGroupParticipant) ? .withCheckBox:.normal
         if cell == nil {
-            cell = ComponentsRegister.shared.ContactsCell.init(displayStyle: (self.headerStyle == .newGroup || self.headerStyle == .addGroupParticipant) ? .withCheckBox:.normal,identifier: "EaseUIKit_ContactsCell")
+            cell = ComponentsRegister.shared.ContactsCell.init(displayStyle: style,identifier: "EaseUIKit_ContactsCell")
         }
         if let item = self.contacts[safe:indexPath.section]?[safe: indexPath.row] {
+            cell?.display = style
             cell?.refresh(profile: item)
         }
         cell?.backgroundColor = .clear
@@ -310,7 +312,6 @@ extension ContactView: IContactListDriver {
             if let profile = self.rawData.first(where: { $0.id == info.id }) {
                 profile.nickname =  info.nickname.isEmpty ? info.id:info.nickname
                 profile.avatarURL = info.avatarURL
-                profile.selected = info.selected
                 profile.remark = info.remark
             }
         }
@@ -372,6 +373,7 @@ struct ContactSorter {
             }
             profile.nickname = showName
             profile.avatarURL = contact.avatarURL
+            profile.selected = contact.selected
             userInfos.append(profile)
         }
         userInfos.sort {
@@ -385,6 +387,7 @@ struct ContactSorter {
                     contact.nickname = contactMap[contact.id]?.nickname ?? ""
                     contact.avatarURL = user.avatarURL
                     contact.remark = contactMap[contact.id]?.remark ?? ""
+                    contact.selected = user.selected
                     result[sectionIndex].append(contact)
                 } else {
                     let contact = EaseProfile()
@@ -392,6 +395,7 @@ struct ContactSorter {
                     contact.nickname = contactMap[contact.id]?.nickname ?? ""
                     contact.avatarURL = user.avatarURL
                     contact.remark = contactMap[contact.id]?.remark ?? ""
+                    contact.selected = user.selected
                     result[sectionTitles.count-1].append(contact)
                 }
             }

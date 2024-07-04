@@ -2,6 +2,8 @@ import Foundation
 
 public let EaseChatUIKit_VERSION = "4.7.0"
 
+public let cache_update_notification = "EaseChatUIKitContextUpdateCache"
+
 @objcMembers public class EaseChatUIKitOptions: NSObject {
     
     /// The option of UI components.

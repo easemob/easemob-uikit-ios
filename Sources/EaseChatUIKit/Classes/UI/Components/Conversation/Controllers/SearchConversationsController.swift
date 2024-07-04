@@ -101,9 +101,13 @@ import UIKit
                 self?.pop()
             }
         }
-        self.searchHeader.searchField.becomeFirstResponder()
+        
     }
     
+    open override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.searchHeader.searchField.becomeFirstResponder()
+    }
 
 }
 

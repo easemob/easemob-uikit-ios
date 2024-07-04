@@ -60,6 +60,11 @@ import UIKit
         self.limitCount.text = "\(self.raw.count)/\(self.textLimit())"
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
+        
+    }
+    
+    open override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         self.contentEditor.becomeFirstResponder()
     }
     
