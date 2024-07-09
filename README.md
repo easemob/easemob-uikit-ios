@@ -403,7 +403,7 @@ EaseChatUIKitClient.shared.unregisterUserStateListener(self)
 ```Swift
         // 可以通过增减显示内容数组中的项，改变消息样式某一部分的显示隐藏。
         Appearance.chat.contentStyle = [.withReply,.withAvatar,.withNickName,.withDateAndTime]
-        // 创建ChatroomView，传入布局参数、底部工具栏扩展按钮模型协议数组等参数。
+
         let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: <#在Console中创建用户的id#>, chatType: .chat)
         vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
