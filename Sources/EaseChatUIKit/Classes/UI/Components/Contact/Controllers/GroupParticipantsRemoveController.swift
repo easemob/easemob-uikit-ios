@@ -31,6 +31,7 @@ import UIKit
     
     @objc required public init(group: ChatGroup,profiles: [EaseProfileProtocol],removeClosure: @escaping ([String]) -> Void) {
         self.chatGroup = group
+        profiles.forEach { $0.selected = false }
         self.participants = profiles
         self.deleteClosure = removeClosure
         super.init(nibName: nil, bundle: nil)

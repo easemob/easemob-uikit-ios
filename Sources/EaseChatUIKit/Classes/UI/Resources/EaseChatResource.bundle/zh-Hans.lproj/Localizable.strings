@@ -81,7 +81,7 @@
 "Groups" = "群聊";
 "NewRequest" = "新请求";
 
-"contactID" = "联系人ID";
+"contactID" = "通过手机号或ID添加联系人";
 
 "new_chat_button_click_menu_addcontacts" = "添加联系人";
 "new_chat_button_click_menu_creategroup" = "创建群组";

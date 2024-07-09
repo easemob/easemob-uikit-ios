@@ -48,6 +48,10 @@ import UIKit
     @objc open func createSeparatorLine() -> UIView {
         UIView(frame: CGRect(x: 16, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-16, height: 0.5))
     }
+    
+    lazy var indicator: UIImageView = {
+        UIImageView(frame: CGRect(x: self.frame.width-37, y: 0, width: 20, height: 20)).contentMode(.scaleAspectFill).backgroundColor(.clear)
+    }()
         
     public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -58,6 +62,7 @@ import UIKit
         self.textLabel?.textColor = UIColor.theme.neutralColor1
         self.contentView.addSubview(self.badge)
         self.contentView.addSubview(self.separatorLine)
+        self.contentView.addSubview(self.indicator)
 //        self.accessoryView = self.badge
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
@@ -66,6 +71,7 @@ import UIKit
     open override func layoutSubviews() {
         super.layoutSubviews()
         self.separatorLine.frame = CGRect(x: 16, y: self.contentView.frame.height-0.5, width: self.frame.width, height: 0.5)
+        self.indicator.frame = CGRect(x: self.frame.width-28, y: (self.frame.height-20)/2.0, width: 10, height: 20)
     }
     
     /// Refresh cell on needed.
@@ -103,8 +109,9 @@ extension ContactListHeaderCell: ThemeSwitchProtocol {
     @objc open func switchTheme(style: ThemeStyle) {
         self.badge.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
         self.textLabel?.textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
-        self.accessoryView?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor3
-        self.accessoryView?.subviews.first?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor3
+        
+        let image = UIImage(named: "chevron_right", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor3)
+        self.indicator.image = image
         
         self.separatorLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
     }

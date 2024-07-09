@@ -145,4 +145,11 @@ extension EaseChatUIKitClient: ContactEventsListener {
             Appearance.contact.listHeaderExtensionActions[index].numberCount = UInt(unreadCount)
         }
     }
+    
+    public func friendRequestDidApprove(byUser aUsername: String) {
+        let conversation = ChatClient.shared().chatManager?.getConversation(aUsername, type: .chat, createIfNotExist: true)
+        let ext = ["something":("You have added".chat.localize+" "+aUsername+" "+"to say hello".chat.localize)]
+        let message = ChatMessage(conversationID: aUsername, body: ChatCustomMessageBody(event: EaseChatUIKit_alert_message, customExt: nil), ext: ext)
+        conversation?.insert(message, error: nil)
+    }
 }

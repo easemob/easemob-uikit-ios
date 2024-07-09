@@ -22,15 +22,15 @@ import Combine
  */
 
 /// An Image loader
-struct ImageLoader {
-    static let shared = ImageLoader()
+public struct ImageLoader {
+    public static let shared = ImageLoader()
     private let cache = ImageCacheManager.shared
     
     /// Load image from url.
     /// - Parameter url: image url
     /// - Returns: An
     /// - How to user? See above the ImageLoader.
-    func loadImage(from url: URL) -> AnyPublisher<UIImage?, Never> {
+    public func loadImage(from url: URL) -> AnyPublisher<UIImage?, Never> {
         if let cachedImage = cache.image(for: url.absoluteString) {
             return Just(cachedImage).eraseToAnyPublisher()
         } else {

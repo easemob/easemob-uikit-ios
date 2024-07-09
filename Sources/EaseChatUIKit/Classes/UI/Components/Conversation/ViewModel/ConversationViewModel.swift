@@ -418,9 +418,18 @@ extension ConversationViewModel: ConversationServiceListener {
     
     
     public func onChatConversationListDidChanged(list: [ConversationInfo]) {
-        self.driver?.refreshList(infos: list)
-        if list.count < 10 {
-            self.requestDisplayProfiles(ids: list.map({ $0.id }))
+        if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
+            let items = self.mapper(objects: infos)
+            var count = UInt(0)
+            for item in items where item.doNotDisturb == false {
+                count += item.unreadCount
+            }
+            self.service?.notifyUnreadCount(count: count)
+            self.driver?.refreshList(infos: items)
+            
+            if infos.count < 10 {
+                self.requestDisplayProfiles(ids: list.map({ $0.id }))
+            }
         }
     }
     

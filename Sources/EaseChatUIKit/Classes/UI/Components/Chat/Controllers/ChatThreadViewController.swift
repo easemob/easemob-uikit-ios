@@ -496,10 +496,13 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
     @objc open func editAction(message: ChatMessage) {
         if let body = message.body as? ChatTextMessageBody {
             let editor = MessageEditor(content: body.text) { text in
-                self.viewModel.processMessage(operation: .edit, message: message, edit: text)
+                if !text.isEmpty {
+                    self.viewModel.processMessage(operation: .edit, message: message, edit: text)
+                }
                 UIViewController.currentController?.dismiss(animated: true)
             }
-            DialogManager.shared.showCustomDialog(customView: editor)
+            DialogManager.shared.showCustomDialog(customView: editor,dismiss: false)
+            editor.editor.textView.becomeFirstResponder()
         }
     }
     

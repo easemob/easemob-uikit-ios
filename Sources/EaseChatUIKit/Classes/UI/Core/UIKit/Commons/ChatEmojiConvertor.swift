@@ -18,15 +18,15 @@ import Foundation
 
     @objc public static let shared = ChatEmojiConvertor()
 
-    @objc var emojiMap: Dictionary<String,UIImage> = [:]
+    @objc public var emojiMap: Dictionary<String,UIImage> = [:]
     
-    @objc var emojiReactionMap: Dictionary<String,UIImage> = [:]
+    @objc public var emojiReactionMap: Dictionary<String,UIImage> = [:]
 
-    @objc var reactions = [String]()
+    @objc public var reactions = [String]()
 
-    @objc let emojis: [String] = ["😀", "😄", "😉", "😮", "🤪", "😎", "🥱", "🥴", "☺️", "🙁", "😭", "😐", "😇", "😬", "🤓", "😳", "🥳", "😠", "🙄", "🤐", "🥺", "🤨", "😫", "😷", "🤒", "😱", "😘", "😍", "🤢", "👿", "🤬", "😡", "👍", "👎", "👏", "🙌", "🤝", "🙏", "❤️", "💔", "💕", "💩", "💋", "☀️", "🌜", "🌈", "⭐", "🌟", "🎉", "💐", "🎂", "🎁"]
+    @objc public let emojis: [String] = ["😀", "😄", "😉", "😮", "🤪", "😎", "🥱", "🥴", "☺️", "🙁", "😭", "😐", "😇", "😬", "🤓", "😳", "🥳", "😠", "🙄", "🤐", "🥺", "🤨", "😫", "😷", "🤒", "😱", "😘", "😍", "🤢", "👿", "🤬", "😡", "👍", "👎", "👏", "🙌", "🤝", "🙏", "❤️", "💔", "💕", "💩", "💋", "☀️", "🌜", "🌈", "⭐", "🌟", "🎉", "💐", "🎂", "🎁"]
     
-    @objc let oldEmojis: [String:String] = [
+    @objc public let oldEmojis: [String:String] = [
         "[):]": "☺️",
         "[:D]": "😄",
         "[;)]": "😉",
@@ -80,7 +80,7 @@ import Foundation
         "[:-]": "🙄"
     ]
     
-    @objc let reactionEmojis: [String:String] = [
+    @objc public let reactionEmojis: [String:String] = [
         "emoji_1":"😀",
         "emoji_2":"😟",
         "emoji_3":"😍",

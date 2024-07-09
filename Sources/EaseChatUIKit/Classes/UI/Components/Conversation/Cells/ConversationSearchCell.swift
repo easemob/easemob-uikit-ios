@@ -45,8 +45,18 @@ import UIKit
     }
     
     func refresh(info: ConversationInfo,keyword: String) {
-        let nickName = info.nickname.isEmpty ? info.id:info.nickname
-        self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: nickName)
+        var showName = EaseChatUIKitContext.shared?.userCache?[info.id]?.remark ?? ""
+        if showName.isEmpty {
+            if info.type == .chat {
+                showName = EaseChatUIKitContext.shared?.userCache?[info.id]?.nickname ?? ""
+            } else {
+                showName = EaseChatUIKitContext.shared?.groupCache?[info.id]?.nickname ?? ""
+            }
+        }
+        if showName.isEmpty {
+            showName = info.id
+        }
+        self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: showName)
         self.avatar.image(with: info.avatarURL, placeHolder: info.type == .chat ? Appearance.conversation.singlePlaceHolder:Appearance.conversation.groupPlaceHolder)
         self.separatorLine.backgroundColor = Theme.style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor9
     

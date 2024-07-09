@@ -39,13 +39,17 @@ import UIKit
     public private(set) lazy var separatorLine: UIView = {
         UIView(frame: CGRect(x: 16, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-16, height: 0.5))
     }()
+    
+    lazy var indicator: UIImageView = {
+        UIImageView(frame: CGRect(x: self.frame.width-37, y: 0, width: 20, height: 20)).contentMode(.scaleAspectFill).backgroundColor(.clear)
+    }()
 
 
     public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.contentView.backgroundColor = .clear
         self.backgroundColor = .clear
-        self.contentView.addSubViews([self.titleLabel,self.detailLabel,self.switchMenu,separatorLine])
+        self.contentView.addSubViews([self.titleLabel,self.detailLabel,self.switchMenu,separatorLine,self.indicator])
         self.switchMenu.addTarget(self, action: #selector(valueSwitch), for: .valueChanged)
         self.switchMenu.isHidden = true
         Theme.registerSwitchThemeViews(view: self)
@@ -62,14 +66,15 @@ import UIKit
         self.detailLabel.frame = CGRect(x: self.frame.width/2.0, y: 16, width: (self.frame.width/2.0-36), height: 22)
         self.switchMenu.frame = CGRect(x: self.frame.width-62, y: (self.contentView.frame.height-30)/2.0, width: 50, height: 30)
         self.separatorLine.frame = CGRect(x: 16, y: self.contentView.frame.height-0.5, width: self.frame.width, height: 0.5)
+        self.indicator.frame = CGRect(x: self.frame.width-28, y: (self.frame.height-20)/2.0, width: 10, height: 20)
     }
     
     @objc public func refresh(info: DetailInfo) {
         self.switchMenu.isHidden = !info.withSwitch
-        self.accessoryType = !info.withSwitch ? .disclosureIndicator:.none
         self.titleLabel.text = info.title
         self.detailLabel.text = info.detail
-        if self.accessoryType == .disclosureIndicator {
+        self.indicator.isHidden = info.withSwitch
+        if !info.withSwitch {
             self.detailLabel.frame = CGRect(x: self.frame.width/2.0, y: 16, width: (self.frame.width/2.0-36), height: 22)
         } else {
             self.detailLabel.frame = CGRect(x: self.frame.width-116, y: 16, width: 100, height: 22)
@@ -89,8 +94,10 @@ extension DetailInfoListCell: ThemeSwitchProtocol {
         self.titleLabel.textColor = style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
         self.detailLabel.textColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5
         self.switchMenu.onTintColor = style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
-        self.accessoryView?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor3
-        self.accessoryView?.subviews.first?.tintColor = style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor3
+        
+        let image = UIImage(named: "chevron_right", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor3)
+        self.indicator.image = image
+        
         
         self.separatorLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
     }

@@ -423,10 +423,10 @@ let message_bubble_space = CGFloat(1)
     
     
     @objc func updateMessageStatus(entity: MessageEntity) {
+        self.status.image = entity.stateImage
         if entity.state != .sending {
             self.status.layer.removeAllAnimations()
             self.status.stopAnimating()
-            self.status.image = entity.stateImage
         } else {
             self.addRotation()
         }

@@ -75,7 +75,7 @@
 "NewRequest" = "New Request";
 "Joined Groups" = "Groups";
 "Create" = "Create";
-"contactID" = "Contact ID";
+"contactID" = "Add contacts by phone number or ID.";
 "add_group_members" = "Add Participants";
 "group_delete_members_alert" = "Are you sure to delete the";
 "group members" = "group participants";

@@ -58,32 +58,32 @@ import UIKit
     @objc open func refresh(profile: EaseProfileProtocol) {
         self.avatar.cornerRadius(Appearance.avatarRadius)
         self.avatar.image(with: profile.avatarURL, placeHolder: Appearance.avatarPlaceHolder)
-        var nickName = profile.id
-        if !profile.nickname.isEmpty {
-            nickName = profile.nickname
+        var showName = EaseChatUIKitContext.shared?.userCache?[profile.id]?.remark ?? ""
+        if showName.isEmpty {
+            showName = EaseChatUIKitContext.shared?.userCache?[profile.id]?.nickname ?? ""
         }
-        if !profile.remark.isEmpty {
-            nickName = profile.remark
+        if showName.isEmpty {
+            showName = profile.id
         }
-        self.nickName.text = nickName
-        if self.display == .withCheckBox,let item = profile as? EaseProfile {
-            self.checkbox.image = UIImage(named: item.selected ? "select":"unselect", in: .chatBundle, with: nil)
+        self.nickName.text = showName
+        if self.display == .withCheckBox {
+            self.checkbox.image = UIImage(named: profile.selected ? "select":"unselect", in: .chatBundle, with: nil)
         }
         self.checkbox.isHidden = self.display != .withCheckBox
     }
     
     @objc public func refresh(profile: EaseProfileProtocol,keyword: String) {
-        var nickName = profile.id
-        if !profile.nickname.isEmpty {
-            nickName = profile.nickname
+        var showName = EaseChatUIKitContext.shared?.userCache?[profile.id]?.remark ?? ""
+        if showName.isEmpty {
+            showName = EaseChatUIKitContext.shared?.userCache?[profile.id]?.nickname ?? ""
         }
-        if !profile.remark.isEmpty {
-            nickName = profile.remark
+        if showName.isEmpty {
+            showName = profile.id
         }
-        self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: nickName)
+        self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: showName)
         self.avatar.image(with: profile.avatarURL, placeHolder: Appearance.conversation.singlePlaceHolder)
-        if self.display == .withCheckBox,let item = profile as? EaseProfile {
-            self.checkbox.image = UIImage(named: item.selected ? "select":"unselect", in: .chatBundle, with: nil)
+        if self.display == .withCheckBox {
+            self.checkbox.image = UIImage(named: profile.selected ? "select":"unselect", in: .chatBundle, with: nil)
         }
         self.checkbox.isHidden = self.display != .withCheckBox
     }

@@ -32,7 +32,7 @@ import UIKit
         self.init()
         
         if customPosition {
-            self.presentedViewComponent = PresentedViewComponent(contentSize: size,destination: .custom(center: CGPoint(x: ScreenWidth/2.0, y: ScreenHeight/2.0-size.height/4.0)))
+            self.presentedViewComponent = PresentedViewComponent(contentSize: size,destination: .custom(center: CGPoint(x: ScreenWidth/2.0, y: ScreenHeight/2.0-size.height/3.0)),keyboardPadding: 20)
         } else {
             self.presentedViewComponent = PresentedViewComponent(contentSize: size,destination: .center)
         }
