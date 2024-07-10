@@ -56,8 +56,12 @@ import UIKit
         if showName.isEmpty {
             showName = info.id
         }
+        var avatarURL = info.avatarURL
+        if avatarURL.isEmpty {
+            avatarURL = EaseChatUIKitContext.shared?.userCache?[info.id]?.avatarURL ?? ""
+        }
         self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: showName)
-        self.avatar.image(with: info.avatarURL, placeHolder: info.type == .chat ? Appearance.conversation.singlePlaceHolder:Appearance.conversation.groupPlaceHolder)
+        self.avatar.image(with: avatarURL, placeHolder: info.type == .chat ? Appearance.conversation.singlePlaceHolder:Appearance.conversation.groupPlaceHolder)
         self.separatorLine.backgroundColor = Theme.style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor9
     
     }

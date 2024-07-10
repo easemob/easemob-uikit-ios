@@ -355,16 +355,20 @@ import UIKit
      */
     @objc open func disband() {
         DialogManager.shared.showAlert(title: "group_details_extend_button_disband_alert_title".chat.localize, content: "group_details_extend_button_disband_alert_subtitle".chat.localize, showCancel: true, showConfirm: true) { [weak self] _ in
-            self?.service.disband(groupId: self?.chatGroup.groupId ?? "") { error in
-                if error == nil {
-                    NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_leaveGroup"), object: self?.chatGroup.groupId ?? "")
-                    self?.pop()
-                } else {
-                    consoleLogInfo("disband error:\(error?.errorDescription ?? "")", type: .error)
-                }
-            }
+            self?.disbandRequest()
         }
         
+    }
+    
+    @objc open func disbandRequest() {
+        self.service.disband(groupId: self.chatGroup.groupId) { error in
+            if error == nil {
+                NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_leaveGroup"), object: self.chatGroup.groupId)
+                self.pop()
+            } else {
+                consoleLogInfo("disband error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        }
     }
     
     /**

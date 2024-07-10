@@ -138,6 +138,7 @@ import AVFoundation
             nickname = self.profile.id
         }
         self.navigation.title = nickname
+        self.navigation.avatarURL = info.avatarURL
     }
     
     open override func viewWillDisappear(_ animated: Bool) {

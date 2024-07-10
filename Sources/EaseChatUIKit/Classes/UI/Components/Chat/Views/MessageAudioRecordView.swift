@@ -125,6 +125,7 @@ import UIKit
                     self.stopPlay(send: false)
                 }
             }
+            self.recordIcon.isEnabled = true
         }
 
         if let timer = self.timer {
@@ -134,6 +135,7 @@ import UIKit
     
     @objc private func buttonAction() {
         self.recordIcon.isSelected = !self.recordIcon.isSelected
+        self.recordIcon.isEnabled = false
         if self.duration > 0 {
             if self.recordIcon.isSelected {
                 self.startPlay()
@@ -164,25 +166,30 @@ import UIKit
     
     private func accessPassRecord() {
         self.recordCount = 0
+        self.timer?.invalidate()
+        self.timer = nil
         self.buildTimer()
         self.recordTitle.text = "Recording".chat.localize
         AudioTools.shared.startRecording()
         self.recordIcon.setImage(nil, for: .normal)
-        self.recordIcon.setTitle("0s", for: .normal)
+        self.recordIcon.setTitle("1s", for: .normal)
     }
     
     private func stopRecord() {
+        self.recordIcon.isEnabled = true
         self.recordAlert.text = nil
         self.trash.isHidden = false
         self.send.isHidden = false
         self.duration = self.recordCount
         self.recordCount = 0
         self.timer?.invalidate()
+        self.timer = nil
         self.recordTitle.text = "Play".chat.localize
         AudioTools.shared.stopRecording()
     }
     
     private func startPlay() {
+        self.recordIcon.isEnabled = true
         self.playCount = self.duration
         self.recordTitle.text = "Playing".chat.localize
         self.buildTimer()
@@ -197,18 +204,22 @@ import UIKit
         self.playCount = self.duration
         self.recordTitle.text = "Play".chat.localize
         self.timer?.invalidate()
+        self.timer = nil
         AudioTools.shared.stopPlaying()
         self.recordIcon.stopAnimation()
+        self.recordIcon.isEnabled = true
     }
     
     @objc private func removeRecord() {
         self.recordAlert.text = nil
-        AudioTools.shared.stopPlaying()
+        self.stopRecord()
+        self.stopPlay(send: false)
         self.recordIcon.stopAnimation()
         self.recordTitle.text = "Record".chat.localize
         self.duration = 0
         self.recordCount = 0
         self.playCount = 0
+        self.recordIcon.isEnabled = true
         self.recordIcon.setTitle(nil, for: .normal)
         self.recordIcon.setImage(self.icon, for: .normal)
         self.trash.isHidden = true
@@ -295,6 +306,7 @@ extension MessageAudioRecordView: ThemeSwitchProtocol {
     @objc func stopAnimation() {
         self.borderColor = .clear
         self.timer?.invalidate()
+        self.timer = nil
     }
 
     @objc private func handleTimer() {
