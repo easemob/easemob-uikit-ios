@@ -106,16 +106,16 @@ public let cache_update_notification = "EaseChatUIKitContextUpdateCache"
         Theme.unregisterSwitchThemeViews()
     }
     
-    /// Updates user information that is used for login with the `login(with user: UserInfoProtocol,token: String,use userProperties: Bool = true,completion: @escaping (ChatError?) -> Void)` method.
-    /// - Parameters:
-    ///   - info: An instance that conforms to ``EaseProfileProtocol``.
-    ///   - completion: Callback.
-    @objc(updateWithUserInfo:completion:)
-    public func updateUserInfo(info: EaseProfileProtocol,completion: @escaping (ChatError?) -> Void) {
-        self.userService?.updateUserInfo(userInfo: info, completion: { success, error in
-            completion(error)
-        })
-    }
+//    /// Updates user information that is used for login with the `login(with user: UserInfoProtocol,token: String,use userProperties: Bool = true,completion: @escaping (ChatError?) -> Void)` method.
+//    /// - Parameters:
+//    ///   - info: An instance that conforms to ``EaseProfileProtocol``.
+//    ///   - completion: Callback.
+//    @objc(updateWithUserInfo:completion:)
+//    public func updateUserInfo(info: EaseProfileProtocol,completion: @escaping (ChatError?) -> Void) {
+//        self.userService?.updateUserInfo(userInfo: info, completion: { success, error in
+//            completion(error)
+//        })
+//    }
     
     ///  Refreshes the user chat token when receiving the ``ChatClientListener.onUserTokenWillExpired`` callback.
     /// - Parameter token: The user chat token.
