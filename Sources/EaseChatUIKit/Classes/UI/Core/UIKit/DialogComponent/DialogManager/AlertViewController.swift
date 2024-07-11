@@ -30,7 +30,6 @@ import UIKit
      */
     @objc public required convenience init(custom: UIView,size: CGSize,customPosition: Bool) {
         self.init()
-        
         if customPosition {
             self.presentedViewComponent = PresentedViewComponent(contentSize: size,destination: .custom(center: CGPoint(x: ScreenWidth/2.0, y: ScreenHeight/2.0-size.height/3.0)),keyboardPadding: 20)
         } else {
@@ -43,6 +42,8 @@ import UIKit
         super.viewDidLoad()
         if self.customView != nil {
             self.customView?.cornerRadius(Appearance.alertStyle == .small ? .extraSmall:.medium)
+            self.customView?.setNeedsLayout()
+            self.customView?.layoutIfNeeded()
             self.view.addSubview(self.customView!)
         }
     }

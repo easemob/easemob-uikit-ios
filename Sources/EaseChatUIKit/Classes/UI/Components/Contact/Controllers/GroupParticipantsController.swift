@@ -265,6 +265,9 @@ import UIKit
                         }
                     }
                     self.cursor = result?.cursor ?? ""
+                    if self.operation == .mention {
+                        self.participants.removeAll { $0.id == EaseChatUIKitContext.shared?.currentUserId ?? "" }
+                    }
                     self.participantsList.reloadData()
                     self.recursiveCount -= 1
                     if self.participants.count < Appearance.chat.groupParticipantsLimitCount {

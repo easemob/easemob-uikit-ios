@@ -387,7 +387,14 @@ import UIKit
     }
     
     private func transferConfirm(profile: EaseProfileProtocol) {
-        DialogManager.shared.showAlert(title: "group_details_extend_button_transfer".chat.localize+"to ".chat.localize+"\(profile.nickname)?", content: "", showCancel: true, showConfirm: true) { [weak self] text in
+        var nickname = profile.remark
+        if nickname.isEmpty {
+            nickname = profile.remark
+        }
+        if nickname.isEmpty {
+            nickname = profile.id
+        }
+        DialogManager.shared.showAlert(title: "", content: "group_details_extend_button_transfer".chat.localize+" to ".chat.localize+"\(nickname)?", showCancel: true, showConfirm: true) { [weak self] text in
             guard let `self` = self else { return }
             self.service.transfer(groupId: self.chatGroup.groupId, userId: profile.id, completion: { group, error in
                 if error == nil {

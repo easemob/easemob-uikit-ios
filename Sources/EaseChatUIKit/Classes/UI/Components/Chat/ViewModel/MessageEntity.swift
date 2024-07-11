@@ -306,6 +306,9 @@ public let urlPreviewImageHeight = CGFloat(137)
         if self.message.edited {
             width += 44
         }
+        if Appearance.chat.bubbleStyle == .withArrow {
+            width += 5
+        }
         if Appearance.chat.enableURLPreview {
             let increase = self.urlPreviewHeight()
             height += increase
@@ -540,7 +543,7 @@ public let urlPreviewImageHeight = CGFloat(137)
                 result = result.replacingOccurrences(of: key, with: value)
             }
             if self.message.mention.isEmpty {
-                text.append(NSAttributedString {
+                text.append(NSMutableAttributedString {
                     AttributedText(result).foregroundColor(textColor).font(self.historyMessage ? UIFont.theme.bodyMedium:UIFont.theme.bodyLarge).lineHeight(multiple: 1.15, minimum: self.historyMessage ? 16:18).lineBreakMode(.byWordWrapping)
                 })
             } else {
@@ -592,7 +595,7 @@ public let urlPreviewImageHeight = CGFloat(137)
                 return text
             }
             // 创建 NSDataDetector 实例以检测文本中的链接
-            guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else {
+            guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue ) else {
                 return text
             }
 
@@ -608,20 +611,13 @@ public let urlPreviewImageHeight = CGFloat(137)
                 self.previewResult = .failure
                 return text
             }
-            self.previewURL = matches.first?.url?.absoluteString ?? ""
-//            for result in matches {
-//                if let url = result.url {
-//                    let urlString = url.absoluteString
-//                    let nsText = text.string as NSString
-//                    let range = nsText.range(of: urlString, options: .caseInsensitive)
-//
-//                    if range.length > 0 {
-//                        let receiveLinkColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
-//                        text.addAttributes([.link:url,.underlineStyle:NSUnderlineStyle.single,.underlineColor:receiveLinkColor], range: range)
-//                    }
-//                    break
-//                }
-//            }
+            if let result = matches.first, result.range.length > 0,result.range.location != NSNotFound,let linkURL = result.url {
+                self.previewURL = linkURL.absoluteString
+                let receiveLinkColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+                let sendLinkColor = Appearance.chat.sendTextColor
+                let color = self.message.direction == .send ? sendLinkColor:receiveLinkColor
+                text.addAttributes([.link:linkURL,.underlineStyle:NSUnderlineStyle.single.rawValue,.underlineColor:color,.foregroundColor:color], range: result.range)
+            }
         }
 
         return text

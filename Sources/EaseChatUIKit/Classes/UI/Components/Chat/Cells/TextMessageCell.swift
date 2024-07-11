@@ -17,12 +17,12 @@ import UIKit
         Theme.style  == .dark ? UIColor.theme.primaryColor3:UIColor.theme.primaryColor9
     }
     
-    public private(set) lazy var content: ActiveLabel = {
+    public private(set) lazy var content: NoLongPressTextView = {
         self.createContent()
     }()
     
-    @objc open func createContent() -> ActiveLabel {
-        ActiveLabel(frame: .zero).backgroundColor(.clear).numberOfLines(0)
+    @objc open func createContent() -> NoLongPressTextView {
+        NoLongPressTextView(frame: .zero).backgroundColor(.clear)
     }
     
     public private(set) lazy var edit: UIButton = {
@@ -95,6 +95,17 @@ import UIKit
         self.translationContainer.showsHorizontalScrollIndicator = false
         self.translationContainer.isSelectable = true
         self.translationContainer.isUserInteractionEnabled = true
+        self.translationContainer.textContainerInset = .zero
+        
+        
+        self.content.showsVerticalScrollIndicator = false
+        self.content.showsHorizontalScrollIndicator = false
+        self.content.isScrollEnabled = false
+        self.content.textContainerInset = .zero
+        self.content.textContainer.lineFragmentPadding = 0
+        self.content.isEditable = false
+        self.content.delegate = self
+        self.content.dataDetectorTypes = [.link]
         self.edit.contentHorizontalAlignment = .right
         self.translateSymbol.contentHorizontalAlignment = .right
         self.previewContent.isHidden = true
@@ -106,12 +117,15 @@ import UIKit
     
     public override func refresh(entity: MessageEntity) {
         super.refresh(entity: entity)
+        
+        let receiveLinkColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        let sendLinkColor = Appearance.chat.sendTextColor
+        let color = self.towards == .right ? sendLinkColor:receiveLinkColor
+        self.content.linkTextAttributes = [.underlineStyle:NSUnderlineStyle.single.rawValue,.underlineColor:color,.foregroundColor:color]
         let textSize = entity.textSize()
         let translationSize = Appearance.chat.enableTranslation ? entity.translationSize():.zero
-        self.content.frame = CGRect(x: 12, y: 6.5, width: entity.bubbleSize.width-24, height: textSize.height)
-        self.content.customize { [weak self] in
-            self?.customizeContent(label: $0,entity: entity,textSize: textSize)
-        }
+        self.content.frame = CGRect(x: 12, y: 7, width: entity.bubbleSize.width-24, height: textSize.height)
+        self.content.attributedText = entity.content
         let stateColor: UIColor = entity.message.direction == .send ? self.sendStateColor:self.receiveStateColor
         self.edit.setTitleColor(stateColor, for: .normal)
         self.translateSymbol.setTitleColor(stateColor, for: .normal)
@@ -149,6 +163,7 @@ import UIKit
             let image = UIImage(named: "text_message_translated", in: .chatBundle, with: nil)
             self.translateSymbol.image(image?.withTintColor(stateColor), .normal)
         } else {
+            self.separatorLine.frame = CGRect(x: 12, y: (entity.message.edited ? self.edit.frame.maxY+6:self.content.frame.maxY+6), width: entity.bubbleSize.width-24, height: 0.5)
             self.separatorLine.isHidden = true
             self.translation.isHidden = true
             self.translateSymbol.isHidden = true
@@ -156,7 +171,9 @@ import UIKit
         if Appearance.chat.enableURLPreview {
             self.previewContent.state = entity.previewResult
             let previewHeight = entity.urlPreviewHeight()
-            self.previewContent.frame = CGRect(x: 0, y: entity.bubbleSize.height-previewHeight+4, width: entity.bubbleSize.width, height: previewHeight)
+            var padding:CGFloat = Appearance.chat.bubbleStyle == .withArrow ? 5:0
+            padding = entity.message.direction == .send ? 0:padding
+            self.previewContent.frame = CGRect(x: padding, y: entity.bubbleSize.height-previewHeight+4, width: entity.bubbleSize.width, height: previewHeight)
             switch entity.previewResult {
             case .success:
                 self.previewContent.show(with: entity.urlPreview)
@@ -167,34 +184,28 @@ import UIKit
         
     }
     
-    @objc open func customizeContent(label: ActiveLabel, entity: MessageEntity, textSize: CGSize) {
-        label.frame = CGRect(x: 12, y: 6.5, width: entity.bubbleSize.width-24, height: textSize.height+2)
-        let receiveLinkColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
-        label.font = UIFont.theme.bodyMedium
-        label.numberOfLines = 0
-        label.lineBreakMode = .byWordWrapping
-        label.URLColor = (entity.message.direction == .send ? Appearance.chat.sendTextColor:receiveLinkColor)
-        label.URLSelectedColor = Theme.style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor9
-        label.attributedText = entity.content
-        
-        label.handleURLTap { url in
-            var urlString = url.absoluteString
-            if !urlString.hasPrefix("http://"), !urlString.hasPrefix("https://") {
-                urlString = "https://" + urlString
-            } else {
-                if urlString.hasPrefix("http://") {
-                    urlString.insert("s", at: 4)
+    
+}
+
+extension TextMessageCell: UITextViewDelegate {
+    // UITextViewDelegate method to handle link clicks
+    public func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+            // Optionally open the URL in a web browser
+            if interaction == .invokeDefaultAction {
+                var urlString = URL.absoluteString
+                if !urlString.hasPrefix("http://"), !urlString.hasPrefix("https://") {
+                    urlString = "https://" + urlString
+                } else {
+                    if urlString.hasPrefix("http://") {
+                        urlString.insert("s", at: 4)
+                    }
+                }
+                if let validateURL = NSURL(string: urlString) as? URL {
+                    UIApplication.shared.open(validateURL)
                 }
             }
-            if let validateURL = URL(string: urlString) {
-                UIApplication.shared.open(validateURL)
-            }
-            
+            return false // Return false if you don't want the default behavior (opening the link)
         }
-    }
-    
-    
-    
 }
 
 

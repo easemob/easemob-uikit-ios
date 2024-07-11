@@ -88,8 +88,8 @@ import UIKit
             self.loadingLabel.heightAnchor.constraint(equalToConstant: 16),
             
             self.imageView.topAnchor.constraint(equalTo: topAnchor),
-            self.imageView.leadingAnchor.constraint(equalTo: leadingAnchor,constant: -0.5),
-            self.imageView.trailingAnchor.constraint(equalTo: trailingAnchor,constant: 0.5),
+            self.imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            self.imageView.trailingAnchor.constraint(equalTo: trailingAnchor),
             self.imageHeightConstraint,
             
             self.titleTopConstraint,

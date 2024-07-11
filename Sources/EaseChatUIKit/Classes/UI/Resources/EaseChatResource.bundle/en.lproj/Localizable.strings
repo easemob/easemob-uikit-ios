@@ -32,7 +32,7 @@
 "barrage_long_press_menu_report" = "Report";
 "barrage_long_press_menu_forward" = "Forward";
 "barrage_long_press_menu_show_original_text" = "Original Text";
-"barrage_long_press_menu_multi_select" = "MultiSelect";
+"barrage_long_press_menu_multi_select" = "Select";
 "barrage_long_press_menu_topic" = "Create Thread";
 "barrage_long_press_menu_pin" = "Pin";
 "Topic" = "Thread";

@@ -970,9 +970,9 @@ extension MessageListView: IMessageListViewDriver {
         }
         entity.state = self.convertStatus(message: message)
         entity.message = message
+        _ = entity.content
         _ = entity.replyTitle
         _ = entity.replyContent
-        _ = entity.content
         entity.topicContent = entity.convertTopicContent()
         self.convertURLPreview(entity: entity)
         _ = entity.replySize
@@ -986,27 +986,36 @@ extension MessageListView: IMessageListViewDriver {
             if let dic = entity.message.ext?["ease_chat_uikit_text_url_preview"] as? Dictionary<String,String> {
                 if let status = dic["status"] {
                     entity.previewResult = status == "1" ? .success:.failure
+                    if entity.previewResult == .success {
+                        entity.urlPreview = URLPreviewManager.caches[dic["url"] ?? entity.previewURL]
+                        _ = entity.urlPreview?.titleAttribute
+                    }
                 } else {
-                    if entity.previewURL == dic["url"]{
+                    if entity.previewURL.contains(dic["url"] ?? entity.previewURL) {
                         if dic["title"]?.isEmpty ?? true {
                             entity.previewResult = .failure
                         } else {
                             entity.previewResult = .success
+                            entity.urlPreview = URLPreviewManager.caches[dic["url"] ?? entity.previewURL]
+                            _ = entity.urlPreview?.titleAttribute
                         }
                     } else {
                         entity.previewResult = .failure
                     }
                 }
-            }
-            if entity.containURL {
-                let previewContent = URLPreviewManager.caches[entity.previewURL]
-                if previewContent != nil,previewContent?.titleAttribute != nil {
-                    entity.urlPreview = previewContent
-                    entity.previewResult = .success
-                } else {
-                    entity.urlPreview = nil
+            } else {
+                if entity.containURL {
+                    let previewContent = URLPreviewManager.caches[entity.previewURL]
+                    if previewContent != nil,previewContent?.titleAttribute != nil {
+                        entity.urlPreview = previewContent
+                        entity.previewResult = .success
+                        _ = entity.urlPreview?.titleAttribute
+                    } else {
+                        entity.urlPreview = nil
+                    }
                 }
             }
+            
             
             if entity.urlPreview == nil, entity.containURL, entity.previewResult == .parsing,!entity.previewURL.isEmpty {
                 entity.previewStart()
