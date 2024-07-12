@@ -1,6 +1,6 @@
 import UIKit
 
-@objc final public class ConversationList: UITableView {
+@objc open class ConversationList: UITableView {
         
     private var eventHandlers: NSHashTable<ConversationListActionEventsDelegate> = NSHashTable<ConversationListActionEventsDelegate>.weakObjects()
     
@@ -64,7 +64,7 @@ import UIKit
         }
     }
     
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
@@ -211,7 +211,17 @@ extension ConversationList: UITableViewDelegate,UITableViewDataSource {
         }
     }
     
-    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            self.requestDisplayInfo()
+        }
+    }
+    
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        self.requestDisplayInfo()
+    }
+        
+    @objc open func requestDisplayInfo() {
         var unknownInfoIds = [String]()
         if let visiblePaths = self.indexPathsForVisibleRows {
             for indexPath in visiblePaths {
@@ -226,8 +236,6 @@ extension ConversationList: UITableViewDelegate,UITableViewDataSource {
             }
         }
     }
-        
-    
 }
 
 //MARK: - IConversationListDriver Implement

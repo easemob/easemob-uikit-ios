@@ -315,15 +315,58 @@ extension GroupParticipantsController: UITableViewDelegate,UITableViewDataSource
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        if scrollView.isKind(of: UICollectionView.self) {
+            return
+        }
+        self.requestDisplayInfos()
+    }
+    
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            self.requestDisplayInfos()
+        }
+    }
+    
+    @objc open func requestDisplayInfos() {
         var unknownInfoIds = [String]()
         if let visiblePaths = self.participantsList.indexPathsForVisibleRows {
             for indexPath in visiblePaths {
                 if let nickName = self.participants[safe: indexPath.row]?.nickname,nickName.isEmpty {
-                    unknownInfoIds.append(self.participants[safe: indexPath.row]?.id ?? "")
+                    if let unknownId = self.participants[safe: indexPath.row]?.id {
+                        unknownInfoIds.append(unknownId)
+                    }
                 }
             }
         }
-        
+        if EaseChatUIKitContext.shared?.userProfileProvider != nil {
+            if !unknownInfoIds.isEmpty {
+                Task {
+                    let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: unknownInfoIds) ?? []
+                    self.fillCache(profiles: profiles)
+                    DispatchQueue.main.async {
+                        self.processCacheProfiles(values: profiles)
+                    }
+                }
+            }
+        } else {
+            EaseChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: unknownInfoIds, completion: { [weak self] profiles in
+                guard let `self` = self else { return }
+                self.fillCache(profiles: profiles)
+                self.processCacheProfiles(values: profiles)
+            })
+        }
+    }
+    
+    private func fillCache(profiles: [EaseProfileProtocol]) {
+        for profile in profiles {
+            if let profile = EaseChatUIKitContext.shared?.userCache?[profile.id] {
+                profile.nickname = profile.nickname
+                profile.remark = profile.remark
+                profile.avatarURL = profile.avatarURL
+            } else {
+                EaseChatUIKitContext.shared?.userCache?[profile.id] = profile
+            }
+        }
     }
     
     private func processCacheInfos(values: [String]) {
@@ -343,6 +386,7 @@ extension GroupParticipantsController: UITableViewDelegate,UITableViewDataSource
                 if value.id == participant.id {
                     participant.nickname = value.nickname
                     participant.avatarURL = value.avatarURL
+                    participant.remark = value.remark
                 }
             }
         }

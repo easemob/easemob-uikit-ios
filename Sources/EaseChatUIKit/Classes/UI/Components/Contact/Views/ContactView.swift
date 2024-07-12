@@ -228,6 +228,16 @@ extension ContactView: UITableViewDelegate,UITableViewDataSource {
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        self.requestDisplayInfo()
+    }
+    
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            self.requestDisplayInfo()
+        }
+    }
+    
+    @objc open func requestDisplayInfo() {
         var unknownInfoIds = [String]()
         if let visiblePaths = self.contactList.indexPathsForVisibleRows {
             for indexPath in visiblePaths {
@@ -244,7 +254,6 @@ extension ContactView: UITableViewDelegate,UITableViewDataSource {
             }
         }
     }
-    
 }
 //MARK: - IContactListDriver
 extension ContactView: IContactListDriver {
