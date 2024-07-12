@@ -217,7 +217,7 @@ extension ConversationList: UITableViewDelegate,UITableViewDataSource {
         }
     }
     
-    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         self.requestDisplayInfo()
     }
         
