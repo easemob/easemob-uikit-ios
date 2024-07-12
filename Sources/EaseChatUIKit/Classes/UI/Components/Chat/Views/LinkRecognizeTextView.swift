@@ -8,14 +8,14 @@
 import UIKit
 
 
-enum ActiveElement {
+enum LinkTextViewActiveElement {
     case mention(String)
     case hashtag(String)
     case email(String)
     case url(original: String, trimmed: String)
     case custom(String)
     
-    static func create(with activeType: ActiveType, text: String) -> ActiveElement {
+    static func create(with activeType: LinkTextViewActiveType, text: String) -> LinkTextViewActiveElement {
         switch activeType {
         case .mention: return mention(text)
         case .hashtag: return hashtag(text)
@@ -26,7 +26,7 @@ enum ActiveElement {
     }
 }
 
-public enum ActiveType {
+public enum LinkTextViewActiveType {
     case mention
     case hashtag
     case url
@@ -35,7 +35,7 @@ public enum ActiveType {
     
 }
 
-extension ActiveType: Hashable, Equatable {
+extension LinkTextViewActiveType: Hashable, Equatable {
     public func hash(into hasher: inout Hasher) {
         switch self {
         case .mention: hasher.combine(-1)
@@ -47,7 +47,7 @@ extension ActiveType: Hashable, Equatable {
     }
 }
 
-public func ==(lhs: ActiveType, rhs: ActiveType) -> Bool {
+public func ==(lhs: LinkTextViewActiveType, rhs: LinkTextViewActiveType) -> Bool {
     switch (lhs, rhs) {
     case (.mention, .mention): return true
     case (.hashtag, .hashtag): return true
@@ -60,16 +60,16 @@ public func ==(lhs: ActiveType, rhs: ActiveType) -> Bool {
 
 
 
-typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveType)
+typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, type: LinkTextViewActiveType)
 
 @objc open class LinkRecognizeTextView: UITextView, UITextViewDelegate {
     
-    lazy var activeElements = [ActiveType: [ElementTuple]]()
+    lazy var activeElements = [LinkTextViewActiveType: [ElementTuple]]()
     
     fileprivate var selectedElement: ElementTuple?
     
     func createURLElements(from text: String, range: NSRange, maximumLength: Int?) -> ([ElementTuple], String) {
-        let type = ActiveType.url
+        let type = LinkTextViewActiveType.url
         var text = text
         guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else {
             return ([],text)
@@ -81,7 +81,7 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
                 let urlString = url.absoluteString
                 if range.length > 0 {
                     let trimmedWord = urlString.trim(to: urlString.count)
-                    let element = ActiveElement.url(original: urlString, trimmed: trimmedWord)
+                    let element = LinkTextViewActiveElement.url(original: urlString, trimmed: trimmedWord)
                     elements.append((result.range, element, type))
                 }
             }
@@ -132,7 +132,7 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
                 default: break
                 }
                 selectedElement = element
-                avoidSuperCall = true
+                avoidSuperCall = false
             } else {
                 selectedElement = nil
             }
@@ -143,7 +143,7 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
             case .url(let url, _): touchURL(urlString: url)
             default: break
             }
-            avoidSuperCall = true
+            avoidSuperCall = false
         case .cancelled:
             selectedElement = nil
         case .stationary:
