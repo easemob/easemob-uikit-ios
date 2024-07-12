@@ -626,7 +626,10 @@ extension MessageListController: MessageListDriverEventsListener {
                 UIViewController.currentController?.dismiss(animated: true)
             }
             DialogManager.shared.showCustomDialog(customView: editor,dismiss: false)
-            editor.editor.textView.becomeFirstResponder()
+            DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.5) {
+                editor.editor.textView.becomeFirstResponder()
+            }
+            
         }
     }
     

@@ -17,12 +17,12 @@ import UIKit
         Theme.style  == .dark ? UIColor.theme.primaryColor3:UIColor.theme.primaryColor9
     }
     
-    public private(set) lazy var content: NoLongPressTextView = {
+    public private(set) lazy var content: LinkRecognizeTextView = {
         self.createContent()
     }()
     
-    @objc open func createContent() -> NoLongPressTextView {
-        NoLongPressTextView(frame: .zero).backgroundColor(.clear)
+    @objc open func createContent() -> LinkRecognizeTextView {
+        LinkRecognizeTextView(frame: .zero).backgroundColor(.clear)
     }
     
     public private(set) lazy var edit: UIButton = {
@@ -104,11 +104,12 @@ import UIKit
         self.content.textContainerInset = .zero
         self.content.textContainer.lineFragmentPadding = 0
         self.content.isEditable = false
-        self.content.delegate = self
+        self.content.isSelectable = false
         self.content.dataDetectorTypes = [.link]
         self.edit.contentHorizontalAlignment = .right
         self.translateSymbol.contentHorizontalAlignment = .right
         self.previewContent.isHidden = true
+        
     }
     
     required public init?(coder: NSCoder) {
@@ -126,6 +127,7 @@ import UIKit
         let translationSize = Appearance.chat.enableTranslation ? entity.translationSize():.zero
         self.content.frame = CGRect(x: 12, y: 7, width: entity.bubbleSize.width-24, height: textSize.height)
         self.content.attributedText = entity.content
+        self.content.parseTextAndExtractActiveElements(entity.content!)
         let stateColor: UIColor = entity.message.direction == .send ? self.sendStateColor:self.receiveStateColor
         self.edit.setTitleColor(stateColor, for: .normal)
         self.translateSymbol.setTitleColor(stateColor, for: .normal)
@@ -187,30 +189,8 @@ import UIKit
     
 }
 
-extension TextMessageCell: UITextViewDelegate {
-    // UITextViewDelegate method to handle link clicks
-    public func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-            // Optionally open the URL in a web browser
-            if interaction == .invokeDefaultAction {
-                var urlString = URL.absoluteString
-                if !urlString.hasPrefix("http://"), !urlString.hasPrefix("https://") {
-                    urlString = "https://" + urlString
-                } else {
-                    if urlString.hasPrefix("http://") {
-                        urlString.insert("s", at: 4)
-                    }
-                }
-                if let validateURL = NSURL(string: urlString) as? URL {
-                    UIApplication.shared.open(validateURL)
-                }
-            }
-            return false // Return false if you don't want the default behavior (opening the link)
-        }
-}
-
 
 @objc open class TranslateTextView: UITextView {
-    // 确保 UITextView 可以响应复制操作
     open override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
         if action == #selector(copy(_:)) {
             return true
@@ -218,7 +198,6 @@ extension TextMessageCell: UITextViewDelegate {
         return super.canPerformAction(action, withSender: sender)
     }
     
-    // 处理复制操作
     open override func copy(_ sender: Any?) {
         if let selectedTextRange = self.selectedTextRange {
             let selectedText = self.text(in: selectedTextRange)

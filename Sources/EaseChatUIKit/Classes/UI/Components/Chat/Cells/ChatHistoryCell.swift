@@ -38,7 +38,7 @@ import UIKit
         super.init(style: .default, reuseIdentifier: reuseIdentifier)
         switch message.body.type {
         case .video,.image:
-            self.content = ImageView(frame: CGRect(x: self.nickname.frame.minX, y: self.nickname.frame.maxY, width: self.contentView.frame.width-self.avatar.frame.maxX-10-16, height: 20)).cornerRadius(.extraSmall)
+            self.content = ImageView(frame: CGRect(x: self.nickname.frame.minX, y: self.nickname.frame.maxY, width: self.contentView.frame.width-self.avatar.frame.maxX-10-16, height: 20)).cornerRadius(.extraSmall).contentMode(.scaleAspectFit)
         default:
             self.content = UILabel(frame: CGRect(x: self.nickname.frame.minX, y: self.nickname.frame.maxY, width: self.contentView.frame.width-self.avatar.frame.maxX-10-16, height: 20)).numberOfLines(0)
         }
@@ -57,7 +57,7 @@ import UIKit
         self.nickname.frame = CGRect(x: self.avatar.frame.maxX+10, y: self.avatar.frame.minY, width: self.contentView.frame.width-self.avatar.frame.maxX-10-132, height: 20)
         self.messageDate.frame =  CGRect(x: self.contentView.frame.width-132, y: 10, width: 120, height: 16)
         self.separatorLine.frame = CGRect(x: self.nickname.frame.minX, y: self.contentView.frame.height - 0.5, width: self.contentView.frame.width, height: 0.5)
-        self.content.frame = CGRect(x: self.nickname.frame.minX, y: self.nickname.frame.maxY, width: ScreenWidth-self.avatar.frame.maxX-10-16, height: self.frame.height - self.nickname.frame.maxY)
+//        self.content.frame = CGRect(x: self.nickname.frame.minX, y: self.nickname.frame.maxY, width: ScreenWidth-self.avatar.frame.maxX-10-16, height: self.frame.height - self.nickname.frame.maxY)
     }
     
     @objc open func refresh(entity: MessageEntity) {
@@ -73,8 +73,7 @@ import UIKit
         case .video,.image:
             self.content.frame = CGRect(x: self.nickname.frame.minX, y: self.nickname.frame.maxY, width: entity.bubbleSize.width, height: entity.bubbleSize.height)
             self.play.isHidden = true
-            self.play.frame = CGRect(origin: .zero, size: CGSize(width: 64, height: 64))
-            self.play.center = CGPoint(x: entity.bubbleSize.width/2.0, y: entity.bubbleSize.height/2.0)
+            self.play.frame = CGRect(origin: CGPoint(x: (entity.bubbleSize.width-64)/2, y: (entity.bubbleSize.height-64)/2), size: CGSize(width: 64, height: 64))
             if let container = self.content as? ImageView {
                 if let body = (entity.message.body as? ChatImageMessageBody) {
                     if let url = body.thumbnailLocalPath,!url.isEmpty,FileManager.default.fileExists(atPath: url) {

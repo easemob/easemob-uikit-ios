@@ -427,7 +427,7 @@ extension ConversationViewModel: ConversationServiceListener {
             self.service?.notifyUnreadCount(count: count)
             self.driver?.refreshList(infos: items)
             
-            if infos.count < 10 {
+            if infos.count < 7 {
                 self.requestDisplayProfiles(ids: list.map({ $0.id }))
             }
         }

@@ -78,7 +78,7 @@ import UIKit
             if error == nil {
                 if let infos = self?.filterContacts(contacts: contacts) {
                     self?.driver?.refreshList(infos: infos)
-                    if infos.count < 10 {
+                    if infos.count < 7 {
                         self?.requestDisplayInfos(ids: infos.map({ $0.id }))
                     }
                     DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {
@@ -100,7 +100,7 @@ import UIKit
             if error == nil {
                 if let infos = self?.filterContacts(contacts: contacts) {
                     self?.driver?.refreshList(infos: infos)
-                    if infos.count < 10 {
+                    if infos.count < 7 {
                         self?.requestDisplayInfos(ids: infos.map({ $0.id }))
                     }
                     DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {

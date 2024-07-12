@@ -61,10 +61,10 @@ import UIKit
         self.editor.placeholderFont = .systemFont(ofSize: 14, weight: .regular)
         self.editor.textView.font = UIFont.theme.labelMedium
         
-        let contentHeight = content.chat.sizeWithText(font: UIFont.systemFont(ofSize: 14, weight: .medium), size: CGSize(width: ScreenWidth-66, height: Appearance.chat.maxInputHeight)).height+CGFloat(BottomBarHeight)+CGFloat(46)
+        let contentHeight = content.chat.sizeWithText(font: UIFont.systemFont(ofSize: 14, weight: .medium), size: CGSize(width: ScreenWidth-66, height: Appearance.chat.maxInputHeight)).height+CGFloat(BottomBarHeight)+CGFloat(46)+(NavigationHeight > 64 ? 0:20)
         if contentHeight > Appearance.chat.maxInputHeight+46+CGFloat(BottomBarHeight) {
             let containerY = ScreenHeight-(Appearance.chat.maxInputHeight+46+CGFloat(BottomBarHeight))
-            self.container.frame = CGRect(x: 0, y: containerY, width: self.frame.width, height: Appearance.chat.maxInputHeight+46+CGFloat(BottomBarHeight))
+            self.container.frame = CGRect(x: 0, y: containerY, width: self.frame.width, height: Appearance.chat.maxInputHeight+46+CGFloat(BottomBarHeight)+(NavigationHeight > 64 ? 0:20))
             self.placeHolderHeight = contentHeight
         }
        
@@ -80,17 +80,18 @@ import UIKit
             self?.done.isEnabled = $0 != content
             self?.text = $0
         }
+        
         self.editor.heightDidChangedShouldScroll = { [weak self] in
             guard let `self` = self else { return true }
-            var changeHeight = ($0+46+CGFloat(BottomBarHeight))
+            var changeHeight = ($0+46+CGFloat(BottomBarHeight)+(NavigationHeight > 64 ? 0:20))
             if $0 > 49 {
-                changeHeight = (Appearance.chat.maxInputHeight+46+CGFloat(BottomBarHeight))
+                changeHeight = (Appearance.chat.maxInputHeight+46+CGFloat(BottomBarHeight)+(NavigationHeight > 64 ? 0:20))
                 self.placeHolderHeight = changeHeight
-                self.container.frame = CGRect(x: 0, y: ScreenHeight - ($0+46+CGFloat(BottomBarHeight)-12) - self.keyboardHeight, width: self.frame.width, height: changeHeight)
+                self.container.frame = CGRect(x: 0, y: ScreenHeight - ($0+46+CGFloat(BottomBarHeight)+(NavigationHeight > 64 ? 0:20)-12) - self.keyboardHeight, width: self.frame.width, height: changeHeight)
                 return true
             } else {
                 self.placeHolderHeight = changeHeight
-                self.container.frame = CGRect(x: 0, y: ScreenHeight - ($0+46+CGFloat(BottomBarHeight)-12) - self.keyboardHeight, width: self.frame.width, height: changeHeight)
+                self.container.frame = CGRect(x: 0, y: ScreenHeight - ($0+46+CGFloat(BottomBarHeight)+(NavigationHeight > 64 ? 0:20)-12) - self.keyboardHeight, width: self.frame.width, height: changeHeight)
                 return false
             }
         }
