@@ -1056,7 +1056,7 @@ extension MessageListView: IMessageListViewDriver {
         self.messageList.refreshControl?.endRefreshing()
         self.messages.append(self.convertMessage(message: message))
         let scrolledBottom = self.scrolledBottom
-        self.messageList.insertRows(at: [IndexPath(row: self.messages.count-1, section: 0)], with: .automatic)
+        self.messageList.reloadData()
         if self.messages.count > 1 {
             if message.direction == .send {
                 let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)

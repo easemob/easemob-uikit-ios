@@ -519,8 +519,16 @@ public let urlPreviewImageHeight = CGFloat(137)
                         })
                         text.addAttribute(NSAttributedString.Key.foregroundColor, value: Theme.style == .dark ? Color.theme.primaryColor6:Color.theme.primaryColor5, range: range)
                     } else {
+                        let user = EaseChatUIKitContext.shared?.chatCache?[self.message.mention]
+                        var nickname = user?.remark
+                        if nickname?.isEmpty ?? true {
+                            nickname = user?.nickname
+                            if nickname?.isEmpty ?? true {
+                                nickname = message.from
+                            }
+                        }
                         text.append(NSMutableAttributedString {
-                            AttributedText(self.message.user?.nickname ?? self.message.from).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.labelSmall).lineHeight(multiple: 1.15, minimum: 14).alignment(.center)
+                            AttributedText(nickname!).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.labelSmall).lineHeight(multiple: 1.15, minimum: 14).alignment(.center)
                         })
                         text.append(NSAttributedString {
                             AttributedText(" "+something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall).lineHeight(multiple: 1.15, minimum: 14).alignment(.center)

@@ -228,12 +228,12 @@ extension ContactView: UITableViewDelegate,UITableViewDataSource {
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        self.requestDisplayInfo()
+//        self.requestDisplayInfo()
     }
     
     public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if !decelerate {
-            self.requestDisplayInfo()
+//            self.requestDisplayInfo()
         }
     }
     
@@ -332,6 +332,10 @@ extension ContactView: IContactListDriver {
         self.contacts.removeAll()
         self.sectionTitles.removeAll()
         self.rawData = infos
+        
+        for eventHandle in self.eventsDelegates.allObjects {
+            eventHandle.onContactListEndScrollNeededDisplayInfos(ids: infos.map({ $0.id }))
+        }
         let tuple = ContactSorter.sort(contacts: self.rawData)
         self.contacts.append(contentsOf: tuple.0)
         self.sectionTitles.append(contentsOf: tuple.1)
