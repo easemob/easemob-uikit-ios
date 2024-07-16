@@ -42,11 +42,11 @@ import UIKit
         placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(placeholderLabel)
         
-        // 设置 textContainerInset 和 lineFragmentPadding
+        
         self.textContainerInset = UIEdgeInsets(top: 8, left: 7, bottom: 7, right: 8)
         self.textContainer.lineFragmentPadding = 0
         
-        // 设置占位符标签的约束
+        
         NSLayoutConstraint.activate([
             placeholderLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: textContainerInset.top),
             placeholderLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: textContainerInset.left),
@@ -68,7 +68,7 @@ import UIKit
     
     open override func layoutSubviews() {
         super.layoutSubviews()
-        // 更新 placeholderLabel 的 frame
+        
         let padding = textContainer.lineFragmentPadding
         let insets = textContainerInset
         placeholderLabel.frame = CGRect(
@@ -78,7 +78,7 @@ import UIKit
             height: placeholderLabel.sizeThatFits(CGSize(width: frame.width - padding * 2 - insets.left - insets.right, height: CGFloat.greatestFiniteMagnitude)).height
         )
         
-        // 在高度变化后强制更新光标位置
+        
         DispatchQueue.main.async {
             self.scrollRangeToVisible(self.selectedRange)
         }

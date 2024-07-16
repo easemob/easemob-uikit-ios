@@ -27,7 +27,7 @@ public extension ChatWrapper where Base == Dictionary<String, Any> {
             let data = try JSONSerialization.data(withJSONObject: base, options: [])
             return String(data: data, encoding: .utf8) ?? ""
         } catch {
-            assert(false, "\(error)")
+            consoleLogInfo("parser failed: \(error.localizedDescription)", type: .error)
         }
         return ""
     }

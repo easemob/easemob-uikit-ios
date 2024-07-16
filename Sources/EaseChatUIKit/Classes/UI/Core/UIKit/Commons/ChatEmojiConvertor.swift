@@ -10,9 +10,6 @@ import Foundation
 
 /**
  A class that converts emojis in a given NSMutableAttributedString to their corresponding UIImage.
- 
- - Author: ChatroomUIKit
- - Version: 1.0.0
  */
 @objc final public class ChatEmojiConvertor: NSObject {
 

@@ -240,12 +240,16 @@ import UIKit
     /// Whether enable pin message function or not
     public var enablePinMessage = true
     
+    /// URL preview feature regular title expression.
     public var titlePreviewPattern = ""
     
+    /// URL preview feature regular description expression.
     public var descriptionPreviewPattern = ""
     
+    /// URL preview feature regular image expression.
     public var imagePreviewPattern = ""
     
+    /// Whether enable URL preview or not.
     public var enableURLPreview = true
     
 }

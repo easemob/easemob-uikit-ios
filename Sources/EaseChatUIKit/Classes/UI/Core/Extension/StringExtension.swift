@@ -437,7 +437,7 @@ public extension ChatWrapper where Base == String {
                 return NSMakeRange(result.range.location, result.range.length)
             }
         } catch {
-            assert(false, "error: \(error)")
+            consoleLogInfo("match failed: \(error.localizedDescription)", type: .error)
         }
         return NSMakeRange(0, 0)
     }
