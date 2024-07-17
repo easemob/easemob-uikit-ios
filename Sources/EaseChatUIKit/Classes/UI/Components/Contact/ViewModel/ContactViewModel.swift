@@ -16,7 +16,7 @@ import UIKit
     
     public var notifySelf = false
     
-    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Array<Dictionary<String,Any>>()) private var newFriends
+    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Array<Dictionary<String,Any>>>()) private var newFriends
     
     
     /// ``ContactViewModel`` init method.
@@ -144,12 +144,15 @@ import UIKit
     }
     
     @objc open func notifyCleanNewFriendRequestBadge() {
+        let oldFriends = self.newFriends[saveIdentifier] ?? [Dictionary<String,Any>]()
         var friends = [Dictionary<String,Any>]()
-        for friend in self.newFriends {
-            let requestInfo: [String:Any] = ["userId":friend["userId"] ?? "","timestamp":Date().timeIntervalSince1970*1000,"groupApply":0,"read":1]
+        for friend in oldFriends {
+            let requestInfo: [String:Any] = ["userId":friend["userId"] ?? "","timestamp":friend["timestamp"] ?? Date().timeIntervalSince1970*1000,"groupApply":friend["groupApply"] ?? 0,"read":1]
             friends.append(requestInfo)
         }
-        self.newFriends = friends
+        
+        self.newFriends[saveIdentifier]?.removeAll()
+        self.newFriends[saveIdentifier] = friends
         if let implement = self.service as? ContactServiceImplement {
             implement.handleResult(error: nil, type: .cleanFriendBadge, operatorId: EaseChatUIKitContext.shared?.currentUserId ?? "")
         }
@@ -198,15 +201,20 @@ extension ContactViewModel: ContactEventsResponse {
     }
     
     @objc open func processFriendRequestDidReceive(userId: String) {
-        var requestInfo: [String:Any] = ["userId":userId,"timestamp":Date().timeIntervalSince1970*1000,"groupApply":0,"read":0]
-        let exist = self.newFriends.first(where: { $0["userId"] as? String == userId })
+        let requestInfo: [String:Any] = ["userId":userId,"timestamp":Date().timeIntervalSince1970*1000,"groupApply":0,"read":0]
+        var exist = self.newFriends[saveIdentifier]
         if exist == nil {
-            self.newFriends.append(requestInfo)
+            self.newFriends[saveIdentifier] = [requestInfo]
+        } else {
+            if exist?.first(where: { $0["userId"] as? String == userId }) == nil {
+                exist?.append(requestInfo)
+                self.newFriends[saveIdentifier] = exist
+            }
         }
         if let index = Appearance.contact.listHeaderExtensionActions.firstIndex(where: { $0.featureIdentify == "NewFriendRequest" }) {
             let item = Appearance.contact.listHeaderExtensionActions[index]
             item.showBadge = true
-            let unreadCount = self.newFriends.filter({ $0["read"] as? Int == 0 }).count
+            let unreadCount = self.newFriends[saveIdentifier]?.filter({ $0["read"] as? Int == 0 }).count ?? 0
             item.numberCount = UInt(unreadCount)
             self.driver?.refreshHeader(info: item)
         }
@@ -233,10 +241,10 @@ extension ContactViewModel: MultiDeviceListener {
     }
     
     @objc open func addContact(userId: String) {
-        self.newFriends.removeAll { ($0["userId"] as? String) ?? "" == userId }
+        self.newFriends[saveIdentifier]?.removeAll { ($0["userId"] as? String) ?? "" == userId }
         
         if let item = Appearance.contact.listHeaderExtensionActions.first(where: { $0.featureIdentify == "NewFriendRequest" }) {
-            let unreadCount = self.newFriends.filter { $0["read"] as? Int == 0 }.count
+            let unreadCount = self.newFriends[saveIdentifier]?.filter { $0["read"] as? Int == 0 }.count ?? 0
             item.numberCount = UInt(unreadCount)
             self.driver?.refreshHeader(info: item)
         }
@@ -260,7 +268,8 @@ extension ContactViewModel: ContactListActionEventsDelegate {
     
     @objc open func requestDisplayInfos(ids: [String]) {
         if EaseChatUIKitContext.shared?.userProfileProvider != nil {
-            Task(priority: .background) {
+            Task(priority: .background) { [weak self] in
+                guard let `self` = self else { return }
                 let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: ids) ?? []
                 self.cacheProfiles(profiles: profiles)
                 DispatchQueue.main.async {
@@ -279,7 +288,9 @@ extension ContactViewModel: ContactListActionEventsDelegate {
     
     @objc open func cacheProfiles(profiles: [EaseProfileProtocol]) {
         for profile in profiles {
-            EaseChatUIKitContext.shared?.userCache?[profile.id] = profile
+            EaseChatUIKitContext.shared?.userCache?[profile.id]?.nickname = profile.nickname
+            EaseChatUIKitContext.shared?.userCache?[profile.id]?.remark = profile.remark
+            EaseChatUIKitContext.shared?.userCache?[profile.id]?.avatarURL = profile.avatarURL
         }
     }
     

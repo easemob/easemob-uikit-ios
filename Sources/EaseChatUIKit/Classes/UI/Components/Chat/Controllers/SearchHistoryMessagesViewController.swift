@@ -107,10 +107,14 @@ import UIKit
         }
         if let item = self.searchResults[safe: indexPath.row] {
             
-            let conversation = (self.type == .chat ? EaseChatUIKitContext.shared?.userCache:EaseChatUIKitContext.shared?.groupCache)?[item.conversationId]
+            var conversation = EaseChatUIKitContext.shared?.chatCache?[item.from]
+            if EaseChatUIKitContext.shared?.userCache?[item.from] != nil {
+                conversation?.remark = EaseChatUIKitContext.shared?.userCache?[item.from]?.remark ?? ""
+            }
             let info = ConversationInfo()
-            info.id = item.conversationId
-            info.nickname = conversation?.nickname ?? item.conversationId
+            info.id = item.from
+            info.nickname = conversation?.nickname ?? ""
+            info.remark = conversation?.remark ?? ""
             cell?.refresh(message: item,info: info,keyword: self.searchKeyWord)
         }
         cell?.selectionStyle = .none

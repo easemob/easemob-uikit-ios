@@ -7,14 +7,14 @@
 
 import Foundation
 
-/// Contain light and dark themes of the chat room UIKit.If you want to switch custom theme,you'll modify primary&secondary&error&neutral&neutralSpecial hues properties in ``Appearance``.Then call `Theme.switchTheme(style: .custom)` method
+/// Contain light and dark themes of the ease chat UIKit.If you want to switch custom theme,you'll modify primary&secondary&error&neutral&neutralSpecial hues properties in ``Appearance``.Then call `Theme.switchTheme(style: .custom)` method
 @objc public enum ThemeStyle: UInt {
     case light
     case dark
     case custom
 }
 
-/// When the system theme changes, you can use this static method to switch between the light and dark themes of the chat room UIKit.
+/// When the system theme changes, you can use this static method to switch between the light and dark themes of the ease chat UIKit.
 @objc public protocol ThemeSwitchProtocol: NSObjectProtocol {
     
     /// When some view Implement the protocol method,you can use `Theme.switchTheme(style: .dark)` to switch theme.

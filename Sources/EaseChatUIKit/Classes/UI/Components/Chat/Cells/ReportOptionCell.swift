@@ -9,9 +9,9 @@ import UIKit
 
 @objc open class ReportOptionCell: UITableViewCell {
     
-    public private(set) var normalImage = UIImage(named: "unselect", in: .chatBundle, with: nil)
+    public private(set) var normalImage = UIImage(named: "uncheck", in: .chatBundle, with: nil)
     
-    public private(set) var selectImage = UIImage(named: "select", in: .chatBundle, with: nil)
+    public private(set) var selectImage = UIImage(named: "check", in: .chatBundle, with: nil)
     
     lazy var content: UILabel = {
         UILabel(frame: CGRect(x: 16, y: (self.contentView.frame.height-22)/2.0, width: self.contentView.frame.width-72, height: 22)).textColor(UIColor.theme.neutralColor1).font(UIFont.theme.labelLarge).backgroundColor(.clear)

@@ -125,6 +125,7 @@ import UIKit
         if let item = self.searchResults[safe: indexPath.row] {
             item.selected = !item.selected
             self.selectClosure?(item)
+            self.searchController.isActive = false
         }
         self.tableView.reloadData()
     }

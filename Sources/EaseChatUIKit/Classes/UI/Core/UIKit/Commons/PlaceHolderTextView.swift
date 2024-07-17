@@ -75,7 +75,11 @@ import UIKit
         newRect.size.width = size.width+20
         newRect.size.height = size.height
         newRect.origin.x = self.contentInset.left
-        newRect.origin.y = (rect.height-size.height)/2.0
+        if rect.height < 70 {
+            newRect.origin.y = (rect.height-size.height)/2.0
+        } else {
+            newRect.origin.y = self.contentInset.top
+        }
         (self.placeHolder as NSString).draw(in: newRect, withAttributes: [.font: self.font ?? UIFont.theme.bodyLarge,.foregroundColor: self.placeHolderColor])
     }
     

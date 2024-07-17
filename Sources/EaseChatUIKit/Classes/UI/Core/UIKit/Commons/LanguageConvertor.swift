@@ -49,8 +49,7 @@ public enum LanguageType: String {
     }
 
     static func chineseLanguage() -> Bool {
-        guard var lang = NSLocale.preferredLanguages.first else { return false }
-        if lang.contains("zh") {
+        if Appearance.ease_chat_language.rawValue.contains("zh") {
             return true
         } else {
             return false
