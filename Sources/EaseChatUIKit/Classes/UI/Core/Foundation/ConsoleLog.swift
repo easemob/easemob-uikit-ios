@@ -57,7 +57,7 @@ private func consoleLog<T> (
 final class Log {
     static let logFileURL: URL = {
         let documentsDirectoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        return documentsDirectoryURL.appendingPathComponent("EaseChatUIKit.log")
+        return documentsDirectoryURL.appendingPathComponent("EaseChatUIKit\(EaseChatUIKit_VERSION).log")
     }()
     
     static func saveLog(_ message: String, file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
