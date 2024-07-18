@@ -304,7 +304,6 @@ import UIKit
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
         
-        self.moreMessages.layer.cornerRadius = CGFloat(Appearance.avatarRadius.rawValue)
         self.moreMessages.layer.masksToBounds = false
         let shadowPath0 = UIBezierPath(roundedRect: self.moreMessages.bounds, cornerRadius: 4)
         let layer0 = CALayer()

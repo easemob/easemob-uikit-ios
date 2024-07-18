@@ -693,6 +693,12 @@ extension ChatThreadViewModel: ChatResponseListener {
                 profile.id = message.from
                 profile.modifyTime = message.timestamp
                 EaseChatUIKitContext.shared?.chatCache?[message.from] = profile
+                if EaseChatUIKitContext.shared?.userCache?[message.from] == nil {
+                    EaseChatUIKitContext.shared?.userCache?[message.from] = profile
+                } else {
+                    EaseChatUIKitContext.shared?.userCache?[message.from]?.nickname = profile.nickname
+                    EaseChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
+                }
             }
             let entity = message
             entity.direction = message.direction

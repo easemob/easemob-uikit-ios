@@ -834,6 +834,12 @@ extension MessageListViewModel: ChatResponseListener {
                 profile.id = message.from
                 profile.modifyTime = message.timestamp
                 EaseChatUIKitContext.shared?.chatCache?[message.from] = profile
+                if EaseChatUIKitContext.shared?.userCache?[message.from] == nil {
+                    EaseChatUIKitContext.shared?.userCache?[message.from] = profile
+                } else {
+                    EaseChatUIKitContext.shared?.userCache?[message.from]?.nickname = profile.nickname
+                    EaseChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
+                }
             }
             if let dic = message.ext?["ease_chat_uikit_text_url_preview"] as? Dictionary<String,String>,let url = dic["url"] {
                 let content = URLPreviewManager.HTMLContent()
