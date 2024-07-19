@@ -225,11 +225,11 @@ extension ConversationListCell: ThemeSwitchProtocol {
             let from = message.from
             let mentionText = "Mentioned".chat.localize
             var nickName = message.user?.remark ?? ""
-            if !nickname.isEmpty {
+            if nickName.isEmpty {
                 nickName = message.user?.nickname ?? ""
             }
-            if !nickName.isEmpty {
-                nickName = message.from
+            if nickName.isEmpty {
+                nickName = from
             }
             if self.mentioned {
                 let showText = NSMutableAttributedString {

@@ -306,7 +306,7 @@ public let urlPreviewImageHeight = CGFloat(137)
         if self.message.edited {
             width += 44
         }
-        if Appearance.chat.bubbleStyle == .withArrow {
+        if Appearance.chat.bubbleStyle == .withArrow,self.historyMessage == false,self.message.body.type != .text {
             width += 5
         }
         if Appearance.chat.enableURLPreview {
@@ -853,6 +853,9 @@ extension ChatMessage {
         let chatUser = EaseChatUIKitContext.shared?.chatCache?[self.from]
         if chatUser == nil,cacheUser != nil {
             return cacheUser
+        }
+        if chatUser?.nickname.isEmpty ?? true {
+            chatUser?.nickname = cacheUser?.nickname ?? ""
         }
         return chatUser
     }
