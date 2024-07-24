@@ -371,8 +371,6 @@ extension MessageListController: MessageListDriverEventsListener {
     }
     
     public func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation) {
-        self.messageContainer.editMode = false
-        self.navigation.editMode = false
         let messages = self.filterSelectedMessages()
         switch operation {
         case .delete:
@@ -391,6 +389,11 @@ extension MessageListController: MessageListDriverEventsListener {
             return
         }
         let vc = ForwardTargetViewController(messages: messages, combine: true)
+        vc.dismissClosure = { [weak self] in
+            guard let `self` = self else { return }
+            self.messageContainer.editMode = !$0
+            self.navigation.editMode = !$0
+        }
         UIViewController.currentController?.present(vc, animated: true)
     }
     
@@ -414,7 +417,6 @@ extension MessageListController: MessageListDriverEventsListener {
                 messages.append(message.message)
             }
         }
-        self.messageContainer.messages.forEach { $0.selected = false }
         return messages
     }
     

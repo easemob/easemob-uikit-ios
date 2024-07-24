@@ -207,6 +207,7 @@ import UIKit
                 } else {
                     self.sendSubviewToBack(self.editBottomBar)
                 }
+                self.messages.forEach { $0.selected = false }
                 self.messageList.reloadData()
             }
         }

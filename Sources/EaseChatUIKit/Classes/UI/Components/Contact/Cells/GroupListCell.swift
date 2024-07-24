@@ -43,7 +43,7 @@ import UIKit
     func refresh(info: EaseProfileProtocol,keyword: String) {
         let nickName = info.nickname.isEmpty ? info.id:info.nickname
         self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: nickName )
-        self.avatar.image(with: info.avatarURL, placeHolder: Appearance.conversation.groupPlaceHolder)
+        self.avatar.image(with: EaseChatUIKitContext.shared?.groupCache?[info.id]?.avatarURL ?? "", placeHolder: Appearance.conversation.groupPlaceHolder)
         self.separateLine.backgroundColor = Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
     
     }

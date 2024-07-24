@@ -306,6 +306,11 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
             return
         }
         let vc = ForwardTargetViewController(messages: messages, combine: true)
+        vc.dismissClosure = { [weak self] in
+            guard let `self` = self else { return }
+            self.messageContainer.editMode = !$0
+            self.navigation.editMode = !$0
+        }
         self.present(vc, animated: true)
     }
     

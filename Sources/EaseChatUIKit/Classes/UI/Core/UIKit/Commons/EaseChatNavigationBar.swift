@@ -199,6 +199,8 @@ import UIKit
         self.cancel.isHidden = true
         self.leftItem.center = CGPoint(x: self.leftItem.center.x, y: self.leftItem.center.y-2)
         self.updateRightItems(images: rightImages)
+        self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: StatusBarHeight+4, width: ScreenWidth - self.rightItems.frame.width - 8 - ((hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8), height: 22)
+        self.detail.frame = CGRect(x: self.titleLabel.frame.minX, y: self.titleLabel.frame.maxY, width: self.titleLabel.frame.width, height: 14)
         self.status.isHidden = Appearance.hiddenPresence
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)

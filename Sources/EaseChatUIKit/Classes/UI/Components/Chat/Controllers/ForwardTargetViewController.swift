@@ -35,6 +35,8 @@ import UIKit
         }
     }
     
+    private var forwarded = false
+    
     private var searchResults = [EaseProfileProtocol]()
     
     public private(set) lazy var indicator: UIView = {
@@ -76,6 +78,8 @@ import UIKit
 
         }).backgroundColor(.clear)
     }()
+    
+    public var dismissClosure: ((Bool) -> Void)?
         
     private var noMoreGroup = false
     
@@ -87,6 +91,11 @@ import UIKit
     
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    open override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.dismissClosure?(self.forwarded)
     }
     
     open override func viewDidLoad() {
@@ -246,6 +255,7 @@ extension ForwardTargetViewController: UITableViewDelegate,UITableViewDataSource
         ChatClient.shared().chatManager?.send(message, progress: nil, completion: { [weak self] successMessage, error in
             guard let `self` = self else { return }
             if error == nil {
+                self.forwarded = true
                 if let cell = self.targetsList.cellForRow(at: indexPath) as? ForwardTargetCell {
                     var profile = EaseProfile()
                     if self.searchMode {
