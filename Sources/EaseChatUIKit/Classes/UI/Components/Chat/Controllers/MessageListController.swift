@@ -129,7 +129,7 @@ import AVFoundation
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         guard let info = (self.chatType == .chat ? EaseChatUIKitContext.shared?.userCache:EaseChatUIKitContext.shared?.groupCache)?[self.profile.id] else { return }
-        self.profile.remark = info.remark
+        self.profile = info
         var nickname = self.profile.remark
         if nickname.isEmpty {
             nickname = self.profile.nickname

@@ -89,7 +89,7 @@ let limitContainerHeight = ScreenHeight*(590/844.0)
     }
     
     @objc open func show(datas: [PinnedMessageEntity]) {
-        self.pinCount.content.text = "\(datas.count)"+"Pin Messages".chat.localize
+        self.pinCount.content.text = "\(datas.count) "+"Pin Messages".chat.localize
         self.isHidden = false
         self.cover.alpha = 1
         self.container.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: 56)
@@ -97,7 +97,6 @@ let limitContainerHeight = ScreenHeight*(590/844.0)
     }
         
     open override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.pinCount.content.text = "Sticky Message".chat.localize
         self.dismiss()
     }
 }

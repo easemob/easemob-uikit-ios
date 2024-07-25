@@ -113,47 +113,47 @@ typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, ty
     }
     
     
-    //MARK: - Handle UI Responder touches
-    open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else { return }
-        if onTouch(touch) { return }
-        super.touchesBegan(touches, with: event)
-    }
-    
-    func onTouch(_ touch: UITouch) -> Bool {
-        let location = touch.location(in: self)
-        var avoidSuperCall = false
-        
-        switch touch.phase {
-        case .began, .moved, .regionEntered, .regionMoved:
-            if let element = element(at: location) {
-                switch element.element {
-                case .url(let url, let trimmed): touchURL(urlString: url)
-                default: break
-                }
-                selectedElement = element
-                avoidSuperCall = false
-            } else {
-                selectedElement = nil
-            }
-        case .ended, .regionExited:
-            guard let selectedElement = selectedElement else { return avoidSuperCall }
-            
-            switch selectedElement.element {
-            case .url(let url, _): touchURL(urlString: url)
-            default: break
-            }
-            avoidSuperCall = false
-        case .cancelled:
-            selectedElement = nil
-        case .stationary:
-            break
-        @unknown default:
-            break
-        }
-        
-        return avoidSuperCall
-    }
+//    //MARK: - Handle UI Responder touches
+//    open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        guard let touch = touches.first else { return }
+//        if onTouch(touch) { return }
+//        super.touchesBegan(touches, with: event)
+//    }
+//    
+//    func onTouch(_ touch: UITouch) -> Bool {
+//        let location = touch.location(in: self)
+//        var avoidSuperCall = false
+//        
+//        switch touch.phase {
+//        case .began, .moved, .regionEntered, .regionMoved:
+//            if let element = element(at: location) {
+//                switch element.element {
+//                case .url(let url, let trimmed): touchURL(urlString: url)
+//                default: break
+//                }
+//                selectedElement = element
+//                avoidSuperCall = false
+//            } else {
+//                selectedElement = nil
+//            }
+//        case .ended, .regionExited:
+//            guard let selectedElement = selectedElement else { return avoidSuperCall }
+//            
+//            switch selectedElement.element {
+//            case .url(let url, _): touchURL(urlString: url)
+//            default: break
+//            }
+//            avoidSuperCall = false
+//        case .cancelled:
+//            selectedElement = nil
+//        case .stationary:
+//            break
+//        @unknown default:
+//            break
+//        }
+//        
+//        return avoidSuperCall
+//    }
     
     /// use regex check all link ranges
     func parseTextAndExtractActiveElements(_ attrString: NSAttributedString) {
@@ -171,6 +171,9 @@ typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, ty
     }
     
     func touchURL(urlString: String) {
+        if self.isLongPress {
+            return
+        }
         var urlString = urlString
         if !urlString.hasPrefix("http://"), !urlString.hasPrefix("https://") {
             urlString = "https://" + urlString
@@ -183,8 +186,5 @@ typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, ty
             UIApplication.shared.open(validateURL)
         }
     }
-    
 }
-
-
 

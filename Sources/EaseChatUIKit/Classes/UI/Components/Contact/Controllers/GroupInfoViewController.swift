@@ -378,7 +378,8 @@ import UIKit
         let vc =
         ComponentsRegister.shared.GroupParticipantController.init(groupId: self.chatGroup.groupId, operation: .transferOwner)
         vc.mentionClosure = { [weak self] in
-            self?.transferConfirm(profile: $0)
+            guard let `self` = self else { return }
+            self.transferConfirm(profile: $0)
         }
         if vc.presentingViewController != nil {
             vc.modalPresentationStyle = .fullScreen
@@ -396,10 +397,15 @@ import UIKit
         }
         DialogManager.shared.showAlert(title: "", content: "group_details_extend_button_transfer".chat.localize+" to ".chat.localize+"\(nickname)?", showCancel: true, showConfirm: true) { [weak self] text in
             guard let `self` = self else { return }
-            self.service.transfer(groupId: self.chatGroup.groupId, userId: profile.id, completion: { group, error in
+            self.service.transfer(groupId: self.chatGroup.groupId, userId: profile.id, completion: { [weak self] group, error in
+                guard let `self` = self else { return }
                 if error == nil {
+                    self.datas.removeLast()
+                    self.menuList.reloadData()
                     NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_leaveGroup"), object: profile.id)
-                    self.pop()
+                    DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.5) {
+                        self.pop()
+                    }
                 } else {
                     consoleLogInfo("transfer owner error:\(error?.errorDescription ?? "")", type: .error)
                 }
