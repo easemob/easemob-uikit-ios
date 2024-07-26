@@ -480,15 +480,6 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
         }
         cell?.indexPath = indexPath
         if let info = self.datas[safe: indexPath.section]?[safe: indexPath.row] {
-//            if EaseChatUIKitContext.shared?.currentUserId ?? "" == self.chatGroup.owner {
-//                cell?.accessoryType = info.withSwitch ? .none:.disclosureIndicator
-//            } else {
-//                if indexPath.section == 1 {
-//                    cell?.accessoryType = .none
-//                } else {
-//                    cell?.accessoryType = info.withSwitch ? .none:.disclosureIndicator
-//                }
-//            }
             cell?.refresh(info: info)
         }
         cell?.switchMenu.isEnabled = !self.chatGroup.isDisabled

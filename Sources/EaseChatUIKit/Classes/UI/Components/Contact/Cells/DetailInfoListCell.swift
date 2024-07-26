@@ -73,7 +73,12 @@ import UIKit
         self.switchMenu.isHidden = !info.withSwitch
         self.titleLabel.text = info.title
         self.detailLabel.text = info.detail
-        self.indicator.isHidden = info.withSwitch
+        if info.title == "contact_details_button_clearchathistory".chat.localize {
+            self.indicator.isHidden = true
+        } else {
+            self.indicator.isHidden = info.withSwitch
+        }
+        
         if !info.withSwitch {
             self.detailLabel.frame = CGRect(x: self.frame.width/2.0, y: 16, width: (self.frame.width/2.0-36), height: 22)
         } else {
