@@ -34,9 +34,16 @@ import UIKit
         self.replyContent.isHidden = true
         self.bubbleWithArrow.isHidden = true
         self.bubbleMultiCorners.isHidden = true
+        self.topicView.isHidden = true
+        self.checkbox.isHidden = true
+        self.reactionView.isHidden = true
         self.contentView.addSubViews([self.time,self.content])
         self.addGestureTo(view: self.content, target: self)
         self.switchTheme(style: Theme.style)
+    }
+    
+    open override func clickAction(gesture: UITapGestureRecognizer) {
+        
     }
     
     open override func layoutSubviews() {
@@ -46,6 +53,7 @@ import UIKit
     }
     
     open override func refresh(entity: MessageEntity) {
+        self.checkbox.isHidden = true
         self.entity = entity
         self.content.attributedText = entity.content
         self.time.text = entity.message.showDate

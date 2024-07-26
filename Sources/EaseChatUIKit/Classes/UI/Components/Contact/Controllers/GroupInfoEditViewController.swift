@@ -132,7 +132,7 @@ import UIKit
 
 extension GroupInfoEditViewController: UITextViewDelegate {
     public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        if text == "\n" {
+        if text == "\n",self.editType == .name {
             return false
         }
         self.navigation.rightItem.isEnabled = (!(textView.text ?? "").isEmpty || !text.isEmpty)

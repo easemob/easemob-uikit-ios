@@ -258,10 +258,8 @@ extension ForwardTargetViewController: UITableViewDelegate,UITableViewDataSource
                 self.forwarded = true
                 if let cell = self.targetsList.cellForRow(at: indexPath) as? ForwardTargetCell {
                     var profile = EaseProfile()
-                    if self.searchMode {
-                        profile = self.searchResults[indexPath.row] as! EaseProfile
-                    } else {
-                        profile = self.datas[indexPath.row] as! EaseProfile
+                    if let user = (self.searchMode ? self.searchResults:self.datas)[safe: indexPath.row] as? EaseProfile {
+                        profile = user
                     }
                     cell.refresh(info: profile, keyword: self.searchKeyWord, forward: .forwarded)
                 }

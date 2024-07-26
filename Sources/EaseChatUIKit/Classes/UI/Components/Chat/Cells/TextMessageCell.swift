@@ -177,9 +177,7 @@ import UIKit
         if Appearance.chat.enableURLPreview {
             self.previewContent.state = entity.previewResult
             let previewHeight = entity.urlPreviewHeight()
-            var padding:CGFloat = Appearance.chat.bubbleStyle == .withArrow ? 5:0
-            padding = entity.message.direction == .send ? 0:padding
-            self.previewContent.frame = CGRect(x: padding, y: entity.bubbleSize.height-previewHeight, width: entity.bubbleSize.width, height: previewHeight)
+            self.previewContent.frame = CGRect(x: 0, y: entity.bubbleSize.height-previewHeight, width: entity.bubbleSize.width, height: previewHeight)
             switch entity.previewResult {
             case .success:
                 self.previewContent.show(with: entity.urlPreview)

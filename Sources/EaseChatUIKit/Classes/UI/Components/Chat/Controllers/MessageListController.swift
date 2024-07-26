@@ -237,6 +237,7 @@ extension MessageListController {
         case .rightItems: self.rightItemsAction(indexPath: indexPath)
         case .cancel:
             self.navigation.editMode = false
+            self.messageContainer.messages.forEach { $0.selected = false }
             self.messageContainer.editMode = false
         default:
             break
@@ -391,6 +392,9 @@ extension MessageListController: MessageListDriverEventsListener {
         let vc = ForwardTargetViewController(messages: messages, combine: true)
         vc.dismissClosure = { [weak self] in
             guard let `self` = self else { return }
+            if !$0 == false {
+                self.messageContainer.messages.forEach { $0.selected = false }
+            }
             self.messageContainer.editMode = !$0
             self.navigation.editMode = !$0
         }
@@ -403,6 +407,7 @@ extension MessageListController: MessageListDriverEventsListener {
     }
     
     @objc open func deleteMessages(messages: [ChatMessage]) {
+        self.messageContainer.editMode = false
         if messages.isEmpty {
             self.showToast(toast: "Please select a message to delete.")
             return
@@ -531,6 +536,9 @@ extension MessageListController: MessageListDriverEventsListener {
      - message: The chat message for which the dialog is shown.
      */
     @objc open func showMessageLongPressedDialog(message: MessageEntity) {
+        if self.messageContainer.editMode {
+            return
+        }
         let header =  CommonReactionView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 44), message: message.message).backgroundColor(.clear)
         header.reactionClosure = { [weak self] emoji,rawMessage in
             UIViewController.currentController?.dismiss(animated: true) {
@@ -602,6 +610,7 @@ extension MessageListController: MessageListDriverEventsListener {
     }
     
     @objc open func multiSelect(message: ChatMessage) {
+        self.messageContainer.messages.forEach { $0.selected = false }
         self.messageContainer.messages.first { $0.message.messageId == message.messageId }?.selected = true
         self.messageContainer.editMode = true
         self.navigation.editMode = true

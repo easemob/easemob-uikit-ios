@@ -25,7 +25,7 @@ import UIKit
     
     public var towards = BubbleTowards.right
     
-    private var shapeLayer = CAShapeLayer()
+//    private var shapeLayer = CAShapeLayer()
     
     internal override init(frame: CGRect) {
         super.init(frame: frame)
@@ -34,27 +34,21 @@ import UIKit
     @objc required public init(frame: CGRect, forward: BubbleTowards) {
         self.towards = forward
         super.init(frame: frame)
-        self.shapeLayer = CAShapeLayer()
-        self.shapeLayer.lineWidth = 2.0
-        self.shapeLayer.lineJoin = .round
-        self.shapeLayer.lineCap = .round
-        self.layer.addSublayer(self.shapeLayer)
-//        self.layer.mask = self.shapeLayer
-//        self.shapeLayer.shouldRasterize = true
     }
     
     required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    open override func draw(_ rect: CGRect) {
-        super.draw(rect)
+    func updateBubbleCorner() {
+        let shapeLayer = CAShapeLayer()
         let receiveColor = Theme.style == .dark ? UIColor.theme.primaryColor2:UIColor.theme.primaryColor95
         let sendColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
-        self.shapeLayer.fillColor = (self.towards == .left ? receiveColor:sendColor).cgColor
-        self.shapeLayer.strokeColor = (self.towards == .left ? receiveColor:sendColor).cgColor
-        let path = self.roundedRect(bounds: self.bounds)
-        self.shapeLayer.path = path
+        let path = self.roundedRect(bounds: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height))
+        shapeLayer.path = path
+        self.layer.mask = shapeLayer
+        self.clipsToBounds = false
+        self.backgroundColor = self.towards == .left ? receiveColor:sendColor
     }
     
     func roundedRect(bounds: CGRect) -> CGPath {
@@ -86,7 +80,6 @@ import UIKit
         //底 左
         path.addArc(center: CGPoint(x: bottomLeftCenterX, y: bottomLeftCenterY), radius: cornerRadius.bottomLeft, startAngle: CGFloat(Double.pi / 2), endAngle: CGFloat(Double.pi), clockwise: false)
         path.closeSubpath()
-
         return path
     }
 
