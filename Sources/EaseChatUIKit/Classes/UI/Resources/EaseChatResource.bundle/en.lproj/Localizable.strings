@@ -212,3 +212,4 @@
 "succeeded" = "succeeded";
 "failed" = "failed";
 "No pinned messages" = "No pinned messages";
+"Please select greater than one message." = "Please select greater than one message.";

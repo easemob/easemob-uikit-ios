@@ -284,9 +284,11 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
     }
     
     public func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation) {
-        self.messageContainer.editMode = false
-        self.navigation.editMode = false
         let messages = self.filterSelectedMessages()
+        if messages.isEmpty {
+            UIViewController.currentController?.showToast(toast: "Please select greater than one message.".chat.localize)
+            return
+        }
         switch operation {
         case .delete:
             DialogManager.shared.showAlert(title: "barrage_long_press_menu_delete".chat.localize+" \(messages.count)"+" messages".chat.localize, content: "", showCancel: true, showConfirm: true) { [weak self] _ in

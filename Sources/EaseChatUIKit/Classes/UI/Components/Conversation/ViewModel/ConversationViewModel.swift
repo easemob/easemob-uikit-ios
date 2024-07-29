@@ -102,7 +102,9 @@ public let disturb_change = "EaseUIKit_do_not_disturb_changed"
             if let info = self.mapper(objects: [conversation]).first,!info.id.isEmpty {
                 if conversation.type == .groupChat {
                     let content = "Group".chat.localize + " \(text) " + "has been created.".chat.localize
-                    conversation.insert(self.welcomeMessage(conversationId: info.id,text: content), error: nil)
+                    let message = self.welcomeMessage(conversationId: info.id,text: content)
+                    message.chatType = .groupChat
+                    conversation.insert(message, error: nil)
                 }
                 self.loadExistLocalDataIfEmptyFetchServer()
                 return info

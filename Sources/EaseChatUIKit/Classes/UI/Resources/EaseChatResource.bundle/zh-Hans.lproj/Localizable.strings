@@ -212,3 +212,4 @@
 "succeeded" = "成功";
 "failed" = "失败";
 "No pinned messages" = "暂无置顶消息";
+"Please select greater than one message." = "请至少选择一条消息";

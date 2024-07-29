@@ -208,9 +208,10 @@ extension ConversationListCell: ThemeSwitchProtocol {
         
         let from = message.from
         let mentionText = "Mentioned".chat.localize
-        var nickName = message.user?.remark ?? ""
+        let user = EaseChatUIKitContext.shared?.userCache?[from]
+        var nickName = user?.remark ?? ""
         if nickName.isEmpty {
-            nickName = message.user?.nickname ?? ""
+            nickName = user?.nickname ?? ""
         }
         if nickName.isEmpty {
             nickName = from
@@ -254,7 +255,7 @@ extension ConversationListCell: ThemeSwitchProtocol {
             }
         } else {
             let showText = NSMutableAttributedString {
-                AttributedText((message.body.type == .custom ? message.showType:(nickName+":"+message.showType))).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.bodyMedium)
+                AttributedText((message.chatType == .chat ? message.showType:(nickName+":"+message.showType))).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.bodyMedium)
             }
             return showText
         }

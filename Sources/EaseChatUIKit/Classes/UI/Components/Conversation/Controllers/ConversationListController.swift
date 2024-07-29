@@ -262,8 +262,14 @@ extension ConversationListController {
      */
     @objc open func create(profiles: [EaseProfileProtocol]) {
         var name = ""
+        var users = [EaseProfileProtocol]()
+        let ownerId = EaseChatUIKitContext.shared?.currentUserId ?? ""
+        if let owner = EaseChatUIKitContext.shared?.userCache?[ownerId] {
+            users.append(owner)
+            users.append(contentsOf: profiles)
+        }
         var ids = [String]()
-        for (index,profile) in profiles.enumerated() {
+        for (index,profile) in users.enumerated() {
             if index <= 2 {
                 if index == 0 {
                     name += (profile.nickname.isEmpty ? profile.id:profile.nickname)
