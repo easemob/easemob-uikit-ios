@@ -190,6 +190,7 @@ import UIKit
                     if error == nil {
                         self?.participants.append(contentsOf: users)
                         self?.participantsList.reloadData()
+                        self?.setupTitle()
                         self?.pop()
                     } else {
                         consoleLogInfo("Add participants  error:\(error?.errorDescription ?? "")", type: .error)
@@ -205,6 +206,7 @@ import UIKit
                 self?.participants.removeAll(where: { $0.id == userId })
             }
             self?.participantsList.reloadData()
+            self?.setupTitle()
         }
         vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)

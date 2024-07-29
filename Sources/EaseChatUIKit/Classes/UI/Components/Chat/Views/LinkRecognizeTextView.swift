@@ -64,6 +64,10 @@ typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, ty
 
 @objc open class LinkRecognizeTextView: UITextView, UITextViewDelegate {
     
+    public var clickAction: (() -> Void)?
+    
+    public private(set) var hasURL = false
+    
     lazy var activeElements = [LinkTextViewActiveType: [ElementTuple]]()
     
     fileprivate var selectedElement: ElementTuple?
@@ -73,11 +77,10 @@ typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, ty
         self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapAction(gesture:))))
     }
     
-    required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     @objc open func tapAction(gesture: UITapGestureRecognizer) {
+        if !self.hasURL {
+            self.clickAction?()
+        }
         let location = gesture.location(in: self)
         guard let element = element(at: location) else { return }
         switch element.element {
@@ -86,12 +89,17 @@ typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, ty
         }
     }
     
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     func createURLElements(from text: String, range: NSRange, maximumLength: Int?) -> ([ElementTuple], String) {
         let type = LinkTextViewActiveType.url
         guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else {
             return ([],text)
         }
         let matches = detector.matches(in: text, options: [], range: NSRange(location: 0, length: text.count))
+        self.hasURL = matches.count == 1
         var elements: [ElementTuple] = []
         for result in matches {
             if let url = result.url {

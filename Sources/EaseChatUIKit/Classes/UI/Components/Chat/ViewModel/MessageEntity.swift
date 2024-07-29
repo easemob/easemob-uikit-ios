@@ -851,11 +851,14 @@ extension ChatMessage {
             EaseChatUIKitContext.shared?.chatCache?[self.from]?.remark = remark
         }
         let chatUser = EaseChatUIKitContext.shared?.chatCache?[self.from]
-        if chatUser == nil,cacheUser != nil {
-            return cacheUser
-        }
         if chatUser?.nickname.isEmpty ?? true {
             chatUser?.nickname = cacheUser?.nickname ?? ""
+        }
+        if chatUser == nil,cacheUser != nil {
+            if let chatAvatarURL = chatUser?.avatarURL,!chatAvatarURL.isEmpty {
+                cacheUser?.avatarURL = chatAvatarURL
+            }
+            return cacheUser
         }
         return chatUser
     }

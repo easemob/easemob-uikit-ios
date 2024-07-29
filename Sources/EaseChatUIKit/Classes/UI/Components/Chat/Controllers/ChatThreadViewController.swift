@@ -319,11 +319,12 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
     }
     
     @objc open func deleteMessages(messages: [ChatMessage]) {
-        self.messageContainer.editMode = false
         if messages.isEmpty {
             self.showToast(toast: "Please select a message to delete.")
             return
         }
+        self.messageContainer.editMode = false
+        self.navigation.editMode = false
         self.viewModel.deleteMessages(messages: messages)
     }
     

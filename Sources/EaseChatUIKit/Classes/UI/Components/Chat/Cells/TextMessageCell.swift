@@ -110,6 +110,12 @@ import UIKit
         self.translateSymbol.contentHorizontalAlignment = .right
         self.previewContent.isHidden = true
         
+        
+        self.content.clickAction = { [weak self] in
+            guard let `self` = self else { return }
+            self.clickAction?(.bubble,self.entity)
+        }
+        
     }
     
     required public init?(coder: NSCoder) {
