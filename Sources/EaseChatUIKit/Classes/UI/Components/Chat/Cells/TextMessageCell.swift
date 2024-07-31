@@ -184,6 +184,13 @@ import UIKit
             self.previewContent.state = entity.previewResult
             let previewHeight = entity.urlPreviewHeight()
             self.previewContent.frame = CGRect(x: 0, y: entity.bubbleSize.height-previewHeight, width: entity.bubbleSize.width, height: previewHeight)
+            var parserColor = UIColor.black
+            if self.towards == .left {
+                parserColor = Theme.style == .dark ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor6
+            } else {
+                parserColor = Theme.style == .dark ? UIColor.theme.primaryColor2:UIColor.theme.primaryColor9
+            }
+            self.previewContent.loadingLabel.textColor = parserColor
             self.previewContent.descriptionLabel.textColor = self.towards == .right ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor
             switch entity.previewResult {
             case .success:
