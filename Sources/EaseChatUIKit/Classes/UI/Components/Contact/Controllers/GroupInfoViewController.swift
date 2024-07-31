@@ -388,9 +388,13 @@ import UIKit
     }
     
     private func transferConfirm(profile: EaseProfileProtocol) {
-        var nickname = profile.remark
+        var user = EaseChatUIKitContext.shared?.userCache?[profile.id]
+        if user == nil {
+            user = EaseChatUIKitContext.shared?.chatCache?[profile.id]
+        }
+        var nickname = user?.remark ?? ""
         if nickname.isEmpty {
-            nickname = profile.remark
+            nickname = user?.nickname ?? ""
         }
         if nickname.isEmpty {
             nickname = profile.id
