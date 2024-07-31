@@ -193,18 +193,37 @@ import UIKit
         UIImage(named: Theme.style == .dark ? "audio_play_right_dark02":"audio_play_right_light02", in: .chatBundle, with: nil)!,
         UIImage(named: Theme.style == .dark ? "audio_play_right_dark03":"audio_play_right_light03", in: .chatBundle, with: nil)!
     ]
-    
     /// The color of the recipient of the text message.
-    public var receiveTextColor = Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
+    public var receiveTextColor: UIColor {
+        get {
+            Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
+        }
+        set {}
+    }
     
     /// The color of the sender of the text message.
-    public var sendTextColor = Theme.style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
+    public var sendTextColor: UIColor {
+        get {
+            Theme.style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
+        }
+        set {}
+    }
         
     /// The color of the recipient of the text message.
-    public var receiveTranslationColor = Theme.style == .dark ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor5
+    public var receiveTranslationColor: UIColor {
+        get {
+            Theme.style == .dark ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor5
+        }
+        set {}
+    }
     
     /// The color of the sender of the text message.
-    public var sendTranslationColor = Theme.style == .dark ? UIColor.theme.neutralSpecialColor2:UIColor.theme.neutralSpecialColor95
+    public var sendTranslationColor: UIColor {
+        get {
+            Theme.style == .dark ? UIColor.theme.neutralSpecialColor2:UIColor.theme.neutralSpecialColor95
+        }
+        set {}
+    }
     
 
     /// The corner of the image message.

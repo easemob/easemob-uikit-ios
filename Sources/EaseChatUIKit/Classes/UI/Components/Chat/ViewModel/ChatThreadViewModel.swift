@@ -700,6 +700,20 @@ extension ChatThreadViewModel: ChatResponseListener {
                     EaseChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
                 }
             }
+            if let dic = message.ext?["ease_chat_uikit_text_url_preview"] as? Dictionary<String,String>,let url = dic["url"] {
+                let content = URLPreviewManager.HTMLContent()
+                if let description = dic["description"] {
+                    content.descriptionHTML = description
+                }
+                if let imageURL = dic["imageUrl"] {
+                    content.imageURL = imageURL
+                }
+                content.towards = message.direction == .send ? .right:.left
+                if let title = dic["title"] {
+                    content.title = title
+                    URLPreviewManager.caches[url] = content
+                }
+            }
             let entity = message
             entity.direction = message.direction
 //            if let scrolledBottom = self.driver?.scrolledBottom,scrolledBottom {

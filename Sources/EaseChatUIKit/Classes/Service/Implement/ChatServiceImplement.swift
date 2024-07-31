@@ -150,7 +150,7 @@ extension ChatServiceImplement: ChatService {
                                 content.title = title
                                 URLPreviewManager.caches[url] = content
                             }
-                           
+                            content.towards = message.direction == .send ? .right:.left
                         }
                     }
                 }

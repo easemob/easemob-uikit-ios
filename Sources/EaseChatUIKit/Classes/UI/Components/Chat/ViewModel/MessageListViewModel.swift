@@ -849,6 +849,7 @@ extension MessageListViewModel: ChatResponseListener {
                 if let imageURL = dic["imageUrl"] {
                     content.imageURL = imageURL
                 }
+                content.towards = message.direction == .send ? .right:.left
                 if let title = dic["title"] {
                     content.title = title
                     URLPreviewManager.caches[url] = content

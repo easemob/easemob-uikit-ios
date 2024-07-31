@@ -1000,6 +1000,7 @@ extension MessageListView: IMessageListViewDriver {
             }
             if entity.containURL {
                 let previewContent = URLPreviewManager.caches[entity.previewURL]
+                previewContent?.towards = entity.message.direction == .send ? .right:.left
                 if previewContent != nil,previewContent?.titleAttribute != nil {
                     entity.urlPreview = previewContent
                     entity.previewResult = .success

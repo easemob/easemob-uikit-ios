@@ -184,6 +184,7 @@ import UIKit
             self.previewContent.state = entity.previewResult
             let previewHeight = entity.urlPreviewHeight()
             self.previewContent.frame = CGRect(x: 0, y: entity.bubbleSize.height-previewHeight, width: entity.bubbleSize.width, height: previewHeight)
+            self.previewContent.descriptionLabel.textColor = self.towards == .right ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor
             switch entity.previewResult {
             case .success:
                 self.previewContent.show(with: entity.urlPreview)
