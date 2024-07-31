@@ -23,8 +23,8 @@
 - [开发环境](#开发环境)
 - [安装](#安装)
 - [结构](#结构)
+- [运行示例项目](#运行示例项目)
 - [快速开始](#快速开始)
-- [注意事项](#注意事项)
 - [进阶用法](#进阶用法)
 - [自定义](#自定义)
 - [主题](#主题)
@@ -107,6 +107,16 @@ Classes
        ├─ Theme // 主题相关组件，包括颜色、字体、换肤协议及其组件。
        └─ Extension // 一些方便的系统类扩展。
 ```
+# 运行示例项目
+
+- [注册环信AppKey](https://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E8%8E%B7%E5%8F%96%E7%8E%AF%E4%BF%A1%E5%8D%B3%E6%97%B6%E9%80%9A%E8%AE%AF-im-%E7%9A%84%E4%BF%A1%E6%81%AF)
+- 在Appdelegate.swift 中找到
+```Swift
+let option = ChatOptions(appkey: <#环信AppKey#>)
+```
+将注册的AppKey填入其中。
+- 如果想要自定义的头像昵称显示信息，在LoginViewController.swift中找到loginAction方法后填入您要显示的当前用户id对应的昵称头像`profile.nickname` `profile.avatarURL`信息即可，然后运行项目即可，出现登录界面后需要您去创建用户以及获取用户token // 。 [使用控制台生成的临时Token登录](https://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E5%88%9B%E5%BB%BA-im-%E7%94%A8%E6%88%B7)
+
 
 # 快速开始
 
@@ -384,6 +394,8 @@ EaseChatUIKitClient.shared.unregisterUserStateListener(self)
 
 # 自定义
 
+详细的自定义请参见wiki.
+
 ## 1.修改可配置项
 
 下面示例展示如何更改消息内容显示
@@ -391,7 +403,7 @@ EaseChatUIKitClient.shared.unregisterUserStateListener(self)
 ```Swift
         // 可以通过增减显示内容数组中的项，改变消息样式某一部分的显示隐藏。
         Appearance.chat.contentStyle = [.withReply,.withAvatar,.withNickName,.withDateAndTime]
-        // 创建ChatroomView，传入布局参数、底部工具栏扩展按钮模型协议数组等参数。
+
         let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: <#在Console中创建用户的id#>, chatType: .chat)
         vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
