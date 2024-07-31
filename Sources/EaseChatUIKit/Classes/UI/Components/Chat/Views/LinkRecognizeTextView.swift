@@ -196,7 +196,7 @@ typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, ty
     }
     
     func touchURL(urlString: String) {
-        var urlString = urlString
+        var urlString = urlString.lowercased()
         if !urlString.hasPrefix("http://"), !urlString.hasPrefix("https://") {
             urlString = "https://" + urlString
         } else {

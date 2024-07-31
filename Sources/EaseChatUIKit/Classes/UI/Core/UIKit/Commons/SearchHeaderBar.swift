@@ -98,6 +98,11 @@ extension SearchHeaderBar: UITextFieldDelegate {
         self.textFieldState?(.end)
     }
     
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.textChanged?(textField.text ?? "")
+        return true
+    }
+    
 }
 
 extension SearchHeaderBar: ThemeSwitchProtocol {
