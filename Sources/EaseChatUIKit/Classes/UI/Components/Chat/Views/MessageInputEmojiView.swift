@@ -25,7 +25,7 @@ import UIKit
     }()
 
     public lazy var emojiList: UICollectionView = {
-        UICollectionView(frame: CGRect(x: 0, y: 10, width: ScreenWidth, height: self.frame.height - 10), collectionViewLayout: self.flowLayout).registerCell(ChatEmojiCell.self, forCellReuseIdentifier: "ChatEmojiCell").dataSource(self).delegate(self).backgroundColor(.clear)
+        UICollectionView(frame: CGRect(x: 0, y: 10, width: self.frame.width, height: self.frame.height - 10 - BottomBarHeight), collectionViewLayout: self.flowLayout).registerCell(ChatEmojiCell.self, forCellReuseIdentifier: "ChatEmojiCell").dataSource(self).delegate(self).backgroundColor(.clear)
     }()
 
     public lazy var separaLine: UIView = {
@@ -33,27 +33,50 @@ import UIKit
     }()
 
     public lazy var deleteEmoji: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.frame.width - 92, y: self.frame.height - 56, width: 36, height: 36)).addTargetFor(self, action: #selector(deleteAction), for: .touchUpInside).isEnabled(true).cornerRadius(.large).backgroundColor(.clear)
+        UIButton(type: .custom).frame(CGRect(x: self.frame.width - 112, y: self.frame.height - 56, width: 44, height: 44)).addTargetFor(self, action: #selector(deleteAction), for: .touchUpInside).isEnabled(true).cornerRadius(.large).backgroundColor(.clear)
     }()
     
     public lazy var sendEmoji: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.frame.width - 48, y: self.frame.height - 56, width: 36, height: 36)).addTargetFor(self, action: #selector(sendAction), for: .touchUpInside).isEnabled(true).cornerRadius(.large).backgroundColor(.clear)
+        UIButton(type: .custom).frame(CGRect(x: self.frame.width - 56, y: self.frame.height - 56, width: 44, height: 44)).addTargetFor(self, action: #selector(sendAction), for: .touchUpInside).isEnabled(true).cornerRadius(.large).backgroundColor(.clear)
+    }()
+    
+    lazy var gradient: GradientEmojiView = {
+        GradientEmojiView(frame: CGRect(x: 0, y: self.frame.height-BottomBarHeight-32, width: self.frame.width, height: 32)).image(UIImage(named: "gradient_light", in: .chatBundle, with: nil))
     }()
 
     @objc required override public init(frame: CGRect) {
         super.init(frame: frame)
-        self.addSubViews([self.emojiList, self.deleteEmoji, self.sendEmoji,self.separaLine])
-        
+        self.addSubViews([self.emojiList, self.gradient,self.deleteEmoji, self.sendEmoji,self.separaLine])
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
     }
     
+    open override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        for view in subviews.reversed() {
+            if view.isKind(of: type(of: view)),view.frame.contains(point) {
+                if view.isKind(of: GradientEmojiView.self) {
+                    let childPoint = self.convert(point, to: self.emojiList)
+                    let childView = self.emojiList.hitTest(childPoint, with: event)
+                    return childView
+                } else {
+                    let childPoint = self.convert(point, to: view)
+                    let childView = view.hitTest(childPoint, with: event)
+                    return childView
+                }
+            }
+        }
+        return super.hitTest(point, with: event)
+    }
+    
     open override func layoutSubviews() {
         super.layoutSubviews()
-        self.deleteEmoji.frame = CGRect(x: self.frame.width - 92, y: self.frame.height - 56, width: 36, height: 36)
-        self.sendEmoji.frame = CGRect(x: self.frame.width - 48, y: self.frame.height - 56, width: 36, height: 36)
+        self.gradient.frame = CGRect(x: 0, y: self.frame.height-BottomBarHeight-32, width: self.frame.width, height: 32)
+        self.deleteEmoji.frame = CGRect(x: self.frame.width - 112, y: self.frame.height - 56 - BottomBarHeight, width: 44, height: 44)
+        self.sendEmoji.frame = CGRect(x: self.frame.width - 56, y: self.frame.height - 56 - BottomBarHeight, width: 44, height: 44)
+        self.deleteEmoji.cornerRadius(Appearance.avatarRadius)
+        self.sendEmoji.cornerRadius(Appearance.avatarRadius)
         self.separaLine.frame = CGRect(x: 0, y: 10, width: self.frame.width, height: 1)
-        self.emojiList.frame = CGRect(x: 0, y: 10, width: self.frame.width, height: self.frame.height - 10)
+        self.emojiList.frame = CGRect(x: 0, y: 10, width: self.frame.width, height: self.frame.height - 10 - BottomBarHeight)
     }
 
     @available(*, unavailable)
@@ -95,6 +118,7 @@ extension MessageInputEmojiView: ThemeSwitchProtocol {
         } else {
             self.sendEmoji.setImage(UIImage(named: "airplane", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor5), for: .normal)
         }
+        self.gradient.image = UIImage(named: style == .dark ? "gradient_dark":"gradient_light", in: .chatBundle, with: nil)
     }
 }
 

@@ -36,6 +36,37 @@ public extension UIViewController {
         return nil
     }
     
+    static func currentController(with view: Any) -> UIViewController? {
+        if let view = view as? UIView {
+            var next = view.superview
+            while next != nil {
+                if let nextResponder = next?.next as? UIViewController {
+                    return nextResponder
+                }
+                next = next?.superview
+            }
+        } else if let view = view as? UIBarButtonItem {
+            var window = UIApplication.shared.chat.keyWindow
+            if window?.windowLevel != .normal {
+                let windows = UIApplication.shared.windows
+                for tempWin in windows {
+                    if tempWin.windowLevel == .normal {
+                        window = tempWin
+                        break
+                    }
+                }
+            }
+            if let frontView = window?.subviews.first {
+                if let nextResponder = frontView.next as? UIViewController {
+                    return nextResponder
+                } else {
+                    return window?.rootViewController
+                }
+            }
+        }
+        return nil
+    }
+    
     func presentViewController(_ viewController: PresentationViewController, animated: Bool = true) {
         if UIViewController.currentController is DialogContainerViewController || UIViewController.currentController is AlertViewController || UIViewController.currentController is PageContainersDialogController {
             dismiss(animated: false)

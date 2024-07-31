@@ -83,7 +83,7 @@ public final class PresentationController: UIPresentationController {
     /// 将要弹出时添加背景按钮
     override public func presentationTransitionWillBegin() {
         /// 注册键盘通知
-        if component.destination != .topBaseline, component.destination != .center {
+        if component.destination != .topBaseline {
             registerObservers()
         }
         /// 背景动画

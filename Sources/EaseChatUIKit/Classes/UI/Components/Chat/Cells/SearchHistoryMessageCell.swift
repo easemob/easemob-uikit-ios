@@ -38,17 +38,17 @@ import UIKit
         super.layoutSubviews()
         self.avatar.center = CGPoint(x: self.avatar.center.x, y: self.contentView.center.y)
         self.conversationName.frame =  CGRect(x: self.avatar.frame.maxX+12, y: 10, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 18)
-        self.messageContent.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.maxY-20, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 16)
+        self.messageContent.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.maxY-20, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 18)
     }
     
-    func refresh(message: ChatMessage,info: ConversationInfo,keyword: String) {
+    func refresh(message: ChatMessage,info: EaseProfileProtocol,keyword: String) {
         var nickName = info.nickname.isEmpty ? info.id:info.nickname
         if !info.remark.isEmpty {
             nickName = info.remark
         }
         self.conversationName.text = nickName
         self.messageContent.attributedText = self.highlightKeywords(keyword: keyword, in: message.showType)
-        self.avatar.image(with: info.avatarURL, placeHolder: info.type == .chat ? Appearance.conversation.singlePlaceHolder:Appearance.conversation.groupPlaceHolder)
+        self.avatar.image(with: info.avatarURL, placeHolder:Appearance.conversation.singlePlaceHolder)
     }
     
     func highlightKeywords(keyword: String, in string: String) -> NSAttributedString {

@@ -664,6 +664,14 @@ extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
 }
 
 extension ChatThreadViewModel: ChatResponseListener {
+    public func onCMDMessageDidReceived(message: ChatMessage) {
+        
+    }
+    
+    public func onMessageStickiedTop(conversationId: String, messageId: String, operation: MessagePinOperation, info: MessagePinInfo) {
+        
+    }
+    
     public func onMessageDidReceived(message: ChatMessage) {
         self.messageDidReceived(message: message)
     }
@@ -685,6 +693,26 @@ extension ChatThreadViewModel: ChatResponseListener {
                 profile.id = message.from
                 profile.modifyTime = message.timestamp
                 EaseChatUIKitContext.shared?.chatCache?[message.from] = profile
+                if EaseChatUIKitContext.shared?.userCache?[message.from] == nil {
+                    EaseChatUIKitContext.shared?.userCache?[message.from] = profile
+                } else {
+                    EaseChatUIKitContext.shared?.userCache?[message.from]?.nickname = profile.nickname
+                    EaseChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
+                }
+            }
+            if let dic = message.ext?["ease_chat_uikit_text_url_preview"] as? Dictionary<String,String>,let url = dic["url"] {
+                let content = URLPreviewManager.HTMLContent()
+                if let description = dic["description"] {
+                    content.descriptionHTML = description
+                }
+                if let imageURL = dic["imageUrl"] {
+                    content.imageURL = imageURL
+                }
+                content.towards = message.direction == .send ? .right:.left
+                if let title = dic["title"] {
+                    content.title = title
+                    URLPreviewManager.caches[url] = content
+                }
             }
             let entity = message
             entity.direction = message.direction

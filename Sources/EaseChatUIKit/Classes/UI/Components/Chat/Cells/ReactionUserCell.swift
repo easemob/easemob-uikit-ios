@@ -63,12 +63,28 @@ import UIKit
     }
     
     @objc open func refresh(profile: EaseProfileProtocol) {
-        let nickName = profile.nickname.isEmpty ? profile.id:profile.nickname
-        self.nickName.text = nickName
         self.nickName.textColor = Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
         
+        var nickName = profile.id
+        var avatarURL = profile.avatarURL
+        var info = EaseChatUIKitContext.shared?.chatCache?[profile.id]
+        if info == nil {
+            info = EaseChatUIKitContext.shared?.userCache?[profile.id]
+        }
+        if let info = info {
+            if !info.nickname.isEmpty {
+                nickName = info.nickname
+            }
+            if !info.remark.isEmpty {
+                nickName = info.remark
+            }
+            if !info.avatarURL.isEmpty {
+                avatarURL = info.avatarURL
+            }
+        }
+        self.nickName.text = nickName
         if !profile.avatarURL.isEmpty {
-            self.avatar.image(with: profile.avatarURL, placeHolder: Appearance.conversation.singlePlaceHolder)
+            self.avatar.image(with: avatarURL, placeHolder: Appearance.conversation.singlePlaceHolder)
         } else {
             self.avatar.image = Appearance.conversation.singlePlaceHolder
         }

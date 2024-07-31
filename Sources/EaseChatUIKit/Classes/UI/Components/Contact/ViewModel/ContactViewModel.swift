@@ -26,7 +26,7 @@ import UIKit
         self.ignoreContacts = ignoreIds
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(addFriendRefreshList), name: Notification.Name("New Friend Chat"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(loadAllContacts), name: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(loadAllContacts), name: Notification.Name(rawValue: cache_update_notification), object: nil)
     }
     
     public private(set) weak var driver: IContactListDriver?
@@ -78,7 +78,7 @@ import UIKit
             if error == nil {
                 if let infos = self?.filterContacts(contacts: contacts) {
                     self?.driver?.refreshList(infos: infos)
-                    if infos.count < 10 {
+                    if infos.count < 7 {
                         self?.requestDisplayInfos(ids: infos.map({ $0.id }))
                     }
                     DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {
@@ -100,7 +100,7 @@ import UIKit
             if error == nil {
                 if let infos = self?.filterContacts(contacts: contacts) {
                     self?.driver?.refreshList(infos: infos)
-                    if infos.count < 10 {
+                    if infos.count < 7 {
                         self?.requestDisplayInfos(ids: infos.map({ $0.id }))
                     }
                     DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {

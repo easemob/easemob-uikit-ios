@@ -99,13 +99,20 @@ import UIKit
         
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
-        NotificationCenter.default.addObserver(self, selector: #selector(refreshList), name: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshList), name: Notification.Name(rawValue: cache_update_notification), object: nil)
+    }
+    
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.refreshList()
     }
     
     @objc private func refreshList() {
         for participant in participants {
-            if let remark = EaseChatUIKitContext.shared?.userCache?[participant.id] as? String {
-                participant.remark = remark
+            if let user = EaseChatUIKitContext.shared?.userCache?[participant.id]{
+                participant.nickname = user.nickname
+                participant.remark = user.remark
+                participant.avatarURL = user.avatarURL
             }
         }
         self.participantsList.reloadData()
@@ -183,6 +190,7 @@ import UIKit
                     if error == nil {
                         self?.participants.append(contentsOf: users)
                         self?.participantsList.reloadData()
+                        self?.setupTitle()
                         self?.pop()
                     } else {
                         consoleLogInfo("Add participants  error:\(error?.errorDescription ?? "")", type: .error)
@@ -198,6 +206,7 @@ import UIKit
                 self?.participants.removeAll(where: { $0.id == userId })
             }
             self?.participantsList.reloadData()
+            self?.setupTitle()
         }
         vc.modalPresentationStyle = .fullScreen
         ControllerStack.toDestination(vc: vc)
@@ -217,9 +226,11 @@ import UIKit
                                 profile.id = id
                                 if let user = EaseChatUIKitContext.shared?.userCache?[id] {
                                     profile.nickname = user.nickname
+                                    profile.avatarURL = user.avatarURL
                                 }
                                 if let user = EaseChatUIKitContext.shared?.chatCache?[id] {
                                     profile.nickname = user.nickname
+                                    profile.avatarURL = user.avatarURL
                                 }
                                 
                                 return profile
@@ -230,9 +241,11 @@ import UIKit
                                     profile.id = self.chatGroup.owner
                                     if let user = EaseChatUIKitContext.shared?.userCache?[self.chatGroup.owner] {
                                         profile.nickname = user.nickname
+                                        profile.avatarURL = user.avatarURL
                                     }
                                     if let user = EaseChatUIKitContext.shared?.chatCache?[self.chatGroup.owner] {
                                         profile.nickname = user.nickname
+                                        profile.avatarURL = user.avatarURL
                                     }
                                     self.participants.insert(profile, at: 0)
                                 }
@@ -241,11 +254,22 @@ import UIKit
                             self.participants.append(contentsOf: list.map({
                                 let profile = EaseProfile()
                                 profile.id = $0 as String
+                                if let user = EaseChatUIKitContext.shared?.userCache?[profile.id] {
+                                    profile.nickname = user.nickname
+                                    profile.avatarURL = user.avatarURL
+                                }
+                                if let user = EaseChatUIKitContext.shared?.chatCache?[profile.id] {
+                                    profile.nickname = user.nickname
+                                    profile.avatarURL = user.avatarURL
+                                }
                                 return profile
                             }))
                         }
                     }
                     self.cursor = result?.cursor ?? ""
+                    if self.operation == .mention {
+                        self.participants.removeAll { $0.id == EaseChatUIKitContext.shared?.currentUserId ?? "" }
+                    }
                     self.participantsList.reloadData()
                     self.recursiveCount -= 1
                     if self.participants.count < Appearance.chat.groupParticipantsLimitCount {
@@ -293,15 +317,58 @@ extension GroupParticipantsController: UITableViewDelegate,UITableViewDataSource
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        if scrollView.isKind(of: UICollectionView.self) {
+            return
+        }
+        self.requestDisplayInfos()
+    }
+    
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            self.requestDisplayInfos()
+        }
+    }
+    
+    @objc open func requestDisplayInfos() {
         var unknownInfoIds = [String]()
         if let visiblePaths = self.participantsList.indexPathsForVisibleRows {
             for indexPath in visiblePaths {
                 if let nickName = self.participants[safe: indexPath.row]?.nickname,nickName.isEmpty {
-                    unknownInfoIds.append(self.participants[safe: indexPath.row]?.id ?? "")
+                    if let unknownId = self.participants[safe: indexPath.row]?.id {
+                        unknownInfoIds.append(unknownId)
+                    }
                 }
             }
         }
-        
+        if EaseChatUIKitContext.shared?.userProfileProvider != nil {
+            if !unknownInfoIds.isEmpty {
+                Task {
+                    let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: unknownInfoIds) ?? []
+                    self.fillCache(profiles: profiles)
+                    DispatchQueue.main.async {
+                        self.processCacheProfiles(values: profiles)
+                    }
+                }
+            }
+        } else {
+            EaseChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: unknownInfoIds, completion: { [weak self] profiles in
+                guard let `self` = self else { return }
+                self.fillCache(profiles: profiles)
+                self.processCacheProfiles(values: profiles)
+            })
+        }
+    }
+    
+    private func fillCache(profiles: [EaseProfileProtocol]) {
+        for profile in profiles {
+            if let profile = EaseChatUIKitContext.shared?.userCache?[profile.id] {
+                profile.nickname = profile.nickname
+                profile.remark = profile.remark
+                profile.avatarURL = profile.avatarURL
+            } else {
+                EaseChatUIKitContext.shared?.userCache?[profile.id] = profile
+            }
+        }
     }
     
     private func processCacheInfos(values: [String]) {
@@ -321,6 +388,7 @@ extension GroupParticipantsController: UITableViewDelegate,UITableViewDataSource
                 if value.id == participant.id {
                     participant.nickname = value.nickname
                     participant.avatarURL = value.avatarURL
+                    participant.remark = value.remark
                 }
             }
         }

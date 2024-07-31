@@ -17,12 +17,12 @@ import UIKit
         Theme.style  == .dark ? UIColor.theme.primaryColor3:UIColor.theme.primaryColor9
     }
     
-    public private(set) lazy var content: UILabel = {
+    public private(set) lazy var content: LinkRecognizeTextView = {
         self.createContent()
     }()
     
-    @objc open func createContent() -> UILabel {
-        UILabel(frame: .zero).backgroundColor(.clear).numberOfLines(0)
+    @objc open func createContent() -> LinkRecognizeTextView {
+        LinkRecognizeTextView(frame: .zero).backgroundColor(.clear)
     }
     
     public private(set) lazy var edit: UIButton = {
@@ -37,12 +37,20 @@ import UIKit
         UIView(frame: .zero)
     }()
     
-    public private(set) lazy var translation: UITextView = {
+    public private(set) lazy var translationContainer: TranslateTextView = {
+        self.createTranslationContainer()
+    }()
+    
+    @objc open func createTranslationContainer() -> TranslateTextView {
+        TranslateTextView(frame: .zero).backgroundColor(.clear).isEditable(false)
+    }
+    
+    public private(set) lazy var translation: UILabel = {
         self.createTranslation()
     }()
     
-    @objc open func createTranslation() -> UITextView {
-        UITextView(frame: .zero).backgroundColor(.clear)
+    @objc open func createTranslation() -> UILabel {
+        UILabel(frame: .zero).backgroundColor(.clear).numberOfLines(0)
     }
     
     public private(set) lazy var translateSymbol: UIButton = {
@@ -53,28 +61,61 @@ import UIKit
         UIButton(type: .custom).frame(.zero).backgroundColor(.clear).font(UIFont.theme.labelSmall)
     }
     
+    public private(set) lazy var previewContent: URLPreviewResultView = {
+        self.createPreviewContent()
+    }()
+    
+    @objc open func createPreviewContent() -> URLPreviewResultView {
+        URLPreviewResultView(frame: CGRect(x: 0, y: self.frame.height-38, width: limitBubbleWidth, height: 38))
+    }
+    
     @objc required public init(towards: BubbleTowards,reuseIdentifier: String) {
         super.init(towards: towards, reuseIdentifier: reuseIdentifier)
         if Appearance.chat.bubbleStyle == .withArrow {
             self.bubbleWithArrow.addSubViews([self.content,self.edit])
             if Appearance.chat.enableTranslation {
-                self.bubbleWithArrow.addSubViews([self.separatorLine,self.translation,self.translateSymbol])
+                self.bubbleWithArrow.bubble.addSubViews([self.separatorLine,self.translationContainer,self.translation,self.translateSymbol])
+                if Appearance.chat.enableURLPreview {
+                    self.bubbleWithArrow.bubble.addSubViews([self.previewContent])
+                }
             }
             self.addGestureTo(view: self.bubbleWithArrow, target: self)
         } else {
             self.bubbleMultiCorners.addSubViews([self.content,self.edit])
             if Appearance.chat.enableTranslation {
-                self.bubbleMultiCorners.addSubViews([self.separatorLine,self.translation,self.translateSymbol])
+                self.bubbleMultiCorners.addSubViews([self.separatorLine,self.translationContainer,self.translation,self.translateSymbol])
+            }
+            if Appearance.chat.enableURLPreview {
+                self.bubbleMultiCorners.addSubViews([self.previewContent])
             }
             self.addGestureTo(view: self.bubbleMultiCorners, target: self)
         }
-        self.translation.isScrollEnabled = false
-        self.translation.showsVerticalScrollIndicator = false
-        self.translation.showsHorizontalScrollIndicator = false
+        self.translationContainer.isScrollEnabled = false
+        self.translationContainer.showsVerticalScrollIndicator = false
+        self.translationContainer.showsHorizontalScrollIndicator = false
+        self.translationContainer.isSelectable = true
+        self.translationContainer.isUserInteractionEnabled = true
+        self.translationContainer.textContainerInset = .zero
+        
+        
+        self.content.showsVerticalScrollIndicator = false
+        self.content.showsHorizontalScrollIndicator = false
+        self.content.isScrollEnabled = false
+        self.content.textContainerInset = .zero
+        self.content.textContainer.lineFragmentPadding = 0
+        self.content.isEditable = false
+        self.content.isSelectable = false
+        self.content.dataDetectorTypes = [.link]
         self.edit.contentHorizontalAlignment = .right
         self.translateSymbol.contentHorizontalAlignment = .right
-        self.translation.isEditable = false 
-        self.translation.contentInset = UIEdgeInsets(top: -8, left: -6, bottom: -8, right: -6)
+        self.previewContent.isHidden = true
+        
+        
+        self.content.clickAction = { [weak self] in
+            guard let `self` = self else { return }
+            self.clickAction?(.bubble,self.entity)
+        }
+        
     }
     
     required public init?(coder: NSCoder) {
@@ -83,9 +124,20 @@ import UIKit
     
     public override func refresh(entity: MessageEntity) {
         super.refresh(entity: entity)
+        
+        let receiveLinkColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        let sendLinkColor = Appearance.chat.sendTextColor
+        let color = self.towards == .right ? sendLinkColor:receiveLinkColor
+        self.content.linkTextAttributes = [.underlineStyle:NSUnderlineStyle.single.rawValue,.underlineColor:color,.foregroundColor:color]
         let textSize = entity.textSize()
         let translationSize = Appearance.chat.enableTranslation ? entity.translationSize():.zero
-        self.content.frame = CGRect(x: 12, y: 6.5, width: entity.bubbleSize.width-24, height: textSize.height)
+        if Appearance.chat.bubbleStyle == .withArrow {
+            self.content.frame = CGRect(x: self.towards == .right ? 10:14, y: 7, width: entity.bubbleSize.width-24, height: textSize.height)
+        } else {
+            self.content.frame = CGRect(x: 12, y: 7, width: entity.bubbleSize.width-24, height: textSize.height)
+        }
+        self.content.attributedText = entity.content
+        self.content.parseTextAndExtractActiveElements(entity.content!)
         let stateColor: UIColor = entity.message.direction == .send ? self.sendStateColor:self.receiveStateColor
         self.edit.setTitleColor(stateColor, for: .normal)
         self.translateSymbol.setTitleColor(stateColor, for: .normal)
@@ -107,22 +159,59 @@ import UIKit
         }
         
         if entity.showTranslation,Appearance.chat.enableTranslation {
+            self.translation.attributedText = entity.translation
             self.separatorLine.isHidden = false
             self.translation.isHidden = false
             self.translateSymbol.isHidden = false
             self.separatorLine.frame = CGRect(x: 12, y: (entity.message.edited ? self.edit.frame.maxY+8:self.content.frame.maxY+6), width: entity.bubbleSize.width-24, height: 0.5)
+            self.translationContainer.frame = CGRect(x: 12, y: self.separatorLine.frame.maxY+8, width: entity.bubbleSize.width-24, height: translationSize.height)
             self.translation.frame = CGRect(x: 12, y: self.separatorLine.frame.maxY+8, width: entity.bubbleSize.width-24, height: translationSize.height)
-            self.translateSymbol.frame = CGRect(x: 12, y: entity.bubbleSize.height-20, width: entity.bubbleSize.width-24, height: 16)
+            var symbolY = entity.bubbleSize.height - 20
+            if Appearance.chat.enableURLPreview {
+                symbolY = self.translation.frame.maxY
+            }
+            self.translateSymbol.frame = CGRect(x: 12, y: symbolY, width: entity.bubbleSize.width-24, height: 16)
             self.translateSymbol.setTitle("Translated".chat.localize, for: .normal)
             let image = UIImage(named: "text_message_translated", in: .chatBundle, with: nil)
             self.translateSymbol.image(image?.withTintColor(stateColor), .normal)
         } else {
+            self.separatorLine.frame = CGRect(x: 12, y: (entity.message.edited ? self.edit.frame.maxY+6:self.content.frame.maxY+6), width: entity.bubbleSize.width-24, height: 0.5)
             self.separatorLine.isHidden = true
             self.translation.isHidden = true
             self.translateSymbol.isHidden = true
         }
-        self.content.attributedText = entity.content
-        self.translation.attributedText = entity.translation
+        if Appearance.chat.enableURLPreview {
+            self.previewContent.state = entity.previewResult
+            let previewHeight = entity.urlPreviewHeight()
+            self.previewContent.frame = CGRect(x: 0, y: entity.bubbleSize.height-previewHeight, width: entity.bubbleSize.width, height: previewHeight)
+            self.previewContent.descriptionLabel.textColor = self.towards == .right ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor
+            switch entity.previewResult {
+            case .success:
+                self.previewContent.show(with: entity.urlPreview)
+            default: break
+            }
+            self.previewContent.isHidden = previewHeight <= 0
+        }
+        
     }
     
+    
+}
+
+
+@objc open class TranslateTextView: UITextView {
+    open override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        if action == #selector(copy(_:)) {
+            return true
+        }
+        return super.canPerformAction(action, withSender: sender)
+    }
+    
+    open override func copy(_ sender: Any?) {
+        if let selectedTextRange = self.selectedTextRange {
+            let selectedText = self.text(in: selectedTextRange)
+            UIPasteboard.general.string = selectedText
+        }
+    }
+
 }

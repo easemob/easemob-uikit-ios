@@ -163,14 +163,14 @@ extension ChatThreadParticipantsController: UITableViewDelegate,UITableViewDataS
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        var unknownInfoIds = [String]()
-        if let visiblePaths = self.participantsList.indexPathsForVisibleRows {
-            for indexPath in visiblePaths {
-                if let nickName = self.participants[safe: indexPath.row]?.nickname,nickName.isEmpty {
-                    unknownInfoIds.append(self.participants[safe: indexPath.row]?.id ?? "")
-                }
-            }
-        }
+//        var unknownInfoIds = [String]()
+//        if let visiblePaths = self.participantsList.indexPathsForVisibleRows {
+//            for indexPath in visiblePaths {
+//                if let nickName = self.participants[safe: indexPath.row]?.nickname,nickName.isEmpty {
+//                    unknownInfoIds.append(self.participants[safe: indexPath.row]?.id ?? "")
+//                }
+//            }
+//        }
 
         
     }

@@ -87,7 +87,7 @@ import UIKit
         self.searchHeader.textChanged = { [weak self] in
             guard let `self` = self else { return }
             self.searchText = $0.lowercased()
-            self.searchResults = self.datas.filter({ $0.nickname.lowercased().contains(self.searchText) || $0.id.lowercased().contains(self.searchText) })
+            self.searchResults = self.datas.filter({ $0.nickname.lowercased().contains(self.searchText) || $0.id.lowercased().contains(self.searchText) || $0.remark.lowercased().contains(self.searchText)})
             self.searchList.reloadData()
         }
         self.searchHeader.textFieldState = { [weak self] in
@@ -101,9 +101,13 @@ import UIKit
                 self?.pop()
             }
         }
-        self.searchHeader.searchField.becomeFirstResponder()
+        
     }
     
+    open override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.searchHeader.searchField.becomeFirstResponder()
+    }
 
 }
 

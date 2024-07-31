@@ -34,24 +34,38 @@ import UIKit
     
     @UserDefault("EaseChatUIKit_conversation_mute_map", defaultValue: Dictionary<String,Dictionary<String,Int>>()) public private(set) var muteMap
     
-    public private(set) lazy var datas: [DetailInfo] = {
+    @UserDefault("EaseChatUIKit_contact_block_list_exist", defaultValue: Dictionary<String,Bool>()) public private(set) var blockListExist
+    
+    public lazy var datas: [DetailInfo] = {
         self.dataSource()
     }()
     
-    /// Can override 
-    /// - Returns: <#description#>
+    /// Can override
+    /// - Returns: Array<DetailInfo> instance.
     @objc open func dataSource() -> [DetailInfo] {
-        [
+        (Appearance.contact.enableBlock ? [
             ["title":"contact_details_switch_donotdisturb".chat.localize,
              "detail":"",
              "withSwitch": true,
              "switchValue":self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
-         
+            ["title":"contact_details_switch_block".chat.localize,
+             "detail":"",
+             "withSwitch": true,
+             "switchValue":false],
             ["title":"contact_details_button_clearchathistory".chat.localize,
              "detail":"",
              "withSwitch": false,
              "switchValue":false]
-        ].map {
+        ]:[
+            ["title":"contact_details_switch_donotdisturb".chat.localize,
+             "detail":"",
+             "withSwitch": true,
+             "switchValue":self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
+            ["title":"contact_details_button_clearchathistory".chat.localize,
+             "detail":"",
+             "withSwitch": false,
+             "switchValue":false]
+        ]).map {
             self.dictionaryMapToInfo(json: $0)
         }
     }
@@ -88,7 +102,7 @@ import UIKit
         DetailInfoHeader(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 284), showMenu: self.showMenu, placeHolder: UIImage(named: "single", in: .chatBundle, with: nil)).backgroundColor(.clear)
     }
     
-    lazy var showMenu: Bool = {
+    public lazy var showMenu: Bool = {
         self.showMenuCondition()
     }()
     
@@ -153,6 +167,72 @@ import UIKit
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// Fetch block user list.
+    @objc open func fetchBlockList() {
+        if !self.showMenu {
+            return
+        }
+        if let exist = self.blockListExist[EaseChatUIKitContext.shared?.currentUserId ?? ""],!exist {
+            ChatClient.shared().contactManager?.getBlackListFromServer(completion: { [weak self] users, error in
+                guard let `self` = self else { return }
+                if error != nil {
+                    consoleLogInfo("fetchBlockList error:\(error?.errorDescription ?? "")", type: .error)
+                } else {
+                    self.blockListExist[EaseChatUIKitContext.shared?.currentUserId ?? ""] = true
+                    let blocked = users?.contains(self.profile.id) ?? false
+                    self.blockUserRefresh(blocked: blocked)
+                }
+            })
+        } else {
+            let blocked = ChatClient.shared().contactManager?.getBlackList()?.contains(self.profile.id) ?? false
+            self.blockUserRefresh(blocked: blocked)
+            self.datas.first?.switchValue = blocked
+            self.menuList.reloadData()
+        }
+    }
+    
+    @objc open func blockUserRefresh(blocked: Bool) {
+        self.header.refreshHeader(showMenu: !blocked)
+        self.datas.removeAll()
+        var blockUserDatas = [
+            ["title":"contact_details_switch_donotdisturb".chat.localize,
+             "detail":"",
+             "withSwitch": true,
+             "switchValue":self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
+            ["title":"contact_details_switch_block".chat.localize,
+             "detail":"",
+             "withSwitch": true,
+             "switchValue":blocked],
+            ["title":"contact_details_button_clearchathistory".chat.localize,
+             "detail":"",
+             "withSwitch": false,
+             "switchValue":false]
+        ]
+        if blocked {
+            blockUserDatas = [["title":"contact_details_switch_block".chat.localize,
+                               "detail":"",
+                               "withSwitch": true,
+                               "switchValue":blocked]]
+        }
+        self.datas = (Appearance.contact.enableBlock ? blockUserDatas:[
+            ["title":"contact_details_switch_donotdisturb".chat.localize,
+             "detail":"",
+             "withSwitch": true,
+             "switchValue":self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
+            ["title":"contact_details_button_clearchathistory".chat.localize,
+             "detail":"",
+             "withSwitch": false,
+             "switchValue":false]
+        ]).map {
+            self.dictionaryMapToInfo(json: $0)
+        }
+        if !self.showMenu {
+            self.datas.removeAll()
+        }
+        self.datas.first?.switchValue = blocked
+        self.menuList.reloadData()
+    }
+    
     /**
      Fetches all contact IDs and updates the contacts array.
      
@@ -163,11 +243,13 @@ import UIKit
             if allContacts.count > 0 {
                 self.contacts = allContacts
                 self.setup()
+                self.fetchBlockList()
             } else {
                 ChatClient.shared().contactManager?.getContactsFromServer(completion: { [weak self] contacts, error in
                     if error == nil {
                         self?.contacts = contacts ?? []
                         self?.setup()
+                        self?.fetchBlockList()
                     }
                 })
             }
@@ -205,13 +287,6 @@ import UIKit
             }
             self.menuList.reloadData()
         }
-    }
-
-    open override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        
-        //Click of the navigation
         self.navigation.clickClosure = { [weak self] in
             self?.navigationClick(type: $0, indexPath: $1)
         }
@@ -219,6 +294,14 @@ import UIKit
         self.headerActions()
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
+    }
+
+    open override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view.
+        
+        //Click of the navigation
+        
         
     }
     
@@ -446,28 +529,78 @@ extension ContactInfoViewController: UITableViewDelegate,UITableViewDataSource {
     */
     @objc open func switchChanged(isOn: Bool, indexPath: IndexPath) {
         if let name = self.datas[safe: indexPath.row]?.title {
-            if isOn {
-                self.conversationService.setSilentMode(conversationId: self.profile.id) { [weak self] result, error in
-                    guard let `self` = self else { return }
-                    if error == nil {
-                        self.processSilentMode(name: name, isOn: isOn)
-                    } else {
-                        consoleLogInfo("ContactInfoViewController set silent mode error:\(error?.errorDescription ?? "")", type: .error)
-                    
-                    }
-                }
-            } else {
-                self.conversationService.clearSilentMode(conversationId: self.profile.id) { [weak self] result, error in
-                    guard let `self` = self else { return }
-                    if error == nil {
-                        self.processSilentMode(name: name, isOn: isOn)
-                    } else {
-                        consoleLogInfo("ContactInfoViewController clear silent mode error:\(error?.errorDescription ?? "")", type: .error)
-                    }
+            switch name {
+            case "contact_details_switch_donotdisturb".chat.localize:
+                self.operateDisturb(isOn: isOn,name: name)
+                self.datas[indexPath.row].switchValue = isOn
+            case "contact_details_switch_block".chat.localize:
+                self.operateBlock(isOn: isOn, name: name)
+            default:
+                break
+            }
+        }
+    }
+    
+    @objc open func operateDisturb(isOn: Bool,name: String) {
+        if isOn {
+            self.conversationService.setSilentMode(conversationId: self.profile.id) { [weak self] result, error in
+                guard let `self` = self else { return }
+                if error == nil {
+                    self.processSilentMode(name: name, isOn: isOn)
+                } else {
+                    consoleLogInfo("ContactInfoViewController set silent mode error:\(error?.errorDescription ?? "")", type: .error)
+                
                 }
             }
-            
-            
+        } else {
+            self.conversationService.clearSilentMode(conversationId: self.profile.id) { [weak self] result, error in
+                guard let `self` = self else { return }
+                if error == nil {
+                    self.processSilentMode(name: name, isOn: isOn)
+                } else {
+                    consoleLogInfo("ContactInfoViewController clear silent mode error:\(error?.errorDescription ?? "")", type: .error)
+                }
+            }
+        }
+    }
+    
+    @objc open func operateBlock(isOn: Bool,name: String) {
+        if isOn {
+            var nickname = self.profile.nickname
+            if nickname.isEmpty {
+                nickname = self.profile.remark
+            }
+            if nickname.isEmpty {
+                nickname = self.profile.id
+            }
+            DialogManager.shared.showAlert(title: "block contact".chat.localize, content: "block alert".chat.localize+"'\(nickname)'?", showCancel: true, showConfirm: true) { [weak self] _ in
+                self?.blockRequest(isOn: isOn)
+            } cancelClosure: { [weak self] in
+                self?.menuList.reloadData()
+            }
+        } else {
+            self.blockRequest(isOn: isOn)
+        }
+    }
+    
+    @objc open func blockRequest(isOn: Bool) {
+        if isOn {
+            ChatClient.shared().contactManager?.addUser(toBlackList: self.profile.id, completion: { [weak self] userId, error in
+                if error != nil {
+                    consoleLogInfo("addUser toBlackList error:\(error?.errorDescription ?? "")", type: .error)
+                } else {
+                    self?.blockUserRefresh(blocked: true)
+                }
+            })
+        } else {
+            ChatClient.shared().contactManager?.removeUser(fromBlackList: self.profile.id, completion: { [weak self] userId, error in
+                if error != nil {
+                    consoleLogInfo("removeUser fromBlackList error:\(error?.errorDescription ?? "")", type: .error)
+                } else {
+                    self?.blockUserRefresh(blocked: false)
+                    self?.showToast(toast: "unblock".chat.localize+" "+"succeeded".chat.localize)
+                }
+            })
         }
     }
     
@@ -479,7 +612,7 @@ extension ContactInfoViewController: UITableViewDelegate,UITableViewDataSource {
             self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""] = [self.profile.id:isOn ? 1:0]
         }
         if name == "contact_details_switch_donotdisturb".chat.localize {
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseUIKit_do_not_disturb_changed"), object: nil,userInfo: ["id":self.profile.id,"value":isOn])
+            NotificationCenter.default.post(name: Notification.Name(rawValue: disturb_change), object: nil,userInfo: ["id":self.profile.id,"value":isOn])
         }
     }
 }

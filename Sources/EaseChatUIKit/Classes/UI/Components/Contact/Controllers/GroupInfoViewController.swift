@@ -355,16 +355,20 @@ import UIKit
      */
     @objc open func disband() {
         DialogManager.shared.showAlert(title: "group_details_extend_button_disband_alert_title".chat.localize, content: "group_details_extend_button_disband_alert_subtitle".chat.localize, showCancel: true, showConfirm: true) { [weak self] _ in
-            self?.service.disband(groupId: self?.chatGroup.groupId ?? "") { error in
-                if error == nil {
-                    NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_leaveGroup"), object: self?.chatGroup.groupId ?? "")
-                    self?.pop()
-                } else {
-                    consoleLogInfo("disband error:\(error?.errorDescription ?? "")", type: .error)
-                }
-            }
+            self?.disbandRequest()
         }
         
+    }
+    
+    @objc open func disbandRequest() {
+        self.service.disband(groupId: self.chatGroup.groupId) { error in
+            if error == nil {
+                NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_leaveGroup"), object: self.chatGroup.groupId)
+                self.pop()
+            } else {
+                consoleLogInfo("disband error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        }
     }
     
     /**
@@ -374,7 +378,8 @@ import UIKit
         let vc =
         ComponentsRegister.shared.GroupParticipantController.init(groupId: self.chatGroup.groupId, operation: .transferOwner)
         vc.mentionClosure = { [weak self] in
-            self?.transferConfirm(profile: $0)
+            guard let `self` = self else { return }
+            self.transferConfirm(profile: $0)
         }
         if vc.presentingViewController != nil {
             vc.modalPresentationStyle = .fullScreen
@@ -383,12 +388,28 @@ import UIKit
     }
     
     private func transferConfirm(profile: EaseProfileProtocol) {
-        DialogManager.shared.showAlert(title: "group_details_extend_button_transfer".chat.localize+"to ".chat.localize+"\(profile.nickname)?", content: "", showCancel: true, showConfirm: true) { [weak self] text in
+        var user = EaseChatUIKitContext.shared?.userCache?[profile.id]
+        if user == nil {
+            user = EaseChatUIKitContext.shared?.chatCache?[profile.id]
+        }
+        var nickname = user?.remark ?? ""
+        if nickname.isEmpty {
+            nickname = user?.nickname ?? ""
+        }
+        if nickname.isEmpty {
+            nickname = profile.id
+        }
+        DialogManager.shared.showAlert(title: "", content: "group_details_extend_button_transfer".chat.localize+" to ".chat.localize+"\(nickname)?", showCancel: true, showConfirm: true) { [weak self] text in
             guard let `self` = self else { return }
-            self.service.transfer(groupId: self.chatGroup.groupId, userId: profile.id, completion: { group, error in
+            self.service.transfer(groupId: self.chatGroup.groupId, userId: profile.id, completion: { [weak self] group, error in
+                guard let `self` = self else { return }
                 if error == nil {
+                    self.datas.removeLast()
+                    self.menuList.reloadData()
                     NotificationCenter.default.post(name: Notification.Name("EaseChatUIKit_leaveGroup"), object: profile.id)
-                    self.pop()
+                    DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.5) {
+                        self.pop()
+                    }
                 } else {
                     consoleLogInfo("transfer owner error:\(error?.errorDescription ?? "")", type: .error)
                 }
@@ -463,22 +484,12 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
         }
         cell?.indexPath = indexPath
         if let info = self.datas[safe: indexPath.section]?[safe: indexPath.row] {
-            if EaseChatUIKitContext.shared?.currentUserId ?? "" == self.chatGroup.owner {
-                cell?.accessoryType = info.withSwitch ? .none:.disclosureIndicator
-            } else {
-                if indexPath.section == 1 {
-                    cell?.accessoryType = .none
-                } else {
-                    cell?.accessoryType = info.withSwitch ? .none:.disclosureIndicator
-                }
-            }
             cell?.refresh(info: info)
         }
         cell?.switchMenu.isEnabled = !self.chatGroup.isDisabled
         cell?.valueChanged = { [weak self] in
             self?.switchChanged(isOn: $0, indexPath: $1)
         }
-        cell?.selectionStyle = .none
         return cell ?? UITableViewCell()
     }
 
@@ -627,7 +638,7 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
             self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""] = [self.chatGroup.groupId:isOn ? 1:0]
         }
         if name == "contact_details_switch_donotdisturb".chat.localize,let groupId = self.chatGroup.groupId {
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "EaseUIKit_do_not_disturb_changed"), object: nil,userInfo: ["id":groupId,"value":isOn])
+            NotificationCenter.default.post(name: Notification.Name(rawValue: disturb_change), object: nil,userInfo: ["id":groupId,"value":isOn])
         }
     }
     

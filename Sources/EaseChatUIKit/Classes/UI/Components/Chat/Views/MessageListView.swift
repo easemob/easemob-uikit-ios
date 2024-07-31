@@ -7,6 +7,7 @@ import UIKit
 }
 
 @objc public enum MessageOperation: UInt {
+    case pin
     case copy
     case edit
     case reply
@@ -154,11 +155,18 @@ import UIKit
     /// - Parameter finished: Bool
     func updateThreadLoadMessagesFinished(finished: Bool)
     
+    /// Update state on chat thread load messages finished.
     func endRefreshing()
     
+    /// Stop audio messages play.
     func stopAudioMessagesPlay()
     
+    /// Update message on message list.
     func readAllMessages()
+    
+    /// Highlight message on message list.
+    /// - Parameter message: ``ChatMessage``
+    func highlightMessage(message: ChatMessage)
 }
 
 @objc public enum MessageListType: UInt8 {
@@ -296,7 +304,6 @@ import UIKit
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
         
-        self.moreMessages.layer.cornerRadius = CGFloat(Appearance.avatarRadius.rawValue)
         self.moreMessages.layer.masksToBounds = false
         let shadowPath0 = UIBezierPath(roundedRect: self.moreMessages.bounds, cornerRadius: 4)
         let layer0 = CALayer()
@@ -328,8 +335,13 @@ import UIKit
             UIView.animate(withDuration: 0.22) {
                 let oldFrame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-52)
                 if firstResponder {
-                    if self.inputBar.keyboardHeight >= 216 {
-                        self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.messageList.frame.height-self.inputBar.keyboardHeight)
+                    if self.inputBar.keyboardHeight >= 216,self.messageList.frame.height >= oldFrame.height {
+                        if self.getLastVisibleCellCoordinate().maxY > self.inputBar.frame.height+self.inputBar.keyboardHeight {
+                            self.messageList.frame = CGRect(x: 0, y: 0-self.inputBar.keyboardHeight, width: self.messageList.frame.width, height: self.messageList.frame.height)
+                        } else {
+                            self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.messageList.frame.height-self.inputBar.keyboardHeight)
+                        }
+                        
                         let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
                         if lastIndexPath.row >= 0 {
                             self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
@@ -359,9 +371,19 @@ import UIKit
             }
         }
         
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil, queue: .main) {  [weak self] notification in
+        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: cache_update_notification), object: nil, queue: .main) {  [weak self] notification in
             self?.messageList.reloadData()
         }
+    }
+    
+    func getLastVisibleCellCoordinate() -> CGRect {
+        guard let visibleIndexPaths = self.messageList.indexPathsForVisibleRows else { return .zero }
+        if let lastIndexPath = visibleIndexPaths.last {
+            let cellRect = self.messageList.rectForRow(at: lastIndexPath)
+            let cellCoordinate = self.messageList.convert(cellRect.origin, to: self.messageList)
+            return CGRect(origin: cellCoordinate, size: cellRect.size)
+        }
+        return .zero
     }
     
     required public init?(coder: NSCoder) {
@@ -466,6 +488,9 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
         if let info = self.messages[safe: indexPath.row] {
             cell?.editMode = self.editMode
             cell?.refresh(entity: info)
+            info.previewFinished = { [weak self] in
+                self?.refreshPreviewResult(entity: $0)
+            }
         }
         cell?.clickAction = { [weak self] in
             self?.handleClick(area: $0, entity: $1)
@@ -478,6 +503,14 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
         }
         cell?.selectionStyle = .none
         return cell ?? UITableViewCell(style: .default, reuseIdentifier: "defaulteCell")
+    }
+    
+    @objc open func refreshPreviewResult(entity: MessageEntity) {
+        if let idx = self.messages.firstIndex(where: { $0.message.messageId == entity.message.messageId }) {
+            self.messageList.beginUpdates()
+            self.messageList.reloadRows(at: [IndexPath(row: idx, section: 0)], with: .automatic)
+            self.messageList.endUpdates()
+        }
     }
     
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -626,24 +659,11 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
             if ComponentViewsActionHooker.shared.chat.replyClicked != nil {
                 ComponentViewsActionHooker.shared.chat.replyClicked?(entity)
             } else {
-                if entity.state == .failure || entity.state == .sending {
-                    return
-                }
-                if let highlightIndex = self.messages.firstIndex(where: { $0.message.messageId == entity.message.quoteMessage?.messageId ?? "" }) {
-                    self.messageList.scrollToRow(at: IndexPath(row: highlightIndex, section: 0), at: .middle, animated: true)
-                    if let cell = self.messageList.cellForRow(at: IndexPath(row: highlightIndex, section: 0)) {
-                        UIView.animate(withDuration: 1, delay: 0.5) {
-                            cell.backgroundColor = Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
-                            cell.contentView.backgroundColor = Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
-                        } completion: { finished in
-                            cell.backgroundColor = .clear
-                            cell.contentView.backgroundColor = .clear
-                        }
+                if let quoteMessage = entity.message.quoteMessage {
+                    self.highlightMessage(message: quoteMessage)
+                    for handler in self.eventHandlers.allObjects {
+                        handler.onMessageReplyClicked(message: entity)
                     }
-                    
-                }
-                for handler in self.eventHandlers.allObjects {
-                    handler.onMessageReplyClicked(message: entity)
                 }
             }
         case .bubble:
@@ -716,12 +736,34 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
             }
         }
     }
+    
 }
 
 extension MessageListView: IMessageListViewDriver {
     public func readAllMessages() {
         self.messages.forEach { $0.state = .read }
-        self.messageList.reloadData()
+        self.messageList.beginUpdates()
+        self.messageList.reloadRows(at: self.messageList.indexPathsForVisibleRows ?? [], with: .automatic)
+        self.messageList.endUpdates()
+    }
+    
+    public func highlightMessage(message: ChatMessage) {
+        if message.status == .failed {
+            return
+        }
+        if let highlightIndex = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
+            self.messageList.scrollToRow(at: IndexPath(row: highlightIndex, section: 0), at: .middle, animated: true)
+            if let cell = self.messageList.cellForRow(at: IndexPath(row: highlightIndex, section: 0)) {
+                UIView.animate(withDuration: 1, delay: 0.5) {
+                    cell.backgroundColor = Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
+                    cell.contentView.backgroundColor = Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
+                } completion: { finished in
+                    cell.backgroundColor = .clear
+                    cell.contentView.backgroundColor = .clear
+                }
+            }
+            
+        }
     }
     
     public func stopAudioMessagesPlay() {
@@ -736,7 +778,9 @@ extension MessageListView: IMessageListViewDriver {
             }
         }
         if indexPaths.count > 0 {
+            self.messageList.beginUpdates()
             self.messageList.reloadRows(at: indexPaths, with: .automatic)
+            self.messageList.endUpdates()
         }
     }
     
@@ -770,7 +814,9 @@ extension MessageListView: IMessageListViewDriver {
                     if let reactions = message.reactionList {
                         if (reactions.count == 1 && reactions.count > entity.visibleReactionToIndex) || reactions.count <= 0 {
                             self.messages.replaceSubrange(index...index, with: [entity])
+                            self.messageList.beginUpdates()
                             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+                            self.messageList.endUpdates()
                         } else {
                             if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
                                 if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }){
@@ -857,7 +903,7 @@ extension MessageListView: IMessageListViewDriver {
                 if self.showType == .normal {
                     let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
                     if lastIndexPath.row >= 0 {
-                        self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
+                        self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: false)
                     }
                 }
             }
@@ -878,7 +924,9 @@ extension MessageListView: IMessageListViewDriver {
     public func updateMessageAttachmentStatus(message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages[index].state = self.convertStatus(message: message)
+            self.messageList.beginUpdates()
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.messageList.endUpdates()
         }
     }
     
@@ -909,22 +957,63 @@ extension MessageListView: IMessageListViewDriver {
         if let index = self.messages.firstIndex(where: { $0.message.localTime == message.localTime }) {
             self.messages[safe: index]?.message = message
             self.messages[safe: index]?.state = status
-            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            if let cell = self.messageList.cellForRow(at: IndexPath(row: index, section: 0)) as? MessageCell {
+                cell.updateMessageStatus(entity: self.messages[index])
+            }
         }
     }
     
     private func convertMessage(message: ChatMessage) -> MessageEntity {
         let entity = ComponentsRegister.shared.MessageRenderEntity.init()
+        if message.status == .pending {
+            message.status = .succeed
+        }
         entity.state = self.convertStatus(message: message)
         entity.message = message
         _ = entity.replyTitle
         _ = entity.replyContent
         _ = entity.content
         entity.topicContent = entity.convertTopicContent()
+        self.convertURLPreview(entity: entity)
         _ = entity.replySize
         _ = entity.bubbleSize
         _ = entity.height
         return entity
+    }
+    
+    private func convertURLPreview(entity: MessageEntity) {
+        if Appearance.chat.enableURLPreview {
+            if let dic = entity.message.ext?["ease_chat_uikit_text_url_preview"] as? Dictionary<String,String> {
+                if let status = dic["status"] {
+                    entity.previewResult = status == "1" ? .success:.failure
+                } else {
+                    if entity.previewURL == dic["url"]{
+                        if dic["title"]?.isEmpty ?? true {
+                            entity.previewResult = .failure
+                        } else {
+                            entity.previewResult = .success
+                        }
+                    } else {
+                        entity.previewResult = .failure
+                    }
+                }
+            }
+            if entity.containURL {
+                let previewContent = URLPreviewManager.caches[entity.previewURL]
+                previewContent?.towards = entity.message.direction == .send ? .right:.left
+                if previewContent != nil,previewContent?.titleAttribute != nil {
+                    entity.urlPreview = previewContent
+                    entity.previewResult = .success
+                } else {
+                    entity.urlPreview = nil
+                }
+            }
+            
+            if entity.urlPreview == nil, entity.containURL, entity.previewResult == .parsing,!entity.previewURL.isEmpty {
+                entity.previewStart()
+            }
+            
+        }
     }
     
     private func convertStatus(message: ChatMessage) -> ChatMessageStatus {
@@ -959,7 +1048,7 @@ extension MessageListView: IMessageListViewDriver {
         self.messageList.refreshControl?.endRefreshing()
         self.messages.append(self.convertMessage(message: message))
         let scrolledBottom = self.scrolledBottom
-        self.messageList.insertRows(at: [IndexPath(row: self.messages.count-1, section: 0)], with: .automatic)
+        self.messageList.reloadData()
         if self.messages.count > 1 {
             if message.direction == .send {
                 let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
@@ -993,6 +1082,7 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     public func processMessage(operation: MessageOperation,message: ChatMessage) {
+        self.inputBar.hiddenInput()
         self.replyBar.isHidden = true
         if message.direction == .send {
             self.replyId = ""
@@ -1016,13 +1106,16 @@ extension MessageListView: IMessageListViewDriver {
             entity.message = message
             entity.showTranslation = false
             _ = entity.content
+            self.convertURLPreview(entity: entity)
             _ = entity.replyTitle
             _ = entity.replyContent
             _ = entity.bubbleSize
             _ = entity.height
             _ = entity.replySize
             self.messages.replaceSubrange(index...index, with: [entity])
+            self.messageList.beginUpdates()
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.messageList.endUpdates()
         }
     }
     
@@ -1035,13 +1128,16 @@ extension MessageListView: IMessageListViewDriver {
             entity.message = message
             entity.showTranslation = true
             _ = entity.content
+            self.convertURLPreview(entity: entity)
             _ = entity.replyTitle
             _ = entity.replyContent
             _ = entity.bubbleSize
             _ = entity.height
             _ = entity.replySize
             self.messages.replaceSubrange(index...index, with: [entity])
+            self.messageList.beginUpdates()
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.messageList.endUpdates()
         }
     }
     
@@ -1057,7 +1153,9 @@ extension MessageListView: IMessageListViewDriver {
     private func editAction(_ message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
+            self.messageList.beginUpdates()
             self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.messageList.endUpdates()
         }
     }
     
@@ -1071,7 +1169,9 @@ extension MessageListView: IMessageListViewDriver {
     private func deleteAction(_ message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             self.messages.remove(at: index)
+            self.messageList.beginUpdates()
             self.messageList.deleteRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.messageList.endUpdates()
         }
         var indexPaths = [IndexPath]()
         for (index,entity) in self.messages.enumerated() {
@@ -1082,7 +1182,9 @@ extension MessageListView: IMessageListViewDriver {
                 }
             }
         }
+        self.messageList.beginUpdates()
         self.messageList.reloadRows(at: indexPaths, with: .automatic)
+        self.messageList.endUpdates()
     }
     
     private func recallAction(_ message: ChatMessage) {
@@ -1103,3 +1205,4 @@ extension MessageListView: IMessageListViewDriver {
     
     
 }
+

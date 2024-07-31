@@ -43,6 +43,7 @@ import UIKit
     
     @MainActor
     @objc public func refresh(entity: MessageEntity) {
+        self.cornerRadius(Appearance.chat.imageMessageCorner)
         guard let message = entity.message.quoteMessage else {
             self.replyIcon.isHidden = true
             self.replyUser.isHidden = true
@@ -141,7 +142,6 @@ extension MessageReplyView: ThemeSwitchProtocol {
         self.replyIcon.layerProperties(style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor8, 0.5)
         self.replyIcon.backgroundColor(style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor9)
         self.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
-        self.backgroundColor = .orange
     }
 }
 

@@ -38,7 +38,13 @@ import UIKit
         self.audioIcon.frame = CGRect(x: self.towards == .left ? 12:self.frame.width-12-20, y: self.frame.height/2.0-10, width: 20, height: 20)
         self.switchTheme(style: Theme.style)
         let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
-        self.content.textColor = currentUser == entity.message.from ? Appearance.chat.sendTextColor:Appearance.chat.receiveTextColor
+        var textColor = UIColor.white
+        if entity.message.direction == .send {
+            textColor = Theme.style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
+        } else {
+            textColor = Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
+        }
+        self.content.textColor = textColor
         self.content.textAlignment = entity.message.direction == .receive ? .right:.left
         self.content.text = entity.message.showContent
         if entity.playing {

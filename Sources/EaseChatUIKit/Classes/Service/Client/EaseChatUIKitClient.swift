@@ -1,6 +1,8 @@
 import Foundation
 
-public let EaseChatUIKit_VERSION = "4.7.0"
+public let EaseChatUIKit_VERSION = "4.8.0"
+
+public let cache_update_notification = "EaseChatUIKitContextUpdateCache"
 
 @objcMembers public class EaseChatUIKitOptions: NSObject {
     
@@ -77,6 +79,8 @@ public let EaseChatUIKit_VERSION = "4.7.0"
     
     /// Logout user
     @objc public func logout(unbindNotificationDeviceToken: Bool = false,completion: @escaping (ChatError?) -> Void) {
+        UserDefaults.standard.removeObject(forKey: "EaseChatUIKit_contact_fetch_server_finished"+saveIdentifier)
+        
         ChatClient.shared().logout(unbindNotificationDeviceToken) { error in
             completion(error)
         }
@@ -102,16 +106,16 @@ public let EaseChatUIKit_VERSION = "4.7.0"
         Theme.unregisterSwitchThemeViews()
     }
     
-    /// Updates user information that is used for login with the `login(with user: UserInfoProtocol,token: String,use userProperties: Bool = true,completion: @escaping (ChatError?) -> Void)` method.
-    /// - Parameters:
-    ///   - info: An instance that conforms to ``EaseProfileProtocol``.
-    ///   - completion: Callback.
-    @objc(updateWithUserInfo:completion:)
-    public func updateUserInfo(info: EaseProfileProtocol,completion: @escaping (ChatError?) -> Void) {
-        self.userService?.updateUserInfo(userInfo: info, completion: { success, error in
-            completion(error)
-        })
-    }
+//    /// Updates user information that is used for login with the `login(with user: UserInfoProtocol,token: String,use userProperties: Bool = true,completion: @escaping (ChatError?) -> Void)` method.
+//    /// - Parameters:
+//    ///   - info: An instance that conforms to ``EaseProfileProtocol``.
+//    ///   - completion: Callback.
+//    @objc(updateWithUserInfo:completion:)
+//    public func updateUserInfo(info: EaseProfileProtocol,completion: @escaping (ChatError?) -> Void) {
+//        self.userService?.updateUserInfo(userInfo: info, completion: { success, error in
+//            completion(error)
+//        })
+//    }
     
     ///  Refreshes the user chat token when receiving the ``ChatClientListener.onUserTokenWillExpired`` callback.
     /// - Parameter token: The user chat token.
@@ -140,5 +144,12 @@ extension EaseChatUIKitClient: ContactEventsListener {
             item.numberCount = UInt(unreadCount)
             Appearance.contact.listHeaderExtensionActions[index].numberCount = UInt(unreadCount)
         }
+    }
+    
+    public func friendRequestDidApprove(byUser aUsername: String) {
+        let conversation = ChatClient.shared().chatManager?.getConversation(aUsername, type: .chat, createIfNotExist: true)
+        let ext = ["something":("You have added".chat.localize+" "+aUsername+" "+"to say hello".chat.localize)]
+        let message = ChatMessage(conversationID: aUsername, body: ChatCustomMessageBody(event: EaseChatUIKit_alert_message, customExt: nil), ext: ext)
+        conversation?.insert(message, error: nil)
     }
 }

@@ -182,6 +182,7 @@ extension ChatThreadViewController {
         case .rightItems: self.rightItemsAction(indexPath: indexPath)
         case .cancel:
             self.navigation.editMode = false
+            self.messageContainer.messages.forEach { $0.selected = false }
             self.messageContainer.editMode = false
         default:
             break
@@ -283,9 +284,11 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
     }
     
     public func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation) {
-        self.messageContainer.editMode = false
-        self.navigation.editMode = false
         let messages = self.filterSelectedMessages()
+        if messages.isEmpty {
+            UIViewController.currentController?.showToast(toast: "Please select greater than one message.".chat.localize)
+            return
+        }
         switch operation {
         case .delete:
             DialogManager.shared.showAlert(title: "barrage_long_press_menu_delete".chat.localize+" \(messages.count)"+" messages".chat.localize, content: "", showCancel: true, showConfirm: true) { [weak self] _ in
@@ -306,6 +309,14 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
             return
         }
         let vc = ForwardTargetViewController(messages: messages, combine: true)
+        vc.dismissClosure = { [weak self] in
+            guard let `self` = self else { return }
+            if !$0 == false {
+                self.messageContainer.messages.forEach { $0.selected = false }
+            }
+            self.messageContainer.editMode = !$0
+            self.navigation.editMode = !$0
+        }
         self.present(vc, animated: true)
     }
     
@@ -314,6 +325,8 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
             self.showToast(toast: "Please select a message to delete.")
             return
         }
+        self.messageContainer.editMode = false
+        self.navigation.editMode = false
         self.viewModel.deleteMessages(messages: messages)
     }
     
@@ -386,7 +399,7 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
         if !Appearance.chat.contentStyle.contains(.withReply) {
             messageActions.removeAll { $0.tag == "Reply" }
         }
-        
+        messageActions.removeAll { $0.tag == "Pin" }
         messageActions.removeAll { $0.tag == "Topic" }
         if message.message.direction != .send {
             messageActions.removeAll { $0.tag == "Recall" }
@@ -412,6 +425,9 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
      - message: The chat message for which the dialog is shown.
      */
     @objc open func showMessageLongPressedDialog(message: MessageEntity) {
+        if self.messageContainer.editMode {
+            return
+        }
         let header =  CommonReactionView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 44), message: message.message).backgroundColor(.clear)
         header.reactionClosure = { [weak self] emoji,rawMessage in
             UIViewController.currentController?.dismiss(animated: true) {
@@ -482,10 +498,10 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
     }
     
     @objc open func multiSelect(message: ChatMessage) {
+        self.messageContainer.messages.forEach { $0.selected = false }
         self.messageContainer.messages.first { $0.message.messageId == message.messageId }?.selected = true
         self.messageContainer.editMode = true
         self.navigation.editMode = true
-        self.messageContainer.messageList.reloadData()
     }
     /**
      Opens the message editor for editing a chat message.
@@ -496,10 +512,15 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
     @objc open func editAction(message: ChatMessage) {
         if let body = message.body as? ChatTextMessageBody {
             let editor = MessageEditor(content: body.text) { text in
-                self.viewModel.processMessage(operation: .edit, message: message, edit: text)
+                if !text.isEmpty {
+                    self.viewModel.processMessage(operation: .edit, message: message, edit: text)
+                }
                 UIViewController.currentController?.dismiss(animated: true)
             }
-            DialogManager.shared.showCustomDialog(customView: editor)
+            DialogManager.shared.showCustomDialog(customView: editor,dismiss: false)
+            DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.5) {
+                editor.editor.textView.becomeFirstResponder()
+            }
         }
     }
     

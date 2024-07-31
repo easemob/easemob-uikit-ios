@@ -58,7 +58,7 @@ import UIKit
         self.switchTheme(style: Theme.style)
         self.requestGroups()
         NotificationCenter.default.addObserver(self, selector: #selector(removeGroup(notification:)), name: Notification.Name("EaseChatUIKit_leaveGroup"), object: nil)
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil, queue: .main) { [weak self] notify in
+        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: cache_update_notification), object: nil, queue: .main) { [weak self] notify in
             guard let `self` = self else { return }
             self.groupList.reloadData()
         }

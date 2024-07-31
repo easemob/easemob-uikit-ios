@@ -38,7 +38,7 @@ import UIKit
     }
     
     @objc open func createList() -> ConversationList {
-        ConversationList(frame: CGRect(x: 0, y: self.search.frame.maxY+5, width: self.view.frame.width, height: self.view.frame.height-NavigationHeight-BottomBarHeight-(self.tabBarController?.tabBar.frame.height ?? 49)), style: .plain)
+        ConversationList(frame: CGRect(x: 0, y: self.search.frame.maxY+10, width: self.view.frame.width, height: self.view.frame.height-self.search.frame.maxY-10-(self.tabBarController?.tabBar.frame.height ?? 0)), style: .plain)
     }
     
     /// Update navigation avatar url.
@@ -144,7 +144,9 @@ extension ConversationListController {
             self.toChat(indexPath: IndexPath(), info: $0)
         }
         if let vc = search {
-            vc.modalPresentationStyle = .fullScreen
+            if vc.navigationController == nil {
+                vc.modalPresentationStyle = .fullScreen
+            }
             ControllerStack.toDestination(vc: vc)
         }
     }
@@ -260,8 +262,14 @@ extension ConversationListController {
      */
     @objc open func create(profiles: [EaseProfileProtocol]) {
         var name = ""
+        var users = [EaseProfileProtocol]()
+        let ownerId = EaseChatUIKitContext.shared?.currentUserId ?? ""
+        if let owner = EaseChatUIKitContext.shared?.userCache?[ownerId] {
+            users.append(owner)
+            users.append(contentsOf: profiles)
+        }
         var ids = [String]()
-        for (index,profile) in profiles.enumerated() {
+        for (index,profile) in users.enumerated() {
             if index <= 2 {
                 if index == 0 {
                     name += (profile.nickname.isEmpty ? profile.id:profile.nickname)

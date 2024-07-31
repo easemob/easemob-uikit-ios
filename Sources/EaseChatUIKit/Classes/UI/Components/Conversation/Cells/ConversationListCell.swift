@@ -205,6 +205,17 @@ extension ConversationListCell: ThemeSwitchProtocol {
     @objc open func contentAttribute() -> NSAttributedString {
         guard let message = self.lastMessage else { return NSAttributedString() }
         var text = NSMutableAttributedString()
+        
+        let from = message.from
+        let mentionText = "Mentioned".chat.localize
+        let user = EaseChatUIKitContext.shared?.userCache?[from]
+        var nickName = user?.remark ?? ""
+        if nickName.isEmpty {
+            nickName = user?.nickname ?? ""
+        }
+        if nickName.isEmpty {
+            nickName = from
+        }
         if message.body.type == .text {
             var result = message.showType
             for (key,value) in ChatEmojiConvertor.shared.oldEmojis {
@@ -223,11 +234,9 @@ extension ConversationListCell: ThemeSwitchProtocol {
                 }
             }
             if self.mentioned {
-                let from = message.from
-                let mentionText = "Mentioned".chat.localize
                 let showText = NSMutableAttributedString {
                     AttributedText("[\(mentionText)] ").foregroundColor(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).font(Font.theme.bodyMedium)
-                    AttributedText((message.user?.nickname ?? from) + ": ").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5)
+                    AttributedText(nickName + ": ").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5)
                 }
                 
                 let show = NSMutableAttributedString(attributedString: text)
@@ -236,12 +245,8 @@ extension ConversationListCell: ThemeSwitchProtocol {
                 showText.append(show)
                 return showText
             } else {
-                var from = message.user?.nickname ?? ""
-                if from.isEmpty {
-                    from = message.from
-                }
                 let showText = NSMutableAttributedString {
-                    AttributedText(message.chatType != .chat ? from + ": ":"").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(Font.theme.bodyMedium)
+                    AttributedText(message.chatType != .chat ? nickName + ": ":"").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(Font.theme.bodyMedium)
                 }
                 showText.append(text)
                 showText.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor6, range: NSRange(location: 0, length: showText.length))
@@ -249,9 +254,8 @@ extension ConversationListCell: ThemeSwitchProtocol {
                 return showText
             }
         } else {
-            let from = message.from
             let showText = NSMutableAttributedString {
-                AttributedText((message.body.type == .custom ? message.showType:(from+":"+message.showType))).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.bodyMedium)
+                AttributedText((message.chatType == .chat ? message.showType:(nickName+":"+message.showType))).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.bodyMedium)
             }
             return showText
         }

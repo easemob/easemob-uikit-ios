@@ -31,7 +31,7 @@ import UIKit
     @objc public required convenience init(custom: UIView,size: CGSize,customPosition: Bool) {
         self.init()
         if customPosition {
-            self.presentedViewComponent = PresentedViewComponent(contentSize: size,destination: .custom(center: CGPoint(x: ScreenWidth/2.0-custom.frame.width/2.0, y: ScreenHeight/2.0-custom.frame.height/2.0)))
+            self.presentedViewComponent = PresentedViewComponent(contentSize: size,destination: .custom(center: CGPoint(x: ScreenWidth/2.0, y: ScreenHeight/2.0-size.height/3.0)),keyboardPadding: 20)
         } else {
             self.presentedViewComponent = PresentedViewComponent(contentSize: size,destination: .center)
         }
@@ -42,6 +42,8 @@ import UIKit
         super.viewDidLoad()
         if self.customView != nil {
             self.customView?.cornerRadius(Appearance.alertStyle == .small ? .extraSmall:.medium)
+            self.customView?.setNeedsLayout()
+            self.customView?.layoutIfNeeded()
             self.view.addSubview(self.customView!)
         }
     }
@@ -268,6 +270,18 @@ import UIKit
         return self
     }
     @discardableResult
+    public func textFieldRightView(rightView: UIView) -> AlertView {
+        textField.rightView = rightView
+        textField.rightViewMode = .always
+        return self
+    }
+    @discardableResult
+    public func textFieldDelegate(delegate: UITextFieldDelegate) -> AlertView {
+        textField.delegate = delegate
+        return self
+    }
+    
+    @discardableResult
     public func leftButton(title: String?) -> AlertView {
         leftButton.isHidden = title == nil
         leftButton.setTitle(title, for: .normal)
@@ -397,10 +411,10 @@ import UIKit
         translatesAutoresizingMaskIntoConstraints = false
         widthAnchor.constraint(equalToConstant: Appearance.alertContainerConstraintsSize.width).isActive = true
         
-        stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: (ScreenWidth-Appearance.alertContainerConstraintsSize.width)/2.0).isActive = true
-        stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -(ScreenWidth-Appearance.alertContainerConstraintsSize.width)/2.0).isActive = true
+        stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20).isActive = true
+        stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20).isActive = true
         stackView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        stackView.topAnchor.constraint(equalTo: topAnchor, constant: (ScreenWidth-Appearance.alertContainerConstraintsSize.width)/2.0).isActive = true
+        stackView.topAnchor.constraint(equalTo: topAnchor, constant: 16).isActive = true
         
         titleLabel.topAnchor.constraint(equalTo: titleLabelContainer.topAnchor).isActive = true
         titleLabel.centerXAnchor.constraint(equalTo: titleLabelContainer.centerXAnchor).isActive = true

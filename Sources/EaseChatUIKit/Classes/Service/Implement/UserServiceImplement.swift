@@ -89,25 +89,19 @@ extension UserServiceImplement:UserServiceProtocol {
     }
     
     public func updateUserInfo(userInfo: EaseProfileProtocol, completion: @escaping (Bool, ChatError?) -> Void) {
-        if userInfo.id == EaseChatUIKitContext.shared?.currentUserId ?? "" {
-            EaseChatUIKitContext.shared?.currentUser = userInfo
-            EaseChatUIKitContext.shared?.userCache?[userInfo.id] = userInfo
-        } else {
-            EaseChatUIKitContext.shared?.updateCache(type: .chat, profile: userInfo)
-            EaseChatUIKitContext.shared?.updateCache(type: .user, profile: userInfo)
-            EaseChatUIKitContext.shared?.updateCache(type: .group, profile: userInfo)
-        }
+//        if userInfo.id == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+//            EaseChatUIKitContext.shared?.currentUser = userInfo
+//            EaseChatUIKitContext.shared?.userCache?[userInfo.id] = userInfo
+//        } else {
+//            EaseChatUIKitContext.shared?.updateCache(type: .chat, profile: userInfo)
+//            EaseChatUIKitContext.shared?.updateCache(type: .user, profile: userInfo)
+//            EaseChatUIKitContext.shared?.updateCache(type: .group, profile: userInfo)
+//        }
     }
     
     public func login(userId: String, token: String, completion: @escaping (Bool, ChatError?) -> Void) {
-        if token.hasPrefix("00") {
-            ChatClient.shared().login(withUsername: userId, agoraToken: token) { user_id, error in
-                completion(error == nil,error)
-            }
-        } else {
-            ChatClient.shared().login(withUsername: userId, token: token) { user_id, error in
-                completion(error == nil,error)
-            }
+        ChatClient.shared().login(withUsername: userId, token: token) { user_id, error in
+            completion(error == nil,error)
         }
     }
     

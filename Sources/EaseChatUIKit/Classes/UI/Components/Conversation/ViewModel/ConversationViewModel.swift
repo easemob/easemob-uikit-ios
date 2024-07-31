@@ -8,6 +8,7 @@
 import Foundation
 import AudioToolbox
 
+public let disturb_change = "EaseUIKit_do_not_disturb_changed"
 
 /// Bind service and driver
 @objc open class ConversationViewModel: NSObject {
@@ -23,7 +24,7 @@ import AudioToolbox
     public required override init() {
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(loadExistLocalDataIfEmptyFetchServer), name: Notification.Name("New Friend Chat"), object: nil)
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "EaseChatUIKitContextUpdateCache"), object: nil, queue: .main) { [weak self] notify in
+        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: cache_update_notification), object: nil, queue: .main) { [weak self] notify in
             guard let `self` = self else { return }
             if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
                 self.driver?.refreshList(infos: self.mapper(objects: infos))
@@ -31,7 +32,7 @@ import AudioToolbox
         }
         
         
-        NotificationCenter.default.addObserver(forName: Notification.Name("EaseUIKit_do_not_disturb_changed"), object: nil, queue: .main) { [weak self] notify in
+        NotificationCenter.default.addObserver(forName: Notification.Name(disturb_change), object: nil, queue: .main) { [weak self] notify in
             if let userInfo = notify.userInfo {
                 if let id = userInfo["id"] as? String {
                     if let doNotDisturb = userInfo["value"] as? Bool {
@@ -101,7 +102,9 @@ import AudioToolbox
             if let info = self.mapper(objects: [conversation]).first,!info.id.isEmpty {
                 if conversation.type == .groupChat {
                     let content = "Group".chat.localize + " \(text) " + "has been created.".chat.localize
-                    conversation.insert(self.welcomeMessage(conversationId: info.id,text: content), error: nil)
+                    let message = self.welcomeMessage(conversationId: info.id,text: content)
+                    message.chatType = .groupChat
+                    conversation.insert(message, error: nil)
                 }
                 self.loadExistLocalDataIfEmptyFetchServer()
                 return info
@@ -165,7 +168,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         }
         if EaseChatUIKitContext.shared?.groupProfileProvider != nil {
             let groupIds = groupChats
-            Task(priority: .background) { [weak self] in 
+            Task(priority: .background) { [weak self] in
                 guard let `self` = self else { return }
                 let profiles = await EaseChatUIKitContext.shared?.groupProfileProvider?.fetchGroupProfiles(profileIds: groupIds) ?? []
                 self.cacheGroup(profiles: profiles)
@@ -265,37 +268,55 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
                 }
                 self?.muteMap[currentUser] = conversationMap
                 self?.driver?.swipeMenuOperation(info: info, type: .mute)
+                self?.updateUnreadCount()
             }
+        }
+    }
+    
+    @objc open func updateUnreadCount() {
+        if let conversationService = self.service {
+            if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
+                let items = self.mapper(objects: infos)
+                var count = UInt(0)
+                for item in items where item.doNotDisturb == false {
+                    count += item.unreadCount
+                }
+                conversationService.notifyUnreadCount(count: count)
+            }
+
         }
     }
     
     @objc open func delete(info: ConversationInfo) {
         self.service?.deleteConversation(conversationId: info.id) { [weak self] error in
             guard let `self` = self else { return }
-                if error != nil {
-                    consoleLogInfo("onConversationSwipe delete:\(error?.errorDescription ?? "")", type: .error)
-                } else {
-                    if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
-                        self.driver?.refreshList(infos: self.mapper(objects: infos))
-                    }
+            if error != nil {
+                consoleLogInfo("onConversationSwipe delete:\(error?.errorDescription ?? "")", type: .error)
+            } else {
+                if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
+                    self.driver?.refreshList(infos: self.mapper(objects: infos))
                 }
+                self.updateUnreadCount()
             }
+        }
     }
     
     @objc open func unmute(info: ConversationInfo) {
         self.service?.clearSilentMode(conversationId: info.id) { [weak self] _, error in
+            guard let `self` = self else { return }
             if error != nil {
                 consoleLogInfo("onConversationSwipe unmute:\(error?.errorDescription ?? "")", type: .error)
             } else {
                 let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
-                var conversationMap = self?.muteMap[currentUser]
+                var conversationMap = self.muteMap[currentUser]
                 if conversationMap != nil {
                     conversationMap?[info.id] = 0
                 } else {
                     conversationMap = [info.id:0]
                 }
-                self?.muteMap[currentUser] = conversationMap
-                self?.driver?.swipeMenuOperation(info: info, type: .unmute)
+                self.muteMap[currentUser] = conversationMap
+                self.driver?.swipeMenuOperation(info: info, type: .unmute)
+                self.updateUnreadCount()
             }
         }
     }
@@ -304,6 +325,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         info.unreadCount = 0
         self.driver?.swipeMenuOperation(info: info, type: .read)
         self.service?.markAllMessagesAsRead(conversationId: info.id)
+        self.updateUnreadCount()
     }
     
     public func onConversationSwipe(type: UIContextualActionType, info: ConversationInfo) {
@@ -332,17 +354,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         ChatClient.shared().chatManager?.ackConversationRead(info.id)
         self.driver?.swipeMenuOperation(info: info, type: .read)
         self.toChat?(indexPath,info)
-        if let conversationService = self.service {
-            if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
-                let items = self.mapper(objects: infos)
-                var count = UInt(0)
-                for item in items where item.doNotDisturb == false {
-                    count += item.unreadCount
-                }
-                conversationService.notifyUnreadCount(count: count)
-            }
-
-        }
+        self.updateUnreadCount()
         
     }
     
@@ -408,10 +420,17 @@ extension ConversationViewModel: ConversationServiceListener {
     
     
     public func onChatConversationListDidChanged(list: [ConversationInfo]) {
-        if let conversations = ChatClient.shared().chatManager?.getAllConversations(true) {
-            self.driver?.refreshList(infos: self.mapper(objects: conversations))
-            if conversations.count < 10 {
-                self.requestDisplayProfiles(ids: conversations.map({ $0.conversationId }))
+        if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
+            let items = self.mapper(objects: infos)
+            var count = UInt(0)
+            for item in items where item.doNotDisturb == false {
+                count += item.unreadCount
+            }
+            self.service?.notifyUnreadCount(count: count)
+            self.driver?.refreshList(infos: items)
+            
+            if infos.count < 7 {
+                self.requestDisplayProfiles(ids: list.map({ $0.id }))
             }
         }
     }
@@ -442,10 +461,8 @@ extension ConversationViewModel: MultiDeviceListener {
             }
         case .conversationDelete:
             if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
-                if let info = self.mapper(objects: infos).first(where: { $0.id == conversationId }) {
-                    self.driver?.swipeMenuOperation(info: info, type: .delete)
-                    self.service?.handleResult(error: nil, type: .delete)
-                }
+                self.driver?.refreshList(infos: self.mapper(objects: infos))
+                self.service?.handleResult(error: nil, type: .delete)
             }
             
         default: break

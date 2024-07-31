@@ -89,8 +89,12 @@ import UIKit
         }
     }
     
+    public var selectClosure: ((EaseProfileProtocol) -> ())?
+    
+    public var firstRefresh = true
+    
     public private(set) lazy var header: ContactListHeader = {
-        ContactListHeader(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: CGFloat(54*(self.headerStyle == .contact ? Appearance.contact.listHeaderExtensionActions.count:0))), style: .plain).backgroundColor(.clear)
+        ContactListHeader(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: CGFloat(Appearance.contact.headerRowHeight*CGFloat((self.headerStyle == .contact ? Appearance.contact.listHeaderExtensionActions.count:0)))), style: .plain).backgroundColor(.clear)
     }()
     
     public private(set) lazy var empty: EmptyStateView = {
@@ -168,13 +172,14 @@ extension ContactView: UITableViewDelegate,UITableViewDataSource {
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ContactsCell.self, reuseIdentifier: "EaseUIKit_ContactsCell")
+        let style:ContactDisplayStyle = (self.headerStyle == .newGroup || self.headerStyle == .addGroupParticipant) ? .withCheckBox:.normal
         if cell == nil {
-            cell = ComponentsRegister.shared.ContactsCell.init(displayStyle: (self.headerStyle == .newGroup || self.headerStyle == .addGroupParticipant) ? .withCheckBox:.normal,identifier: "EaseUIKit_ContactsCell")
+            cell = ComponentsRegister.shared.ContactsCell.init(displayStyle: style,identifier: "EaseUIKit_ContactsCell")
         }
         if let item = self.contacts[safe:indexPath.section]?[safe: indexPath.row] {
+            cell?.display = style
             cell?.refresh(profile: item)
         }
-        cell?.selectionStyle = .none
         cell?.backgroundColor = .clear
         return cell ?? UITableViewCell()
     }
@@ -193,6 +198,7 @@ extension ContactView: UITableViewDelegate,UITableViewDataSource {
                         handler.didSelected(indexPath: indexPath, profile: item)
                     }
                 }
+                self.selectClosure?(item)
             }
         } else {
             if let item = self.contacts[safe:indexPath.section]?[safe: indexPath.row] {
@@ -203,6 +209,7 @@ extension ContactView: UITableViewDelegate,UITableViewDataSource {
                         handler.didSelected(indexPath: indexPath, profile: item)
                     }
                 }
+                self.selectClosure?(item)
             }
         }
     }
@@ -223,6 +230,16 @@ extension ContactView: UITableViewDelegate,UITableViewDataSource {
     }
     
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+//        self.requestDisplayInfo()
+    }
+    
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+//            self.requestDisplayInfo()
+        }
+    }
+    
+    @objc open func requestDisplayInfo() {
         var unknownInfoIds = [String]()
         if let visiblePaths = self.contactList.indexPathsForVisibleRows {
             for indexPath in visiblePaths {
@@ -239,7 +256,6 @@ extension ContactView: UITableViewDelegate,UITableViewDataSource {
             }
         }
     }
-    
 }
 //MARK: - IContactListDriver
 extension ContactView: IContactListDriver {
@@ -307,7 +323,6 @@ extension ContactView: IContactListDriver {
             if let profile = self.rawData.first(where: { $0.id == info.id }) {
                 profile.nickname =  info.nickname.isEmpty ? info.id:info.nickname
                 profile.avatarURL = info.avatarURL
-                profile.selected = info.selected
                 profile.remark = info.remark
             }
         }
@@ -319,6 +334,13 @@ extension ContactView: IContactListDriver {
         self.contacts.removeAll()
         self.sectionTitles.removeAll()
         self.rawData = infos
+        
+        if self.firstRefresh {
+            self.firstRefresh = false
+            for eventHandle in self.eventsDelegates.allObjects {
+                eventHandle.onContactListEndScrollNeededDisplayInfos(ids: infos.map({ $0.id }))
+            }
+        }
         let tuple = ContactSorter.sort(contacts: self.rawData)
         self.contacts.append(contentsOf: tuple.0)
         self.sectionTitles.append(contentsOf: tuple.1)
@@ -331,6 +353,7 @@ extension ContactView: IContactListDriver {
 
 extension ContactView: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
+        self.header.reloadData()
         self.contactList.reloadData()
     }
 }
@@ -368,6 +391,7 @@ struct ContactSorter {
             }
             profile.nickname = showName
             profile.avatarURL = contact.avatarURL
+            profile.selected = contact.selected
             userInfos.append(profile)
         }
         userInfos.sort {
@@ -381,6 +405,7 @@ struct ContactSorter {
                     contact.nickname = contactMap[contact.id]?.nickname ?? ""
                     contact.avatarURL = user.avatarURL
                     contact.remark = contactMap[contact.id]?.remark ?? ""
+                    contact.selected = user.selected
                     result[sectionIndex].append(contact)
                 } else {
                     let contact = EaseProfile()
@@ -388,6 +413,7 @@ struct ContactSorter {
                     contact.nickname = contactMap[contact.id]?.nickname ?? ""
                     contact.avatarURL = user.avatarURL
                     contact.remark = contactMap[contact.id]?.remark ?? ""
+                    contact.selected = user.selected
                     result[sectionTitles.count-1].append(contact)
                 }
             }

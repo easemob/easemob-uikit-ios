@@ -31,6 +31,7 @@ import UIKit
         self.bubbleMultiCorners.isHidden = true
         self.contentView.addSubview(self.content)
         self.addGestureTo(view: self.content, target: self)
+        self.longPressGestureTo(view: self.content, target: self)
         self.content.addSubview(self.play)
         self.play.isHidden = true
     }

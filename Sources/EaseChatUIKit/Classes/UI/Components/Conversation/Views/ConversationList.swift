@@ -1,6 +1,6 @@
 import UIKit
 
-@objc final public class ConversationList: UITableView {
+@objc open class ConversationList: UITableView {
         
     private var eventHandlers: NSHashTable<ConversationListActionEventsDelegate> = NSHashTable<ConversationListActionEventsDelegate>.weakObjects()
     
@@ -64,7 +64,7 @@ import UIKit
         }
     }
     
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }
@@ -88,7 +88,6 @@ extension ConversationList: UITableViewDelegate,UITableViewDataSource {
         if let info = self.datas[safe: indexPath.row] {
             cell?.refresh(info: info)
         }
-        cell?.selectionStyle = .none
         return cell ?? UITableViewCell()
     }
     
@@ -118,12 +117,16 @@ extension ConversationList: UITableViewDelegate,UITableViewDataSource {
                 Appearance.conversation.swipeLeftActions[index] = .mute
             }
         }
-        return UISwipeActionsConfiguration(actions: self.actions(leading: false,info: info,indexPath: indexPath))
+        let configuration = UISwipeActionsConfiguration(actions: self.actions(leading: false,info: info,indexPath: indexPath))
+        configuration.performsFirstActionWithFullSwipe = false
+        return configuration
     }
 
     public func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard let info = self.datas[safe: indexPath.row] else { return nil }
-        return UISwipeActionsConfiguration(actions: self.actions(leading: true,info: info,indexPath: indexPath))
+        let configuration = UISwipeActionsConfiguration(actions: self.actions(leading: true,info: info,indexPath: indexPath))
+        configuration.performsFirstActionWithFullSwipe = false
+        return configuration
     }
     
     private func actions(leading: Bool,info: ConversationInfo,indexPath: IndexPath) -> [UIContextualActionChatUIKit] {
@@ -208,7 +211,17 @@ extension ConversationList: UITableViewDelegate,UITableViewDataSource {
         }
     }
     
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if !decelerate {
+            self.requestDisplayInfo()
+        }
+    }
+    
     public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        self.requestDisplayInfo()
+    }
+        
+    @objc open func requestDisplayInfo() {
         var unknownInfoIds = [String]()
         if let visiblePaths = self.indexPathsForVisibleRows {
             for indexPath in visiblePaths {
@@ -223,8 +236,6 @@ extension ConversationList: UITableViewDelegate,UITableViewDataSource {
             }
         }
     }
-        
-    
 }
 
 //MARK: - IConversationListDriver Implement
@@ -288,7 +299,9 @@ extension ConversationList: IConversationListDriver {
         if let index = self.datas.firstIndex(where: { $0.id == info.id }) {
             self.datas[safe: index]?.unreadCount = 0
             if self.indexPathsForVisibleRows?.contains(where: { $0.row == index }) ?? false {
+                self.beginUpdates()
                 self.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+                self.endUpdates()
             }
         }
     }
@@ -306,7 +319,9 @@ extension ConversationList: IConversationListDriver {
         if let index = self.datas.firstIndex(where: { $0.id == info.id }) {
             self.datas[safe: index]?.doNotDisturb = true
             if self.indexPathsForVisibleRows?.contains(where: { $0.row == index }) ?? false {
+                self.beginUpdates()
                 self.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+                self.endUpdates()
             }
         }
     }
@@ -315,14 +330,18 @@ extension ConversationList: IConversationListDriver {
         if let index = self.datas.firstIndex(where: { $0.id == info.id }) {
             self.datas[safe: index]?.doNotDisturb = false
             if self.indexPathsForVisibleRows?.contains(where: { $0.row == index }) ?? false {
+                self.beginUpdates()
                 self.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
+                self.endUpdates()
             }
         }
     }
     
     private func delete(info: ConversationInfo) {
         if let index = self.datas.firstIndex(where: { $0.id == info.id }) {
+            self.beginUpdates()
             self.deleteRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.endUpdates()
             self.datas.remove(at: index)
             self.updateIndexMap()
         }
