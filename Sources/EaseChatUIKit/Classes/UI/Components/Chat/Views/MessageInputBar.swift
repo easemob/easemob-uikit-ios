@@ -331,6 +331,9 @@ extension MessageInputBar: UITextViewDelegate {
         } else {
             self.inputField.becomeFirstResponder()
         }
+        if self.keyboardHeight <= 52 {
+            self.keyboardHeight = 256+BottomBarHeight
+        }
         self.textViewFirstResponder?(true)
     }
     
