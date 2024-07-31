@@ -214,8 +214,8 @@ import UIKit
     
     private var replyId = ""
     
-    public private(set) lazy var messageList: TestTableView = {
-        TestTableView(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-52), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).separatorStyle(.none).backgroundColor(.clear)
+    public private(set) lazy var messageList: UITableView = {
+        UITableView(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-52), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).separatorStyle(.none).backgroundColor(.clear)
     }()
     
     private var oldFrame = CGRect.zero
@@ -1205,10 +1205,3 @@ extension MessageListView: IMessageListViewDriver {
     
 }
 
-
-public class TestTableView: UITableView {
-    
-    public override func reloadData() {
-        super.reloadData()
-    }
-}

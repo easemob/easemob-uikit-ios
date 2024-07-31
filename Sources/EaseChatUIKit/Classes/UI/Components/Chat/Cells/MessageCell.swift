@@ -331,9 +331,11 @@ let message_bubble_space = CGFloat(1)
         
         //topic
         self.topicView.refresh(entity: entity)
+        self.topicView.isHidden = entity.message.chatThread == nil
         
         //reaction
         self.reactionView.refresh(entity: entity)
+        self.reactionView.isHidden = (entity.message.reactionList?.count ?? 0 <= 0)
         
         //date
         let date = entity.message.showDetailDate
