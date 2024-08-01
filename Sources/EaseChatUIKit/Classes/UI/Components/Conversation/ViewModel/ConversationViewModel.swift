@@ -56,8 +56,9 @@ public let disturb_change = "EaseUIKit_do_not_disturb_changed"
     
     public private(set) var service: ConversationServiceImplement? = ConversationServiceImplement()
     
-    
     public private(set) var multiService: MultiDeviceService?  = MultiDeviceServiceImplement()
+    
+    public private(set) var firstLoadConversation = false
     
     /// Bind UI driver and service
     /// - Parameters:
@@ -87,6 +88,7 @@ public let disturb_change = "EaseUIKit_do_not_disturb_changed"
     
     /// Load all sessions that exist locally. If they do not exist, load them from the server.
     @objc open func loadExistLocalDataIfEmptyFetchServer() {
+        self.firstLoadConversation = true
         self.service?.loadExistConversations()
     }
     
@@ -429,8 +431,10 @@ extension ConversationViewModel: ConversationServiceListener {
             self.service?.notifyUnreadCount(count: count)
             self.driver?.refreshList(infos: items)
             
-            if infos.count < 7 {
-                self.requestDisplayProfiles(ids: list.map({ $0.id }))
+            if infos.count < 11 || self.firstLoadConversation {
+                let requestCount = infos.count < 11 ? (infos.count - 1):10
+                self.requestDisplayProfiles(ids: list.prefix(upTo: requestCount).map({ $0.id }))
+                self.firstLoadConversation = false
             }
         }
     }

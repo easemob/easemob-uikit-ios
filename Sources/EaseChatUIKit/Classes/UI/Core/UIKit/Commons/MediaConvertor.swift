@@ -56,18 +56,6 @@ final class MediaConvertor: NSObject {
         return path
     }
     
-    static func imagePath(imageURL: URL,completion: @escaping (String?) -> Void) {
-        let result = PHAsset.fetchAssets(withALAssetURLs: [imageURL], options: nil)
-        if result.count > 0,let asset = result.firstObject {
-            let options = PHImageRequestOptions()
-            options.isSynchronous = true
-            PHImageManager.default().requestImageData(for: asset, options: options) { (imageData, dataUTI, orientation, info) in
-                let imagePath = info?["PHImageFileURLKey"] as? NSURL
-                completion(imagePath?.absoluteString)
-            }
-        }
-    }
-    
     static func firstFrame(from videoPath: String, completion: @escaping (UIImage?) -> Void) {
         let videoAsset = AVURLAsset(url: URL(fileURLWithPath: videoPath))
         let imageGenerator = AVAssetImageGenerator(asset: videoAsset)
