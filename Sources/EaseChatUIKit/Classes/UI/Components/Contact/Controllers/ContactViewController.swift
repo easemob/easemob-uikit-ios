@@ -176,8 +176,22 @@ import UIKit
     */
     @objc open func searchAction() {
         var vc: ContactSearchResultController?
-        vc = ContactSearchResultController(headerStyle: self.style) { [weak self] item in
-            vc?.navigationController?.popViewController(animated: false)
+        var selectProfiles = [EaseProfileProtocol]()
+        for contacts in self.contactList.contacts {
+            for contact in contacts {
+                if contact.selected {
+                    selectProfiles.append(contact)
+                }
+            }
+        }
+        var canDismiss = true
+        if self.style == .addGroupParticipant || self.style == .newGroup {
+            canDismiss = false
+        }
+        vc = ContactSearchResultController(headerStyle: self.style,selectProfiles: selectProfiles) { [weak self] item in
+            if canDismiss {
+                vc?.navigationController?.popViewController(animated: false)
+            }
             self?.viewContact(profile: item)
         }
         if let vc = vc {
@@ -261,7 +275,19 @@ import UIKit
         case .shareContact:
             self.confirmClosure?([profile])
         case .addGroupParticipant,.newGroup:
-            let count = self.contactList.rawData.filter { $0.selected }.count
+            var count = 0
+            for contacts in self.contactList.contacts {
+                for contact in contacts {
+                    if contact.id == profile.id {
+                        contact.selected = profile.selected
+                    }
+                    if contact.selected {
+                        count += 1
+                    }
+                }
+            }
+            self.contactList.contactList.reloadData()
+            
             self.navigation.rightItem.isEnabled = count > 0
             var title = self.style == .newGroup ? "Create".chat.localize:"Add".chat.localize
             if count > 0 {

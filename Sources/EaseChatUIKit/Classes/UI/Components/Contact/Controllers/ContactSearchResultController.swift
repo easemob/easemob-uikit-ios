@@ -29,17 +29,22 @@ import UIKit
     
     public private(set) var searchResults = [EaseProfileProtocol]()
     
+    public private(set) var selectProfiles = [EaseProfileProtocol]()
+    
     private var active = false {
         didSet {
             if self.active == false {
-                self.searchResults.removeAll()
+                DispatchQueue.main.async {
+                    self.searchResults.removeAll()
+                    self.searchList.reloadData()
+                }
             }
         }
     }
     
     
     public private(set) lazy var searchHeader: SearchHeaderBar = {
-        SearchHeaderBar(frame: CGRect(x: 0, y: StatusBarHeight+10, width: ScreenWidth, height: 44), displayStyle: .other).backgroundColor(.clear)
+        SearchHeaderBar(frame: CGRect(x: 0, y: (self.navigationController == nil) ? 20:StatusBarHeight+10, width: ScreenWidth, height: 44), displayStyle: .other).backgroundColor(.clear)
     }()
     
     public private(set) lazy var searchList: UITableView = {
@@ -59,8 +64,9 @@ import UIKit
     /// - Parameters:
     ///   - headerStyle: ``ContactListHeaderStyle``
     ///   - action: Select row callback.
-    @objc public required init(headerStyle: ContactListHeaderStyle = .contact,action: @escaping (EaseProfileProtocol) -> Void) {
+    @objc public required init(headerStyle: ContactListHeaderStyle = .contact,selectProfiles: [EaseProfileProtocol] = [],action: @escaping (EaseProfileProtocol) -> Void) {
         self.headerStyle = headerStyle
+        self.selectProfiles = selectProfiles
         self.selectClosure = action
         super.init(nibName: nil, bundle: nil)
     }
@@ -112,7 +118,17 @@ import UIKit
                 })
                 self?.rawDatas.removeAll()
                 self?.searchResults.removeAll()
+                if let selectProfiles = self?.selectProfiles {
+                    for profile in infos {
+                        if selectProfiles.contains(where: { $0.id == profile.id }) {
+                            profile.selected = true
+                        }
+                    }
+                }
                 self?.rawDatas = infos
+                if infos.count > 0 {
+                    self?.searchList.reloadData()
+                }
             } else {
                 consoleLogInfo("ContactSearchResultController loadAllContacts error:\(error?.errorDescription ?? "")", type: .error)
             }
@@ -160,12 +176,22 @@ import UIKit
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        if self.active {
+        if self.active && self.searchText.count > 0 {
             if let info = self.searchResults[safe: indexPath.row] {
+                if self.headerStyle == .addGroupParticipant || self.headerStyle ==  .newGroup {
+                    info.selected = !info.selected
+                    self.rawDatas.first { $0.id == info.id }?.selected = info.selected
+                    tableView.reloadData()
+                }
                 self.selectClosure?(info)
             }
         } else {
             if let info = self.rawDatas[safe: indexPath.row] {
+                if self.headerStyle == .addGroupParticipant || self.headerStyle ==  .newGroup {
+                    info.selected = !info.selected
+                    self.rawDatas.first { $0.id == info.id }?.selected = info.selected
+                    tableView.reloadData()
+                }
                 self.selectClosure?(info)
             }
         }
