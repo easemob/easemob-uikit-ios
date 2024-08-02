@@ -149,7 +149,6 @@ import UIKit
             self.navigationController?.pushViewController(vc, animated: true)
 //            self.selectClosure?(item)
         }
-        self.searchList.reloadData()
     }
 
 }

@@ -46,6 +46,8 @@ import UIKit
         self.createContactList()
     }()
     
+    private var ignoreIds = [String]()
+    
     /**
      Creates a contact list view.
 
@@ -65,6 +67,7 @@ import UIKit
     public required init(headerStyle: ContactListHeaderStyle = .contact,ignoreIds: [String] = []) {
         self.style = headerStyle
         self.viewModel = ComponentsRegister.shared.ContactViewService.init(ignoreIds: ignoreIds)
+        self.ignoreIds = ignoreIds
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -188,7 +191,7 @@ import UIKit
         if self.style == .addGroupParticipant || self.style == .newGroup {
             canDismiss = false
         }
-        vc = ContactSearchResultController(headerStyle: self.style,selectProfiles: selectProfiles) { [weak self] item in
+        vc = ContactSearchResultController(headerStyle: self.style,selectProfiles: selectProfiles,ignoreIds: self.ignoreIds) { [weak self] item in
             if canDismiss {
                 vc?.navigationController?.popViewController(animated: false)
             }
