@@ -198,7 +198,7 @@ extension ContactView: UITableViewDelegate,UITableViewDataSource {
                         handler.didSelected(indexPath: indexPath, profile: item)
                     }
                 }
-                self.selectClosure?(item)
+//                self.selectClosure?(item)
             }
         } else {
             if let item = self.contacts[safe:indexPath.section]?[safe: indexPath.row] {

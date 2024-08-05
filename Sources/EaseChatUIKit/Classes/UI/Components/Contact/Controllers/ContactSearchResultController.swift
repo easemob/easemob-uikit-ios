@@ -11,7 +11,13 @@ import UIKit
     
     private var searchText = ""
     
-    public var rawDatas = [EaseProfileProtocol]() {
+    public var rawDatas = [EaseProfileProtocol]()
+    
+    private var selectClosure: ((EaseProfileProtocol) -> Void)?
+    
+    private var service: ContactServiceProtocol = ContactServiceImplement()
+    
+    public private(set) var searchResults = [EaseProfileProtocol]() {
         didSet {
             DispatchQueue.main.async {
                 if self.rawDatas.count <= 0  {
@@ -23,23 +29,15 @@ import UIKit
         }
     }
     
-    private var selectClosure: ((EaseProfileProtocol) -> Void)?
+    public private(set) var selectProfiles = [EaseProfileProtocol]()
     
-    private var service: ContactServiceProtocol = ContactServiceImplement()
+    public private(set) var ignoreIds = [String]()
     
-    public private(set) var searchResults = [EaseProfileProtocol]()
-    
-    private var active = false {
-        didSet {
-            if self.active == false {
-                self.searchResults.removeAll()
-            }
-        }
-    }
+    private var active = false
     
     
     public private(set) lazy var searchHeader: SearchHeaderBar = {
-        SearchHeaderBar(frame: CGRect(x: 0, y: StatusBarHeight+10, width: ScreenWidth, height: 44), displayStyle: .other).backgroundColor(.clear)
+        SearchHeaderBar(frame: CGRect(x: 0, y: (self.navigationController == nil) ? 20:StatusBarHeight+10, width: ScreenWidth, height: 44), displayStyle: .other).backgroundColor(.clear)
     }()
     
     public private(set) lazy var searchList: UITableView = {
@@ -59,8 +57,10 @@ import UIKit
     /// - Parameters:
     ///   - headerStyle: ``ContactListHeaderStyle``
     ///   - action: Select row callback.
-    @objc public required init(headerStyle: ContactListHeaderStyle = .contact,action: @escaping (EaseProfileProtocol) -> Void) {
+    @objc public required init(headerStyle: ContactListHeaderStyle = .contact,selectProfiles: [EaseProfileProtocol] = [],ignoreIds: [String] = [],action: @escaping (EaseProfileProtocol) -> Void) {
         self.headerStyle = headerStyle
+        self.selectProfiles = selectProfiles
+        self.ignoreIds = ignoreIds
         self.selectClosure = action
         super.init(nibName: nil, bundle: nil)
     }
@@ -74,6 +74,9 @@ import UIKit
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         self.view.backgroundColor = UIColor.theme.neutralColor98
+        if self.headerStyle == .addGroupParticipant || self.headerStyle == .newGroup {
+            self.searchHeader.cancel.setTitle("Confirm".chat.localize, for: .normal)
+        }
         self.view.addSubViews([self.searchHeader,self.searchList])
         self.searchList.keyboardDismissMode = .onDrag
         self.loadAllContacts()
@@ -102,7 +105,7 @@ import UIKit
     @objc public func loadAllContacts() {
         self.service.contacts(completion: { [weak self] error, contacts in
             if error == nil {
-                let infos = contacts.map({
+                var infos = contacts.map({
                     let profile = EaseProfile()
                     profile.id = $0.userId
                     profile.nickname = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
@@ -112,7 +115,24 @@ import UIKit
                 })
                 self?.rawDatas.removeAll()
                 self?.searchResults.removeAll()
+                if let ignoreIds = self?.ignoreIds {
+                    for id in ignoreIds {
+                        if let index = infos.firstIndex(where: { $0.id == id }) {
+                            infos.remove(at: index)
+                        }
+                    }
+                }
+                if let selectProfiles = self?.selectProfiles {
+                    for profile in infos {
+                        if selectProfiles.contains(where: { $0.id == profile.id }) {
+                            profile.selected = true
+                        }
+                    }
+                }
                 self?.rawDatas = infos
+                if infos.count > 0 {
+                    self?.searchList.reloadData()
+                }
             } else {
                 consoleLogInfo("ContactSearchResultController loadAllContacts error:\(error?.errorDescription ?? "")", type: .error)
             }
@@ -135,7 +155,7 @@ import UIKit
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        self.active ? self.searchResults.count:self.rawDatas.count
+        self.searchResults.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -144,14 +164,8 @@ import UIKit
             cell = ComponentsRegister.shared.ContactsCell.init(displayStyle: (self.headerStyle == .newGroup || self.headerStyle == .addGroupParticipant) ? .withCheckBox:.normal,identifier: "EaseUIKit_ContactsCell_Search")
         }
         cell?.backgroundColor = .clear
-        if self.active {
-            if let info = self.searchResults[safe: indexPath.row] {
-                cell?.refresh(profile: info, keyword: self.searchText)
-            }
-        } else {
-            if let info = self.rawDatas[safe: indexPath.row] {
-                cell?.refresh(profile: info, keyword: self.searchText)
-            }
+        if let info = self.searchResults[safe: indexPath.row] {
+            cell?.refresh(profile: info, keyword: self.searchText)
         }
         cell?.selectionStyle = .none
         return cell ?? UITableViewCell()
@@ -160,14 +174,24 @@ import UIKit
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        if self.active {
+        if self.active && self.searchText.count > 0 {
             if let info = self.searchResults[safe: indexPath.row] {
+                if self.headerStyle == .addGroupParticipant || self.headerStyle ==  .newGroup {
+                    info.selected = !info.selected
+                    self.rawDatas.first { $0.id == info.id }?.selected = info.selected
+                    tableView.reloadData()
+                }
                 self.selectClosure?(info)
             }
         } else {
-            if let info = self.rawDatas[safe: indexPath.row] {
-                self.selectClosure?(info)
-            }
+//            if let info = self.rawDatas[safe: indexPath.row] {
+//                if self.headerStyle == .addGroupParticipant || self.headerStyle ==  .newGroup {
+//                    info.selected = !info.selected
+//                    self.rawDatas.first { $0.id == info.id }?.selected = info.selected
+//                    tableView.reloadData()
+//                }
+//                self.selectClosure?(info)
+//            }
         }
     }
 }
