@@ -433,7 +433,7 @@ extension ConversationViewModel: ConversationServiceListener {
             
             if infos.count < 11 || self.firstLoadConversation {
                 let requestCount = infos.count < 11 ? (infos.count - 1):10
-                self.requestDisplayProfiles(ids: list.prefix(upTo: requestCount).map({ $0.id }))
+                self.requestDisplayProfiles(ids: items.prefix(upTo: requestCount).map({ $0.id }))
                 self.firstLoadConversation = false
             }
         }
