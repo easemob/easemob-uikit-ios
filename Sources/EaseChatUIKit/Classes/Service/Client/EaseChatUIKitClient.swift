@@ -74,7 +74,13 @@ public let cache_update_notification = "EaseChatUIKitContextUpdateCache"
         EaseChatUIKitContext.shared?.currentUser = user
         EaseChatUIKitContext.shared?.chatCache?[user.id] = user
         EaseChatUIKitContext.shared?.userCache?[user.id] = user
-        self.userService = UserServiceImplement(userInfo: user, token: token, completion: completion)
+        if self.userService != nil {
+            self.userService?.login(userId: user.id, token: token, completion: { success, error in
+                completion(error)
+            })
+        } else {
+            self.userService = UserServiceImplement(userInfo: user, token: token, completion: completion)
+        }
     }
     
     /// Logout user

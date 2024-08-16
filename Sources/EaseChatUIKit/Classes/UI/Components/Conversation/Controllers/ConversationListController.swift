@@ -297,7 +297,7 @@ extension ConversationListController {
 }
 
 extension ConversationListController: ThemeSwitchProtocol {
-    public func switchTheme(style: ThemeStyle) {
+    open func switchTheme(style: ThemeStyle) {
         self.view.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
         self.search.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
         self.navigation.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98

@@ -300,7 +300,7 @@ import UIKit
     }
     
     @objc open func fetchPinnedMessages() {
-        if Appearance.chat.enablePinMessage,self.chatType != .chat {
+        if Appearance.chat.enablePinMessage {
             self.chatService?.pinnedMessages(conversationId: self.to, completion: { [weak self]  messages,error in
                 guard let `self` = self else { return }
                 if error == nil {

@@ -337,9 +337,9 @@ import UIKit
                 if firstResponder {
                     if self.inputBar.keyboardHeight >= 216,self.messageList.frame.height >= oldFrame.height {
                         if self.getLastVisibleCellCoordinate().maxY > self.inputBar.frame.height+self.inputBar.keyboardHeight {
-                            self.messageList.frame = CGRect(x: 0, y: 0-self.inputBar.keyboardHeight, width: self.messageList.frame.width, height: self.messageList.frame.height)
+                            self.messageList.frame = CGRect(x: 0, y: self.frame.minY-self.inputBar.keyboardHeight, width: self.messageList.frame.width, height: self.messageList.frame.height)
                         } else {
-                            self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.messageList.frame.height-self.inputBar.keyboardHeight)
+                            self.messageList.frame = CGRect(x: 0, y: self.frame.minY, width: self.messageList.frame.width, height: self.messageList.frame.height-self.inputBar.keyboardHeight)
                         }
                         
                         let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)

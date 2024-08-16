@@ -166,7 +166,8 @@ public enum AnimationOptions {
 ///
 /// - unabgeschirmt: discover PresentedView，compress: keyboard nearly present view
 /// - compressInputView: Nearly system keyboard
-public enum KeyboardTranslationType {
+public enum KeyboardTranslationType:Equatable {
     case unabgeschirmt(compress: Bool)
     case compressInputView
+    case noTreatment
 }

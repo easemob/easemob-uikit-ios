@@ -398,6 +398,7 @@ extension MessageListController: MessageListDriverEventsListener {
             self.messageContainer.editMode = !$0
             self.navigation.editMode = !$0
         }
+        
         UIViewController.currentController?.present(vc, animated: true)
     }
     
@@ -499,7 +500,7 @@ extension MessageListController: MessageListDriverEventsListener {
                 messageActions.removeAll { $0.tag == "OriginalText" }
             }
         }
-        if !Appearance.chat.enablePinMessage,self.chatType != .chat {
+        if !Appearance.chat.enablePinMessage {
             messageActions.removeAll { $0.tag == "Pin" }
         }
         if !Appearance.chat.contentStyle.contains(.withReply) {
@@ -516,9 +517,7 @@ extension MessageListController: MessageListDriverEventsListener {
                 messageActions.removeAll { $0.tag == "Recall" }
             }
         }
-        if self.chatType == .chat {
-            messageActions.removeAll { $0.tag == "Pin" }
-        }
+        
         return messageActions
     }
     
