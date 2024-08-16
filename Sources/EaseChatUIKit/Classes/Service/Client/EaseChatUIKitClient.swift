@@ -58,7 +58,7 @@ public let cache_update_notification = "EaseChatUIKitContextUpdateCache"
             if let key = appKey {
                 return ChatClient.shared().initializeSDK(with: ChatOptions(appkey: key))
             }
-            return ChatError(description: "App key can't nil", code: .invalidAppkey)
+            return ChatError(description: "App key can't be nil", code: .invalidAppkey)
         }
     }
     
