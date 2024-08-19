@@ -76,7 +76,18 @@ import UIKit
         self.nickName.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.avatar.frame.minX+4, width: self.contentView.frame.width-self.avatar.frame.maxX-12-16-50, height: 16)
         self.date.frame = CGRect(x: self.contentView.frame.width-66, y: self.nickName.frame.minY+2, width: 50, height: 16)
         self.content.frame = CGRect(x: self.avatar.frame.maxX+12, y: self.nickName.frame.maxY+2, width: self.contentView.frame.width-12-12-16-80, height: 20)
-//        self.badge.frame = CGRect(x: self.contentView.frame.width-48, y: self.nickName.frame.maxY+5, width: 32, height: 18)
+        var badgeWidth: CGFloat = 18
+        if let badgeText = self.badge.text {
+            if badgeText.count > 2 {
+                badgeWidth = 32
+            } else if badgeText.count > 1 {
+                badgeWidth = 24
+            }
+        }
+        self.badge.frame = CGRect(x: self.contentView.frame.width - badgeWidth - 16,
+                                  y: self.nickName.frame.maxY + 5,
+                                  width: badgeWidth,
+                                  height: 18)
         self.dot.frame =  CGRect(x: self.date.frame.maxX-12, y: self.nickName.frame.maxY+10, width: 8, height: 8)
         self.separatorLine.frame =  CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5)
     }
@@ -124,15 +135,8 @@ import UIKit
         } else {
             self.badge.isHidden = info.unreadCount <= 0
             self.dot.isHidden = true
-            var badgeWidth = 18
-            if info.unreadCount > 9 {
-                badgeWidth = 24
-                if info.unreadCount > 99 {
-                    badgeWidth = 32
-                }
-            }
-            self.badge.frame = CGRect(x: Int(ScreenWidth)-16-badgeWidth, y: Int(self.nickName.frame.maxY)+5, width: badgeWidth, height: 18)
         }
+        self.setNeedsLayout()
     }
     
    
