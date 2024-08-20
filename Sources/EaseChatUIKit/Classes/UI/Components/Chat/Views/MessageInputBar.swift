@@ -353,13 +353,15 @@ extension MessageInputBar: UITextViewDelegate {
     }
     
     @objc private func keyboardWillHide(notification: Notification) {
-        if notification.object is MessageInputBar {
+        if self.rightView.isSelected {
             let frame = notification.chat.keyboardEndFrame
             let duration = notification.chat.keyboardAnimationDuration
             self.hiddenDuration = duration ?? 0
             self.keyboardHeight = frame!.height
             self.showEmojiKeyboard()
             self.textViewFirstResponder?(true)
+        } else {
+            self.hiddenInputBar()
         }
     }
     
