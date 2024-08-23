@@ -807,7 +807,7 @@ extension MessageListView: IMessageListViewDriver {
     
     public func reloadReaction(message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
-            if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }),indexPath.row > 0 {
+            if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }),indexPath.row >= 0 {
                 let entity = self.convertMessage(message: message)
                 let reactionWidth = entity.reactionMenuWidth()
                 if reactionWidth < reactionMaxWidth-30 {
