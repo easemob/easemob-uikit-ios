@@ -448,7 +448,7 @@ extension ConversationViewModel: ConversationServiceListener {
     
     @objc open func conversationMessageAlreadyReadOnOtherDevice(info: ConversationInfo) {
         info.unreadCount = 0
-        self.service?.markAllMessagesAsRead(conversationId: info.id)
+//        self.service?.markAllMessagesAsRead(conversationId: info.id)
         self.driver?.swipeMenuOperation(info: info, type: .read)
     }
 }
