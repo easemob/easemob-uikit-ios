@@ -21,6 +21,8 @@ import UIKit
     private var pageTitles = [String]()
     
     private var childControllers = [UIViewController]()
+    
+    public var willRemoveClosure: (() -> ())?
 
     lazy var container: PageContainer = {
         PageContainer(frame: CGRect(x: 0, y: 0, width: self.presentedViewComponent?.contentSize.width ?? 0, height: self.presentedViewComponent?.contentSize.height ?? 0), viewControllers: self.childControllers, indicators: self.pageTitles).cornerRadius(.medium, [.topLeft,.topRight], .clear, 0).backgroundColor(UIColor.theme.neutralColor98)
@@ -62,6 +64,11 @@ import UIKit
         super.viewDidLoad()
         self.view.backgroundColor(.clear)
         self.view.addSubview(self.container)
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.willRemoveClosure?()
     }
 }
 

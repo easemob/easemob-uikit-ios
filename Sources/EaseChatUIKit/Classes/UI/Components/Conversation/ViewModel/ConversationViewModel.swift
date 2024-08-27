@@ -448,6 +448,14 @@ extension ConversationViewModel: ConversationServiceListener {
     
     @objc open func conversationMessageAlreadyReadOnOtherDevice(info: ConversationInfo) {
         info.unreadCount = 0
+        if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
+            let items = self.mapper(objects: infos)
+            var count = UInt(0)
+            for item in items where item.doNotDisturb == false {
+                count += item.unreadCount
+            }
+            self.service?.notifyUnreadCount(count: count)
+        }
 //        self.service?.markAllMessagesAsRead(conversationId: info.id)
         self.driver?.swipeMenuOperation(info: info, type: .read)
     }
