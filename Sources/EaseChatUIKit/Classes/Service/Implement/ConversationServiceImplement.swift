@@ -450,7 +450,7 @@ extension ConversationServiceImplement: ChatEventsListener {
     }
     
     @objc open func onConversationReadCallback(conversation: ChatConversation ) {
-        conversation.markAllMessages(asRead: nil)
+//        conversation.markAllMessages(asRead: nil)
         if let info = self.mapper(objects: [conversation]).first{
             info.unreadCount = 0
             for listener in self.responseDelegates.allObjects {
