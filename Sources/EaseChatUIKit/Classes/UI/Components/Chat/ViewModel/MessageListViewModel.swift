@@ -225,6 +225,11 @@ import UIKit
             if let userId =  extensionInfo["uid"] as? String {
                 customExt["uid"] = userId
                 ext.removeValue(forKey: "uid")
+//                customExt["moderation"] = ["enable": true,
+//                                           "contents": [[
+//                                                   "type": "text",
+//                                                   "data": "习近平"]]
+//                ].chat.jsonString
             }
             if let avatar =  extensionInfo["avatar"] as? String {
                 customExt["avatar"] = avatar
