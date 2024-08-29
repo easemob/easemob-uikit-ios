@@ -1,6 +1,6 @@
 import Foundation
 
-public let EaseChatUIKit_VERSION = "4.8.0"
+public let EaseChatUIKit_VERSION = "4.9.0"
 
 public let cache_update_notification = "EaseChatUIKitContextUpdateCache"
 
