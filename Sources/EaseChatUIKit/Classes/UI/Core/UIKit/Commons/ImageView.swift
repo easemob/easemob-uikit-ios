@@ -27,7 +27,12 @@ import Combine
     ///   - placeHolder: An optional placeholder image to display while the image is being loaded.
     @MainActor public func image(with url: String,placeHolder: UIImage?) {
         self.image = placeHolder
-        var urlString = url.lowercased()
+        var urlString = ""
+        if url.hasSuffix(".png") || url.hasSuffix(".jpg") || url.hasSuffix(".jpeg") {
+            urlString = url
+        } else {
+            urlString = url.lowercased()
+        }
         if !url.hasPrefix("http://"), !url.hasPrefix("https://") {
             urlString = "https://" + url
         } else {

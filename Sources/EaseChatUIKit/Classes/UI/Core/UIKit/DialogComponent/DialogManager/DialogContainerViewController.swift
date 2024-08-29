@@ -16,7 +16,7 @@ import UIKit
    
     public var presentedViewComponent: PresentedViewComponent? = PresentedViewComponent(contentSize: Appearance.pageContainerConstraintsSize,destination: .bottomBaseline,canTapBGDismiss: true)
 
-    var customView: UIView?
+    public var customView: UIView?
 
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)

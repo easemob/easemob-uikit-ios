@@ -49,7 +49,7 @@ private func consoleLog<T> (
     debugPrint("\(timeString) \(type.rawValue) \(fileName):\(line) EaseChatUIKit Log:\(message) function Name:\(functionName)")
     #else
     if type == .error {
-        Log.saveLog(" EaseChatUIKit Log:\(message)",file: file,function: function,line: line)
+        Log.saveLog(" EaseChatUIKit Log:\(message) \n",file: file,function: function,line: line)
     }
     #endif
 }

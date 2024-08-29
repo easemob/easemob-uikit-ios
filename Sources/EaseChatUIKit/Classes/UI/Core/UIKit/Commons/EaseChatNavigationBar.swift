@@ -110,7 +110,7 @@ import UIKit
     }
     
     public private(set) lazy var titleLabel: UILabel = {
-        UILabel(frame: CGRect(x: self.avatar.frame.maxX+4, y: StatusBarHeight+2, width: ScreenWidth-self.avatar.frame.maxX*2-8*3, height: 22)).font(UIFont.theme.headlineSmall).textColor(UIColor.theme.neutralColor1).backgroundColor(.clear).tag(2)
+        UILabel(frame: CGRect(x: self.avatar.frame.maxX+4, y: (nearStatusBar ? StatusBarHeight:0)+2, width: ScreenWidth-self.avatar.frame.maxX*2-8*3, height: 22)).font(UIFont.theme.headlineSmall).textColor(UIColor.theme.neutralColor1).backgroundColor(.clear).tag(2)
     }()
     
     public private(set) lazy var detail: UILabel = {
@@ -141,6 +141,10 @@ import UIKit
     public private(set) lazy var cancel: UIButton = {
         UIButton(type: .custom).frame(CGRect(x: ScreenWidth-58, y: self.frame.height-36, width: 50, height: 28)).backgroundColor(.clear).title("barrage_long_press_menu_cancel".chat.localize, .normal).font(UIFont.theme.labelMedium).textColor(UIColor.theme.primaryColor5, .normal).tag(4).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside)
     }()
+    
+    private var originalRenderRightImage = false
+    
+    private var nearStatusBar = true
 
     internal override init(frame: CGRect) {
         super.init(frame: frame)
@@ -154,9 +158,10 @@ import UIKit
     ///   - avatarURL: Avatar url.
     ///   - rightImages: Right buttons kind of `[UIImage]`.
     ///   - hiddenAvatar: Whether hide avatar or not.
-    @objc required public convenience init(frame: CGRect = CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: Bool, textAlignment: NSTextAlignment = .center, placeHolder: UIImage? = nil,avatarURL: String? = nil,rightImages: [UIImage] = [],hiddenAvatar: Bool = false) {
+    @objc required public convenience init(frame: CGRect = CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: Bool, textAlignment: NSTextAlignment = .center, placeHolder: UIImage? = nil,avatarURL: String? = nil,rightImages: [UIImage] = [],hiddenAvatar: Bool = false,nearStatusBar: Bool = true) {
         self.init(frame: frame)
         self.showLeft = showLeftItem
+        self.nearStatusBar = nearStatusBar
         if showLeftItem {
             var width = CGFloat(self.rightImages.count*36)
             if self.avatar.frame.maxX+4 > width {
@@ -167,7 +172,7 @@ import UIKit
             } else {
                 self.addSubViews([self.leftItem,self.avatar,self.status,self.titleLabel,self.detail,self.rightItems,self.separateLine,self.cancel])
             }
-            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: StatusBarHeight+4, width: ScreenWidth - width*2 - 4, height: 22)
+            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: (nearStatusBar ? StatusBarHeight:0)+4, width: ScreenWidth - width*2 - 4, height: 22)
             if textAlignment == .center {
                 self.titleLabel.center = CGPoint(x: self.center.x, y: self.titleLabel.center.y)
             }
@@ -180,7 +185,7 @@ import UIKit
             }
             self.bringSubviewToFront(self.avatar)
             self.bringSubviewToFront(self.status)
-            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: StatusBarHeight+4, width: ScreenWidth - CGFloat(self.rightImages.count*36)*2, height: 22)
+            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: (nearStatusBar ? StatusBarHeight:0), width: ScreenWidth - CGFloat(self.rightImages.count*36)*2, height: 22)
             if textAlignment == .center {
                 self.titleLabel.center = CGPoint(x: self.center.x, y: self.titleLabel.center.y)
             }
@@ -198,8 +203,9 @@ import UIKit
         self.addGesture()
         self.cancel.isHidden = true
         self.leftItem.center = CGPoint(x: self.leftItem.center.x, y: self.leftItem.center.y-2)
+        self.avatar.frame = CGRect(x: self.showLeft ? self.leftItem.frame.maxX:CGFloat(10), y: self.frame.height-38, width: 32, height: 32)
         self.updateRightItems(images: rightImages)
-        self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: StatusBarHeight+4, width: ScreenWidth - self.rightItems.frame.width - 8 - ((hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8), height: 22)
+        self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: (nearStatusBar ? StatusBarHeight:0)+4, width: ScreenWidth - self.rightItems.frame.width - 8 - ((hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8), height: 22)
         self.detail.frame = CGRect(x: self.titleLabel.frame.minX, y: self.titleLabel.frame.maxY, width: self.titleLabel.frame.width, height: 14)
         self.status.isHidden = Appearance.hiddenPresence
         Theme.registerSwitchThemeViews(view: self)
@@ -269,27 +275,33 @@ import UIKit
         }
     }
     
-    @objc public func updateRightItems(images: [UIImage]) {
+    @objc public func updateRightItems(images: [UIImage],original: Bool = false) {
+        self.originalRenderRightImage = original
         self.rightImages.removeAll()
         if images.count > 3 {
             self.rightImages = Array(images.prefix(3))
         } else {
             self.rightImages.append(contentsOf: images)
         }
-        self.rightItems.frame = CGRect(x: ScreenWidth-CGFloat(images.count*36)-8, y: StatusBarHeight+8, width: CGFloat(images.count*36), height: 36)
+        self.rightItems.frame = CGRect(x: ScreenWidth-CGFloat(images.count*36)-8, y: (nearStatusBar ? StatusBarHeight:0)+8, width: CGFloat(images.count*36), height: 36)
         self.rightItems.reloadData()
     }
+
 }
 
 extension EaseChatNavigationBar: UICollectionViewDataSource,UICollectionViewDelegate {
-    
+     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         self.rightImages.count
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EaseChatNavigationBarRightCell", for: indexPath) as? EaseChatNavigationBarRightCell
-        cell?.imageView.image = self.rightImages[safe: indexPath.row]?.withTintColor(Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor3)
+        if self.originalRenderRightImage {
+            cell?.imageView.image = self.rightImages[safe: indexPath.row]?.withRenderingMode(.alwaysOriginal)
+        } else {
+            cell?.imageView.image = self.rightImages[safe: indexPath.row]?.withTintColor(Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor3)
+        }
         return cell ?? UICollectionViewCell()
     }
     
