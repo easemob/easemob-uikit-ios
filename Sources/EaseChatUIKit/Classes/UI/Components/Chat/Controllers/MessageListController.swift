@@ -625,15 +625,20 @@ extension MessageListController: MessageListDriverEventsListener {
      - message: The chat message to be edited.
      */
     @objc open func editAction(message: ChatMessage) {
+        if let current = UIViewController.currentController as? DialogContainerViewController {
+            current.dismiss(animated: false)
+        }
         if let body = message.body as? ChatTextMessageBody {
             let editor = MessageEditor(content: body.text) { text in
                 if !text.isEmpty {
                     self.viewModel.processMessage(operation: .edit, message: message, edit: text)
                 }
-                UIViewController.currentController?.dismiss(animated: true)
+                if let current = UIViewController.currentController as? DialogContainerViewController {
+                    current.dismiss(animated: true)
+                }
             }
             DialogManager.shared.showCustomDialog(customView: editor,dismiss: false)
-            DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.5) {
+            DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.2) {
                 editor.editor.textView.becomeFirstResponder()
             }
             

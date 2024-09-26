@@ -46,7 +46,7 @@ private func consoleLog<T> (
     let timeString = time.string(from: Date())
     let fileName = (file.description as NSString).lastPathComponent
     let functionName = (function.description as NSString).lastPathComponent
-    debugPrint("\(timeString) \(type.rawValue) \(fileName):\(line) EaseChatUIKit Log:\(message) function Name:\(functionName)")
+    debugPrint("\n\(timeString) \(type.rawValue) \(fileName):\(line) EaseChatUIKit Log:\(message) function Name:\(functionName)")
     #else
     if type == .error {
         Log.saveLog(" EaseChatUIKit Log:\(message) \n",file: file,function: function,line: line)
@@ -78,9 +78,9 @@ final class Log {
             try? message.write(to: logFileURL, atomically: false, encoding: .utf8)
         } else {
             let data = message.data(using: .utf8)!
-            fileHandle!.seekToEndOfFile()
-            fileHandle!.write(data)
-            fileHandle!.closeFile()
+            fileHandle?.seekToEndOfFile()
+            fileHandle?.write(data)
+            fileHandle?.closeFile()
         }
     }
 }
