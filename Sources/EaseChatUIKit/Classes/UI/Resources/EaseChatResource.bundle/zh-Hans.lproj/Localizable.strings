@@ -29,7 +29,7 @@
 "barrage_long_press_menu_recall" = "撤回";
 "barrage_long_press_menu_reply" = "回复";
 "barrage_long_press_menu_report" = "举报";
-"barrage_long_press_menu_show_original_text" = "显示原文";
+"barrage_long_press_menu_show_original_text" = "隐藏译文";
 "barrage_long_press_menu_multi_select" = "多选";
 "barrage_long_press_menu_topic" = "创建话题";
 "Topic" = "话题";

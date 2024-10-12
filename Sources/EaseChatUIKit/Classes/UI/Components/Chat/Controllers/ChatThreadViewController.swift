@@ -414,8 +414,8 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
         return messageActions
     }
     
-    public func onMessageBubbleLongPressed(message: MessageEntity) {
-        self.showMessageLongPressedDialog(message: message)
+    public func onMessageBubbleLongPressed(cell: MessageCell) {
+        self.showMessageLongPressedDialog(cell: cell)
     }
     
     /**
@@ -424,23 +424,23 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
      - Parameters:
      - message: The chat message for which the dialog is shown.
      */
-    @objc open func showMessageLongPressedDialog(message: MessageEntity) {
+    @objc open func showMessageLongPressedDialog(cell: MessageCell) {
         if self.messageContainer.editMode {
             return
         }
-        let header =  CommonReactionView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 44), message: message.message).backgroundColor(.clear)
+        let header =  CommonReactionView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 44), message: cell.entity.message).backgroundColor(.clear)
         header.reactionClosure = { [weak self] emoji,rawMessage in
             UIViewController.currentController?.dismiss(animated: true) {
                 if emoji.isEmpty {
                     //more reaction
-                    self?.showAllReactionsController(message: message)
+                    self?.showAllReactionsController(message: cell.entity)
                 } else {
                     self?.viewModel.operationReaction(emoji: emoji, message: rawMessage)
                 }
             }
         }
-        DialogManager.shared.showMessageActions(actions: self.filterMessageActions(message: message),withHeader: Appearance.chat.contentStyle.contains(.withMessageReaction) ? header:nil) { [weak self] item in
-            self?.processMessage(item: item, message: message.message)
+        DialogManager.shared.showMessageActions(actions: self.filterMessageActions(message: cell.entity),withHeader: Appearance.chat.contentStyle.contains(.withMessageReaction) ? header:nil) { [weak self] item in
+            self?.processMessage(item: item, message: cell.entity.message)
         }
     }
     

@@ -597,9 +597,9 @@ extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
         }
     }
     
-    public func onMessageContentLongPressed(message: MessageEntity) {
+    public func onMessageContentLongPressed(cell: MessageCell) {
         for handler in self.handlers.allObjects {
-            handler.onMessageBubbleLongPressed(message: message)
+            handler.onMessageBubbleLongPressed(cell: cell)
         }
     }
     

@@ -66,16 +66,192 @@ typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, ty
     
     public var clickAction: (() -> Void)?
     
+    public var longPressAction: (() -> Void)?
+    
     public private(set) var hasURL = false
+    
+    private var longPress: UILongPressGestureRecognizer?
+    private var tap: UITapGestureRecognizer?
+    private var mark: Bool = false
+    private var isLongPress = false
+    
+    private var isUpdatingSelection = false
+    
+    open var selectedTextColor: UIColor = .clear
+    
+    open override var selectedRange: NSRange {
+        didSet {
+            guard !isUpdatingSelection else { return }
+            isUpdatingSelection = true
+            defer { isUpdatingSelection = false }
+            
+            if self.selectedRange.length > 0 {
+                self.setSelectedTextBackgroundColor(self.selectedTextColor)
+            } else {
+                if self.attributedText != nil {
+                    self.setSelectedTextBackgroundColor(self.selectedTextColor)
+                }
+            }
+        }
+    }
+    
+    override init(frame: CGRect, textContainer: NSTextContainer?) {
+        super.init(frame: frame, textContainer: textContainer)
+        self.delegate = self
+        addLongPress()
+        addTap()
+        NotificationCenter.default.addObserver(self, selector: #selector(hidePopMenuIfNeeded), name: NSNotification.Name("ChangePopMenuIfNeeded"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(showPopMenuIfNeeded), name: NSNotification.Name("ShowPopMenuIfNeeded"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(markedClickTextView), name: NSNotification.Name("ClickPopMenuInTextView"), object: nil)
+    }
+    
+    required public init?(coder: NSCoder) {
+        super.init(coder: coder)
+        self.delegate = self
+        addLongPress()
+        addTap()
+        NotificationCenter.default.addObserver(self, selector: #selector(hidePopMenuIfNeeded), name: NSNotification.Name("ChangePopMenuIfNeeded"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(showPopMenuIfNeeded), name: NSNotification.Name("ShowPopMenuIfNeeded"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(markedClickTextView), name: NSNotification.Name("ClickPopMenuInTextView"), object: nil)
+    }
+    
+    @objc private func markedClickTextView() {
+        self.mark = true
+    }
+    
+    @objc private func hidePopMenuIfNeeded() {
+        if !self.mark {
+            self.selectedRange = NSMakeRange(0, 0)
+        }
+    }
+    
+    @objc private func showPopMenuIfNeeded() {
+        self.mark = false
+        if self.selectedRange.length > 0 {
+            showPopMenu(with: self)
+        }
+    }
+    
+    private func addLongPress() {
+        if self.longPress == nil {
+            self.longPress = UILongPressGestureRecognizer(target: self, action: #selector(onLongPress))
+            self.longPress?.minimumPressDuration = 0.3
+            if let longPress = self.longPress {
+                self.addGestureRecognizer(longPress)
+            }
+        }
+    }
+    
+    private func addTap() {
+        self.isLongPress = false
+        if self.tap == nil {
+            self.tap = UITapGestureRecognizer(target: self, action: #selector(textViewTapped(gesture:)))
+            if let tap = self.tap {
+                self.addGestureRecognizer(tap)
+            }
+        }
+    }
+    
+    @objc private func onLongPress() {
+        if Appearance.chat.messageLongPressMenuStyle == .withArrow {
+            self.isLongPress = true
+            self.selectedRange = NSMakeRange(0, 0)
+            self.perform(#selector(selectAll(_:)), with: nil)
+        } else {
+            self.isLongPress = true
+            self.longPressAction?()
+        }
+    }
+    
+    open override func selectAll(_ sender: Any?) {
+        super.selectAll(sender)
+    }
+    
+    func setSelectedTextBackgroundColor(_ color: UIColor) {
+        guard let attributedText = self.attributedText else { return }
+        
+        let mutableAttributedText = NSMutableAttributedString(attributedString: attributedText)
+        
+        if let selectedRange = self.selectedTextRange {
+            let start = self.offset(from: self.beginningOfDocument, to: selectedRange.start)
+            let length = self.offset(from: selectedRange.start, to: selectedRange.end)
+            let range = NSRange(location: start, length: length)
+            
+            mutableAttributedText.addAttribute(.backgroundColor, value: color, range: range)
+        }
+        
+        // 保存当前的选择范围
+        let currentSelectedRange = self.selectedRange
+        
+        // 更新 attributedText
+        self.attributedText = mutableAttributedText
+        
+        // 恢复选择范围
+        self.selectedRange = currentSelectedRange
+    }
+    
+    @objc private func textViewTapped(gesture: UITapGestureRecognizer) {
+        self.isLongPress = false
+        self.selectedRange = NSMakeRange(0, 0)
+        if !self.hasURL {
+            self.clickAction?()
+            return
+        }
+        let location = gesture.location(in: self)
+        
+        switch gesture.state {
+        case .began,.ended:
+            if let element = element(at: location) {
+                switch element.element {
+                case .url(let url, _): touchURL(urlString: url)
+                default: break
+                }
+                selectedElement = element
+            } else {
+                selectedElement = nil
+            }
+        case  .cancelled, .changed, .failed:
+            selectedElement = nil
+        case .possible:
+            break
+        @unknown default:
+            break
+        }
+        
+    }
+    
+    open override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        return false
+    }
+    
+    public func textViewDidChangeSelection(_ textView: UITextView) {
+        if textView.selectedRange.length < textView.text.count {
+            // Assuming SJPopMenu.menu().hideMenu() is a valid method
+            MessageLongPressMenu.shared.hiddenMenu()
+            return
+        }
+        showPopMenu(with: textView)
+    }
+    
+    private func showPopMenu(with textView: UITextView) {
+        if textView.selectedRange.location == 0 && textView.selectedRange.length == textView.text.count {
+            // Assuming self.showTextMenu is a valid closure
+            self.showTextMenu?(CGRect.zero, CGRect.zero, textView.selectedRange, true)
+        } else {
+            let startRect = textView.caretRect(for: textView.selectedTextRange!.start)
+            let endRect = textView.caretRect(for: textView.selectedTextRange!.end)
+            
+            self.showTextMenu?(startRect, endRect, textView.selectedRange, false)
+        }
+    }
+    
+    // Assuming there is a closure like this
+    var showTextMenu: ((CGRect, CGRect, NSRange, Bool) -> Void)?
     
     lazy var activeElements = [LinkTextViewActiveType: [ElementTuple]]()
     
     fileprivate var selectedElement: ElementTuple?
-    
-    public override init(frame: CGRect, textContainer: NSTextContainer?) {
-        super.init(frame: frame, textContainer: textContainer)
-        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapAction(gesture:))))
-    }
+
     
     @objc open func tapAction(gesture: UITapGestureRecognizer) {
         if !self.hasURL {
@@ -87,10 +263,6 @@ typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, ty
         case .url(let url, _): touchURL(urlString: url)
         default: break
         }
-    }
-    
-    required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     func createURLElements(from text: String, range: NSRange, maximumLength: Int?) -> ([ElementTuple], String) {
@@ -137,49 +309,6 @@ typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, ty
         return nil
     }
     
-    
-    //MARK: - Handle UI Responder touches
-//    open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        guard let touch = touches.first else { return }
-//        if onTouch(touch) { return }
-//        super.touchesBegan(touches, with: event)
-//    }
-    
-    func onTouch(_ touch: UITouch) -> Bool {
-        let location = touch.location(in: self)
-        var avoidSuperCall = false
-        
-        switch touch.phase {
-        case .began, .moved, .regionEntered, .regionMoved:
-            if let element = element(at: location) {
-                switch element.element {
-                case .url(let url, let trimmed): touchURL(urlString: url)
-                default: break
-                }
-                selectedElement = element
-                avoidSuperCall = false
-            } else {
-                selectedElement = nil
-            }
-        case .ended, .regionExited:
-            guard let selectedElement = selectedElement else { return avoidSuperCall }
-            
-            switch selectedElement.element {
-            case .url(let url, _): touchURL(urlString: url)
-            default: break
-            }
-            avoidSuperCall = false
-        case .cancelled:
-            selectedElement = nil
-        case .stationary:
-            break
-        @unknown default:
-            break
-        }
-        
-        return avoidSuperCall
-    }
-    
     /// use regex check all link ranges
     func parseTextAndExtractActiveElements(_ attrString: NSAttributedString) {
         var textString = attrString.string
@@ -197,6 +326,9 @@ typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, ty
     
     func touchURL(urlString: String) {
         var urlString = urlString.lowercased()
+        if self.isLongPress {
+            return
+        }
         if !urlString.hasPrefix("http://"), !urlString.hasPrefix("https://") {
             urlString = "https://" + urlString
         } else {
@@ -208,8 +340,5 @@ typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, ty
             UIApplication.shared.open(validateURL)
         }
     }
-    
 }
-
-
 

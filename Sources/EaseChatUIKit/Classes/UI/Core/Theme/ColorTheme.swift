@@ -108,6 +108,32 @@ public extension UIColor {
                   alpha: alpha)
     }
     
+    // Function to get HSLA components from UIColor
+    func getHSLA() -> (hue: CGFloat, saturation: CGFloat, lightness: CGFloat, alpha: CGFloat)? {
+        var hue: CGFloat = 0
+        var saturation: CGFloat = 0
+        var brightness: CGFloat = 0
+        var alpha: CGFloat = 0
+        
+        guard self.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) else {
+            return nil
+        }
+        
+        let lightness = (2 - saturation) * brightness / 2
+        
+        if lightness != 0 {
+            if lightness == 1 {
+                saturation = 0
+            } else if lightness < 0.5 {
+                saturation = saturation * brightness / (lightness * 2)
+            } else {
+                saturation = saturation * brightness / (2 - lightness * 2)
+            }
+        }
+        
+        return (hue: hue, saturation: saturation, lightness: lightness, alpha: alpha)
+    }
+    
     /// UIColor theme of ChatroomUIKit.Contain primary, secondary, error, neutral, neutralSpecial  color series .Every series has 13 colors.
     @objc static let theme: ColorTheme = ColorTheme()
         

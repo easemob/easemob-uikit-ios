@@ -19,7 +19,7 @@ import UIKit
     
     func onMessageBubbleClicked(message: MessageEntity)
     
-    func onMessageBubbleLongPressed(message: MessageEntity)
+    func onMessageBubbleLongPressed(cell: MessageCell)
     
     /// When you click a attachment message,we'll download the attachment,the method also called.
     /// - Parameter loading: Whether downloaded or not.
@@ -717,9 +717,9 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
         }
     }
     
-    public func onMessageContentLongPressed(message: MessageEntity) {
+    public func onMessageContentLongPressed(cell: MessageCell) {
         for handler in self.handlers.allObjects {
-            handler.onMessageBubbleLongPressed(message: message)
+            handler.onMessageBubbleLongPressed(cell: cell)
         }
     }
     

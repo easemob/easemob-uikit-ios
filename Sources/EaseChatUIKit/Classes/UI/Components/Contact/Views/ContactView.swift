@@ -94,7 +94,7 @@ import UIKit
     public var firstRefresh = true
     
     public private(set) lazy var header: ContactListHeader = {
-        ContactListHeader(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: CGFloat(Appearance.contact.headerRowHeight*CGFloat((self.headerStyle == .contact ? Appearance.contact.listHeaderExtensionActions.count:0)))), style: .plain).backgroundColor(.clear)
+        ContactListHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: CGFloat(Appearance.contact.headerRowHeight*CGFloat((self.headerStyle == .contact ? Appearance.contact.listHeaderExtensionActions.count:0)))), style: .plain).backgroundColor(.clear)
     }()
     
     public private(set) lazy var empty: EmptyStateView = {

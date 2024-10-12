@@ -257,6 +257,8 @@ import AVFoundation
 }
 
 extension ChatThreadCreateController: MessageListViewActionEventsDelegate {
+    public func onMessageContentLongPressed(cell: MessageCell) { }
+    
     public func onMessageListLoadMore() {
         
     }
@@ -275,7 +277,6 @@ extension ChatThreadCreateController: MessageListViewActionEventsDelegate {
     
     public func onMessageContentClicked(message: MessageEntity) { }
     
-    public func onMessageContentLongPressed(message: MessageEntity) { }
     
     public func onMessageAvatarClicked(profile: EaseProfileProtocol) { }
     

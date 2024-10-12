@@ -75,7 +75,7 @@ let message_bubble_space = CGFloat(1)
     
     public var reactionClicked: ((MessageReaction,MessageEntity) -> Void)?
     
-    public var longPressAction: ((MessageCellClickArea,MessageEntity) -> Void)?
+    public var longPressAction: ((MessageCellClickArea,MessageEntity,MessageCell) -> Void)?
     
     public private(set) lazy var checkbox: UIImageView = {
         self.createCheckbox()
@@ -260,9 +260,9 @@ let message_bubble_space = CGFloat(1)
             case .began:
                 switch tag {
                 case bubbleTag:
-                    self.longPressAction?(.bubble,self.entity)
+                    self.longPressAction?(.bubble,self.entity,self)
                 case avatarTag:
-                    self.longPressAction?(.avatar,self.entity)
+                    self.longPressAction?(.avatar,self.entity,self)
                 default:
                     break
                 }
@@ -467,3 +467,12 @@ extension MessageCell: ThemeSwitchProtocol {
 }
 
 
+public extension MessageCell {
+    
+    func contentViewIfPresent() -> UIView? {
+        if let content = self.value(forKey: "content") as? UIView {
+            return content
+        }
+        return nil
+    }
+}

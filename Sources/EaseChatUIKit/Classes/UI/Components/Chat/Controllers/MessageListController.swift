@@ -175,8 +175,34 @@ import AVFoundation
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
         self.view.addSubview(self.loadingView)
+        self.processFollowInputAttachmentAction()
     }
    
+    @objc open func processFollowInputAttachmentAction() {
+        if Appearance.chat.messageAttachmentMenuStyle == .followInput {
+            if let fileItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "File" }) {
+                fileItem.action = { [weak self] item,object in
+                    self?.handleAttachmentAction(item: item)
+                }
+            }
+            if let photoItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Photo" }) {
+                photoItem.action = { [weak self] item,object in
+                    self?.handleAttachmentAction(item: item)
+                }
+            }
+            if let cameraItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Camera" }) {
+                cameraItem.action = { [weak self] item,object in
+                    self?.handleAttachmentAction(item: item)
+                }
+            }
+            if let contactItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Contact" }) {
+                contactItem.action = { [weak self] item,object in
+                    self?.handleAttachmentAction(item: item)
+                }
+            }
+            
+        }
+    }
     
     @objc open func setupNavigation() {
         self.navigation.subtitle = nil
@@ -521,8 +547,8 @@ extension MessageListController: MessageListDriverEventsListener {
         return messageActions
     }
     
-    public func onMessageBubbleLongPressed(message: MessageEntity) {
-        self.showMessageLongPressedDialog(message: message)
+    public func onMessageBubbleLongPressed(cell: MessageCell) {
+        self.showMessageLongPressedDialog(cell: cell)
     }
     
     /**
@@ -531,24 +557,66 @@ extension MessageListController: MessageListDriverEventsListener {
      - Parameters:
      - message: The chat message for which the dialog is shown.
      */
-    @objc open func showMessageLongPressedDialog(message: MessageEntity) {
+    @objc open func showMessageLongPressedDialog(cell: MessageCell) {
         if self.messageContainer.editMode {
             return
         }
-        let header =  CommonReactionView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 44), message: message.message).backgroundColor(.clear)
+        let items = self.filterMessageActions(message: cell.entity)
+        let width = (items.count < 5 ? 5:CGFloat(min(items.count, 5))) * PopItemWidth - PopLeftRightMargin * 4
+        
+        let header =  CommonReactionView(frame: CGRect(x: 0, y: 0, width: width, height: 44), message: cell.entity.message).backgroundColor(.clear)
         header.reactionClosure = { [weak self] emoji,rawMessage in
+            if Appearance.chat.messageLongPressMenuStyle == .withArrow {
+                MessageLongPressMenu.shared.hiddenMenu()
+            }
             UIViewController.currentController?.dismiss(animated: true) {
                 if emoji.isEmpty {
                     //more reaction
-                    self?.showAllReactionsController(message: message)
+                    self?.showAllReactionsController(message: cell.entity)
                 } else {
                     self?.viewModel.operationReaction(emoji: emoji, message: rawMessage)
                 }
             }
         }
-        DialogManager.shared.showMessageActions(actions: self.filterMessageActions(message: message),withHeader: Appearance.chat.contentStyle.contains(.withMessageReaction) ? header:nil) { [weak self] item in
-            self?.processMessage(item: item, message: message.message)
+        switch Appearance.chat.messageLongPressMenuStyle {
+        case .withArrow:
+            self.showMessageLongPressedMenuWithArrow(cell: cell, items: items,header: Appearance.chat.contentStyle.contains(.withMessageReaction) ? header:nil)
+        case .actionSheet:
+            self.showMessageLongPressedMenuActionSheet(cell: cell, items: items,header: Appearance.chat.contentStyle.contains(.withMessageReaction) ? header:nil)
+        default:
+            break
         }
+        self.feedback(with: .medium)
+        
+    }
+    
+    @objc open func showMessageLongPressedMenuWithArrow(cell: MessageCell,items: [ActionSheetItemProtocol],header: UIView? = nil) {
+        if cell is ImageMessageCell || cell is VideoMessageCell {
+            if let content = cell.contentViewIfPresent() {
+                MessageLongPressMenu.shared.showMenu(items: items, targetView: content) { [weak self] item, _ in
+                    self?.processMessage(item: item, message: cell.entity.message)
+                }
+            }
+        } else {
+            MessageLongPressMenu.shared.showMenu(items: items, targetView: Appearance.chat.bubbleStyle == .withArrow ? cell.bubbleWithArrow:cell.bubbleMultiCorners, header: header){ [weak self] item, _ in
+                self?.processMessage(item: item, message: cell.entity.message)
+            }
+        }
+    }
+    
+    @objc open func showMessageLongPressedMenuActionSheet(cell: MessageCell,items: [ActionSheetItemProtocol],header: UIView? = nil) {
+        if UIViewController.currentController is DialogContainerViewController {
+            return
+        }
+        DialogManager.shared.showMessageActions(actions: items,withHeader: header) { [weak self] item in
+            self?.processMessage(item: item, message: cell.entity.message)
+        }
+    }
+    
+    @objc open func feedback(with style: UIImpactFeedbackGenerator.FeedbackStyle) {
+        let feedbackGenerator = UIImpactFeedbackGenerator(style: style)
+        feedbackGenerator.prepare()
+        feedbackGenerator.impactOccurred()
     }
     
     @objc open func showAllReactionsController(message: MessageEntity) {
@@ -638,6 +706,7 @@ extension MessageListController: MessageListDriverEventsListener {
                 }
             }
             DialogManager.shared.showCustomDialog(customView: editor,dismiss: false)
+
             DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.2) {
                 editor.editor.textView.becomeFirstResponder()
             }

@@ -43,7 +43,7 @@ import UIKit
         let vc = DialogContainerViewController(custom: actionSheet,constraintsSize: actionSheet.frame.size)
         let current = UIViewController.currentController
         if current != nil {
-            self.feedback()
+//            self.feedback()
             current?.presentViewController(vc)
         }
     }

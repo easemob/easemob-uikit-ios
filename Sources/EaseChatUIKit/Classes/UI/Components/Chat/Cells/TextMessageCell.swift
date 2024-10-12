@@ -104,7 +104,7 @@ import UIKit
         self.content.textContainerInset = .zero
         self.content.textContainer.lineFragmentPadding = 0
         self.content.isEditable = false
-        self.content.isSelectable = false
+        self.content.isSelectable = Appearance.chat.messageLongPressMenuStyle == .withArrow
         self.content.dataDetectorTypes = [.link]
         self.edit.contentHorizontalAlignment = .right
         self.translateSymbol.contentHorizontalAlignment = .right
@@ -116,6 +116,16 @@ import UIKit
             self.clickAction?(.bubble,self.entity)
         }
         
+        self.content.longPressAction = { [weak self] in
+            guard let `self` = self else { return }
+            self.longPressAction?(.bubble,self.entity,self)
+        }
+        
+        self.content.showTextMenu = { [weak self] _,_,_,_ in
+            guard let `self` = self else { return }
+            self.longPressAction?(.bubble,self.entity,self)
+        }
+
     }
     
     required public init?(coder: NSCoder) {
@@ -124,11 +134,7 @@ import UIKit
     
     public override func refresh(entity: MessageEntity) {
         super.refresh(entity: entity)
-        
-        let receiveLinkColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
-        let sendLinkColor = Appearance.chat.sendTextColor
-        let color = self.towards == .right ? sendLinkColor:receiveLinkColor
-        self.content.linkTextAttributes = [.underlineStyle:NSUnderlineStyle.single.rawValue,.underlineColor:color,.foregroundColor:color]
+        self.onThemeChanged()
         let textSize = entity.textSize()
         let translationSize = Appearance.chat.enableTranslation ? entity.translationSize():.zero
         if Appearance.chat.bubbleStyle == .withArrow {
@@ -201,8 +207,25 @@ import UIKit
         }
         
     }
+
+    open override func switchTheme(style: ThemeStyle) {
+        super.switchTheme(style: style)
+        self.onThemeChanged()
+    }
     
-    
+    open func onThemeChanged() {
+        let receiveLinkColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        let sendLinkColor = Appearance.chat.sendTextColor
+        let receiveSelectedColor = Theme.style == .dark ? UIColor.theme.primaryColor1:UIColor.theme.primaryColor8
+        let sendSelectedColor = Theme.style == .dark ? UIColor.theme.primaryColor8:UIColor.theme.primaryColor3
+        let sendTintColor = UIColor.theme.primaryColor98
+        let receiveTintColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        let color = self.towards == .right ? sendLinkColor:receiveLinkColor
+        self.content.linkTextAttributes = [.underlineStyle:NSUnderlineStyle.single.rawValue,.underlineColor:color,.foregroundColor:color]
+        
+        self.content.tintColor = self.towards == .right ? sendTintColor:receiveTintColor
+        self.content.selectedTextColor = self.towards == .right ? sendSelectedColor:receiveSelectedColor
+    }
 }
 
 

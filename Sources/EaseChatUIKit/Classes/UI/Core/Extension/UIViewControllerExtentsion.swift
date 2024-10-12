@@ -82,10 +82,8 @@ extension UIViewController {
         UIView.animate(withDuration: 0.3, delay: delay, options: .curveEaseOut, animations: {
             toastView.alpha = 1
         }, completion: { (finished) in
-            if finished {
-                DispatchQueue.main.asyncAfter(deadline: .now()+duration) {
-                    toastView.removeFromSuperview()
-                }
+            DispatchQueue.main.asyncAfter(deadline: .now()+duration) {
+                toastView.removeFromSuperview()
             }
         })
     }

@@ -298,7 +298,7 @@ extension EaseChatNavigationBar: UICollectionViewDataSource,UICollectionViewDele
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EaseChatNavigationBarRightCell", for: indexPath) as? EaseChatNavigationBarRightCell
         if self.originalRenderRightImage {
-            cell?.imageView.image = self.rightImages[safe: indexPath.row]?.withRenderingMode(.alwaysOriginal)
+            cell?.imageView.image = self.rightImages[safe: indexPath.row]
         } else {
             cell?.imageView.image = self.rightImages[safe: indexPath.row]?.withTintColor(Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor3)
         }
