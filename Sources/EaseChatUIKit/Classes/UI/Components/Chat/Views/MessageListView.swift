@@ -43,11 +43,11 @@ public let MessageInputBarHeight = CGFloat(52)
     
     /// The method will call on message avatar clicked
     /// - Parameter profile: ``EaseProfileProtocol``
-    func onMessageAvatarClicked(profile: EaseProfileProtocol)
+    func onMessageAvatarClicked(profile: ChatUserProfileProtocol)
     
     /// The method will call on message avatar long pressed.
     /// - Parameter profile: ``EaseProfileProtocol``
-    func onMessageAvatarLongPressed(profile: EaseProfileProtocol)
+    func onMessageAvatarLongPressed(profile: ChatUserProfileProtocol)
     
     /// The method will call on input box event occur.
     /// - Parameter type: ``MessageInputBarActionType``
@@ -133,7 +133,7 @@ public let MessageInputBarHeight = CGFloat(52)
     
     ///  Add mention user to textfield on needed.
     /// - Parameter user: ``NSAttributedString``
-    func addMentionUserToField(user: EaseProfileProtocol)
+    func addMentionUserToField(user: ChatUserProfileProtocol)
     
     /// Update audio message  on play status changed.
     /// - Parameters:
@@ -476,8 +476,8 @@ extension MessageListView: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         self.moreMessages.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
         self.moreMessages.layerProperties(style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9, 0.5)
-        self.moreMessages.setTitleColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, for: .normal)
-        self.moreMessages.image(UIImage(named: "more_messages", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5), .normal)
+        self.moreMessages.setTitleColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor, for: .normal)
+        self.moreMessages.image(UIImage(named: "more_messages", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor), .normal)
         self.messageList.reloadData()
     }
     
@@ -652,7 +652,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                 if let user = entity.message.user {
                     ComponentViewsActionHooker.shared.chat.avatarClicked?(user)
                 } else {
-                    let user = EaseProfile()
+                    let user = ChatUserProfile()
                     user.id = entity.message.from
                     ComponentViewsActionHooker.shared.chat.avatarClicked?(user)
                 }
@@ -661,7 +661,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                     if let user = entity.message.user {
                         handler.onMessageAvatarClicked(profile: user)
                     } else {
-                        let user = EaseProfile()
+                        let user = ChatUserProfile()
                         user.id = entity.message.from
                         handler.onMessageAvatarClicked(profile: user)
                     }
@@ -702,6 +702,17 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
             for handler in self.eventHandlers.allObjects {
                 handler.onMessageReactionClicked(reaction: nil, entity: entity)
             }
+        case .cell:
+            if entity.message.body.type == .custom {
+                if ComponentViewsActionHooker.shared.chat.bubbleClicked != nil {
+                    ComponentViewsActionHooker.shared.chat.bubbleClicked?(entity)
+                } else {
+                    for handler in self.eventHandlers.allObjects {
+                        handler.onMessageContentClicked(message: entity)
+                    }
+                    
+                }
+            }
         default:
             break
         }
@@ -731,7 +742,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                 if let user = entity.message.user {
                     ComponentViewsActionHooker.shared.chat.avatarLongPressed?(user)
                 } else {
-                    let user = EaseProfile()
+                    let user = ChatUserProfile()
                     user.id = entity.message.from
                     ComponentViewsActionHooker.shared.chat.avatarLongPressed?(user)
                 }
@@ -740,7 +751,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                     if let user = entity.message.user {
                         handler.onMessageAvatarLongPressed(profile: user)
                     } else {
-                        let user = EaseProfile()
+                        let user = ChatUserProfile()
                         user.id = entity.message.from
                         handler.onMessageAvatarLongPressed(profile: user)
                     }
@@ -943,7 +954,7 @@ extension MessageListView: IMessageListViewDriver {
         }
     }
     
-    public func addMentionUserToField(user: EaseProfileProtocol) {
+    public func addMentionUserToField(user: ChatUserProfileProtocol) {
         let result = NSMutableAttributedString(attributedString: self.inputBar.inputField.attributedText)
         let key = NSAttributedString.Key("mentionInfo")
         var nickName = user.remark

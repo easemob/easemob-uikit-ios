@@ -1,6 +1,6 @@
 //
 //  MessageReactionView.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/1/18.
 //
@@ -87,6 +87,7 @@ extension MessageReactionView: UICollectionViewDelegate, UICollectionViewDataSou
         self.reactionClosure?(self.datas[safe: indexPath.row])
     }
     
+    
 }
 
 extension MessageReactionView: ThemeSwitchProtocol {
@@ -106,7 +107,7 @@ extension MessageReactionView: ThemeSwitchProtocol {
     }()
     
     @objc open func createContent() -> UILabel {
-        UILabel(frame: self.bounds).cornerRadius(Appearance.avatarRadius).layerProperties(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, 1).textAlignment(.center)
+        UILabel(frame: self.bounds).cornerRadius(Appearance.avatarRadius).layerProperties(Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor, 1).textAlignment(.center)
     }
     
     public override init(frame: CGRect) {
@@ -117,7 +118,7 @@ extension MessageReactionView: ThemeSwitchProtocol {
     @objc open func refresh(reaction: MessageReaction) {
         self.content.attributedText = reaction.reactionAttribute
         if reaction.isAddedBySelf {
-            self.content.layer.borderColor = Theme.style == .dark ? UIColor.theme.primaryColor6.cgColor:UIColor.theme.primaryColor5.cgColor
+            self.content.layer.borderColor = Theme.style == .dark ? UIColor.theme.primaryDarkColor.cgColor:UIColor.theme.primaryLightColor.cgColor
             self.content.backgroundColor = Theme.style == .dark ? UIColor.theme.primaryColor1:UIColor.theme.primaryColor95
         } else {
             self.content.layer.borderColor = UIColor.clear.cgColor
@@ -157,13 +158,13 @@ extension MessageReaction {
                 attribute  = NSMutableAttributedString {
                     AttributedText("").font(Font.theme.labelSmall)
                     AttributedText("\(content)").font(.systemFont(ofSize: 24))
-                    AttributedText(" \(self.count)").font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
+                    AttributedText(" \(self.count)").font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor)
                 }
             } else {
                 attribute = NSMutableAttributedString {
                     ImageAttachment(image, bounds: CGRect(x: 0, y: -6.5, width: 24, height: 24))
                     AttributedText(" ").font(Font.theme.labelSmall)
-                    AttributedText(" \(self.count)").font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
+                    AttributedText(" \(self.count)").font(Font.theme.labelSmall).foregroundColor(Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor)
                 }
             }
             return attribute

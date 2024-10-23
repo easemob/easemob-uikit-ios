@@ -1,6 +1,6 @@
 //
 //  LinkRecognizeTextView.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/7/10.
 //
@@ -100,9 +100,9 @@ typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, ty
         self.delegate = self
         addLongPress()
         addTap()
-        NotificationCenter.default.addObserver(self, selector: #selector(hidePopMenuIfNeeded), name: NSNotification.Name("ChangePopMenuIfNeeded"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(showPopMenuIfNeeded), name: NSNotification.Name("ShowPopMenuIfNeeded"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(markedClickTextView), name: NSNotification.Name("ClickPopMenuInTextView"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(hidePopMenuIfNeeded), name: Notification.Name("ChangePopMenuIfNeeded"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(showPopMenuIfNeeded), name: Notification.Name("ShowPopMenuIfNeeded"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(markedClickTextView), name: Notification.Name("ClickPopMenuInTextView"), object: nil)
     }
     
     required public init?(coder: NSCoder) {
@@ -110,9 +110,9 @@ typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, ty
         self.delegate = self
         addLongPress()
         addTap()
-        NotificationCenter.default.addObserver(self, selector: #selector(hidePopMenuIfNeeded), name: NSNotification.Name("ChangePopMenuIfNeeded"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(showPopMenuIfNeeded), name: NSNotification.Name("ShowPopMenuIfNeeded"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(markedClickTextView), name: NSNotification.Name("ClickPopMenuInTextView"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(hidePopMenuIfNeeded), name: Notification.Name("ChangePopMenuIfNeeded"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(showPopMenuIfNeeded), name: Notification.Name("ShowPopMenuIfNeeded"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(markedClickTextView), name: Notification.Name("ClickPopMenuInTextView"), object: nil)
     }
     
     @objc private func markedClickTextView() {

@@ -1,6 +1,6 @@
 //
 //  GroupInfoEditViewController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/27.
 //
@@ -19,8 +19,8 @@ import UIKit
     
     public private(set) var editType = GroupInfoEditType.name
     
-    public private(set) lazy var navigation: EaseChatNavigationBar = {
-        EaseChatNavigationBar(textAlignment: .left,rightTitle: "Save".chat.localize)
+    public private(set) lazy var navigation: ChatNavigationBar = {
+        ChatNavigationBar(textAlignment: .left,rightTitle: "Save".chat.localize)
     }()
     
     public private(set) lazy var container: UIView = {
@@ -80,7 +80,7 @@ import UIKit
         return text
     }
     
-    private func navigationClick(type: EaseChatNavigationBarClickEvent,indexPath: IndexPath?) {
+    private func navigationClick(type: ChatNavigationBarClickEvent,indexPath: IndexPath?) {
         switch type {
         case .back: self.pop()
         case .rightTitle: self.save()

@@ -40,7 +40,7 @@ import UIKit
     }()
     
     @objc open func createBadge() -> UILabel {
-        UILabel(frame: CGRect(x: self.contentView.frame.width-48, y: self.nickName.frame.maxY+5, width: 32, height: 18)).cornerRadius(.large).backgroundColor(UIColor.theme.primaryColor5).textColor(UIColor.theme.neutralColor98).font(UIFont.theme.labelSmall).textAlignment(.center)
+        UILabel(frame: CGRect(x: self.contentView.frame.width-48, y: self.nickName.frame.maxY+5, width: 32, height: 18)).cornerRadius(.large).backgroundColor(UIColor.theme.primaryLightColor).textColor(UIColor.theme.neutralColor98).font(UIFont.theme.labelSmall).textAlignment(.center)
     }
     
     public private(set) lazy var dot: UIView = {
@@ -48,7 +48,7 @@ import UIKit
     }()
     
     @objc open func createDot() -> UIView {
-        UIView(frame: CGRect(x: self.contentView.frame.width-28, y: self.nickName.frame.maxY+10, width: 8, height: 8)).cornerRadius(.large).backgroundColor(UIColor.theme.primaryColor5)
+        UIView(frame: CGRect(x: self.contentView.frame.width-28, y: self.nickName.frame.maxY+10, width: 8, height: 8)).cornerRadius(.large).backgroundColor(UIColor.theme.primaryLightColor)
     }
     
     public private(set) lazy var separatorLine: UIView = {
@@ -147,15 +147,15 @@ extension ConversationListCell: ThemeSwitchProtocol {
         self.nickName.setTitleColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1, for: .normal)
 //        self.content.textColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5
         self.date.textColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5
-        self.badge.backgroundColor = style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
-        self.dot.backgroundColor = style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        self.badge.backgroundColor = style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor
+        self.dot.backgroundColor = style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor
         self.separatorLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
     }
     
     
 }
 
-@objcMembers open class ConversationInfo:NSObject, EaseProfileProtocol {
+@objcMembers open class ConversationInfo:NSObject, ChatUserProfileProtocol {
     open func toJsonObject() -> Dictionary<String, Any>? {
         [:]
     }
@@ -164,7 +164,7 @@ extension ConversationListCell: ThemeSwitchProtocol {
     
     public var selected: Bool = false
     
-    public var type: EaseProfileProviderType = .chat
+    public var type: ChatUserProfileProviderType = .chat
     
     public var id: String = ""
     
@@ -212,7 +212,7 @@ extension ConversationListCell: ThemeSwitchProtocol {
         
         let from = message.from
         let mentionText = "Mentioned".chat.localize
-        let user = EaseChatUIKitContext.shared?.userCache?[from]
+        let user = ChatUIKitContext.shared?.userCache?[from]
         var nickName = user?.remark ?? ""
         if nickName.isEmpty {
             nickName = user?.nickname ?? ""
@@ -239,7 +239,7 @@ extension ConversationListCell: ThemeSwitchProtocol {
             }
             if self.mentioned {
                 let showText = NSMutableAttributedString {
-                    AttributedText("[\(mentionText)] ").foregroundColor(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).font(Font.theme.bodyMedium)
+                    AttributedText("[\(mentionText)] ").foregroundColor(Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor).font(Font.theme.bodyMedium)
                     AttributedText(nickName + ": ").foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5)
                 }
                 

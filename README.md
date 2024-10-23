@@ -153,7 +153,7 @@ class AppDelegate：UIResponder，UIApplicationDelegate {
          // 需要传入App Key。
          // 获取App Key，请访问
          // https://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E8%8E%B7%E5%8F%96%E7%8E%AF%E4%BF%A1%E5%8D%B3%E6%97%B6%E9%80%9A%E8%AE%AF-im-%E7%9A%84%E4%BF%A1%E6%81%AF
-         let error = EaseChatUIKitClient.shared.setup(appKey: "Appkey")
+         let error = ChatUIKitClient.shared.setup(appKey: "Appkey")
      }
 }
 ```
@@ -183,7 +183,7 @@ public final class YourAppUser: NSObject, EaseProfileProtocol {
 // 需要从您的应用服务器获取token。 您也可以使用控制台生成的临时Token登录。
 // 在控制台生成用户和临时用户 token，请参见
 // https://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E5%88%9B%E5%BB%BA-im-%E7%94%A8%E6%88%B7。
-  EaseChatUIKitClient.shared.login(user: YourAppUser(), token: ExampleRequiredConfig.chatToken) { error in 
+  ChatUIKitClient.shared.login(user: YourAppUser(), token: ExampleRequiredConfig.chatToken) { error in 
  }
 ```
 
@@ -205,7 +205,7 @@ public final class YourAppUser: NSObject, EaseProfileProtocol {
 ## 1.初始化单群聊UIKit
 相比于上面快速开始的单群聊UIKit初始化这里多了ChatOptions的参数，主要是对SDK中是否打印log以及是否自动登录，是否默认使用用户属性的开关配置。ChatOptions即IMSDK的Option类，内中有诸多开关属性可参见环信官网IMSDK文档
 ```Swift
-let error = EaseChatUIKitClient.shared.setup(option: ChatOptions(appkey: appKey))
+let error = ChatUIKitClient.shared.setup(option: ChatOptions(appkey: appKey))
 ```
 
 ## 2.登录
@@ -233,11 +233,11 @@ public final class YourAppUser: NSObject, EaseProfileProtocol {
 }
 // 使用当前用户对象符合`EaseProfileProtocol`协议的用户信息登录EaseChatUIKit。
 // token生成参见快速开始中登录步骤中链接。
- EaseChatUIKitClient.shared.login(user: YourAppUser(), token: ExampleRequiredConfig.chatToken) { error in 
+ ChatUIKitClient.shared.login(user: YourAppUser(), token: ExampleRequiredConfig.chatToken) { error in 
  }
 ```
 
-## 3.EaseChatUIKitContext中的Provider
+## 3.ChatUIKitContext中的Provider
 
 - 注: 仅用于会话列表以及联系人列表,在只是用快速开始进入聊天页面时不需要实现Provider
 
@@ -246,23 +246,23 @@ Provider是一个数据提供者，当会话列表展示并且滑动减速时候
 ```Swift
             private func setupDataProvider() {
         //userProfileProvider为用户数据的提供者，使用协程实现与userProfileProviderOC不能同时存在userProfileProviderOC使用闭包实现
-        EaseChatUIKitContext.shared?.userProfileProvider = self
-        EaseChatUIKitContext.shared?.userProfileProviderOC = nil
+        ChatUIKitContext.shared?.userProfileProvider = self
+        ChatUIKitContext.shared?.userProfileProviderOC = nil
         //groupProvider原理同上
-        EaseChatUIKitContext.shared?.groupProfileProvider = self
-        EaseChatUIKitContext.shared?.groupProfileProviderOC = nil
+        ChatUIKitContext.shared?.groupProfileProvider = self
+        ChatUIKitContext.shared?.groupProfileProviderOC = nil
     }
         //继承注册后的自定义类还可以调用ViewModel的registerEventsListener方法监听相关事件
 
-//MARK: - EaseProfileProvider for conversations&contacts usage.
+//MARK: - ChatUserProfileProvider for conversations&contacts usage.
 //For example using conversations controller,as follows.
-extension MainViewController: EaseProfileProvider,EaseGroupProfileProvider {
-    //MARK: - EaseProfileProvider
-    func fetchProfiles(profileIds: [String]) async -> [any EaseChatUIKit.EaseProfileProtocol] {
-        return await withTaskGroup(of: [EaseChatUIKit.EaseProfileProtocol].self, returning: [EaseChatUIKit.EaseProfileProtocol].self) { group in
-            var resultProfiles: [EaseChatUIKit.EaseProfileProtocol] = []
+extension MainViewController: ChatUserProfileProvider,ChatGroupProfileProvider {
+    //MARK: - ChatUserProfileProvider
+    func fetchProfiles(profileIds: [String]) async -> [any ChatUIKit.ChatUserProfileProtocol] {
+        return await withTaskGroup(of: [ChatUIKit.ChatUserProfileProtocol].self, returning: [ChatUIKit.ChatUserProfileProtocol].self) { group in
+            var resultProfiles: [ChatUIKit.ChatUserProfileProtocol] = []
             group.addTask {
-                var resultProfiles: [EaseChatUIKit.EaseProfileProtocol] = []
+                var resultProfiles: [ChatUIKit.ChatUserProfileProtocol] = []
                 let result = await self.requestUserInfos(profileIds: profileIds)
                 if let infos = result {
                     resultProfiles.append(contentsOf: infos)
@@ -276,13 +276,13 @@ extension MainViewController: EaseProfileProvider,EaseGroupProfileProvider {
             return resultProfiles
         }
     }
-    //MARK: - EaseGroupProfileProvider
-    func fetchGroupProfiles(profileIds: [String]) async -> [any EaseChatUIKit.EaseProfileProtocol] {
+    //MARK: - ChatGroupProfileProvider
+    func fetchGroupProfiles(profileIds: [String]) async -> [any ChatUIKit.ChatUserProfileProtocol] {
         
-        return await withTaskGroup(of: [EaseChatUIKit.EaseProfileProtocol].self, returning: [EaseChatUIKit.EaseProfileProtocol].self) { group in
-            var resultProfiles: [EaseChatUIKit.EaseProfileProtocol] = []
+        return await withTaskGroup(of: [ChatUIKit.ChatUserProfileProtocol].self, returning: [ChatUIKit.ChatUserProfileProtocol].self) { group in
+            var resultProfiles: [ChatUIKit.ChatUserProfileProtocol] = []
             group.addTask {
-                var resultProfiles: [EaseChatUIKit.EaseProfileProtocol] = []
+                var resultProfiles: [ChatUIKit.ChatUserProfileProtocol] = []
                 let result = await self.requestGroupsInfo(groupIds: profileIds)
                 if let infos = result {
                     resultProfiles.append(contentsOf: infos)
@@ -301,7 +301,7 @@ extension MainViewController: EaseProfileProvider,EaseGroupProfileProvider {
         var unknownIds = [String]()
         var resultProfiles = [EaseProfileProtocol]()
         for profileId in profileIds {
-            if let profile = EaseChatUIKitContext.shared?.userCache?[profileId] {
+            if let profile = ChatUIKitContext.shared?.userCache?[profileId] {
                 if profile.nickname.isEmpty {
                     unknownIds.append(profile.id)
                 } else {
@@ -326,12 +326,12 @@ extension MainViewController: EaseProfileProvider,EaseGroupProfileProvider {
                 }
                 profile.avatarURL = info.avatarUrl ?? ""
                 resultProfiles.append(profile)
-                if (EaseChatUIKitContext.shared?.userCache?[userId]) != nil {
+                if (ChatUIKitContext.shared?.userCache?[userId]) != nil {
                     profile.updateFFDB()
                 } else {
                     profile.insert()
                 }
-                EaseChatUIKitContext.shared?.userCache?[userId] = profile
+                ChatUIKitContext.shared?.userCache?[userId] = profile
             }
             return resultProfiles
         }
@@ -348,7 +348,7 @@ extension MainViewController: EaseProfileProvider,EaseGroupProfileProvider {
                 profile.nickname = group.groupName
                 profile.avatarURL = group.settings.ext
                 resultProfiles.append(profile)
-                EaseChatUIKitContext.shared?.groupCache?[groupId] = profile
+                ChatUIKitContext.shared?.groupCache?[groupId] = profile
             }
 
         }
@@ -389,7 +389,7 @@ extension MainViewController: EaseProfileProvider,EaseGroupProfileProvider {
 您可以调用`registerUserStateListener`方法来监听 EaseChatUIKit中用户相关以及链接状态变更的事件和错误。
 
 ```Swift
-EaseChatUIKitClient.shared.unregisterUserStateListener(self)
+ChatUIKitClient.shared.unregisterUserStateListener(self)
 ```
 
 # 自定义

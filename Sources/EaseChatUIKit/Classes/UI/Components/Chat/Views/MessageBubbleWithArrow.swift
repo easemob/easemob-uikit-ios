@@ -1,6 +1,6 @@
 //
 //  MessageBubbleWithArrow.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/9.
 //
@@ -15,7 +15,7 @@ import UIKit
 @objcMembers open class MessageBubbleWithArrow: UIView {
     
     var sendBubbleColor: UIColor {
-        Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor
     }
     
     var receiveBubbleColor: UIColor {

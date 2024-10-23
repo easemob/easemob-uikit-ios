@@ -54,14 +54,6 @@ import UIKit
     
     /// The placeholder image of the avatar image view of ``MessageCell``.
     public static var avatarPlaceHolder: UIImage? = UIImage(named: "default_avatar", in: .chatBundle, with: nil)
-        
-    public lazy var primaryDarkColor: UIColor = {
-        UIColor.theme.primaryColor6
-    }()
-    
-    public lazy var primaryLightColor: UIColor = {
-        UIColor.theme.primaryColor5
-    }()
     
     /// Conversation Component
     public static var conversation = ConversationAppearance()
@@ -109,8 +101,8 @@ import UIKit
     lazy public var listMoreActions: [ActionSheetItemProtocol] = {
         [
             ActionSheetItem(title: "new_chat_button_click_menu_selectcontacts".chat.localize, type: .normal, tag: "SelectContacts", image: UIImage(named: "chatWith", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "new_chat_button_click_menu_addcontacts".chat.localize, type: .normal, tag: "AddContact", image: UIImage(named: "person_add_fill", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor5)),
-            ActionSheetItem(title: "new_chat_button_click_menu_creategroup".chat.localize, type: .normal, tag: "CreateGroup", image: UIImage(named: "create_group", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor5))
+            ActionSheetItem(title: "new_chat_button_click_menu_addcontacts".chat.localize, type: .normal, tag: "AddContact", image: UIImage(named: "person_add_fill", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryLightColor)),
+            ActionSheetItem(title: "new_chat_button_click_menu_creategroup".chat.localize, type: .normal, tag: "CreateGroup", image: UIImage(named: "create_group", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryLightColor))
         ]
     }()
 }

@@ -1,6 +1,6 @@
 //
 //  GroupMemberAttributesCache.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/12/19.
 //
@@ -11,7 +11,7 @@ import UIKit
     
     @objc public private(set) var attributes: Dictionary<String,Dictionary<String,Dictionary<String,String>>> = [:]
     
-    @objc public var profiles: Dictionary<String,Dictionary<String,EaseProfileProtocol>> = [:]
+    @objc public var profiles: Dictionary<String,Dictionary<String,ChatUserProfileProtocol>> = [:]
     
     /// Cache a group member attribute for key.
     /// - Parameters:
@@ -32,7 +32,7 @@ import UIKit
     /// - Parameters:
     ///   - groupId: ID of the group.
     ///   - profile: ``EaseProfileProtocol``
-    @objc public func cacheProfile(groupId: String,profile: EaseProfileProtocol) {
+    @objc public func cacheProfile(groupId: String,profile: ChatUserProfileProtocol) {
         self.profiles[groupId]?[profile.id] = profile
     }
     
@@ -53,7 +53,7 @@ import UIKit
     ///   - groupId: ID of the group.
     ///   - profile: ``EaseProfileProtocol``
     @objc(removeProfileCacheWithGroupId:profile:)
-    public func removeCacheProfile(groupId: String,profile: EaseProfileProtocol) {
+    public func removeCacheProfile(groupId: String,profile: ChatUserProfileProtocol) {
         self.profiles[groupId]?.removeValue(forKey: profile.id)
     }
     
@@ -69,7 +69,7 @@ import UIKit
         for id in userIds {
             if let value = self.attributes[groupId]?[id]?[key] {
                 values.append(value)
-                EaseChatUIKitContext.shared?.chatCache?[id]?.remark = value
+                ChatUIKitContext.shared?.chatCache?[id]?.remark = value
             }
         }
 

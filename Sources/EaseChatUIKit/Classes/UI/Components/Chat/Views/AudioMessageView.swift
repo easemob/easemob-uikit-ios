@@ -1,6 +1,6 @@
 //
 //  AudioMessageView.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/12/9.
 //
@@ -37,7 +37,7 @@ import UIKit
         self.content.frame = CGRect(x: self.towards == .left ? 12+20+8:12, y: 5, width: self.frame.width-32-20, height: self.frame.height-10)
         self.audioIcon.frame = CGRect(x: self.towards == .left ? 12:self.frame.width-12-20, y: self.frame.height/2.0-10, width: 20, height: 20)
         self.switchTheme(style: Theme.style)
-        let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
+        let currentUser = ChatUIKitContext.shared?.currentUserId ?? ""
         var textColor = UIColor.white
         if entity.message.direction == .send {
             textColor = Theme.style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98

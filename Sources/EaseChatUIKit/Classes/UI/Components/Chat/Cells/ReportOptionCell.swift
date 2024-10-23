@@ -1,6 +1,6 @@
 //
 //  ReportOptionCell.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/9/12.
 //
@@ -58,7 +58,7 @@ import UIKit
 extension ReportOptionCell: ThemeSwitchProtocol {
     open func switchTheme(style: ThemeStyle) {
         self.content.textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
-        self.selectImage = style == .dark ? self.selectImage?.withTintColor(UIColor.theme.primaryColor6, renderingMode: .automatic):self.selectImage
+        self.selectImage = style == .dark ? self.selectImage?.withTintColor(UIColor.theme.primaryDarkColor, renderingMode: .automatic):self.selectImage
         self.normalImage = style == .dark ? self.normalImage?.withTintColor(UIColor.theme.neutralColor8, renderingMode: .automatic):self.normalImage
         self.separatorLine.backgroundColor = (style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9)
     }

@@ -1,6 +1,6 @@
 //
 //  ContactSearchResultController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/24.
 //
@@ -11,13 +11,13 @@ import UIKit
     
     private var searchText = ""
     
-    public var rawDatas = [EaseProfileProtocol]()
+    public var rawDatas = [ChatUserProfileProtocol]()
     
-    private var selectClosure: ((EaseProfileProtocol) -> Void)?
+    private var selectClosure: ((ChatUserProfileProtocol) -> Void)?
     
     private var service: ContactServiceProtocol = ContactServiceImplement()
     
-    public private(set) var searchResults = [EaseProfileProtocol]() {
+    public private(set) var searchResults = [ChatUserProfileProtocol]() {
         didSet {
             DispatchQueue.main.async {
                 if self.rawDatas.count <= 0  {
@@ -29,7 +29,7 @@ import UIKit
         }
     }
     
-    public private(set) var selectProfiles = [EaseProfileProtocol]()
+    public private(set) var selectProfiles = [ChatUserProfileProtocol]()
     
     public private(set) var ignoreIds = [String]()
     
@@ -57,7 +57,7 @@ import UIKit
     /// - Parameters:
     ///   - headerStyle: ``ContactListHeaderStyle``
     ///   - action: Select row callback.
-    @objc public required init(headerStyle: ContactListHeaderStyle = .contact,selectProfiles: [EaseProfileProtocol] = [],ignoreIds: [String] = [],action: @escaping (EaseProfileProtocol) -> Void) {
+    @objc public required init(headerStyle: ContactListHeaderStyle = .contact,selectProfiles: [ChatUserProfileProtocol] = [],ignoreIds: [String] = [],action: @escaping (ChatUserProfileProtocol) -> Void) {
         self.headerStyle = headerStyle
         self.selectProfiles = selectProfiles
         self.ignoreIds = ignoreIds
@@ -106,11 +106,11 @@ import UIKit
         self.service.contacts(completion: { [weak self] error, contacts in
             if error == nil {
                 var infos = contacts.map({
-                    let profile = EaseProfile()
+                    let profile = ChatUserProfile()
                     profile.id = $0.userId
-                    profile.nickname = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
-                    profile.avatarURL = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
-                    profile.remark = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.remark ?? ""
+                    profile.nickname = ChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
+                    profile.avatarURL = ChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
+                    profile.remark = ChatUIKitContext.shared?.userCache?[$0.userId]?.remark ?? ""
                     return profile
                 })
                 self?.rawDatas.removeAll()

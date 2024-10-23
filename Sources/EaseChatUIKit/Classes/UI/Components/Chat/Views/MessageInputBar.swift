@@ -1,6 +1,6 @@
 //
 //  MessageInputBar.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/9/4.
 //
@@ -127,7 +127,7 @@ import UIKit
         self.inputField.cornerRadius(Appearance.chat.inputBarCorner)
         self.inputField.placeHolder = Appearance.chat.inputPlaceHolder.chat.localize
         self.inputField.contentInset = UIEdgeInsets(top: 4, left: Appearance.chat.inputBarCorner == .large ? 10:6, bottom: 4, right: 6)
-        self.inputField.tintColor = UIColor.theme.primaryColor5
+        self.inputField.tintColor = UIColor.theme.primaryLightColor
         self.inputField.placeHolderColor = UIColor.theme.neutralColor6
         self.inputField.textColor = UIColor.theme.neutralColor1
         self.inputField.font = UIFont.theme.bodyLarge
@@ -187,7 +187,7 @@ extension MessageInputBar: UITextViewDelegate {
                     let attributedString = textView.attributedText
                     
                     attributedString?.enumerateAttributes(in: NSRange(location: 0, length: attributedString?.length ?? 0), options: []) { (attributes, blockRange, stop) in
-                        if let mentionUser = attributes[NSAttributedString.Key(rawValue: "mentionInfo")] as? EaseProfileProtocol {
+                        if let mentionUser = attributes[NSAttributedString.Key(rawValue: "mentionInfo")] as? ChatUserProfileProtocol {
                             if range.location + range.length == blockRange.location + blockRange.length { mention = true
                                 let result = NSMutableAttributedString(attributedString: textView.attributedText)
                                 result.deleteCharacters(in: blockRange)
@@ -217,7 +217,7 @@ extension MessageInputBar: UITextViewDelegate {
             self.rightView.isSelected = false
         }
         textView.attributedText.enumerateAttributes(in: NSMakeRange(0, textView.text.count), options: []) { (attributes, range, stop) in
-            if attributes[NSAttributedString.Key(rawValue: "mentionInfo")] is EaseProfileProtocol {
+            if attributes[NSAttributedString.Key(rawValue: "mentionInfo")] is ChatUserProfileProtocol {
                 let min = textView.selectedRange.location
                 let max = textView.selectedRange.location + textView.selectedRange.length
                 if min > range.location && min <= range.location + range.length {
@@ -300,7 +300,6 @@ extension MessageInputBar: UITextViewDelegate {
         self.inputField.text = nil
         self.inputField.attributedText = nil
         self.updateHeight()
-        self.hiddenInputBar()
     }
     
     
@@ -378,7 +377,9 @@ extension MessageInputBar: UITextViewDelegate {
         self.actionClosure?(self.rightView.isSelected ? .emojiKeyboard:.textKeyboard,nil)
         if self.rightView.isSelected {
             if !self.inputField.isFirstResponder {
-                self.inputField.becomeFirstResponder()
+                if self.keyboardHeight <= 152 {
+                    self.keyboardHeight = 256+BottomBarHeight
+                }
             }
             self.rightView.isSelected = true
             self.inputField.resignFirstResponder()
@@ -386,7 +387,7 @@ extension MessageInputBar: UITextViewDelegate {
         } else {
             self.inputField.becomeFirstResponder()
         }
-        if self.keyboardHeight <= 52 {
+        if self.keyboardHeight <= 152 {
             self.keyboardHeight = 256+BottomBarHeight
         }
         self.textViewFirstResponder?(true)
@@ -409,7 +410,7 @@ extension MessageInputBar: UITextViewDelegate {
     
     @objc private func keyboardWillHide(notification: Notification) {
         if self.rightView.isSelected {
-            guard let frame = notification.chat.keyboardEndFrame else { return }
+//            guard let frame = notification.chat.keyboardEndFrame else { return }
             guard let duration = notification.chat.keyboardAnimationDuration else { return }
             self.hiddenDuration = duration
             self.showEmojiKeyboard()
@@ -421,7 +422,7 @@ extension MessageInputBar: UITextViewDelegate {
     
     @objc open func showEmojiKeyboard() {
         if self.rightView.isSelected {
-            if self.keyboardHeight <= 52 {
+            if self.keyboardHeight <= 152 {
                 self.keyboardHeight = 256+BottomBarHeight
             }
             self.frame = CGRect(x: 0, y: self.frame.origin.y, width: self.frame.width, height: self.keyboardHeight + self.rawFrame.height)
@@ -555,7 +556,7 @@ extension MessageInputBar: ThemeSwitchProtocol {
         self.audio.setImage(self.audioImage, for: .normal)
         self.viewWithTag(124)?.backgroundColor(style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98)
         self.inputField.backgroundColor(style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95)
-        self.inputField.tintColor = style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        self.inputField.tintColor = style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor
         self.inputField.placeHolderColor = style == .dark ? UIColor.theme.neutralColor4:UIColor.theme.neutralColor6
         self.inputField.textColor = style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
         self.emoji?.backgroundColor(style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98)

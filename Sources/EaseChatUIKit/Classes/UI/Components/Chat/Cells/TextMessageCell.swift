@@ -1,6 +1,6 @@
 //
 //  TextMessageCell.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/12/5.
 //
@@ -214,12 +214,12 @@ import UIKit
     }
     
     open func onThemeChanged() {
-        let receiveLinkColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        let receiveLinkColor = Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor
         let sendLinkColor = Appearance.chat.sendTextColor
         let receiveSelectedColor = Theme.style == .dark ? UIColor.theme.primaryColor1:UIColor.theme.primaryColor8
         let sendSelectedColor = Theme.style == .dark ? UIColor.theme.primaryColor8:UIColor.theme.primaryColor3
         let sendTintColor = UIColor.theme.primaryColor98
-        let receiveTintColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        let receiveTintColor = Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor
         let color = self.towards == .right ? sendLinkColor:receiveLinkColor
         self.content.linkTextAttributes = [.underlineStyle:NSUnderlineStyle.single.rawValue,.underlineColor:color,.foregroundColor:color]
         

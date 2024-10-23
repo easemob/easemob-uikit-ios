@@ -1,6 +1,6 @@
 //
 //  DialogManager.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/9/6.
 //
@@ -95,7 +95,7 @@ import UIKit
             }
         }
         if showConfirm {
-            alert.rightButtonBackground(color: Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).rightButton(color: UIColor.theme.neutralColor98).rightButtonTapClosure {
+            alert.rightButtonBackground(color: Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor).rightButton(color: UIColor.theme.neutralColor98).rightButtonTapClosure {
                 confirmClosure($0 ?? "")
             }.rightButton(title: "Confirm".chat.localize).rightButtonRadius(cornerRadius: Appearance.alertStyle == .small ? .extraSmall:.large)
         }

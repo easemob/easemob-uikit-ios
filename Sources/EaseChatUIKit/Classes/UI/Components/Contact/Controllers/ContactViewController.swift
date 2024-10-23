@@ -4,11 +4,11 @@ import UIKit
     
     /// A closure that is called when the user confirms the selection of profiles.
     /// - Parameter profiles: An array of `EaseProfileProtocol` objects representing the selected profiles.
-    public var confirmClosure: (([EaseProfileProtocol]) -> ())?
+    public var confirmClosure: (([ChatUserProfileProtocol]) -> ())?
     
     public private(set) var style = ContactListHeaderStyle.contact
     
-    public private(set) lazy var navigation: EaseChatNavigationBar = {
+    public private(set) lazy var navigation: ChatNavigationBar = {
         self.createNavigation()
     }()
     
@@ -17,14 +17,14 @@ import UIKit
      
      - Returns: An instance of EaseChatNavigationBar.
      */
-    @objc open func createNavigation() -> EaseChatNavigationBar {
+    @objc open func createNavigation() -> ChatNavigationBar {
         if self.style == .newGroup  || self.style == .shareContact || self.style == .newChat {
-            return EaseChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "").backgroundColor(.clear)
+            return ChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "").backgroundColor(.clear)
         } else {
             if style == .addGroupParticipant {
-                return EaseChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: .left,rightTitle: "Add".chat.localize).backgroundColor(.clear)
+                return ChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: .left,rightTitle: "Add".chat.localize).backgroundColor(.clear)
             } else {
-                return EaseChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: self.style != .contact, rightImages: self.style == .newChat ? []:[UIImage(named: "person_add", in: .chatBundle, with: nil)!],hiddenAvatar: self.style == .contact ? false:true).backgroundColor(.clear)
+                return ChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: self.style != .contact, rightImages: self.style == .newChat ? []:[UIImage(named: "person_add", in: .chatBundle, with: nil)!],hiddenAvatar: self.style == .contact ? false:true).backgroundColor(.clear)
             }
         }
     }
@@ -78,7 +78,7 @@ import UIKit
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(true, animated: false)
-        self.navigation.avatarURL = EaseChatUIKitContext.shared?.currentUser?.avatarURL
+        self.navigation.avatarURL = ChatUIKitContext.shared?.currentUser?.avatarURL
     }
     
     open override func viewDidLoad() {
@@ -115,7 +115,7 @@ import UIKit
         - type: The type of navigation bar click event.
         - indexPath: The index path associated with the click event (optional).
      */
-    @objc open func navigationClick(type: EaseChatNavigationBarClickEvent, indexPath: IndexPath?) {
+    @objc open func navigationClick(type: ChatNavigationBarClickEvent, indexPath: IndexPath?) {
         switch type {
         case .back: self.pop()
         case .rightTitle: self.confirmAction()
@@ -179,7 +179,7 @@ import UIKit
     */
     @objc open func searchAction() {
         var vc: ContactSearchResultController?
-        var selectProfiles = [EaseProfileProtocol]()
+        var selectProfiles = [ChatUserProfileProtocol]()
         for contacts in self.contactList.contacts {
             for contact in contacts {
                 if contact.selected {
@@ -247,7 +247,7 @@ import UIKit
                 It then invokes the `confirmClosure` with the `choices` array as the parameter.
     */
     @objc open func confirmAction() {
-        var choices = [EaseProfileProtocol]()
+        var choices = [ChatUserProfileProtocol]()
         for contacts in self.contactList.contacts {
             for contact in contacts {
                 if contact.selected {
@@ -264,7 +264,7 @@ import UIKit
      - Parameters:
         - profile: The profile of the contact to be viewed.
      */
-    @objc open func viewContact(profile: EaseProfileProtocol) {
+    @objc open func viewContact(profile: ChatUserProfileProtocol) {
         switch self.style {
         case .newChat:
             self.confirmClosure?([profile])
@@ -342,7 +342,7 @@ extension ContactViewController: ThemeSwitchProtocol {
         
         
         self.navigation.rightItem.textColor(style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor7, .disabled)
-        self.navigation.rightItem.textColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, .normal)
+        self.navigation.rightItem.textColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor, .normal)
     }
     
 }

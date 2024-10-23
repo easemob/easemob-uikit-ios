@@ -1,6 +1,6 @@
 //
 //  SectionIndexList.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/22.
 //
@@ -25,7 +25,7 @@ import UIKit
         
     @objc public var selectClosure: ((IndexPath) -> Void)?
     
-    @objc public var selectedColor = UIColor.theme.primaryColor5
+    @objc public var selectedColor = UIColor.theme.primaryLightColor
     
     private var selectIndex = 0
     
@@ -107,7 +107,7 @@ extension SectionIndexList: UITableViewDelegate,UITableViewDataSource {
 
 extension SectionIndexList: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
-        self.selectedColor = style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        self.selectedColor = style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor
         self.reloadData()
     }
     

@@ -1,6 +1,6 @@
 //
 //  ColorTheme.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/8/29.
 //
@@ -183,6 +183,15 @@ public extension UIColor {
         
         /// You can modify this value to change the value of all gradient end colors.
         public static var gradientEndHue: CGFloat = 233/360.0
+        
+            
+        public lazy var primaryDarkColor: UIColor = {
+            UIColor.theme.primaryColor6
+        }()
+        
+        public lazy var primaryLightColor: UIColor = {
+            UIColor.theme.primaryColor5
+        }()
         
         /// UIColor Extension
         ///  `UIColor.theme.primaryColor0`
@@ -581,9 +590,9 @@ public extension UIColor {
 
     public static var graduentColors4: [UIColor] = [UIColor.theme.primaryColor4,UIColor.ColorTheme.gradientEndColor(lightness: .six)]
 
-    public static var graduentColors5: [UIColor] = [UIColor.theme.primaryColor5,UIColor.ColorTheme.gradientEndColor(lightness: .seven)]
+    public static var graduentColors5: [UIColor] = [UIColor.theme.primaryLightColor,UIColor.ColorTheme.gradientEndColor(lightness: .seven)]
 
-    public static var graduentColors6: [UIColor] = [UIColor.theme.primaryColor6,UIColor.ColorTheme.gradientEndColor(lightness: .seventyFive)]
+    public static var graduentColors6: [UIColor] = [UIColor.theme.primaryDarkColor,UIColor.ColorTheme.gradientEndColor(lightness: .seventyFive)]
 
     static var graduentColors7: [UIColor] = [UIColor.theme.primaryColor7,UIColor.ColorTheme.gradientEndColor(lightness: .eight)]
 

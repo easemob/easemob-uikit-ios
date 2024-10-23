@@ -1,6 +1,6 @@
 //
 //  MessageInputExtensionView.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/7/31.
 //
@@ -96,13 +96,16 @@ import UIKit
         self.scrollView.subviews.forEach { $0.removeFromSuperview() }
         
         let pageWidth = self.scrollView.frame.width
-        let pageHeight: CGFloat = 210
+        let pageHeight: CGFloat = self.items.count <= 4 ? 100 : 198
         
         let horizontalMargin: CGFloat = 31
         let horizontalSpacing: CGFloat = 24
         let verticalSpacing: CGFloat = 12
         
-        let itemWidth = (pageWidth - 2 * horizontalMargin - 3 * horizontalSpacing) / 4
+        var itemWidth = (pageWidth - 2 * horizontalMargin - 3 * horizontalSpacing) / 4
+        if itemWidth < 64 {
+            itemWidth = 64
+        }
         let itemHeight = (pageHeight - verticalSpacing) / 2
         
         let numberOfPages = Int(ceil(Double(self.items.count) / 8.0))
@@ -111,13 +114,20 @@ import UIKit
         
         self.scrollView.contentSize = CGSize(width: pageWidth * CGFloat(numberOfPages), height: pageHeight)
         
-        for (index,item) in self.items.enumerated() {
+        // Calculate total content width
+        let totalColumns = min(self.items.count, 4)
+        let totalContentWidth = CGFloat(totalColumns) * itemWidth + CGFloat(totalColumns - 1) * horizontalSpacing
+        
+        // Calculate left margin to center the content
+        let leftMargin = (pageWidth - totalContentWidth) / 2
+        
+        for (index, item) in self.items.enumerated() {
             let pageIndex = index / 8
             let itemIndex = index % 8
             let row = itemIndex / 4
             let column = itemIndex % 4
             
-            let x = CGFloat(pageIndex) * pageWidth + horizontalMargin + CGFloat(column) * (itemWidth + horizontalSpacing)
+            let x = CGFloat(pageIndex) * pageWidth + leftMargin + CGFloat(column) * (itemWidth + horizontalSpacing)
             let y = CGFloat(row) * (itemHeight + verticalSpacing)
             
             let itemView = MenuItemView(frame: CGRect(x: x, y: y, width: itemWidth, height: itemHeight))
@@ -126,6 +136,7 @@ import UIKit
             self.scrollView.addSubview(itemView)
         }
     }
+
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let pageIndex = round(scrollView.contentOffset.x / scrollView.frame.width)
@@ -185,9 +196,10 @@ extension MessageInputExtensionView: ThemeSwitchProtocol {
     open override func layoutSubviews() {
         super.layoutSubviews()
         let itemWidth = min(self.frame.width, self.frame.height)
-        self.cover.frame = CGRect(x: 0, y: 0, width: itemWidth, height: itemWidth)
+        self.cover.frame = CGRect(x: 0, y: 0, width: 64, height: 64)
         self.icon.frame = CGRect(x: self.cover.frame.width / 2.0 - 16, y: self.cover.frame.height / 2.0 - 16, width: 32, height: 32)
         self.name.frame = CGRect(x: 0, y: self.cover.frame.maxY + 8, width: self.frame.width, height: 18)
+        self.name.center.x = self.cover.center.x
     }
     
     required public init?(coder: NSCoder) {

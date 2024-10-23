@@ -1,6 +1,6 @@
 //
 //  MessageListViewModel.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/29.
 //
@@ -15,7 +15,7 @@ import UIKit
 
 @objc public protocol MessageListDriverEventsListener: NSObjectProtocol {
     
-    func onMessageAvatarClicked(user: EaseProfileProtocol)
+    func onMessageAvatarClicked(user: ChatUserProfileProtocol)
     
     func onMessageBubbleClicked(message: MessageEntity)
     
@@ -192,7 +192,7 @@ import UIKit
     @objc open func constructMessage(text: String,type: MessageCellStyle,extensionInfo: Dictionary<String,Any> = [:]) -> ChatMessage? {
         
         var ext = extensionInfo
-        let json = EaseChatUIKitContext.shared?.currentUser?.toJsonObject() ?? [:]
+        let json = ChatUIKitContext.shared?.currentUser?.toJsonObject() ?? [:]
         ext.merge(json) { _, new in
             new
         }
@@ -272,7 +272,7 @@ import UIKit
     /// - Parameters:
     ///   - profile: ``EaseProfileProtocol``
     @objc(updateMentionIdsWithProfile:type:)
-    open func updateMentionIds(profile: EaseProfileProtocol,type: MentionUpdate) {
+    open func updateMentionIds(profile: ChatUserProfileProtocol,type: MentionUpdate) {
         if type == .add {
             self.driver?.addMentionUserToField(user: profile)
         } else {
@@ -304,7 +304,7 @@ import UIKit
             self.chatService?.pinnedMessages(conversationId: self.to, completion: { [weak self]  messages,error in
                 guard let `self` = self else { return }
                 if error == nil {
-                    EaseChatUIKitContext.shared?.pinnedCache?[self.to] = true
+                    ChatUIKitContext.shared?.pinnedCache?[self.to] = true
                 } else {
                     consoleLogInfo("fetch pinned messages error:\(error?.errorDescription ?? "")", type: .error)
                 }
@@ -314,7 +314,7 @@ import UIKit
     }
     
     @objc open func showPinnedMessages() -> [PinnedMessageEntity] {
-        let has = EaseChatUIKitContext.shared?.pinnedCache?[self.to] as? Bool ?? false
+        let has = ChatUIKitContext.shared?.pinnedCache?[self.to] as? Bool ?? false
         if has {
             let messages = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.pinnedMessages() ?? []
             return messages.map {
@@ -409,7 +409,7 @@ import UIKit
     }
     
     @objc open func deleteMessage(message: ChatMessage) {
-        if EaseChatUIKitClient.shared.option.option_UI.loadLocalHistoryMessages {
+        if ChatUIKitClient.shared.option.option_UI.loadLocalHistoryMessages {
             self.chatService?.removeLocalMessage(messageId: message.messageId)
             self.driver?.processMessage(operation: .delete, message: message)
         } else {
@@ -425,7 +425,7 @@ import UIKit
     
     open func deleteMessages(messages: [ChatMessage]) {
         
-        if EaseChatUIKitClient.shared.option.option_UI.loadLocalHistoryMessages {
+        if ChatUIKitClient.shared.option.option_UI.loadLocalHistoryMessages {
             if var dataSource = self.driver?.dataSource {
                 for message in messages {
                     self.chatService?.removeLocalMessage(messageId: message.messageId)
@@ -468,7 +468,7 @@ extension MessageListViewModel: PinnedMessagesContainerDelegate {
             if error == nil {
                 self.pinDriver?.remove(messageId: entity.message.messageId)
                 let info = MessagePinInfo()
-                info.operatorId = EaseChatUIKitContext.shared?.currentUserId ?? ""
+                info.operatorId = ChatUIKitContext.shared?.currentUserId ?? ""
                 info.pinTime = Int(Date().timeIntervalSince1970*1000)
                 self.pinAlert(info: info, operation: .unpin)
             } else {
@@ -723,17 +723,17 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
         }
     }
     
-    public func onMessageAvatarClicked(profile: EaseProfileProtocol) {
+    public func onMessageAvatarClicked(profile: ChatUserProfileProtocol) {
         for handler in self.handlers.allObjects {
             handler.onMessageAvatarClicked(user: profile)
         }
     }
     
-    public func onMessageAvatarLongPressed(profile: EaseProfileProtocol) {
+    public func onMessageAvatarLongPressed(profile: ChatUserProfileProtocol) {
         self.onMessageAvatarLongPressed(profile: profile)
     }
     
-    @objc open func messageAvatarLongPressed(profile: EaseProfileProtocol) {
+    @objc open func messageAvatarLongPressed(profile: ChatUserProfileProtocol) {
         
     }
     
@@ -777,7 +777,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
         }
         attributeText.enumerateAttributes(in: NSRange(location: 0, length: attributeText.length), options: []) { (attributes, blockRange, stop) in
             let key = NSAttributedString.Key("mentionInfo")
-            if let mentionInfo = attributes[key] as? EaseProfileProtocol {
+            if let mentionInfo = attributes[key] as? ChatUserProfileProtocol {
                 mentionIds.append(mentionInfo.id)
             }
         }
@@ -797,7 +797,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
 
 extension MessageListViewModel: ChatResponseListener {
     public func onCMDMessageDidReceived(message: ChatMessage) {
-        if let body = message.body as? ChatCMDMessageBody,body.action == "TypingBegin",message.conversationId == self.to,message.from != EaseChatUIKitContext.shared?.currentUserId ?? "",self.chatType == .chat {
+        if let body = message.body as? ChatCMDMessageBody,body.action == "TypingBegin",message.conversationId == self.to,message.from != ChatUIKitContext.shared?.currentUserId ?? "",self.chatType == .chat {
             for handler in self.handlers.allObjects {
                 handler.onOtherPartyTypingText?()
             }
@@ -808,7 +808,7 @@ extension MessageListViewModel: ChatResponseListener {
         self.pinAlert(info: info,operation: operation)
         let message = ChatClient.shared().chatManager?.getMessageWithMessageId(messageId)
         if message == nil {
-            EaseChatUIKitContext.shared?.pinnedCache?.removeValue(forKey: conversationId)
+            ChatUIKitContext.shared?.pinnedCache?.removeValue(forKey: conversationId)
         }
         self.pinDriver?.refresh(entities: self.showPinnedMessages())
     }
@@ -829,16 +829,16 @@ extension MessageListViewModel: ChatResponseListener {
                 return
             }
             if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-                let profile = EaseProfile()
+                let profile = ChatUserProfile()
                 profile.setValuesForKeys(dic)
                 profile.id = message.from
                 profile.modifyTime = message.timestamp
-                EaseChatUIKitContext.shared?.chatCache?[message.from] = profile
-                if EaseChatUIKitContext.shared?.userCache?[message.from] == nil {
-                    EaseChatUIKitContext.shared?.userCache?[message.from] = profile
+                ChatUIKitContext.shared?.chatCache?[message.from] = profile
+                if ChatUIKitContext.shared?.userCache?[message.from] == nil {
+                    ChatUIKitContext.shared?.userCache?[message.from] = profile
                 } else {
-                    EaseChatUIKitContext.shared?.userCache?[message.from]?.nickname = profile.nickname
-                    EaseChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
+                    ChatUIKitContext.shared?.userCache?[message.from]?.nickname = profile.nickname
+                    ChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
                 }
             }
             if let dic = message.ext?["ease_chat_uikit_text_url_preview"] as? Dictionary<String,String>,let url = dic["url"] {
@@ -1025,15 +1025,15 @@ extension MessageListViewModel: GroupChatThreadEventListener {
                 if type == .created {
                     let topicName = event.chatThread?.threadName ?? ""
                     let owner = event.chatThread.owner ?? ""
-                    var showUserName = EaseChatUIKitContext.shared?.chatCache?[owner]?.remark ?? ""
+                    var showUserName = ChatUIKitContext.shared?.chatCache?[owner]?.remark ?? ""
                     if showUserName.isEmpty {
-                        showUserName = EaseChatUIKitContext.shared?.chatCache?[owner]?.nickname ?? ""
+                        showUserName = ChatUIKitContext.shared?.chatCache?[owner]?.nickname ?? ""
                     }
                     if showUserName.isEmpty {
-                        showUserName = EaseChatUIKitContext.shared?.userCache?[owner]?.remark ?? ""
+                        showUserName = ChatUIKitContext.shared?.userCache?[owner]?.remark ?? ""
                     }
                     if showUserName.isEmpty {
-                        showUserName = EaseChatUIKitContext.shared?.userCache?[owner]?.nickname ?? ""
+                        showUserName = ChatUIKitContext.shared?.userCache?[owner]?.nickname ?? ""
                     }
                     if showUserName.isEmpty {
                         showUserName = owner
@@ -1057,12 +1057,12 @@ extension MessageListViewModel: GroupChatThreadEventListener {
     }
     
     public func onAttributesChangedOfGroupMember(groupId: String, userId: String, operatorId: String, attributes: Dictionary<String, String>) {
-        if userId != EaseChatUIKitContext.shared?.currentUserId ?? "" {
+        if userId != ChatUIKitContext.shared?.currentUserId ?? "" {
             ChatClient.shared().chatManager?.getConversationWithConvId(groupId)?.loadMessages(withKeyword: "", timestamp: Int64(Date().timeIntervalSince1970*1000), count: 1, fromUser: userId, searchDirection: .up, scope: .content, completion: { messages, error in
                 if error === nil,let message = messages?.first {
                     message.ext?["remark"] = attributes["nickName"]
                     ChatClient.shared().chatManager?.update(message)
-                    EaseChatUIKitContext.shared?.chatCache?[userId]?.remark = attributes["nickName"] ?? ""
+                    ChatUIKitContext.shared?.chatCache?[userId]?.remark = attributes["nickName"] ?? ""
                 } else {
                     consoleLogInfo("onAttributesChangedOfGroupMember loadMessages user:\(userId)'s latest message error:\(error?.errorDescription ?? "")", type: .error)
                 }

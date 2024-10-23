@@ -1,6 +1,6 @@
 //
 //  SearchHistoryMessagesViewController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/1/15.
 //
@@ -131,7 +131,7 @@ import UIKit
         }
         if let item = (self.active ? self.searchResults:self.rawDatas)[safe: indexPath.row] {
             if let info = item.user {
-                info.remark = EaseChatUIKitContext.shared?.userCache?[item.from]?.remark ?? ""
+                info.remark = ChatUIKitContext.shared?.userCache?[item.from]?.remark ?? ""
                 cell?.refresh(message: item,info: info,keyword: self.searchKeyWord)
             }
         }

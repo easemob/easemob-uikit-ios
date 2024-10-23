@@ -1,6 +1,6 @@
 //
 //  MessageAudioRecordView.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/29.
 //
@@ -59,7 +59,7 @@ import UIKit
     }()
 
     public private(set) lazy var recordIcon: RippleButton = {
-        RippleButton(type: .custom).frame(CGRect(x: self.frame.width/2.0-35, y: 70, width: 72, height: 48)).cornerRadius(.large).backgroundColor(UIColor.theme.primaryColor5).textColor(UIColor.theme.neutralColor98, .normal).image(self.icon, .normal).addTargetFor(self, action: #selector(buttonAction), for: .touchUpInside)
+        RippleButton(type: .custom).frame(CGRect(x: self.frame.width/2.0-35, y: 70, width: 72, height: 48)).cornerRadius(.large).backgroundColor(UIColor.theme.primaryLightColor).textColor(UIColor.theme.neutralColor98, .normal).image(self.icon, .normal).addTargetFor(self, action: #selector(buttonAction), for: .touchUpInside)
     }()
 
     public private(set) lazy var recordTitle: UILabel = {
@@ -75,7 +75,7 @@ import UIKit
     }()
     
     public private(set) lazy var send: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.recordIcon.frame.maxX+60, y: 76, width: 36, height: 36)).backgroundColor(UIColor.theme.primaryColor5).cornerRadius(.large).image(self.sendIcon, .normal).addTargetFor(self, action: #selector(sendAudio), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: self.recordIcon.frame.maxX+60, y: 76, width: 36, height: 36)).backgroundColor(UIColor.theme.primaryLightColor).cornerRadius(.large).image(self.sendIcon, .normal).addTargetFor(self, action: #selector(sendAudio), for: .touchUpInside)
     }()
     
     override init(frame: CGRect) {
@@ -255,8 +255,8 @@ extension MessageAudioRecordView: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         self.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
         self.recordCover.backgroundColor(style == .dark ? UIColor.theme.primaryColor2:UIColor.theme.primaryColor95)
-        self.recordIcon.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
-        self.send.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
+        self.recordIcon.backgroundColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor)
+        self.send.backgroundColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor)
         self.trash.backgroundColor(style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9)
         self.trashIcon = self.trashIcon?.withTintColor(style == .dark ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor5)
         self.trash.setImage(self.trashIcon, for: .normal)

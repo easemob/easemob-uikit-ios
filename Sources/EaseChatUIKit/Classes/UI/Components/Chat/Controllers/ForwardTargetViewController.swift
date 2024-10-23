@@ -1,6 +1,6 @@
 //
 //  ForwardTargetViewController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/2/19.
 //
@@ -23,7 +23,7 @@ import UIKit
     
     private var searchMode = false
         
-    private var datas = [EaseProfileProtocol]() {
+    private var datas = [ChatUserProfileProtocol]() {
         didSet {
             DispatchQueue.main.async {
                 if self.datas.count <= 0 {
@@ -37,7 +37,7 @@ import UIKit
     
     private var forwarded = false
     
-    private var searchResults = [EaseProfileProtocol]()
+    private var searchResults = [ChatUserProfileProtocol]()
     
     public private(set) lazy var indicator: UIView = {
         UIView(frame: CGRect(x: self.view.frame.width/2.0-18, y: 6, width: 36, height: 5)).cornerRadius(2.5).backgroundColor(UIColor.theme.neutralColor8)
@@ -133,11 +133,11 @@ import UIKit
                     if let contacts = ChatClient.shared().contactManager?.getAllContacts() {
                         self?.datas.removeAll()
                         self?.datas = contacts.map {
-                            let profile = EaseProfile()
+                            let profile = ChatUserProfile()
                             profile.id = $0.userId
-                            profile.nickname = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
+                            profile.nickname = ChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
                             profile.remark = $0.remark ?? ""
-                            profile.avatarURL = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
+                            profile.avatarURL = ChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
                             return profile
                         }
                         self?.targetsList.reloadData()
@@ -150,11 +150,11 @@ import UIKit
             let contacts = ChatClient.shared().contactManager?.getAllContacts() ?? []
             self.datas.removeAll()
             self.datas = contacts.map {
-                let profile = EaseProfile()
+                let profile = ChatUserProfile()
                 profile.id = $0.userId
-                profile.nickname = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
+                profile.nickname = ChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
                 profile.remark = $0.remark ?? ""
-                profile.avatarURL = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
+                profile.avatarURL = ChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
                 return profile
             }
             self.targetsList.reloadData()
@@ -169,10 +169,10 @@ import UIKit
                         self?.noMoreGroup = true
                     }
                     self?.datas.append(contentsOf: groups.map {
-                        let profile = EaseProfile()
+                        let profile = ChatUserProfile()
                         profile.id = $0.groupId
                         profile.nickname = $0.groupName
-                        profile.avatarURL = EaseChatUIKitContext.shared?.groupCache?[$0.groupId]?.avatarURL ?? ""
+                        profile.avatarURL = ChatUIKitContext.shared?.groupCache?[$0.groupId]?.avatarURL ?? ""
                         return profile
                     })
                     self?.targetsList.reloadData()
@@ -250,15 +250,15 @@ extension ForwardTargetViewController: UITableViewDelegate,UITableViewDataSource
         } else {
             conversationId = self.datas[indexPath.row].id
         }
-        let message =  ChatMessage(conversationID: conversationId, body: body, ext: EaseChatUIKitContext.shared?.currentUser?.toJsonObject())
+        let message =  ChatMessage(conversationID: conversationId, body: body, ext: ChatUIKitContext.shared?.currentUser?.toJsonObject())
         message.chatType = self.index == 0 ? .chat:.groupChat
         ChatClient.shared().chatManager?.send(message, progress: nil, completion: { [weak self] successMessage, error in
             guard let `self` = self else { return }
             if error == nil {
                 self.forwarded = true
                 if let cell = self.targetsList.cellForRow(at: indexPath) as? ForwardTargetCell {
-                    var profile = EaseProfile()
-                    if let user = (self.searchMode ? self.searchResults:self.datas)[safe: indexPath.row] as? EaseProfile {
+                    var profile = ChatUserProfile()
+                    if let user = (self.searchMode ? self.searchResults:self.datas)[safe: indexPath.row] as? ChatUserProfile {
                         profile = user
                     }
                     cell.refresh(info: profile, keyword: self.searchKeyWord, forward: .forwarded)

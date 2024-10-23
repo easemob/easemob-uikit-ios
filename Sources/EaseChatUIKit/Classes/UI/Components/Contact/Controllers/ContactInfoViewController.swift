@@ -1,6 +1,6 @@
 //
 //  ContactInfoViewController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/21.
 //
@@ -26,7 +26,7 @@ import UIKit
     
     public let conversationService = ConversationServiceImplement()
     
-    public private(set) var profile: EaseProfileProtocol = EaseProfile()
+    public private(set) var profile: ChatUserProfileProtocol = ChatUserProfile()
     
     @objc public var removeContact: (() -> Void)?
     
@@ -47,7 +47,7 @@ import UIKit
             ["title":"contact_details_switch_donotdisturb".chat.localize,
              "detail":"",
              "withSwitch": true,
-             "switchValue":self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
+             "switchValue":self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
             ["title":"contact_details_switch_block".chat.localize,
              "detail":"",
              "withSwitch": true,
@@ -60,7 +60,7 @@ import UIKit
             ["title":"contact_details_switch_donotdisturb".chat.localize,
              "detail":"",
              "withSwitch": true,
-             "switchValue":self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
+             "switchValue":self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
             ["title":"contact_details_button_clearchathistory".chat.localize,
              "detail":"",
              "withSwitch": false,
@@ -76,7 +76,7 @@ import UIKit
         return info
     }
     
-    public private(set) lazy var navigation: EaseChatNavigationBar = {
+    public private(set) lazy var navigation: ChatNavigationBar = {
         self.createNavigation()
     }()
     
@@ -85,8 +85,8 @@ import UIKit
      
      - Returns: An instance of EaseChatNavigationBar.
      */
-    @objc open func createNavigation() -> EaseChatNavigationBar {
-        EaseChatNavigationBar(showLeftItem: true, rightImages: self.showMenu ? [UIImage(named: "more_detail", in: .chatBundle, with: nil)!] : [], hiddenAvatar: true)
+    @objc open func createNavigation() -> ChatNavigationBar {
+        ChatNavigationBar(showLeftItem: true, rightImages: self.showMenu ? [UIImage(named: "more_detail", in: .chatBundle, with: nil)!] : [], hiddenAvatar: true)
     }
     
     public private(set) lazy var header: DetailInfoHeader = {
@@ -112,7 +112,7 @@ import UIKit
      - Returns: `true` if the menu should be shown, `false` otherwise.
      */
     @objc open func showMenuCondition() -> Bool {
-        if self.profile.id == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+        if self.profile.id == ChatUIKitContext.shared?.currentUserId ?? "" {
             return false
         } else {
             if !self.contacts.contains(self.profile.id) {
@@ -154,10 +154,10 @@ import UIKit
      - Parameters:
         - profile: The profile of the contact.
      */
-    @objc public required init(profile: EaseProfileProtocol) {
+    @objc public required init(profile: ChatUserProfileProtocol) {
         self.profile = profile
         super.init(nibName: nil, bundle: nil)
-        if self.profile.id == EaseChatUIKitContext.shared?.currentUserId ?? "", let user = EaseChatUIKitContext.shared?.currentUser {
+        if self.profile.id == ChatUIKitContext.shared?.currentUserId ?? "", let user = ChatUIKitContext.shared?.currentUser {
             self.profile = user
         }
         self.fetchAllContactIds()
@@ -172,13 +172,13 @@ import UIKit
         if !self.showMenu {
             return
         }
-        if let exist = self.blockListExist[EaseChatUIKitContext.shared?.currentUserId ?? ""],!exist {
+        if let exist = self.blockListExist[ChatUIKitContext.shared?.currentUserId ?? ""],!exist {
             ChatClient.shared().contactManager?.getBlackListFromServer(completion: { [weak self] users, error in
                 guard let `self` = self else { return }
                 if error != nil {
                     consoleLogInfo("fetchBlockList error:\(error?.errorDescription ?? "")", type: .error)
                 } else {
-                    self.blockListExist[EaseChatUIKitContext.shared?.currentUserId ?? ""] = true
+                    self.blockListExist[ChatUIKitContext.shared?.currentUserId ?? ""] = true
                     let blocked = users?.contains(self.profile.id) ?? false
                     self.blockUserRefresh(blocked: blocked)
                 }
@@ -198,7 +198,7 @@ import UIKit
             ["title":"contact_details_switch_donotdisturb".chat.localize,
              "detail":"",
              "withSwitch": true,
-             "switchValue":self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
+             "switchValue":self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
             ["title":"contact_details_switch_block".chat.localize,
              "detail":"",
              "withSwitch": true,
@@ -218,7 +218,7 @@ import UIKit
             ["title":"contact_details_switch_donotdisturb".chat.localize,
              "detail":"",
              "withSwitch": true,
-             "switchValue":self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
+             "switchValue":self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
             ["title":"contact_details_button_clearchathistory".chat.localize,
              "detail":"",
              "withSwitch": false,
@@ -279,7 +279,7 @@ import UIKit
         self.header.userState = .offline
         self.header.detailText = self.profile.id
         if !self.showMenu {
-            let userId = EaseChatUIKitContext.shared?.currentUserId ?? ""
+            let userId = ChatUIKitContext.shared?.currentUserId ?? ""
             self.datas.removeAll()
             if self.profile.id != userId {
                 self.menuList.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 60)).backgroundColor(.clear)
@@ -399,7 +399,7 @@ import UIKit
         - type: The type of navigation click event.
         - indexPath: The optional index path associated with the event.
      */
-    @objc open func navigationClick(type: EaseChatNavigationBarClickEvent, indexPath: IndexPath?) {
+    @objc open func navigationClick(type: ChatNavigationBarClickEvent, indexPath: IndexPath?) {
         switch type {
         case .back: self.pop()
         case .rightItems: self.rightActions(indexPath: indexPath ?? IndexPath())
@@ -605,11 +605,11 @@ extension ContactInfoViewController: UITableViewDelegate,UITableViewDataSource {
     }
     
     @objc open func processSilentMode(name: String,isOn: Bool) {
-        if var userMap = self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""] {
+        if var userMap = self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""] {
             userMap[self.profile.id] = isOn ? 1:0
-            self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""] = userMap
+            self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""] = userMap
         } else {
-            self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""] = [self.profile.id:isOn ? 1:0]
+            self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""] = [self.profile.id:isOn ? 1:0]
         }
         if name == "contact_details_switch_donotdisturb".chat.localize {
             NotificationCenter.default.post(name: Notification.Name(rawValue: disturb_change), object: nil,userInfo: ["id":self.profile.id,"value":isOn])
@@ -620,6 +620,6 @@ extension ContactInfoViewController: UITableViewDelegate,UITableViewDataSource {
 extension ContactInfoViewController: ThemeSwitchProtocol {
     open func switchTheme(style: ThemeStyle) {
         self.view.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
-        self.addContact.backgroundColor = style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        self.addContact.backgroundColor = style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor
     }
 }

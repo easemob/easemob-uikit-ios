@@ -1,6 +1,6 @@
 //
 //  ConversationSearchCell.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/14.
 //
@@ -45,12 +45,12 @@ import UIKit
     }
     
     func refresh(info: ConversationInfo,keyword: String) {
-        var showName = EaseChatUIKitContext.shared?.userCache?[info.id]?.remark ?? ""
+        var showName = ChatUIKitContext.shared?.userCache?[info.id]?.remark ?? ""
         if showName.isEmpty {
             if info.type == .chat {
-                showName = EaseChatUIKitContext.shared?.userCache?[info.id]?.nickname ?? ""
+                showName = ChatUIKitContext.shared?.userCache?[info.id]?.nickname ?? ""
             } else {
-                showName = EaseChatUIKitContext.shared?.groupCache?[info.id]?.nickname ?? ""
+                showName = ChatUIKitContext.shared?.groupCache?[info.id]?.nickname ?? ""
             }
         }
         if showName.isEmpty {
@@ -58,7 +58,7 @@ import UIKit
         }
         var avatarURL = info.avatarURL
         if avatarURL.isEmpty {
-            avatarURL = EaseChatUIKitContext.shared?.userCache?[info.id]?.avatarURL ?? ""
+            avatarURL = ChatUIKitContext.shared?.userCache?[info.id]?.avatarURL ?? ""
         }
         self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: showName)
         self.avatar.image(with: avatarURL, placeHolder: info.type == .chat ? Appearance.conversation.singlePlaceHolder:Appearance.conversation.groupPlaceHolder)
@@ -73,7 +73,7 @@ import UIKit
         if !keyword.isEmpty {
             var range = (string as NSString).range(of: keyword, options: .caseInsensitive)
             while range.location != NSNotFound {
-                attributedString.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, range: range)
+                attributedString.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor, range: range)
                 let remainingRange = NSRange(location: range.location + range.length, length: string.count - (range.location + range.length))
                 range = (string as NSString).range(of: keyword, options: .caseInsensitive, range: remainingRange)
             }

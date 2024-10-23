@@ -68,7 +68,7 @@
 "message doesn't exist" = "message doesn't exist";
 "Add Contact" = "Add Contact";
 
-"Contact" = "Contact";
+"Contact" = "Contacts";
 "Add" = "Add";
 "NewRequestDetail" = "request to add you as a friend";
 "Groups" = "Groups";
@@ -152,7 +152,7 @@
 
 "input_extension_menu_file" = "File";
 
-"input_extension_menu_contact" = "Contact Card";
+"input_extension_menu_contact" = "Card";
 
 "remaining" = "remaining";
 

@@ -1,6 +1,6 @@
 //
 //  ChatThreadViewModel.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/1/24.
 //
@@ -63,7 +63,7 @@ import UIKit
     
     @objc open func threadCreateAlert() {
         let id = self.chatThread?.owner ?? ""
-        let nickname = EaseChatUIKitContext.shared?.chatCache?[id]?.nickname ?? ""
+        let nickname = ChatUIKitContext.shared?.chatCache?[id]?.nickname ?? ""
         if let createMessage = self.constructMessage(text: "\(nickname)"+"CreateThreadAlert".chat.localize, type: .alert) {
             var threadMessages = self.driver?.dataSource ?? []
             createMessage.localTime = Int64(self.chatThread?.createAt ?? Int(Date().timeIntervalSince1970))
@@ -164,7 +164,7 @@ import UIKit
     @objc open func constructMessage(text: String,type: MessageCellStyle,extensionInfo: Dictionary<String,Any> = [:]) -> ChatMessage? {
         
         var ext = extensionInfo
-        let json = EaseChatUIKitContext.shared?.currentUser?.toJsonObject() ?? [:]
+        let json = ChatUIKitContext.shared?.currentUser?.toJsonObject() ?? [:]
         ext.merge(json) { _, new in
             new
         }
@@ -603,17 +603,17 @@ extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
         }
     }
     
-    public func onMessageAvatarClicked(profile: EaseProfileProtocol) {
+    public func onMessageAvatarClicked(profile: ChatUserProfileProtocol) {
         for handler in self.handlers.allObjects {
             handler.onMessageAvatarClicked(user: profile)
         }
     }
     
-    public func onMessageAvatarLongPressed(profile: EaseProfileProtocol) {
+    public func onMessageAvatarLongPressed(profile: ChatUserProfileProtocol) {
         self.onMessageAvatarLongPressed(profile: profile)
     }
     
-    @objc open func messageAvatarLongPressed(profile: EaseProfileProtocol) {
+    @objc open func messageAvatarLongPressed(profile: ChatUserProfileProtocol) {
         
     }
     
@@ -645,7 +645,7 @@ extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
         }
         attributeText.enumerateAttributes(in: NSRange(location: 0, length: attributeText.length), options: []) { (attributes, blockRange, stop) in
             let key = NSAttributedString.Key("mentionInfo")
-            if let mentionInfo = attributes[key] as? EaseProfileProtocol {
+            if let mentionInfo = attributes[key] as? ChatUserProfileProtocol {
                 mentionIds.append(mentionInfo.id)
             }
         }
@@ -688,16 +688,16 @@ extension ChatThreadViewModel: ChatResponseListener {
                 return
             }
             if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-                let profile = EaseProfile()
+                let profile = ChatUserProfile()
                 profile.setValuesForKeys(dic)
                 profile.id = message.from
                 profile.modifyTime = message.timestamp
-                EaseChatUIKitContext.shared?.chatCache?[message.from] = profile
-                if EaseChatUIKitContext.shared?.userCache?[message.from] == nil {
-                    EaseChatUIKitContext.shared?.userCache?[message.from] = profile
+                ChatUIKitContext.shared?.chatCache?[message.from] = profile
+                if ChatUIKitContext.shared?.userCache?[message.from] == nil {
+                    ChatUIKitContext.shared?.userCache?[message.from] = profile
                 } else {
-                    EaseChatUIKitContext.shared?.userCache?[message.from]?.nickname = profile.nickname
-                    EaseChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
+                    ChatUIKitContext.shared?.userCache?[message.from]?.nickname = profile.nickname
+                    ChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
                 }
             }
             if let dic = message.ext?["ease_chat_uikit_text_url_preview"] as? Dictionary<String,String>,let url = dic["url"] {

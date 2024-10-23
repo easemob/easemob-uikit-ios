@@ -1,6 +1,6 @@
 //
 //  ChatThreadListController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/1/24.
 //
@@ -27,8 +27,8 @@ import UIKit
     
     public private(set) var groupId = ""
     
-    public private(set) lazy var navigation: EaseChatNavigationBar = {
-        EaseChatNavigationBar(showLeftItem: true,textAlignment: .left,hiddenAvatar: true).backgroundColor(.white)
+    public private(set) lazy var navigation: ChatNavigationBar = {
+        ChatNavigationBar(showLeftItem: true,textAlignment: .left,hiddenAvatar: true).backgroundColor(.white)
     }()
     
     public private(set) lazy var empty: EmptyStateView = {
@@ -80,7 +80,7 @@ import UIKit
         self.loadingView.startAnimating()
         ChatClient.shared().groupManager?.getGroupSpecificationFromServer(withId: self.groupId, completion: { groupInfo, error in
             if error == nil, let group = groupInfo {
-                if group.owner == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+                if group.owner == ChatUIKitContext.shared?.currentUserId ?? "" {
                     ChatClient.shared().threadManager?.getChatThreadsFromServer(withParentId: self.groupId, cursor: self.cursor, pageSize: self.pageSize, completion: { [weak self] result, error in
                         guard let `self` = self else { return }
                         self.loadingView.stopAnimating()
@@ -142,7 +142,7 @@ import UIKit
      - type: The type of navigation bar click event.
      - indexPath: The index path associated with the event (optional).
      */
-    @objc open func navigationClick(type: EaseChatNavigationBarClickEvent, indexPath: IndexPath?) {
+    @objc open func navigationClick(type: ChatNavigationBarClickEvent, indexPath: IndexPath?) {
         switch type {
         case .back: self.pop()
         default:

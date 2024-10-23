@@ -1,6 +1,6 @@
 //
 //  ReactionEmojiCellCollectionViewCell.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/1/29.
 //
@@ -30,7 +30,7 @@ import UIKit
         }
         var addedColor = UIColor.clear
         if reaction.addBySelf {
-            addedColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+            addedColor = Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor
         }
         self.background.backgroundColor = addedColor
     

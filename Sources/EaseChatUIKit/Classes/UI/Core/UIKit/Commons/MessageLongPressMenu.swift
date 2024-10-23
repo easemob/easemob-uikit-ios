@@ -1,6 +1,6 @@
 //
 //  MessageLongPressMenu.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/7/23.
 //
@@ -214,7 +214,7 @@ public let HeaderTopBottomMargin = CGFloat(9)
     func updateMenuSize() {
         let line = (self.items.count + 4) / 5
         let width = (line <= 1 ? 5:CGFloat(min(self.items.count, 5))) * PopItemWidth + PopLeftRightMargin * 2
-        let height = CGFloat(line) * PopItemHeight + PopTopBottomMargin * 2
+        let height = CGFloat(line) * PopItemHeight + PopTopBottomMargin * 2 + 8 * (CGFloat(line)-1)
         self.menuSize = CGSize(width: width, height: height)
         self.collectionView.frame = CGRect(x: 0, y: HeaderTopBottomMargin, width: self.menuSize.width, height: self.menuSize.height)
     }
@@ -259,6 +259,76 @@ public let HeaderTopBottomMargin = CGFloat(9)
         return CGPoint(x:centerX, y:centerY);
     }
     
+    func getPopFrameWithoutReaction() -> CGRect {
+        let targetFrame = self.targetViewFrame
+        let targetCenter = self.targetViewCenter()
+        let headerFrame = self.header?.frame ?? .zero
+        let itemCount = min(self.items.count, 5)
+        let menuWidth = itemCount < 5 ? CGFloat(itemCount) * PopItemWidth + PopLeftRightMargin * 2 : self.menuSize.width
+        let menuHeight = self.menuSize.height + headerFrame.height + HeaderTopBottomMargin * 2
+        let spac: CGFloat = 10.0
+        var popFrame = CGRect(x: (ScreenWidth - menuWidth) / 2.0, y: 0, width: menuWidth, height: menuHeight + HeaderTopBottomMargin + (self.header != nil ? 16 : 0))
+        
+        let left = targetCenter.x / ScreenWidth < 0.5
+        var top = targetFrame.minY < popFrame.height + PopArrowSize.height + StatusBarHeight
+        if top {
+            popFrame = CGRect(x: (ScreenWidth - menuWidth) / 2.0, y: 0, width: menuWidth, height: menuHeight + HeaderTopBottomMargin + (self.header != nil ? 16 : 0))
+        }
+        if self.startRect != .zero {
+            top = targetFrame.minY < popFrame.height + PopArrowSize.height + StatusBarHeight
+        }
+        
+        if top {
+            if self.startRect != .zero {
+                if self.tempEndRect.maxY + popFrame.height + PopArrowSize.height > self.visibleHeight {
+                    popFrame.origin.y = self.visibleHeight - popFrame.height - spac
+                } else {
+                    popFrame.origin.y = max(self.tempEndRect.maxY, spac) + PopArrowSize.height
+                }
+            } else {
+                if targetFrame.maxY + popFrame.height + PopArrowSize.height > self.visibleHeight {
+                    popFrame.origin.y = self.visibleHeight - popFrame.height - spac
+                } else {
+                    popFrame.origin.y = targetFrame.origin.y + targetFrame.size.height + PopArrowSize.height
+                }
+            }
+        } else {
+            if self.startRect != .zero {
+                popFrame.origin.y = min(self.tempStartRect.minY - popFrame.height, self.visibleHeight - spac) - PopArrowSize.height
+            } else {
+                popFrame.origin.y = targetFrame.origin.y - popFrame.height - PopArrowSize.height
+            }
+        }
+        
+        // Align PopView center with PopArrow center
+        let arrowCenterX = targetCenter.x
+        if itemCount < 5,self.header == nil {
+            popFrame.origin.x = arrowCenterX - menuWidth / 2.0
+            
+            // Ensure PopView doesn't go off screen
+            if popFrame.minX < spac {
+                popFrame.origin.x = spac
+            } else if popFrame.maxX > ScreenWidth - spac {
+                popFrame.origin.x = ScreenWidth - spac - menuWidth
+            }
+        } else {
+            if left {
+                popFrame.origin.x = max(popFrame.origin.x, spac)
+            } else {
+                popFrame.origin.x = min(popFrame.origin.x, ScreenWidth - spac - menuWidth)
+            }
+        }
+        
+        self.collectionView.frame = CGRect(x: 0, y: HeaderTopBottomMargin, width: menuWidth, height: self.menuSize.height)
+        
+        // Update header and separator line positions
+        self.header?.frame = CGRect(x: CGFloat(ceilf(Float((popFrame.width-headerFrame.width))/2.0)), y: 13, width: headerFrame.width, height: headerFrame.height)
+        self.separateLine.frame = CGRect(x: 18, y: (self.header?.frame.maxY ?? 0)+12, width: popFrame.width-36, height: 0.5)
+        
+        popFrame.origin.y = ceil(popFrame.origin.y) + (top ? 2 : -2)
+        return popFrame
+    }
+
     func getPopFrame() -> CGRect {
         let targetFrame = self.targetViewFrame
         let targetCenter = self.targetViewCenter()
@@ -365,7 +435,11 @@ public let HeaderTopBottomMargin = CGFloat(9)
         }
         
         self.updateTargetViewFrame()
-        self.popView.frame = self.getPopFrame()
+        if self.items.count < 5,self.header == nil {
+            self.popView.frame = self.getPopFrameWithoutReaction()
+        } else {
+            self.popView.frame = self.getPopFrame()
+        }
         self.popArrow.frame = self.getArrowFrame()
         self.popView.layer.shadowColor = UIColor(red: 0.275, green: 0.306, blue: 0.325, alpha: Theme.style == .dark ? 0.3:0.15).cgColor
         if self.popArrow.frame.origin.y > popView.frame.origin.y {
@@ -392,8 +466,11 @@ public let HeaderTopBottomMargin = CGFloat(9)
         self.items = items
         self.updateSubviewsLayout()
         if let headerView = header {
+            self.separateLine.isHidden = false
             self.popView.addSubview(headerView)
             self.popView.addSubview(self.separateLine)
+        } else {
+            self.separateLine.isHidden = true
         }
         self.shadowLayer0.removeFromSuperlayer()
         self.shadowLayer1.removeFromSuperlayer()

@@ -1,6 +1,6 @@
 //
 //  ChatThreadParticipantsController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/1/24.
 //
@@ -19,16 +19,16 @@ import UIKit
     /**
      The array of participants in the group.
      */
-    public private(set) var participants: [EaseProfileProtocol] = []
+    public private(set) var participants: [ChatUserProfileProtocol] = []
     
-    public private(set) lazy var navigation: EaseChatNavigationBar = {
+    public private(set) lazy var navigation: ChatNavigationBar = {
         self.createNavigation()
     }()
     
     /// Creates and returns a navigation bar for the ChatThreadParticipantsController.
     /// - Returns: An instance of EaseChatNavigationBar.
-    @objc open func createNavigation() -> EaseChatNavigationBar {
-        EaseChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: true, textAlignment: .left ,hiddenAvatar: true).backgroundColor(.clear)
+    @objc open func createNavigation() -> ChatNavigationBar {
+        ChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: true, textAlignment: .left ,hiddenAvatar: true).backgroundColor(.clear)
     }
 
     
@@ -64,7 +64,7 @@ import UIKit
     @objc open func requestGroupDetail() {
         ChatClient.shared().groupManager?.getGroupSpecificationFromServer(withId: self.profile.parentId, completion: { [weak self] group, error in
             if error == nil {
-                if group?.owner ?? "" == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+                if group?.owner ?? "" == ChatUIKitContext.shared?.currentUserId ?? "" {
                     self?.owner = true
                 }
             } else {
@@ -80,7 +80,7 @@ import UIKit
         - type: The type of navigation bar click event.
         - indexPath: The index path associated with the event (optional).
      */
-    @objc open func navigationClick(type: EaseChatNavigationBarClickEvent, indexPath: IndexPath?) {
+    @objc open func navigationClick(type: ChatNavigationBarClickEvent, indexPath: IndexPath?) {
         switch type {
         case .back: self.pop()
         default:
@@ -104,13 +104,13 @@ import UIKit
                     if self.cursor.isEmpty {
                         self.participants.removeAll()
                         self.participants = list.map({
-                            let profile = EaseProfile()
+                            let profile = ChatUserProfile()
                             let id = $0 as String
                             profile.id = id
-                            if let user = EaseChatUIKitContext.shared?.userCache?[id] {
+                            if let user = ChatUIKitContext.shared?.userCache?[id] {
                                 profile.nickname = user.nickname
                             }
-                            if let user = EaseChatUIKitContext.shared?.chatCache?[id] {
+                            if let user = ChatUIKitContext.shared?.chatCache?[id] {
                                 profile.nickname = user.nickname
                             }
                             
@@ -118,13 +118,13 @@ import UIKit
                         })
                     } else {
                         self.participants.append(contentsOf: list.map({
-                            let profile = EaseProfile()
+                            let profile = ChatUserProfile()
                             let id = $0 as String
                             profile.id = id
-                            if let user = EaseChatUIKitContext.shared?.userCache?[id] {
+                            if let user = ChatUIKitContext.shared?.userCache?[id] {
                                 profile.nickname = user.nickname
                             }
-                            if let user = EaseChatUIKitContext.shared?.chatCache?[id] {
+                            if let user = ChatUIKitContext.shared?.chatCache?[id] {
                                 profile.nickname = user.nickname
                             }
                             
@@ -186,7 +186,7 @@ extension ChatThreadParticipantsController: UITableViewDelegate,UITableViewDataS
         self.participantsList.reloadData()
     }
     
-    private func processCacheProfiles(values: [EaseProfileProtocol]) {
+    private func processCacheProfiles(values: [ChatUserProfileProtocol]) {
         for participant in self.participants {
             for value in values {
                 if value.id == participant.id {
@@ -203,13 +203,13 @@ extension ChatThreadParticipantsController: UITableViewDelegate,UITableViewDataS
         if self.owner {
             DialogManager.shared.showActions(actions: [ActionSheetItem(title: "remove_participants".chat.localize, type: .destructive, tag: "RemoveMember")]) { [weak self] item in
                 if item.tag == "RemoveMember" {
-                    self?.removeMember(user: self?.participants[safe: indexPath.row] ?? EaseProfile())
+                    self?.removeMember(user: self?.participants[safe: indexPath.row] ?? ChatUserProfile())
                 }
             }
         }
     }
                                                    
-    open func removeMember(user: EaseProfileProtocol) {
+    open func removeMember(user: ChatUserProfileProtocol) {
         ChatClient.shared().threadManager?.removeMember(fromChatThread: user.id, threadId: self.profile.threadId, completion: { error in
             if error == nil {
                 self.participants.removeAll(where: { $0.id == user.id })
