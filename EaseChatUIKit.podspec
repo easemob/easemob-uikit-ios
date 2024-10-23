@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'EaseChatUIKit'
-  s.version          = '4.9.0'
+  s.version          = '4.10.0'
   s.summary          = 'A easy for use ChatUIKit.'
 
 # This description is used to generate tags and improve search results.
@@ -25,7 +25,7 @@ TODO: Add long description of the pod here.
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'zjc19891106' => '984065974@qq.com' }
-  s.source           = { :git => 'https://github.com/easemob/chatuikit-ios.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/easemob/easemob-uikit-ios.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '13.0'
@@ -36,7 +36,7 @@ TODO: Add long description of the pod here.
   s.source_files = [ 'Sources/EaseChatUIKit/Classes/**/*.{h,swift}' ]
 #  s.private_header_files = ['Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*']
   s.resources = ['Sources/EaseChatUIKit/Classes/UI/**/*.bundle','Sources/EaseChatUIKit/Classes/UI/**/*.xcprivacy']
-  s.dependency 'HyphenateChat','>= 4.6.0'
+  s.dependency 'HyphenateChat','>= 4.10.1'
   s.static_framework = true
   
   s.swift_version = '5.0'

@@ -161,7 +161,7 @@ class AppDelegate：UIResponder，UIApplicationDelegate {
 ### 第2步：登录
 
 ``` Swift
-public final class YourAppUser: NSObject, EaseProfileProtocol {
+public final class YourAppUser: NSObject, ChatUserProfileProtocol {
 
     var id: String = ""
     
@@ -178,7 +178,7 @@ public final class YourAppUser: NSObject, EaseProfileProtocol {
     }
 
 }
-// 使用当前用户对象符合`EaseProfileProtocol`协议的用户信息登录EaseChatUIKit。
+// 使用当前用户对象符合`ChatUserProfileProtocol`协议的用户信息登录EaseChatUIKit。
 // token生成参见快速开始中登录步骤中链接。
 // 需要从您的应用服务器获取token。 您也可以使用控制台生成的临时Token登录。
 // 在控制台生成用户和临时用户 token，请参见
@@ -211,7 +211,7 @@ let error = ChatUIKitClient.shared.setup(option: ChatOptions(appkey: appKey))
 ## 2.登录
 
 ```Swift
-public final class YourAppUser: NSObject, EaseProfileProtocol {
+public final class YourAppUser: NSObject, ChatUserProfileProtocol {
 
             public func toJsonObject() -> Dictionary<String, Any>? {
         ["ease_chat_uikit_user_info":["nickname":self.nickname,"avatarURL":self.avatarURL,"userId":self.id]]
@@ -231,7 +231,7 @@ public final class YourAppUser: NSObject, EaseProfileProtocol {
     public var avatarURL: String = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/sample_avatar/sample_avatar_1.png"
 
 }
-// 使用当前用户对象符合`EaseProfileProtocol`协议的用户信息登录EaseChatUIKit。
+// 使用当前用户对象符合`ChatUserProfileProtocol`协议的用户信息登录EaseChatUIKit。
 // token生成参见快速开始中登录步骤中链接。
  ChatUIKitClient.shared.login(user: YourAppUser(), token: ExampleRequiredConfig.chatToken) { error in 
  }
@@ -297,9 +297,9 @@ extension MainViewController: ChatUserProfileProvider,ChatGroupProfileProvider {
         }
     }
     
-    private func requestUserInfos(profileIds: [String]) async -> [EaseProfileProtocol]? {
+    private func requestUserInfos(profileIds: [String]) async -> [ChatUserProfileProtocol]? {
         var unknownIds = [String]()
-        var resultProfiles = [EaseProfileProtocol]()
+        var resultProfiles = [ChatUserProfileProtocol]()
         for profileId in profileIds {
             if let profile = ChatUIKitContext.shared?.userCache?[profileId] {
                 if profile.nickname.isEmpty {
@@ -317,7 +317,7 @@ extension MainViewController: ChatUserProfileProvider,ChatGroupProfileProvider {
         let result = await ChatClient.shared().userInfoManager?.fetchUserInfo(byId: unknownIds)
         if result?.1 == nil,let infoMap = result?.0 {
             for (userId,info) in infoMap {
-                let profile = EaseChatProfile()
+                let profile = ChatUserProfile()
                 let nickname = info.nickname ?? ""
                 profile.id = userId
                 profile.nickname = nickname
@@ -338,12 +338,12 @@ extension MainViewController: ChatUserProfileProvider,ChatGroupProfileProvider {
         return []
     }
     
-    private func requestGroupsInfo(groupIds: [String]) async -> [EaseProfileProtocol]? {
-        var resultProfiles = [EaseProfileProtocol]()
+    private func requestGroupsInfo(groupIds: [String]) async -> [ChatUserProfileProtocol]? {
+        var resultProfiles = [ChatUserProfileProtocol]()
         let groups = ChatClient.shared().groupManager?.getJoinedGroups() ?? []
         for groupId in groupIds {
             if let group = groups.first(where: { $0.groupId == groupId }) {
-                let profile = EaseChatProfile()
+                let profile = ChatUserProfile()
                 profile.id = groupId
                 profile.nickname = group.groupName
                 profile.avatarURL = group.settings.ext
