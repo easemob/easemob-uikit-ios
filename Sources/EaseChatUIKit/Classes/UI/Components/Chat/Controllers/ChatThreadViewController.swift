@@ -1,6 +1,6 @@
 //
 //  ChatThreadViewController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/1/24.
 //
@@ -16,14 +16,14 @@ import AVFoundation
             
     public private(set) var profile: GroupChatThread = GroupChatThread()
     
-    public private(set) lazy var navigation: EaseChatNavigationBar = {
+    public private(set) lazy var navigation: ChatNavigationBar = {
         self.createNavigation()
     }()
     
     /// Creates a navigation bar for the MessageListController.
     /// - Returns: An instance of EaseChatNavigationBar.
-    @objc open func createNavigation() -> EaseChatNavigationBar {
-        EaseChatNavigationBar(showLeftItem: true,textAlignment: .left,rightImages: [UIImage(named: "more_detail", in: .chatBundle, with: nil)!],hiddenAvatar: true).backgroundColor(.clear)
+    @objc open func createNavigation() -> ChatNavigationBar {
+        ChatNavigationBar(showLeftItem: true,textAlignment: .left,rightImages: [UIImage(named: "more_detail", in: .chatBundle, with: nil)!],hiddenAvatar: true).backgroundColor(.clear)
     }
         
     public private(set) lazy var entity: MessageEntity = {
@@ -108,12 +108,39 @@ import AVFoundation
         self.navigation.clickClosure = { [weak self] in
             self?.navigationClick(type: $0, indexPath: $1)
         }
-        EaseChatUIKitContext.shared?.onGroupNameUpdated = { [weak self] _,_ in
+        ChatUIKitContext.shared?.onGroupNameUpdated = { [weak self] _,_ in
             self?.setupTitle()
         }
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
         self.view.addSubview(self.loadingView)
+        self.processFollowInputAttachmentAction()
+    }
+    
+    @objc open func processFollowInputAttachmentAction() {
+        if Appearance.chat.messageAttachmentMenuStyle == .followInput {
+            if let fileItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "File" }) {
+                fileItem.action = { [weak self] item,object in
+                    self?.handleAttachmentAction(item: item)
+                }
+            }
+            if let photoItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Photo" }) {
+                photoItem.action = { [weak self] item,object in
+                    self?.handleAttachmentAction(item: item)
+                }
+            }
+            if let cameraItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Camera" }) {
+                cameraItem.action = { [weak self] item,object in
+                    self?.handleAttachmentAction(item: item)
+                }
+            }
+            if let contactItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Contact" }) {
+                contactItem.action = { [weak self] item,object in
+                    self?.handleAttachmentAction(item: item)
+                }
+            }
+            
+        }
     }
     
     open func setupTitle() {
@@ -152,7 +179,7 @@ import AVFoundation
     
     
     deinit {
-        EaseChatUIKitContext.shared?.cleanCache(type: .chat)
+        ChatUIKitContext.shared?.cleanCache(type: .chat)
     }
 }
 
@@ -176,7 +203,7 @@ extension ChatThreadViewController {
      - type: The type of navigation bar click event.
      - indexPath: The index path associated with the event (optional).
      */
-    @objc open func navigationClick(type: EaseChatNavigationBarClickEvent, indexPath: IndexPath?) {
+    @objc open func navigationClick(type: ChatNavigationBarClickEvent, indexPath: IndexPath?) {
         switch type {
         case .back: self.pop()
         case .rightItems: self.rightItemsAction(indexPath: indexPath)
@@ -203,12 +230,12 @@ extension ChatThreadViewController {
             ActionSheetItem(title: "Leave Topic", type: .destructive, tag: "LeaveTopic", image: UIImage(named: "quit", in: .chatBundle, with: nil))
         ]
         let group = ChatGroup(id: self.profile.parentId)
-        if group?.owner == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+        if group?.owner == ChatUIKitContext.shared?.currentUserId ?? "" {
             items.removeLast()
             items.append(ActionSheetItem(title: "Disband Topic", type: .destructive, tag: "DisbandTopic", image: UIImage(named: "quit", in: .chatBundle, with: nil)))
 
         }
-        if group?.owner == EaseChatUIKitContext.shared?.currentUserId ?? "" || self.profile.owner == EaseChatUIKitContext.shared?.currentUserId ?? ""{
+        if group?.owner == ChatUIKitContext.shared?.currentUserId ?? "" || self.profile.owner == ChatUIKitContext.shared?.currentUserId ?? ""{
             items.insert(ActionSheetItem(title: "Edit Topic", type: .normal, tag: "EditTopic", image: UIImage(named: "message_action_edit", in: .chatBundle, with: nil)), at: 0)
         }
         return items
@@ -414,8 +441,8 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
         return messageActions
     }
     
-    public func onMessageBubbleLongPressed(message: MessageEntity) {
-        self.showMessageLongPressedDialog(message: message)
+    public func onMessageBubbleLongPressed(cell: MessageCell) {
+        self.showMessageLongPressedDialog(cell: cell)
     }
     
     /**
@@ -424,24 +451,70 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
      - Parameters:
      - message: The chat message for which the dialog is shown.
      */
-    @objc open func showMessageLongPressedDialog(message: MessageEntity) {
+    @objc open func showMessageLongPressedDialog(cell: MessageCell) {
         if self.messageContainer.editMode {
             return
         }
-        let header =  CommonReactionView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 44), message: message.message).backgroundColor(.clear)
+        let items = self.filterMessageActions(message: cell.entity)
+        
+        var width = ScreenWidth
+        if Appearance.chat.messageLongPressMenuStyle == .withArrow {
+            width = (items.count < 5 ? 5:CGFloat(min(items.count, 5))) * PopItemWidth - PopLeftRightMargin * 4
+        }
+        
+        let header =  CommonReactionView(frame: CGRect(x: 0, y: 0, width: width, height: 44), message: cell.entity.message).backgroundColor(.clear)
         header.reactionClosure = { [weak self] emoji,rawMessage in
+            if Appearance.chat.messageLongPressMenuStyle == .withArrow {
+                MessageLongPressMenu.shared.hiddenMenu()
+            }
             UIViewController.currentController?.dismiss(animated: true) {
                 if emoji.isEmpty {
                     //more reaction
-                    self?.showAllReactionsController(message: message)
+                    self?.showAllReactionsController(message: cell.entity)
                 } else {
                     self?.viewModel.operationReaction(emoji: emoji, message: rawMessage)
                 }
             }
         }
-        DialogManager.shared.showMessageActions(actions: self.filterMessageActions(message: message),withHeader: Appearance.chat.contentStyle.contains(.withMessageReaction) ? header:nil) { [weak self] item in
-            self?.processMessage(item: item, message: message.message)
+        switch Appearance.chat.messageLongPressMenuStyle {
+        case .withArrow:
+            self.showMessageLongPressedMenuWithArrow(cell: cell, items: items,header: Appearance.chat.contentStyle.contains(.withMessageReaction) ? header:nil)
+        case .actionSheet:
+            self.showMessageLongPressedMenuActionSheet(cell: cell, items: items,header: Appearance.chat.contentStyle.contains(.withMessageReaction) ? header:nil)
+        default:
+            break
         }
+        self.feedback(with: .medium)
+        
+    }
+    
+    @objc open func showMessageLongPressedMenuWithArrow(cell: MessageCell,items: [ActionSheetItemProtocol],header: UIView? = nil) {
+        if cell is ImageMessageCell || cell is VideoMessageCell {
+            if let content = cell.contentViewIfPresent() {
+                MessageLongPressMenu.shared.showMenu(items: items, targetView: content, header: header) { [weak self] item, _ in
+                    self?.processMessage(item: item, message: cell.entity.message)
+                }
+            }
+        } else {
+            MessageLongPressMenu.shared.showMenu(items: items, targetView: Appearance.chat.bubbleStyle == .withArrow ? cell.bubbleWithArrow:cell.bubbleMultiCorners, header: header){ [weak self] item, _ in
+                self?.processMessage(item: item, message: cell.entity.message)
+            }
+        }
+    }
+    
+    @objc open func showMessageLongPressedMenuActionSheet(cell: MessageCell,items: [ActionSheetItemProtocol],header: UIView? = nil) {
+        if UIViewController.currentController is DialogContainerViewController {
+            return
+        }
+        DialogManager.shared.showMessageActions(actions: items,withHeader: header) { [weak self] item in
+            self?.processMessage(item: item, message: cell.entity.message)
+        }
+    }
+    
+    @objc open func feedback(with style: UIImpactFeedbackGenerator.FeedbackStyle) {
+        let feedbackGenerator = UIImpactFeedbackGenerator(style: style)
+        feedbackGenerator.prepare()
+        feedbackGenerator.impactOccurred()
     }
     
     @objc open func showAllReactionsController(message: MessageEntity) {
@@ -589,7 +662,7 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
         let avatarURL = body.customExt?["avatar"] as? String
         let nickname = body.customExt?["nickname"] as? String
         if body.event == EaseChatUIKit_user_card_message {
-            let profile = EaseProfile()
+            let profile = ChatUserProfile()
             profile.id = userId ?? ""
             profile.nickname = nickname ?? ""
             profile.avatarURL = avatarURL ?? ""
@@ -599,7 +672,7 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
         }
     }
     
-    public func onMessageAvatarClicked(user: EaseProfileProtocol) {
+    public func onMessageAvatarClicked(user: ChatUserProfileProtocol) {
         self.messageAvatarClick(user: user)
     }
     
@@ -609,8 +682,8 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
      - Parameters:
      - user: The user profile associated with the clicked avatar.
      */
-    @objc open func messageAvatarClick(user: EaseProfileProtocol) {
-        if user.id == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+    @objc open func messageAvatarClick(user: ChatUserProfileProtocol) {
+        if user.id == ChatUIKitContext.shared?.currentUserId ?? "" {
             return
         }
         let vc = ComponentsRegister.shared.ContactInfoController.init(profile: user)

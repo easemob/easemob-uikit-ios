@@ -1,6 +1,6 @@
 //
 //  ConversationServiceImplement.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/6.
 //
@@ -65,7 +65,7 @@ extension ConversationServiceImplement: ConversationService {
                                 if let list = result?.list {
                                     for item in list {
                                         if let silentMode = resultSilent?[item.id]?.remindType {
-                                            let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
+                                            let currentUser = ChatUIKitContext.shared?.currentUserId ?? ""
                                             var conversationMap = self.muteMap[currentUser]
                                             if conversationMap != nil {
                                                 conversationMap?[item.id] = silentMode.rawValue
@@ -167,7 +167,7 @@ extension ConversationServiceImplement: ConversationService {
                             if silentError == nil {
                                 for item in list {
                                     if let silentMode = resultSilent?[item.conversationId]?.remindType {
-                                        let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
+                                        let currentUser = ChatUIKitContext.shared?.currentUserId ?? ""
                                         var conversationMap = self?.muteMap[currentUser]
                                         if conversationMap != nil {
                                             conversationMap?[item.conversationId] = silentMode.rawValue
@@ -192,7 +192,7 @@ extension ConversationServiceImplement: ConversationService {
                             if silentError == nil {
                                 for item in list {
                                     if let silentMode = resultSilent?[item.conversationId]?.remindType {
-                                        let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
+                                        let currentUser = ChatUIKitContext.shared?.currentUserId ?? ""
                                         var conversationMap = self?.muteMap[currentUser]
                                         if conversationMap != nil {
                                             conversationMap?[item.conversationId] = silentMode.rawValue
@@ -237,7 +237,7 @@ extension ConversationServiceImplement: ConversationService {
     public func deleteConversation(conversationId: String, completion: @escaping (ChatError?) -> Void) {
         if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(conversationId) {
             ChatClient.shared().chatManager?.deleteConversation(conversationId, isDeleteMessages: true, completion: { [weak self] localId, error in
-                EaseChatUIKitContext.shared?.pinnedCache?.removeValue(forKey: conversationId)
+                ChatUIKitContext.shared?.pinnedCache?.removeValue(forKey: conversationId)
                 self?.handleResult(error: error, type: .delete)
                 completion(error)
             })
@@ -301,12 +301,12 @@ extension ConversationServiceImplement: ConversationService {
             let conversation = ComponentsRegister.shared.Conversation.init()
             conversation.id = $0.conversationId
             var nickname = ""
-            var profile: EaseProfileProtocol?
+            var profile: ChatUserProfileProtocol?
             if $0.type == .chat {
-                profile = EaseChatUIKitContext.shared?.userCache?[$0.conversationId]
+                profile = ChatUIKitContext.shared?.userCache?[$0.conversationId]
             } else {
-                profile = EaseChatUIKitContext.shared?.groupCache?[$0.conversationId]
-                if EaseChatUIKitContext.shared?.groupProfileProvider == nil,EaseChatUIKitContext.shared?.groupProfileProviderOC == nil {
+                profile = ChatUIKitContext.shared?.groupCache?[$0.conversationId]
+                if ChatUIKitContext.shared?.groupProfileProvider == nil,ChatUIKitContext.shared?.groupProfileProviderOC == nil {
                     profile?.nickname = ChatGroup(id: $0.conversationId).groupName ?? ""
                 }
             }
@@ -323,38 +323,38 @@ extension ConversationServiceImplement: ConversationService {
             conversation.lastMessage = $0.latestMessage
             if let dic = conversation.lastMessage?.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
                 let from = conversation.lastMessage?.from ?? ""
-                let profile_chat = EaseProfile()
+                let profile_chat = ChatUserProfile()
                 profile_chat.setValuesForKeys(dic)
                 profile_chat.id = from
                 profile_chat.modifyTime = conversation.lastMessage?.timestamp ?? 0
-                if EaseChatUIKitContext.shared?.userCache?[from] == nil {
-                    EaseChatUIKitContext.shared?.userCache?[from] = profile_chat
+                if ChatUIKitContext.shared?.userCache?[from] == nil {
+                    ChatUIKitContext.shared?.userCache?[from] = profile_chat
                 } else {
-                    EaseChatUIKitContext.shared?.userCache?[from]?.nickname = profile_chat.nickname
-                    EaseChatUIKitContext.shared?.userCache?[from]?.avatarURL = profile_chat.avatarURL
+                    ChatUIKitContext.shared?.userCache?[from]?.nickname = profile_chat.nickname
+                    ChatUIKitContext.shared?.userCache?[from]?.avatarURL = profile_chat.avatarURL
                 }
             }
-            conversation.type = EaseProfileProviderType(rawValue: UInt($0.type.rawValue)) ?? .chat
+            conversation.type = ChatUserProfileProviderType(rawValue: UInt($0.type.rawValue)) ?? .chat
             conversation.pinned = $0.isPinned
-            if EaseChatUIKitClient.shared.option.option_UI.saveConversationInfo {
+            if ChatUIKitClient.shared.option.option_UI.saveConversationInfo {
                 if $0.type == .chat {
-                    if let nickName = EaseChatUIKitContext.shared?.userCache?[$0.conversationId]?.nickname as? String {
+                    if let nickName = ChatUIKitContext.shared?.userCache?[$0.conversationId]?.nickname as? String {
                         conversation.nickname = nickName
                     }
-                    if let avatarURL = EaseChatUIKitContext.shared?.userCache?[$0.conversationId]?.avatarURL as? String {
+                    if let avatarURL = ChatUIKitContext.shared?.userCache?[$0.conversationId]?.avatarURL as? String {
                         conversation.avatarURL = avatarURL
                     }
                 } else {
-                    if let nickName = EaseChatUIKitContext.shared?.groupCache?[$0.conversationId]?.nickname as? String {
+                    if let nickName = ChatUIKitContext.shared?.groupCache?[$0.conversationId]?.nickname as? String {
                         conversation.nickname = nickName
                     }
-                    if let avatarURL = EaseChatUIKitContext.shared?.groupCache?[$0.conversationId]?.avatarURL as? String {
+                    if let avatarURL = ChatUIKitContext.shared?.groupCache?[$0.conversationId]?.avatarURL as? String {
                         conversation.avatarURL = avatarURL
                     }
                 }
             }
             conversation.doNotDisturb = false
-            if let silentMode = self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[$0.conversationId] {
+            if let silentMode = self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""]?[$0.conversationId] {
                 conversation.doNotDisturb = silentMode != 0
             }
             
@@ -402,16 +402,16 @@ extension ConversationServiceImplement: ChatEventsListener {
             conversation.ext?["EaseChatUIKit_mention"] = true
         }
         if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-            let profile = EaseProfile()
+            let profile = ChatUserProfile()
             profile.setValuesForKeys(dic)
             profile.id = message.from
             profile.modifyTime = message.timestamp
-            EaseChatUIKitContext.shared?.chatCache?[message.from] = profile
-            if EaseChatUIKitContext.shared?.userCache?[message.from] == nil {
-                EaseChatUIKitContext.shared?.userCache?[message.from] = profile
+            ChatUIKitContext.shared?.chatCache?[message.from] = profile
+            if ChatUIKitContext.shared?.userCache?[message.from] == nil {
+                ChatUIKitContext.shared?.userCache?[message.from] = profile
             } else {
-                EaseChatUIKitContext.shared?.userCache?[message.from]?.nickname = profile.nickname
-                EaseChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
+                ChatUIKitContext.shared?.userCache?[message.from]?.nickname = profile.nickname
+                ChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
             }
         }
         let list = self.mapper(objects: [conversation])
@@ -437,7 +437,7 @@ extension ConversationServiceImplement: ChatEventsListener {
     }
     
     public func onConversationRead(_ from: String, to: String) {
-        if from == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+        if from == ChatUIKitContext.shared?.currentUserId ?? "" {
             if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(to) {
                 self.onConversationReadCallback(conversation: conversation)
             } else {

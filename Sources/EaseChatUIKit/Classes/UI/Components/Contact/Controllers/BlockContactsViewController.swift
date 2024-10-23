@@ -1,6 +1,6 @@
 //
 //  BlockContactsViewController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/6/4.
 //
@@ -11,7 +11,7 @@ open class BlockContactsViewController: UIViewController {
     
     @UserDefault("EaseChatUIKit_contact_block_list_exist", defaultValue: Dictionary<String,Bool>()) public private(set) var blockListExist
     
-    public private(set) lazy var navigation: EaseChatNavigationBar = {
+    public private(set) lazy var navigation: ChatNavigationBar = {
         self.createNavigation()
     }()
     
@@ -20,8 +20,8 @@ open class BlockContactsViewController: UIViewController {
      
      - Returns: An instance of EaseChatNavigationBar.
      */
-    @objc open func createNavigation() -> EaseChatNavigationBar {
-        EaseChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: .left).backgroundColor(.clear)
+    @objc open func createNavigation() -> ChatNavigationBar {
+        ChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: .left).backgroundColor(.clear)
     }
     
     public private(set) lazy var search: UIButton = {
@@ -86,7 +86,7 @@ open class BlockContactsViewController: UIViewController {
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
-    @objc func viewProfile(profile: EaseProfileProtocol) {
+    @objc func viewProfile(profile: ChatUserProfileProtocol) {
         let vc = ComponentsRegister.shared.ContactInfoController.init(profile: profile)
 
         vc.modalPresentationStyle = .fullScreen
@@ -95,7 +95,7 @@ open class BlockContactsViewController: UIViewController {
 
     /// Fetch block user list.
     @objc open func fetchBlockList() {
-        if let exist = self.blockListExist[EaseChatUIKitContext.shared?.currentUserId ?? ""],!exist {
+        if let exist = self.blockListExist[ChatUIKitContext.shared?.currentUserId ?? ""],!exist {
             ChatClient.shared().contactManager?.getBlackListFromServer(completion: { [weak self] users, error in
                 if error != nil {
                     consoleLogInfo("fetchBlockList error:\(error?.errorDescription ?? "")", type: .error)
@@ -109,14 +109,14 @@ open class BlockContactsViewController: UIViewController {
     }
     
     @objc open func mirrorIdsToProfiles(users: [String]?) {
-        var profiles = [EaseProfileProtocol]()
+        var profiles = [ChatUserProfileProtocol]()
         if let users = users {
             for user in users {
-                let profile = EaseProfile()
+                let profile = ChatUserProfile()
                 profile.id = user
-                profile.nickname = EaseChatUIKitContext.shared?.userCache?[user]?.nickname ?? ""
-                profile.remark = EaseChatUIKitContext.shared?.userCache?[user]?.remark ?? ""
-                profile.avatarURL = EaseChatUIKitContext.shared?.userCache?[user]?.avatarURL ?? ""
+                profile.nickname = ChatUIKitContext.shared?.userCache?[user]?.nickname ?? ""
+                profile.remark = ChatUIKitContext.shared?.userCache?[user]?.remark ?? ""
+                profile.avatarURL = ChatUIKitContext.shared?.userCache?[user]?.avatarURL ?? ""
                 profiles.append(profile)
             }
         }

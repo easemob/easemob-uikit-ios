@@ -1,6 +1,6 @@
 //
 //  JoinedGroupsViewController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/24.
 //
@@ -15,7 +15,7 @@ import UIKit
     
     private var loadFinished = false
     
-    public private(set) var datas: [EaseProfileProtocol] = [] {
+    public private(set) var datas: [ChatUserProfileProtocol] = [] {
         didSet {
             if self.datas.count <= 0 {
                 self.groupList.backgroundView = self.empty
@@ -25,12 +25,12 @@ import UIKit
         }
     }
     
-    public private(set) lazy var navigation: EaseChatNavigationBar = {
+    public private(set) lazy var navigation: ChatNavigationBar = {
         self.createNavigation()
     }()
     
-    @objc open func createNavigation() -> EaseChatNavigationBar {
-        EaseChatNavigationBar(showLeftItem: true, textAlignment: .left, hiddenAvatar: true).backgroundColor(.clear)
+    @objc open func createNavigation() -> ChatNavigationBar {
+        ChatNavigationBar(showLeftItem: true, textAlignment: .left, hiddenAvatar: true).backgroundColor(.clear)
     }
     
     public private(set) lazy var groupList: UITableView = {
@@ -71,7 +71,7 @@ import UIKit
         }
     }
     
-    @objc open func navigationClick(type: EaseChatNavigationBarClickEvent,indexPath: IndexPath?) {
+    @objc open func navigationClick(type: ChatNavigationBarClickEvent,indexPath: IndexPath?) {
         switch type {
         case .back: self.pop()
         default: break
@@ -93,10 +93,10 @@ import UIKit
                 if error == nil {
                     if let groups = groups {
                         self.datas.append(contentsOf: groups.map({
-                            let profile = EaseProfile()
+                            let profile = ChatUserProfile()
                             profile.id = $0.groupId
                             profile.nickname = $0.groupName
-                            profile.avatarURL = EaseChatUIKitContext.shared?.groupCache?[$0.groupId]?.avatarURL ?? ""
+                            profile.avatarURL = ChatUIKitContext.shared?.groupCache?[$0.groupId]?.avatarURL ?? ""
                             return profile
                         }))
                         self.groupList.reloadData()

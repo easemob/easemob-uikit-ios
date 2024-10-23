@@ -1,6 +1,6 @@
 //
 //  MessageReplyView.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/12/5.
 //
@@ -91,7 +91,7 @@ import UIKit
             }
         }
         if let body = message.body as? ChatImageMessageBody {
-            if message.from == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+            if message.from == ChatUIKitContext.shared?.currentUserId ?? "" {
                 if FileManager.default.fileExists(atPath: body.localPath) {
                     self.replyIcon.image = UIImage(contentsOfFile: body.localPath)
                 } else {

@@ -1,6 +1,6 @@
 //
 //  ActionSheet.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/8/28.
 //
@@ -43,7 +43,7 @@ import UIKit
     }()
     
     lazy var cancel: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: 0, y: self.frame.height - Appearance.actionSheetRowHeight - BottomBarHeight, width: self.frame.width, height: Appearance.actionSheetRowHeight)).backgroundColor(UIColor.theme.neutralColor98).title("report_button_click_menu_button_cancel".chat.localize, .normal).font(UIFont.theme.labelLarge).textColor(UIColor.theme.primaryColor5, .normal).addTargetFor(self, action: #selector(cancelAction), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: 0, y: self.frame.height - Appearance.actionSheetRowHeight - BottomBarHeight, width: self.frame.width, height: Appearance.actionSheetRowHeight)).backgroundColor(UIColor.theme.neutralColor98).title("report_button_click_menu_button_cancel".chat.localize, .normal).font(UIFont.theme.labelLarge).textColor(UIColor.theme.primaryLightColor, .normal).addTargetFor(self, action: #selector(cancelAction), for: .touchUpInside)
     }()
 
     override init(frame: CGRect) {
@@ -158,7 +158,7 @@ extension ActionSheet: ThemeSwitchProtocol {
         self.messageContainer.textColor(style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5)
         self.dividingLine.backgroundColor(style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9)
         self.cancel.backgroundColor(style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98)
-        self.cancel.setTitleColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, for: .normal)
+        self.cancel.setTitleColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor, for: .normal)
         self.indicator.backgroundColor(style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor8)
         self.menuList.tableFooterView?.backgroundColor(style == .dark ? UIColor.theme.neutralColor0:UIColor.theme.neutralColor95)
         self.menuList.backgroundColor(style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98)
@@ -184,7 +184,7 @@ extension ActionSheet: UITableViewDelegate,UITableViewDataSource {
         cell?.textLabel?.font = .systemFont(ofSize: 16, weight: .regular)
         cell?.textLabel?.textAlignment = item.image == nil ? .center:.left
         if item.type == .normal {
-            cell?.imageView?.image = Theme.style == .dark ? item.image?.withTintColor(UIColor.theme.primaryColor6):item.image?.withTintColor(UIColor.theme.primaryColor5)
+            cell?.imageView?.image = Theme.style == .dark ? item.image?.withTintColor(UIColor.theme.primaryDarkColor):item.image?.withTintColor(UIColor.theme.primaryLightColor)
         } else {
             cell?.imageView?.image = Theme.style == .dark ? item.image?.withTintColor(UIColor.theme.errorColor6):item.image?.withTintColor(UIColor.theme.errorColor5)
         }
@@ -192,9 +192,9 @@ extension ActionSheet: UITableViewDelegate,UITableViewDataSource {
         cell?.textLabel?.numberOfLines = 2
         cell?.textLabel?.backgroundColor = .clear
         if Theme.style == .light {
-            cell?.textLabel?.textColor = self.items[indexPath.row].type == .destructive ? UIColor.theme.errorColor5 : UIColor.theme.primaryColor5
+            cell?.textLabel?.textColor = self.items[indexPath.row].type == .destructive ? UIColor.theme.errorColor5 : UIColor.theme.primaryLightColor
         } else {
-            cell?.textLabel?.textColor = self.items[indexPath.row].type == .destructive ? UIColor.theme.errorColor6 : UIColor.theme.primaryColor6
+            cell?.textLabel?.textColor = self.items[indexPath.row].type == .destructive ? UIColor.theme.errorColor6 : UIColor.theme.primaryDarkColor
         }
         cell?.selectionStyle = .default
         return cell ?? ActionSheetCell()

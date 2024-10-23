@@ -1,6 +1,6 @@
 //
 //  PullRefresher.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/12/12.
 //

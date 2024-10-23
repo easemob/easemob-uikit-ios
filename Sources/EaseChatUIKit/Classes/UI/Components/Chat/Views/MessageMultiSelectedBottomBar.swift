@@ -1,6 +1,6 @@
 //
 //  MessageMultiSelectedBottomBar.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/1/24.
 //
@@ -66,7 +66,7 @@ extension MessageMultiSelectedBottomBar: ThemeSwitchProtocol {
         
         let disable_forward = self.forwardIcon?.withTintColor(style == .dark ? UIColor.theme.neutralColor7:UIColor.theme.neutralColor6)
         self.forward.setImage(disable_forward, for: .disabled)
-        let enable_forward = self.forwardIcon?.withTintColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
+        let enable_forward = self.forwardIcon?.withTintColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor)
         self.forward.setImage(enable_forward, for: .normal)
     }
 }

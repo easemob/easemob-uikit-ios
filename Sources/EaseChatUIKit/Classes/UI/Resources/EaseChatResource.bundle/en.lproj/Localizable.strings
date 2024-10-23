@@ -25,15 +25,15 @@
 
 "message doesn't exist" = "message doesn't exist";
 "Replying" = "Replying ";
-"barrage_long_press_menu_translate" = "Translate";
+"barrage_long_press_menu_translate" = "Trans";
 "barrage_long_press_menu_delete" = "Delete";
 "barrage_long_press_menu_recall" = "Recall";
 "barrage_long_press_menu_reply" = "Reply";
 "barrage_long_press_menu_report" = "Report";
 "barrage_long_press_menu_forward" = "Forward";
-"barrage_long_press_menu_show_original_text" = "Original Text";
+"barrage_long_press_menu_show_original_text" = "Hide";
 "barrage_long_press_menu_multi_select" = "Select";
-"barrage_long_press_menu_topic" = "Create Thread";
+"barrage_long_press_menu_topic" = "Thread";
 "barrage_long_press_menu_pin" = "Pin";
 "Topic" = "Thread";
 "barrage_long_press_menu_cancel" = "Cancel";
@@ -68,7 +68,7 @@
 "message doesn't exist" = "message doesn't exist";
 "Add Contact" = "Add Contact";
 
-"Contact" = "Contact";
+"Contact" = "Contacts";
 "Add" = "Add";
 "NewRequestDetail" = "request to add you as a friend";
 "Groups" = "Groups";
@@ -152,7 +152,7 @@
 
 "input_extension_menu_file" = "File";
 
-"input_extension_menu_contact" = "Contact Card";
+"input_extension_menu_contact" = "Card";
 
 "remaining" = "remaining";
 

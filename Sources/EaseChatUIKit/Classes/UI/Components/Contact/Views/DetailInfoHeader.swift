@@ -1,6 +1,6 @@
 //
 //  DetailInfoHeader.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/22.
 //
@@ -151,7 +151,7 @@ extension DetailInfoHeader: UICollectionViewDelegate,UICollectionViewDataSource 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(with: DetailInfoHeaderExtensionCell.self, reuseIdentifier: "DetailInfoHeaderExtensionCell", indexPath: indexPath) else { return DetailInfoHeaderExtensionCell() }
         if let item = Appearance.contact.detailExtensionActionItems[safe: indexPath.row] {
-            cell.icon.image = item.featureIcon?.withTintColor(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
+            cell.icon.image = item.featureIcon?.withTintColor(Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor)
             cell.title.text = item.featureName
         }
         return cell

@@ -1,6 +1,6 @@
 //
 //  MessageReactionsDetailController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/1/24.
 //
@@ -17,7 +17,7 @@ import UIKit
     
     public private(set) var reactions: [MessageReaction] = []
     
-    public private(set) var users = [EaseProfileProtocol]()
+    public private(set) var users = [ChatUserProfileProtocol]()
     
     public private(set) var selectedReaction = ""
     
@@ -89,24 +89,24 @@ import UIKit
             if error == nil {
                 if let userList = reaction.userList {
                     self.users.append(contentsOf: userList.map({
-                        let profile = EaseProfile()
+                        let profile = ChatUserProfile()
                         profile.id = $0
                         if self.message.chatType == .groupChat {
-                            var user = EaseChatUIKitContext.shared?.chatCache?[self.message.from]
-                            if $0 == EaseChatUIKitContext.shared?.currentUserId ?? "" {
-                                user = EaseChatUIKitContext.shared?.currentUser
+                            var user = ChatUIKitContext.shared?.chatCache?[self.message.from]
+                            if $0 == ChatUIKitContext.shared?.currentUserId ?? "" {
+                                user = ChatUIKitContext.shared?.currentUser
                             }
                             profile.nickname = user?.nickname ?? ""
                             profile.avatarURL = user?.avatarURL ?? ""
                         } else {
-                            var user = EaseChatUIKitContext.shared?.chatCache?[$0]
-                            if $0 == EaseChatUIKitContext.shared?.currentUserId ?? "" {
-                                user = EaseChatUIKitContext.shared?.currentUser
+                            var user = ChatUIKitContext.shared?.chatCache?[$0]
+                            if $0 == ChatUIKitContext.shared?.currentUserId ?? "" {
+                                user = ChatUIKitContext.shared?.currentUser
                             } else {
                                 if user == nil {
-                                    user = EaseChatUIKitContext.shared?.userCache?[$0]
+                                    user = ChatUIKitContext.shared?.userCache?[$0]
                                     if user == nil {
-                                        user = EaseChatUIKitContext.shared?.userCache?[$0]
+                                        user = ChatUIKitContext.shared?.userCache?[$0]
                                     }
                                 }
                             }
@@ -115,10 +115,10 @@ import UIKit
                         }
                         return profile
                     }))
-                    let index = self.users.firstIndex { $0.id == EaseChatUIKitContext.shared?.currentUserId ?? "" }
+                    let index = self.users.firstIndex { $0.id == ChatUIKitContext.shared?.currentUserId ?? "" }
                     if let idx = index {
                         self.users.remove(at: idx)
-                        if let currentUser = EaseChatUIKitContext.shared?.currentUser {
+                        if let currentUser = ChatUIKitContext.shared?.currentUser {
                             self.users.insert(currentUser, at: 0)
                         }
                     }
@@ -156,10 +156,10 @@ import UIKit
                 }
             }
         }
-        if EaseChatUIKitContext.shared?.userProfileProvider != nil {
+        if ChatUIKitContext.shared?.userProfileProvider != nil {
             if !unknownInfoIds.isEmpty {
                 Task {
-                    let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: unknownInfoIds) ?? []
+                    let profiles = await ChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: unknownInfoIds) ?? []
                     self.fillCache(profiles: profiles)
                     DispatchQueue.main.async {
                         self.processCacheProfiles(values: profiles)
@@ -167,7 +167,7 @@ import UIKit
                 }
             }
         } else {
-            EaseChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: unknownInfoIds, completion: { [weak self] profiles in
+            ChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: unknownInfoIds, completion: { [weak self] profiles in
                 guard let `self` = self else { return }
                 self.fillCache(profiles: profiles)
                 self.processCacheProfiles(values: profiles)
@@ -175,14 +175,14 @@ import UIKit
         }
     }
     
-    private func fillCache(profiles: [EaseProfileProtocol]) {
+    private func fillCache(profiles: [ChatUserProfileProtocol]) {
         for profile in profiles {
-            if let profile = EaseChatUIKitContext.shared?.userCache?[profile.id] {
+            if let profile = ChatUIKitContext.shared?.userCache?[profile.id] {
                 profile.nickname = profile.nickname
                 profile.remark = profile.remark
                 profile.avatarURL = profile.avatarURL
             } else {
-                EaseChatUIKitContext.shared?.userCache?[profile.id] = profile
+                ChatUIKitContext.shared?.userCache?[profile.id] = profile
             }
         }
     }
@@ -198,7 +198,7 @@ import UIKit
         self.reactionUserList.reloadData()
     }
     
-    private func processCacheProfiles(values: [EaseProfileProtocol]) {
+    private func processCacheProfiles(values: [ChatUserProfileProtocol]) {
         for user in self.users {
             for value in values {
                 if value.id == user.id {
@@ -274,11 +274,11 @@ extension MessageReactionsDetailController:UITableViewDelegate,UITableViewDataSo
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if let user = self.users[safe: indexPath.row],user.id == EaseChatUIKitContext.shared?.currentUserId ?? "" {
+        if let user = self.users[safe: indexPath.row],user.id == ChatUIKitContext.shared?.currentUserId ?? "" {
             ChatClient.shared().chatManager?.removeReaction(self.selectedReaction, fromMessage: self.message.messageId, completion: { [weak self] error in
                 guard let `self` = self else { return }
                 if error == nil {
-                    self.users.removeAll { $0.id == EaseChatUIKitContext.shared?.currentUserId ?? "" }
+                    self.users.removeAll { $0.id == ChatUIKitContext.shared?.currentUserId ?? "" }
                     self.needRefresh?()
                 } else {
                     consoleLogInfo("removeReaction error:\(error?.errorDescription ?? "")", type: .error)

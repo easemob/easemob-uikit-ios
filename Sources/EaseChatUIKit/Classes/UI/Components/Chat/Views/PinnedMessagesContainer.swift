@@ -1,6 +1,6 @@
 //
 //  PinnedMessagesContainer.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/6/18.
 //
@@ -180,6 +180,8 @@ extension PinnedMessagesContainer: IPinnedMessagesContainerDriver {
             self.messageList.frame =  CGRect(x: 0, y: self.pinCount.frame.maxY+8, width: self.frame.width, height: self.container.frame.height-34-16-8)
             self.indicator.frame = CGRect(x: self.frame.width/2.0-18, y: self.container.frame.height-10, width: 36, height: 5)
         }
+        
+        self.pinCount.content.text = "\(self.entities.count) "+"Pin Messages".chat.localize
     }
 }
 

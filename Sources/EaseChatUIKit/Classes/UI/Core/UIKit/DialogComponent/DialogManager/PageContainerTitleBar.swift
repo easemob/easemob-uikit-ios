@@ -1,6 +1,6 @@
 //
 //  PageContainer.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/9/1.
 //
@@ -14,7 +14,7 @@ import UIKit
     var chooseClosure: ((Int)->())?
         
     lazy var indicator: UIView = {
-        UIView(frame: CGRect(x: 16+Appearance.pageContainerTitleBarItemWidth/2.0-8, y: self.frame.height-4, width: 16, height: 4)).cornerRadius(2).backgroundColor(UIColor.theme.primaryColor5)
+        UIView(frame: CGRect(x: 16+Appearance.pageContainerTitleBarItemWidth/2.0-8, y: self.frame.height-4, width: 16, height: 4)).cornerRadius(2).backgroundColor(UIColor.theme.primaryLightColor)
     }()
     
     lazy var layout: UICollectionViewFlowLayout = {
@@ -107,7 +107,7 @@ extension PageContainerTitleBar: ThemeSwitchProtocol {
     
     public func switchTheme(style: ThemeStyle) {
         self.backgroundColor(style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98)
-        self.indicator.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
+        self.indicator.backgroundColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor)
         self.choicesBar.reloadData()
     }
 }

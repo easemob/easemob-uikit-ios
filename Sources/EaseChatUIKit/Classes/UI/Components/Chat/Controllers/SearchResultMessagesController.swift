@@ -1,6 +1,6 @@
 //
 //  HistoricalMessagesPreviewController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/2/27.
 //
@@ -55,7 +55,7 @@ import UIKit
         
     }
     
-    public override func onMessageAvatarClicked(user: any EaseProfileProtocol) {
+    public override func onMessageAvatarClicked(user: any ChatUserProfileProtocol) {
         
     }
     
@@ -63,7 +63,7 @@ import UIKit
         
     }
     
-    open override func navigationClick(type: EaseChatNavigationBarClickEvent, indexPath: IndexPath?) {
+    open override func navigationClick(type: ChatNavigationBarClickEvent, indexPath: IndexPath?) {
         self.pop()
     }
 }

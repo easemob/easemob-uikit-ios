@@ -1,5 +1,7 @@
 import UIKit
 
+public let MessageInputBarHeight = CGFloat(52)
+
 @objc public enum MoreMessagePosition: UInt {
     case left
     case center
@@ -36,16 +38,16 @@ import UIKit
     func onMessageContentClicked(message: MessageEntity)
     
     /// The method will call on message content long pressed.
-    /// - Parameter message: ``MessageEntity``
-    func onMessageContentLongPressed(message: MessageEntity)
+    /// - Parameter message: ``MessageCell``
+    func onMessageContentLongPressed(cell: MessageCell)
     
     /// The method will call on message avatar clicked
     /// - Parameter profile: ``EaseProfileProtocol``
-    func onMessageAvatarClicked(profile: EaseProfileProtocol)
+    func onMessageAvatarClicked(profile: ChatUserProfileProtocol)
     
     /// The method will call on message avatar long pressed.
     /// - Parameter profile: ``EaseProfileProtocol``
-    func onMessageAvatarLongPressed(profile: EaseProfileProtocol)
+    func onMessageAvatarLongPressed(profile: ChatUserProfileProtocol)
     
     /// The method will call on input box event occur.
     /// - Parameter type: ``MessageInputBarActionType``
@@ -131,7 +133,7 @@ import UIKit
     
     ///  Add mention user to textfield on needed.
     /// - Parameter user: ``NSAttributedString``
-    func addMentionUserToField(user: EaseProfileProtocol)
+    func addMentionUserToField(user: ChatUserProfileProtocol)
     
     /// Update audio message  on play status changed.
     /// - Parameters:
@@ -215,21 +217,21 @@ import UIKit
     private var replyId = ""
     
     public private(set) lazy var messageList: UITableView = {
-        UITableView(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-52), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).separatorStyle(.none).backgroundColor(.clear)
+        UITableView(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-MessageInputBarHeight), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).separatorStyle(.none).backgroundColor(.clear)
     }()
     
     private var oldFrame = CGRect.zero
         
     public private(set) lazy var inputBar: MessageInputBar = {
-        MessageInputBar(frame: CGRect(x: 0, y: self.frame.height-52-BottomBarHeight, width: self.frame.width, height: 52), text: "", placeHolder: "Aa")
+        MessageInputBar(frame: CGRect(x: 0, y: self.frame.height-MessageInputBarHeight-BottomBarHeight, width: self.frame.width, height: MessageInputBarHeight), text: "", placeHolder: "Aa")
     }()
     
     public private(set) lazy var editBottomBar: MessageMultiSelectedBottomBar = {
-        MessageMultiSelectedBottomBar(frame: CGRect(x: 0, y: self.frame.height-52-BottomBarHeight, width: self.frame.width, height: 52))
+        MessageMultiSelectedBottomBar(frame: CGRect(x: 0, y: self.frame.height-MessageInputBarHeight-BottomBarHeight, width: self.frame.width, height: 52))
     }()
         
     public private(set) lazy var replyBar: MessageInputReplyView = {
-        MessageInputReplyView(frame: CGRect(x: 0, y: self.inputBar.frame.minY-52, width: self.frame.width, height: 53))
+        MessageInputReplyView(frame: CGRect(x: 0, y: self.inputBar.frame.minY-MessageInputBarHeight, width: self.frame.width, height: 53))
     }()
     
     private var moreMessagesCount = 0  {
@@ -316,43 +318,9 @@ import UIKit
         layer0.position = self.moreMessages.center
         self.moreMessages.layer.addSublayer(layer0)
         
-        self.inputBar.axisYChanged = { [weak self] value in
-            guard let `self` = self else { return }
-            DispatchQueue.main.async {
-                UIView.animate(withDuration: 0.22) {
-                    self.replyBar.frame = CGRect(x: 0, y: self.inputBar.frame.minY-52, width: self.frame.width, height: 53)
-                    if self.replyBar.isHidden  {
-                        self.moreMessages.frame = CGRect(x: self.moreMessageAxisX, y: self.inputBar.frame.minY-44, width: 180, height: 36)
-                    } else {
-                        self.moreMessages.frame = CGRect(x: self.moreMessageAxisX, y: self.replyBar.frame.minY-44, width: 180, height: 36)
-                    }
-                }
-            }
-        }
+        self.processInputBarAxisYChanged()
         
-        self.inputBar.textViewFirstResponder = { [weak self] firstResponder in
-            guard let `self` = self else { return }
-            UIView.animate(withDuration: 0.22) {
-                let oldFrame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-52)
-                if firstResponder {
-                    if self.inputBar.keyboardHeight >= 216,self.messageList.frame.height >= oldFrame.height {
-                        if self.getLastVisibleCellCoordinate().maxY > self.inputBar.frame.height+self.inputBar.keyboardHeight {
-                            self.messageList.frame = CGRect(x: 0, y: 0-self.inputBar.keyboardHeight, width: self.messageList.frame.width, height: self.messageList.frame.height)
-                        } else {
-                            self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.messageList.frame.height-self.inputBar.keyboardHeight)
-                        }
-                        
-                        let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
-                        if lastIndexPath.row >= 0 {
-                            self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: true)
-                        }
-                    }
-                
-                } else {
-                    self.messageList.frame = oldFrame
-                }
-            }
-        }
+        self.processInputBarFirstResponder()
         
         self.editBottomBar.operationClosure = { [weak self] in
             self?.bottomMultiSelectedBarEvents(operation: $0)
@@ -380,10 +348,55 @@ import UIKit
         guard let visibleIndexPaths = self.messageList.indexPathsForVisibleRows else { return .zero }
         if let lastIndexPath = visibleIndexPaths.last {
             let cellRect = self.messageList.rectForRow(at: lastIndexPath)
-            let cellCoordinate = self.messageList.convert(cellRect.origin, to: self.messageList)
+            let cellCoordinate = self.messageList.convert(cellRect.origin, to: self)
             return CGRect(origin: cellCoordinate, size: cellRect.size)
         }
         return .zero
+    }
+    
+    private func processInputBarAxisYChanged() {
+        self.inputBar.axisYChanged = { [weak self] value in
+            guard let `self` = self else { return }
+            DispatchQueue.main.async {
+                UIView.animate(withDuration: 0.22) {
+                    self.replyBar.frame = CGRect(x: 0, y: self.inputBar.frame.minY-MessageInputBarHeight, width: self.frame.width, height: 53)
+                    if self.replyBar.isHidden  {
+                        self.moreMessages.frame = CGRect(x: self.moreMessageAxisX, y: self.inputBar.frame.minY-44, width: 180, height: 36)
+                    } else {
+                        self.moreMessages.frame = CGRect(x: self.moreMessageAxisX, y: self.replyBar.frame.minY-44, width: 180, height: 36)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func processInputBarFirstResponder() {
+        self.inputBar.textViewFirstResponder = { [weak self] firstResponder in
+            guard let `self` = self else { return }
+            UIView.animate(withDuration: 0.22) {
+                let oldFrame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-MessageInputBarHeight)
+                if firstResponder {
+                    consoleLogInfo("self.inputBar.keyboardHeight: \(self.inputBar.keyboardHeight)", type: .debug)
+                    var space = 0
+                    if self.inputBar.keyboardHeight == 132 || self.inputBar.keyboardHeight == 230 {
+                        space = Int(BottomBarHeight*2)
+                    }
+                    var raiseHeight = self.inputBar.keyboardHeight
+                    if raiseHeight > 336 {
+                        raiseHeight = 336
+                    }
+                    self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.frame.height-self.inputBar.frame.height-raiseHeight+CGFloat(space))
+                    
+                    let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
+                    if lastIndexPath.row >= 0 {
+                        self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: false)
+                    }
+                
+                } else {
+                    self.messageList.frame = oldFrame
+                }
+            }
+        }
     }
     
     required public init?(coder: NSCoder) {
@@ -463,8 +476,8 @@ extension MessageListView: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         self.moreMessages.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
         self.moreMessages.layerProperties(style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9, 0.5)
-        self.moreMessages.setTitleColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, for: .normal)
-        self.moreMessages.image(UIImage(named: "more_messages", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5), .normal)
+        self.moreMessages.setTitleColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor, for: .normal)
+        self.moreMessages.image(UIImage(named: "more_messages", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor), .normal)
         self.messageList.reloadData()
     }
     
@@ -496,7 +509,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
             self?.handleClick(area: $0, entity: $1)
         }
         cell?.longPressAction = { [weak self] in
-            self?.handleLongPressed(area: $0, entity: $1)
+            self?.handleLongPressed(area: $0, entity: $1, cell: $2)
         }
         cell?.reactionClicked = { [weak self] in
             self?.processReactionEmojiClick(reaction: $0, entity: $1)
@@ -639,7 +652,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                 if let user = entity.message.user {
                     ComponentViewsActionHooker.shared.chat.avatarClicked?(user)
                 } else {
-                    let user = EaseProfile()
+                    let user = ChatUserProfile()
                     user.id = entity.message.from
                     ComponentViewsActionHooker.shared.chat.avatarClicked?(user)
                 }
@@ -648,7 +661,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                     if let user = entity.message.user {
                         handler.onMessageAvatarClicked(profile: user)
                     } else {
-                        let user = EaseProfile()
+                        let user = ChatUserProfile()
                         user.id = entity.message.from
                         handler.onMessageAvatarClicked(profile: user)
                     }
@@ -689,6 +702,17 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
             for handler in self.eventHandlers.allObjects {
                 handler.onMessageReactionClicked(reaction: nil, entity: entity)
             }
+        case .cell:
+            if entity.message.body.type == .custom {
+                if ComponentViewsActionHooker.shared.chat.bubbleClicked != nil {
+                    ComponentViewsActionHooker.shared.chat.bubbleClicked?(entity)
+                } else {
+                    for handler in self.eventHandlers.allObjects {
+                        handler.onMessageContentClicked(message: entity)
+                    }
+                    
+                }
+            }
         default:
             break
         }
@@ -704,13 +728,13 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
         }
     }
         
-    private func handleLongPressed(area: MessageCellClickArea,entity: MessageEntity) {
+    private func handleLongPressed(area: MessageCellClickArea,entity: MessageEntity,cell: MessageCell) {
         if area == .bubble {
             if ComponentViewsActionHooker.shared.chat.bubbleLongPressed != nil {
                 ComponentViewsActionHooker.shared.chat.bubbleLongPressed?(entity)
             } else {
                 for handler in self.eventHandlers.allObjects {
-                    handler.onMessageContentLongPressed(message: entity)
+                    handler.onMessageContentLongPressed(cell: cell)
                 }
             }
         } else {
@@ -718,7 +742,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                 if let user = entity.message.user {
                     ComponentViewsActionHooker.shared.chat.avatarLongPressed?(user)
                 } else {
-                    let user = EaseProfile()
+                    let user = ChatUserProfile()
                     user.id = entity.message.from
                     ComponentViewsActionHooker.shared.chat.avatarLongPressed?(user)
                 }
@@ -727,7 +751,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                     if let user = entity.message.user {
                         handler.onMessageAvatarLongPressed(profile: user)
                     } else {
-                        let user = EaseProfile()
+                        let user = ChatUserProfile()
                         user.id = entity.message.from
                         handler.onMessageAvatarLongPressed(profile: user)
                     }
@@ -930,7 +954,7 @@ extension MessageListView: IMessageListViewDriver {
         }
     }
     
-    public func addMentionUserToField(user: EaseProfileProtocol) {
+    public func addMentionUserToField(user: ChatUserProfileProtocol) {
         let result = NSMutableAttributedString(attributedString: self.inputBar.inputField.attributedText)
         let key = NSAttributedString.Key("mentionInfo")
         var nickName = user.remark
@@ -1077,7 +1101,7 @@ extension MessageListView: IMessageListViewDriver {
     }
     
     @objc open func scrollToBottom() {
-        let bottomOffset = CGPoint(x: 0, y: self.messageList.contentSize.height - self.messageList.bounds.size.height + self.messageList.contentInset.bottom + 52)
+        let bottomOffset = CGPoint(x: 0, y: self.messageList.contentSize.height - self.messageList.bounds.size.height + self.messageList.contentInset.bottom + MessageInputBarHeight)
         self.messageList.setContentOffset(bottomOffset, animated: true)
     }
     
@@ -1205,4 +1229,6 @@ extension MessageListView: IMessageListViewDriver {
     
     
 }
+
+
 

@@ -188,7 +188,7 @@ extension ConversationList: UITableViewDelegate,UITableViewDataSource {
                         listener.onConversationSwipe(type: .pin, info: info)
                     }
                     completion(true)
-                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).icon(image: UIImage(named: "pin", in: .chatBundle, with: nil))
+                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor).icon(image: UIImage(named: "pin", in: .chatBundle, with: nil))
             case .unpin:
                 return UIContextualActionChatUIKit(title: "conversation_left_slide_menu_unpin".chat.localize, style: .normal, actionType: $0) { (action, view, completion) in
                     if let hooker = ComponentViewsActionHooker.shared.conversation.swipeAction {
@@ -199,7 +199,7 @@ extension ConversationList: UITableViewDelegate,UITableViewDataSource {
                         }
                     }
                     completion(true)
-                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).icon(image: UIImage(named: "unpin", in: .chatBundle, with: nil))
+                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor).icon(image: UIImage(named: "unpin", in: .chatBundle, with: nil))
             case .unmute:
                 return UIContextualActionChatUIKit(title: "conversation_left_slide_menu_unmute".chat.localize, style: .normal, actionType: $0) { (action, view, completion) in
                     for listener in self.eventHandlers.allObjects {
@@ -254,7 +254,7 @@ extension ConversationList: IConversationListDriver {
         self.reloadData()
     }
     
-    public func refreshProfiles(infos: [EaseProfileProtocol]) {
+    public func refreshProfiles(infos: [ChatUserProfileProtocol]) {
         
         for info in infos {
             if let index = self.indexMap[info.id], let item = self.datas[safe: index] {
@@ -424,7 +424,7 @@ extension ConversationList: ThemeSwitchProtocol {
     
     /// This method can be used when you want refresh some  display info  of datas.
     /// - Parameter infos: Array of conform ``EaseProfileProtocol`` object.
-    func refreshProfiles(infos: [EaseProfileProtocol])
+    func refreshProfiles(infos: [ChatUserProfileProtocol])
     
     /// This method can be used when pulling down to refresh.
     /// - Parameter infos: Array of ConversationInfo objects.

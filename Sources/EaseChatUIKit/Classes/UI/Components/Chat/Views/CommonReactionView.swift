@@ -1,6 +1,6 @@
 //
 //  CommonReactionView.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/1/30.
 //
@@ -22,7 +22,7 @@ fileprivate let space = Int((ScreenWidth-10-CGFloat((Appearance.chat.commonReact
         let flow = UICollectionViewFlowLayout()
         flow.itemSize = CGSize(width: 36, height: 36)
         flow.minimumLineSpacing = 0
-        flow.minimumInteritemSpacing = CGFloat(space)
+        flow.minimumInteritemSpacing = CGFloat(19)
         return flow
     }()
     

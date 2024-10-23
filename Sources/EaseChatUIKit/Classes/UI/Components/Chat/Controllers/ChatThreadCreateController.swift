@@ -1,6 +1,6 @@
 //
 //  ChatThreadCreateController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/1/24.
 //
@@ -30,8 +30,8 @@ import AVFoundation
         return entity
     }()
     
-    public private(set) lazy var navigation: EaseChatNavigationBar = {
-        EaseChatNavigationBar(showLeftItem: true,textAlignment: .left,hiddenAvatar: true)
+    public private(set) lazy var navigation: ChatNavigationBar = {
+        ChatNavigationBar(showLeftItem: true,textAlignment: .left,hiddenAvatar: true)
     }()
     
     public private(set) lazy var messageHeader: UITableView = {
@@ -257,6 +257,8 @@ import AVFoundation
 }
 
 extension ChatThreadCreateController: MessageListViewActionEventsDelegate {
+    public func onMessageContentLongPressed(cell: MessageCell) { }
+    
     public func onMessageListLoadMore() {
         
     }
@@ -275,11 +277,10 @@ extension ChatThreadCreateController: MessageListViewActionEventsDelegate {
     
     public func onMessageContentClicked(message: MessageEntity) { }
     
-    public func onMessageContentLongPressed(message: MessageEntity) { }
     
-    public func onMessageAvatarClicked(profile: EaseProfileProtocol) { }
+    public func onMessageAvatarClicked(profile: ChatUserProfileProtocol) { }
     
-    public func onMessageAvatarLongPressed(profile: EaseProfileProtocol) { }
+    public func onMessageAvatarLongPressed(profile: ChatUserProfileProtocol) { }
     
     public func onInputBoxEventsOccur(action type: MessageInputBarActionType, attributeText: NSAttributedString?) {
         if type == .send {

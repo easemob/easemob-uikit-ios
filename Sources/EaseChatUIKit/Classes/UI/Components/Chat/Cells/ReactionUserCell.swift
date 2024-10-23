@@ -1,6 +1,6 @@
 //
 //  ReactionUserCell.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/1/30.
 //
@@ -62,14 +62,14 @@ import UIKit
     
     }
     
-    @objc open func refresh(profile: EaseProfileProtocol) {
+    @objc open func refresh(profile: ChatUserProfileProtocol) {
         self.nickName.textColor = Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
         
         var nickName = profile.id
         var avatarURL = profile.avatarURL
-        var info = EaseChatUIKitContext.shared?.chatCache?[profile.id]
+        var info = ChatUIKitContext.shared?.chatCache?[profile.id]
         if info == nil {
-            info = EaseChatUIKitContext.shared?.userCache?[profile.id]
+            info = ChatUIKitContext.shared?.userCache?[profile.id]
         }
         if let info = info {
             if !info.nickname.isEmpty {
@@ -93,7 +93,7 @@ import UIKit
             image = image?.withTintColor(UIColor.theme.neutralColor7)
         }
         self.trash.image = image
-        self.trash.isHidden = EaseChatUIKitContext.shared?.currentUserId ?? "" != profile.id
+        self.trash.isHidden = ChatUIKitContext.shared?.currentUserId ?? "" != profile.id
         self.separatorLine.backgroundColor = Theme.style == .dark ? UIColor.theme.neutralColor3:UIColor.theme.neutralColor9
     }
 

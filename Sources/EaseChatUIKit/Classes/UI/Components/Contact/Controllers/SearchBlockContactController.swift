@@ -1,6 +1,6 @@
 //
 //  SearchBlockContactController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/6/5.
 //
@@ -11,11 +11,11 @@ import UIKit
 
     private var searchKeyWord = ""
     
-    public var rawDatas = [EaseProfileProtocol]()
+    public var rawDatas = [ChatUserProfileProtocol]()
     
-    private var selectClosure: ((EaseProfileProtocol) -> Void)?
+    private var selectClosure: ((ChatUserProfileProtocol) -> Void)?
          
-    public private(set) var searchResults = [EaseProfileProtocol]()
+    public private(set) var searchResults = [ChatUserProfileProtocol]()
     
     public private(set) lazy var searchController: UISearchController = {
         let searchController = UISearchController(searchResultsController: nil)
@@ -42,7 +42,7 @@ import UIKit
     /// - Parameters:
     ///   - headerStyle: ``ContactListHeaderStyle``
     ///   - action: Select row callback.
-    @objc public required init(action: @escaping (EaseProfileProtocol) -> Void) {
+    @objc public required init(action: @escaping (ChatUserProfileProtocol) -> Void) {
         self.selectClosure = action
         super.init(nibName: nil, bundle: nil)
     }
@@ -71,11 +71,11 @@ import UIKit
     @objc public func loadAllBlockUsers() {
         if let users = ChatClient.shared().contactManager?.getBlackList() {
             let infos = users.map({
-                let profile = EaseProfile()
+                let profile = ChatUserProfile()
                 profile.id = $0
-                profile.nickname = EaseChatUIKitContext.shared?.userCache?[$0]?.nickname ?? ""
-                profile.avatarURL = EaseChatUIKitContext.shared?.userCache?[$0]?.avatarURL ?? ""
-                profile.remark = EaseChatUIKitContext.shared?.userCache?[$0]?.remark ?? ""
+                profile.nickname = ChatUIKitContext.shared?.userCache?[$0]?.nickname ?? ""
+                profile.avatarURL = ChatUIKitContext.shared?.userCache?[$0]?.avatarURL ?? ""
+                profile.remark = ChatUIKitContext.shared?.userCache?[$0]?.remark ?? ""
                 return profile
             })
             self.rawDatas.removeAll()

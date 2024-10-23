@@ -1,6 +1,6 @@
 //
 //  ChatHistoryViewController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/1/24.
 //
@@ -13,11 +13,11 @@ import UIKit
     
     public private(set) var messages = [MessageEntity]()
     
-    @objc open func createNavigation() -> EaseChatNavigationBar {
-        EaseChatNavigationBar(showLeftItem: true,textAlignment: .left,rightImages: [],hiddenAvatar: true)
+    @objc open func createNavigation() -> ChatNavigationBar {
+        ChatNavigationBar(showLeftItem: true,textAlignment: .left,rightImages: [],hiddenAvatar: true)
     }
     
-    public private(set) lazy var navigation: EaseChatNavigationBar = {
+    public private(set) lazy var navigation: ChatNavigationBar = {
         self.createNavigation()
     }()
     
@@ -55,7 +55,7 @@ import UIKit
         - type: The type of navigation bar click event.
         - indexPath: The index path associated with the event (optional).
      */
-    @objc open func navigationClick(type: EaseChatNavigationBarClickEvent, indexPath: IndexPath?) {
+    @objc open func navigationClick(type: ChatNavigationBarClickEvent, indexPath: IndexPath?) {
         switch type {
         case .back: self.pop()
         case .rightItems: self.rightItemsAction(indexPath: indexPath)

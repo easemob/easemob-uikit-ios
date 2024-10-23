@@ -1,6 +1,6 @@
 //
 //  ChatServiceImplement.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/6.
 //
@@ -112,30 +112,30 @@ extension ChatServiceImplement: ChatService {
     }
     
     public func loadMessages(start messageId: String, pageSize: UInt, searchMessage: Bool, completion: @escaping (ChatError?, [ChatMessage]) -> Void) {
-        if EaseChatUIKitContext.shared?.chatCache == nil {
-            EaseChatUIKitContext.shared?.chatCache = [String:EaseProfileProtocol]()
+        if ChatUIKitContext.shared?.chatCache == nil {
+            ChatUIKitContext.shared?.chatCache = [String:ChatUserProfileProtocol]()
         }
-        if EaseChatUIKitClient.shared.option.option_UI.loadLocalHistoryMessages {
+        if ChatUIKitClient.shared.option.option_UI.loadLocalHistoryMessages {
             ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.loadMessagesStart(fromId: messageId, count: Int32(pageSize), searchDirection: searchMessage ? .down:.up,completion: { messages, error in
                 if error == nil,let messages = messages {
                     for message in messages {
                         if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-                            if let user = EaseChatUIKitContext.shared?.chatCache?[message.from] as? EaseProfile,user.modifyTime < message.timestamp {
-                                let user = EaseProfile()
+                            if let user = ChatUIKitContext.shared?.chatCache?[message.from] as? ChatUserProfile,user.modifyTime < message.timestamp {
+                                let user = ChatUserProfile()
                                 user.setValuesForKeys(dic)
                                 if user.id.isEmpty {
                                     user.id = message.from
                                 }
                                 user.modifyTime = message.timestamp
-                                EaseChatUIKitContext.shared?.chatCache?[message.from] = user
+                                ChatUIKitContext.shared?.chatCache?[message.from] = user
                             } else {
-                                let user = EaseProfile()
+                                let user = ChatUserProfile()
                                 user.setValuesForKeys(dic)
                                 if user.id.isEmpty {
                                     user.id = message.from
                                 }
                                 user.modifyTime = message.timestamp
-                                EaseChatUIKitContext.shared?.chatCache?[message.from] = user
+                                ChatUIKitContext.shared?.chatCache?[message.from] = user
                             }
                         }
                         if let dic = message.ext?["ease_chat_uikit_text_url_preview"] as? Dictionary<String,String>,let url = dic["url"] {
@@ -162,22 +162,22 @@ extension ChatServiceImplement: ChatService {
                 if error == nil,let messages = result?.list {
                     for message in messages {
                         if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-                            if let user = EaseChatUIKitContext.shared?.chatCache?[message.from] as? EaseProfile,user.modifyTime < message.timestamp {
-                                let user = EaseProfile()
+                            if let user = ChatUIKitContext.shared?.chatCache?[message.from] as? ChatUserProfile,user.modifyTime < message.timestamp {
+                                let user = ChatUserProfile()
                                 user.setValuesForKeys(dic)
                                 if user.id.isEmpty {
                                     user.id = message.from
                                 }
                                 user.modifyTime = message.timestamp
-                                EaseChatUIKitContext.shared?.chatCache?[message.from] = user
+                                ChatUIKitContext.shared?.chatCache?[message.from] = user
                             } else {
-                                let user = EaseProfile()
+                                let user = ChatUserProfile()
                                 user.setValuesForKeys(dic)
                                 if user.id.isEmpty {
                                     user.id = message.from
                                 }
                                 user.modifyTime = message.timestamp
-                                EaseChatUIKitContext.shared?.chatCache?[message.from] = user
+                                ChatUIKitContext.shared?.chatCache?[message.from] = user
                             }
                         }
                     }
@@ -291,7 +291,7 @@ extension ChatServiceImplement: ChatEventsListener {
     }
     
     public func onConversationRead(_ from: String, to: String) {
-        if EaseChatUIKitContext.shared?.currentUserId ?? "" != from {
+        if ChatUIKitContext.shared?.currentUserId ?? "" != from {
             for listener in self.responseDelegates.allObjects {
                 listener.messagesAlreadyRead(conversationId: from)
             }

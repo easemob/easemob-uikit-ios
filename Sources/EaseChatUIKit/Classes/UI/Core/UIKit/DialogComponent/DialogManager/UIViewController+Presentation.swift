@@ -79,7 +79,7 @@ public extension UIViewController {
 }
 
 // MARK: -  UIViewControllerTransitioningDelegate
-extension UIViewController: UIViewControllerTransitioningDelegate {
+extension UIViewController: @retroactive UIViewControllerTransitioningDelegate {
     public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
         return PresentationController(presentedViewController: presented, presenting: presenting)
     }

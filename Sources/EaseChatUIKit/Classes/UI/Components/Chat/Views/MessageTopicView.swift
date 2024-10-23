@@ -1,6 +1,6 @@
 //
 //  MessageTopicView.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/1/16.
 //
@@ -76,10 +76,10 @@ extension MessageTopicView: ThemeSwitchProtocol {
         }
         self.icon.image = image
         self.title.textColor = textColor
-        self.messageCount.textColor = style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        self.messageCount.textColor = style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor
         var indicatorImage = UIImage(named: "topic_indicator", in: .chatBundle, with: nil)
         if style == .light {
-            indicatorImage = indicatorImage?.withTintColor(UIColor.theme.primaryColor5)
+            indicatorImage = indicatorImage?.withTintColor(UIColor.theme.primaryLightColor)
         }
         self.indicator.image = indicatorImage
     }

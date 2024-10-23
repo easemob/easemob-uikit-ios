@@ -1,6 +1,6 @@
 //
 //  ContactViewModel.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/21.
 //
@@ -12,7 +12,7 @@ import UIKit
     
     public private(set) var ignoreContacts: [String] = []
     
-    @objc public var viewContact: ((EaseProfileProtocol) -> Void)?
+    @objc public var viewContact: ((ChatUserProfileProtocol) -> Void)?
     
     public var notifySelf = false
     
@@ -114,7 +114,7 @@ import UIKit
         })
     }
     
-    @objc open func filterContacts(contacts: [Contact]) -> [EaseProfileProtocol] {
+    @objc open func filterContacts(contacts: [Contact]) -> [ChatUserProfileProtocol] {
         var users = [Contact]()
         if self.ignoreContacts.isEmpty {
             users.append(contentsOf: contacts)
@@ -126,20 +126,20 @@ import UIKit
             }
         }
         let infos = users.map({
-            let profile = EaseProfile()
+            let profile = ChatUserProfile()
             profile.id = $0.userId
-            profile.nickname = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
-            profile.avatarURL = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
+            profile.nickname = ChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
+            profile.avatarURL = ChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
             var remark = $0.remark ?? ""
             if remark.isEmpty {
-                remark = EaseChatUIKitContext.shared?.userCache?[$0.userId]?.remark ?? ""
+                remark = ChatUIKitContext.shared?.userCache?[$0.userId]?.remark ?? ""
             }
             profile.remark = remark
-            EaseChatUIKitContext.shared?.userCache?[$0.userId]?.remark = remark
+            ChatUIKitContext.shared?.userCache?[$0.userId]?.remark = remark
             return profile
         })
         self.notifySelf = true
-        EaseChatUIKitContext.shared?.updateCaches(type: .user, profiles: infos)
+        ChatUIKitContext.shared?.updateCaches(type: .user, profiles: infos)
         return infos
     }
     
@@ -154,7 +154,7 @@ import UIKit
         self.newFriends[saveIdentifier]?.removeAll()
         self.newFriends[saveIdentifier] = friends
         if let implement = self.service as? ContactServiceImplement {
-            implement.handleResult(error: nil, type: .cleanFriendBadge, operatorId: EaseChatUIKitContext.shared?.currentUserId ?? "")
+            implement.handleResult(error: nil, type: .cleanFriendBadge, operatorId: ChatUIKitContext.shared?.currentUserId ?? "")
         }
     }
 }
@@ -165,7 +165,7 @@ extension ContactViewModel: ContactEventsResponse {
     }
     
     @objc open func processFriendDidAgree(userId: String) {
-        let profile = EaseProfile()
+        let profile = ChatUserProfile()
         profile.id = userId
         self.driver?.appendThenRefresh(info: profile)
     }
@@ -183,7 +183,7 @@ extension ContactViewModel: ContactEventsResponse {
     }
     
     @objc open func processFriendshipDidRemove(userId: String) {
-        let profile = EaseProfile()
+        let profile = ChatUserProfile()
         profile.id = userId
         self.driver?.remove(info: profile)
     }
@@ -232,7 +232,7 @@ extension ContactViewModel: MultiDeviceListener {
         case .contactAccept:
             self.addContact(userId: userId)
         case .contactRemove:
-            let profile = EaseProfile()
+            let profile = ChatUserProfile()
             profile.id = userId
             self.driver?.remove(info: profile)
         default:
@@ -267,18 +267,18 @@ extension ContactViewModel: ContactListActionEventsDelegate {
     }
     
     @objc open func requestDisplayInfos(ids: [String]) {
-        if EaseChatUIKitContext.shared?.userProfileProvider != nil {
+        if ChatUIKitContext.shared?.userProfileProvider != nil {
             Task(priority: .background) { [weak self] in
                 guard let `self` = self else { return }
-                let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: ids) ?? []
+                let profiles = await ChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: ids) ?? []
                 self.cacheProfiles(profiles: profiles)
                 DispatchQueue.main.async {
                     self.driver?.refreshProfiles(infos: profiles)
                 }
             }
         }
-        if EaseChatUIKitContext.shared?.userProfileProviderOC != nil {
-            EaseChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: ids, completion: {[weak self] profiles in
+        if ChatUIKitContext.shared?.userProfileProviderOC != nil {
+            ChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: ids, completion: {[weak self] profiles in
                 self?.cacheProfiles(profiles: profiles)
                 self?.driver?.refreshProfiles(infos: profiles)
             })
@@ -286,15 +286,15 @@ extension ContactViewModel: ContactListActionEventsDelegate {
         }
     }
     
-    @objc open func cacheProfiles(profiles: [EaseProfileProtocol]) {
+    @objc open func cacheProfiles(profiles: [ChatUserProfileProtocol]) {
         for profile in profiles {
-            EaseChatUIKitContext.shared?.userCache?[profile.id]?.nickname = profile.nickname
-            EaseChatUIKitContext.shared?.userCache?[profile.id]?.remark = profile.remark
-            EaseChatUIKitContext.shared?.userCache?[profile.id]?.avatarURL = profile.avatarURL
+            ChatUIKitContext.shared?.userCache?[profile.id]?.nickname = profile.nickname
+            ChatUIKitContext.shared?.userCache?[profile.id]?.remark = profile.remark
+            ChatUIKitContext.shared?.userCache?[profile.id]?.avatarURL = profile.avatarURL
         }
     }
     
-    public func didSelected(indexPath: IndexPath, profile: EaseProfileProtocol) {
+    public func didSelected(indexPath: IndexPath, profile: ChatUserProfileProtocol) {
          self.viewContact?(profile)
     }
     

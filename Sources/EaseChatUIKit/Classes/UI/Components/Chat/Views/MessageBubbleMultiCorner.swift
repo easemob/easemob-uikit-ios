@@ -1,6 +1,6 @@
 //
 //  MessageMultiCornerBubble.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/9.
 //
@@ -43,7 +43,7 @@ import UIKit
     func updateBubbleCorner() {
         let shapeLayer = CAShapeLayer()
         let receiveColor = Theme.style == .dark ? UIColor.theme.primaryColor2:UIColor.theme.primaryColor95
-        let sendColor = Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5
+        let sendColor = Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor
         let path = self.roundedRect(bounds: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height))
         shapeLayer.path = path
         self.layer.mask = shapeLayer

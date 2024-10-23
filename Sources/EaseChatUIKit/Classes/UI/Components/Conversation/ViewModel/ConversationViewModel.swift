@@ -1,6 +1,6 @@
 //
 //  ConversationViewModel.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/14.
 //
@@ -99,7 +99,7 @@ public let disturb_change = "EaseUIKit_do_not_disturb_changed"
     ///   - text: Welcome message.
     /// - Returns: ``ConversationInfo`` object.
     @objc(loadIfNotExistCreateWithProfile:type:text:)
-    open func loadIfNotExistCreate(profile: EaseProfileProtocol,type: ChatConversationType,text: String) -> ConversationInfo? {
+    open func loadIfNotExistCreate(profile: ChatUserProfileProtocol,type: ChatConversationType,text: String) -> ConversationInfo? {
         if let conversation = self.service?.loadIfNotExistCreate(conversationId: profile.id,type: type) {
             if let info = self.mapper(objects: [conversation]).first,!info.id.isEmpty {
                 if conversation.type == .groupChat {
@@ -158,38 +158,38 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
                 }
             }
         }
-        if EaseChatUIKitContext.shared?.userProfileProvider != nil {
+        if ChatUIKitContext.shared?.userProfileProvider != nil {
             let userIds = privateChats.map { $0 }
             Task(priority: .background) { [weak self] in
                 guard let `self` = self else { return }
-                let profiles = await EaseChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: userIds) ?? []
+                let profiles = await ChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: userIds) ?? []
                 self.cacheUser(profiles: profiles)
                 DispatchQueue.main.async {
                     self.renderDriver(infos: profiles)
                 }
             }
         }
-        if EaseChatUIKitContext.shared?.groupProfileProvider != nil {
+        if ChatUIKitContext.shared?.groupProfileProvider != nil {
             let groupIds = groupChats
             Task(priority: .background) { [weak self] in
                 guard let `self` = self else { return }
-                let profiles = await EaseChatUIKitContext.shared?.groupProfileProvider?.fetchGroupProfiles(profileIds: groupIds) ?? []
+                let profiles = await ChatUIKitContext.shared?.groupProfileProvider?.fetchGroupProfiles(profileIds: groupIds) ?? []
                 self.cacheGroup(profiles: profiles)
                 DispatchQueue.main.async {
                     self.driver?.refreshProfiles(infos: profiles)
                 }
             }
         }
-        if EaseChatUIKitContext.shared?.userProfileProviderOC != nil {
-            EaseChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: privateChats, completion: { [weak self] profiles in
+        if ChatUIKitContext.shared?.userProfileProviderOC != nil {
+            ChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: privateChats, completion: { [weak self] profiles in
                 self?.cacheUser(profiles: profiles)
                 DispatchQueue.main.async {
                     self?.driver?.refreshProfiles(infos: profiles)
                 }
             })
         }
-        if EaseChatUIKitContext.shared?.groupProfileProviderOC != nil {
-            EaseChatUIKitContext.shared?.groupProfileProviderOC?.fetchGroupProfiles(profileIds: groupChats, completion: { [weak self] profiles in
+        if ChatUIKitContext.shared?.groupProfileProviderOC != nil {
+            ChatUIKitContext.shared?.groupProfileProviderOC?.fetchGroupProfiles(profileIds: groupChats, completion: { [weak self] profiles in
                 self?.cacheGroup(profiles: profiles)
                 DispatchQueue.main.async {
                     self?.driver?.refreshProfiles(infos: profiles)
@@ -199,23 +199,23 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         
     }
     
-    @objc open func cacheUser(profiles: [EaseProfileProtocol]) {
+    @objc open func cacheUser(profiles: [ChatUserProfileProtocol]) {
         for profile in profiles {
-            EaseChatUIKitContext.shared?.userCache?[profile.id]?.nickname = profile.nickname
-            EaseChatUIKitContext.shared?.userCache?[profile.id]?.remark = profile.remark
-            EaseChatUIKitContext.shared?.userCache?[profile.id]?.avatarURL = profile.avatarURL
+            ChatUIKitContext.shared?.userCache?[profile.id]?.nickname = profile.nickname
+            ChatUIKitContext.shared?.userCache?[profile.id]?.remark = profile.remark
+            ChatUIKitContext.shared?.userCache?[profile.id]?.avatarURL = profile.avatarURL
         }
     }
     
-    @objc open func cacheGroup(profiles: [EaseProfileProtocol]) {
+    @objc open func cacheGroup(profiles: [ChatUserProfileProtocol]) {
         for profile in profiles {
-            EaseChatUIKitContext.shared?.groupCache?[profile.id]?.nickname = profile.nickname
-            EaseChatUIKitContext.shared?.groupCache?[profile.id]?.avatarURL = profile.avatarURL
-            EaseChatUIKitContext.shared?.groupCache?[profile.id]?.remark = profile.remark
+            ChatUIKitContext.shared?.groupCache?[profile.id]?.nickname = profile.nickname
+            ChatUIKitContext.shared?.groupCache?[profile.id]?.avatarURL = profile.avatarURL
+            ChatUIKitContext.shared?.groupCache?[profile.id]?.remark = profile.remark
         }
     }
     
-    @objc open func renderDriver(infos: [EaseProfileProtocol]) {
+    @objc open func renderDriver(infos: [ChatUserProfileProtocol]) {
         self.driver?.refreshProfiles(infos: infos)
     }
     
@@ -262,7 +262,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
             if error != nil {
                 consoleLogInfo("onConversationSwipe mute:\(error?.errorDescription ?? "")", type: .error)
             } else {
-                let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
+                let currentUser = ChatUIKitContext.shared?.currentUserId ?? ""
                 var conversationMap = self?.muteMap[currentUser]
                 if conversationMap != nil {
                     conversationMap?[info.id] = 1
@@ -310,7 +310,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
             if error != nil {
                 consoleLogInfo("onConversationSwipe unmute:\(error?.errorDescription ?? "")", type: .error)
             } else {
-                let currentUser = EaseChatUIKitContext.shared?.currentUserId ?? ""
+                let currentUser = ChatUIKitContext.shared?.currentUserId ?? ""
                 var conversationMap = self.muteMap[currentUser]
                 if conversationMap != nil {
                     conversationMap?[info.id] = 0
@@ -405,7 +405,7 @@ extension ConversationViewModel: ConversationServiceListener {
             }
             self.service?.notifyUnreadCount(count: count)
             self.driver?.refreshList(infos: items)
-            if !info.doNotDisturb,EaseChatUIKitClient.shared.option.option_UI.soundOnReceivedNewMessage,UIApplication.shared.applicationState == .active,self.chatId != info.id {
+            if !info.doNotDisturb,ChatUIKitClient.shared.option.option_UI.soundOnReceivedNewMessage,UIApplication.shared.applicationState == .active,self.chatId != info.id {
                 self.playNewMessageSound()
             }
         }
@@ -490,12 +490,12 @@ extension ConversationViewModel: MultiDeviceListener {
             let conversation = ComponentsRegister.shared.Conversation.init()
             conversation.id = $0.conversationId
             var nickname = ""
-            var profile: EaseProfileProtocol?
+            var profile: ChatUserProfileProtocol?
             if $0.type == .chat {
-                profile = EaseChatUIKitContext.shared?.userCache?[$0.conversationId]
+                profile = ChatUIKitContext.shared?.userCache?[$0.conversationId]
             } else {
-                profile = EaseChatUIKitContext.shared?.groupCache?[$0.conversationId]
-                if EaseChatUIKitContext.shared?.groupProfileProvider == nil,EaseChatUIKitContext.shared?.groupProfileProviderOC == nil {
+                profile = ChatUIKitContext.shared?.groupCache?[$0.conversationId]
+                if ChatUIKitContext.shared?.groupProfileProvider == nil,ChatUIKitContext.shared?.groupProfileProviderOC == nil {
                     profile?.nickname = ChatGroup(id: $0.conversationId).groupName ?? ""
                 }
             }
@@ -510,13 +510,13 @@ extension ConversationViewModel: MultiDeviceListener {
             }
             conversation.unreadCount = UInt($0.unreadMessagesCount)
             conversation.lastMessage = $0.latestMessage
-            conversation.type = EaseProfileProviderType(rawValue: UInt($0.type.rawValue)) ?? .chat
+            conversation.type = ChatUserProfileProviderType(rawValue: UInt($0.type.rawValue)) ?? .chat
             conversation.pinned = $0.isPinned
             conversation.nickname = profile?.nickname ?? ""
             conversation.remark = profile?.remark ?? ""
             conversation.avatarURL = profile?.avatarURL ?? ""
             conversation.doNotDisturb = false
-            if let silentMode = self.muteMap[EaseChatUIKitContext.shared?.currentUserId ?? ""]?[$0.conversationId] {
+            if let silentMode = self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""]?[$0.conversationId] {
                 conversation.doNotDisturb = silentMode != 0
             }
             

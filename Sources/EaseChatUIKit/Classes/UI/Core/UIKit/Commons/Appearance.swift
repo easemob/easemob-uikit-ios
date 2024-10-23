@@ -101,8 +101,8 @@ import UIKit
     lazy public var listMoreActions: [ActionSheetItemProtocol] = {
         [
             ActionSheetItem(title: "new_chat_button_click_menu_selectcontacts".chat.localize, type: .normal, tag: "SelectContacts", image: UIImage(named: "chatWith", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "new_chat_button_click_menu_addcontacts".chat.localize, type: .normal, tag: "AddContact", image: UIImage(named: "person_add_fill", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor5)),
-            ActionSheetItem(title: "new_chat_button_click_menu_creategroup".chat.localize, type: .normal, tag: "CreateGroup", image: UIImage(named: "create_group", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor5))
+            ActionSheetItem(title: "new_chat_button_click_menu_addcontacts".chat.localize, type: .normal, tag: "AddContact", image: UIImage(named: "person_add_fill", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryLightColor)),
+            ActionSheetItem(title: "new_chat_button_click_menu_creategroup".chat.localize, type: .normal, tag: "CreateGroup", image: UIImage(named: "create_group", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryLightColor))
         ]
     }()
 }
@@ -271,6 +271,23 @@ import UIKit
     /// Whether enable URL preview or not.
     public var enableURLPreview = true
     
+    /// Choose to show the message long press menu style.
+    public var messageLongPressMenuStyle: MessageLongPressMenuStyle = .withArrow
+    
+    /// Choose to show the message attachment menu style.
+    public var messageAttachmentMenuStyle: MessageAttachmentMenuStyle = .followInput
+    
+}
+
+@objc public enum MessageAttachmentMenuStyle: UInt8 {
+    case followInput //A menu that follows the input box,like WeChat.
+    case actionSheet //A menu with an actionSheet,like iOS system ``UIActionSheet``.
+}
+
+@objc public enum MessageLongPressMenuStyle: UInt8 {
+//    case system //A system menu,like iMessage.
+    case withArrow //A menu with an arrow,like we-chat message long press menu.
+    case actionSheet //A menu with an actionSheet,like iOS system ``UIActionSheet``.
 }
 
 /// Contact Module

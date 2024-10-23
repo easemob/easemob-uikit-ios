@@ -1,6 +1,6 @@
 //
 //  GroupParticipantsRemoveController.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/27.
 //
@@ -15,21 +15,21 @@ import UIKit
     
     public private(set) var chatGroup = ChatGroup()
     
-    public var participants: [EaseProfileProtocol] = []
+    public var participants: [ChatUserProfileProtocol] = []
     
-    public private(set) lazy var navigation: EaseChatNavigationBar = {
+    public private(set) lazy var navigation: ChatNavigationBar = {
         self.createNavigation()
     }()
     
-    @objc open func createNavigation() -> EaseChatNavigationBar {
-        EaseChatNavigationBar(textAlignment: .left,rightTitle: "conversation_left_slide_menu_delete".chat.localize)
+    @objc open func createNavigation() -> ChatNavigationBar {
+        ChatNavigationBar(textAlignment: .left,rightTitle: "conversation_left_slide_menu_delete".chat.localize)
     }
     
     public private(set) lazy var participantsList: UITableView = {
         UITableView(frame: CGRect(x: 0, y: self.navigation.frame.maxY, width: self.view.frame.width, height: self.view.frame.height-self.navigation.frame.maxY), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).rowHeight(60).backgroundColor(.clear).separatorStyle(.none)
     }()
     
-    @objc required public init(group: ChatGroup,profiles: [EaseProfileProtocol],removeClosure: @escaping ([String]) -> Void) {
+    @objc required public init(group: ChatGroup,profiles: [ChatUserProfileProtocol],removeClosure: @escaping ([String]) -> Void) {
         self.chatGroup = group
         profiles.forEach { $0.selected = false }
         self.participants = profiles
@@ -60,7 +60,7 @@ import UIKit
         self.switchTheme(style: Theme.style)
     }
     
-    @objc open func navigationClick(type: EaseChatNavigationBarClickEvent,indexPath: IndexPath?) {
+    @objc open func navigationClick(type: ChatNavigationBarClickEvent,indexPath: IndexPath?) {
         switch type {
         case .back: self.pop()
         case .rightTitle: self.rightAction()

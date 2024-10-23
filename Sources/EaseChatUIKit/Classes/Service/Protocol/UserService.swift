@@ -1,6 +1,6 @@
 //
 //  UserService.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/8/28.
 //
@@ -26,19 +26,19 @@ import Foundation
     /// - Parameters:
     ///   - userId: userId
     ///   - completion: completion
-    func userInfo(userId: String, completion: @escaping (EaseProfileProtocol?,ChatError?) -> Void)
+    func userInfo(userId: String, completion: @escaping (ChatUserProfileProtocol?,ChatError?) -> Void)
     
     /// Get user info by userIds.The frequency of api usage for free users is 100 times in 1 second.Upgrading the package can increase the usage.
     /// - Parameters:
     ///   - userIds: userIds
     ///   - completion: completion
-    func userInfos(userIds: [String], completion: @escaping ([EaseProfileProtocol],ChatError?) -> Void)
+    func userInfos(userIds: [String], completion: @escaping ([ChatUserProfileProtocol],ChatError?) -> Void)
     
     /// Update user info.The frequency of api usage for free users is 100 times in 1 second.Upgrading the package can increase the usage.
     /// - Parameters:
     ///   - userInfo: EaseProfileProtocol
     ///   - completion: 
-    func updateUserInfo(userInfo: EaseProfileProtocol, completion: @escaping (Bool,ChatError?) -> Void)
+    func updateUserInfo(userInfo: ChatUserProfileProtocol, completion: @escaping (Bool,ChatError?) -> Void)
     
     /// Login SDK
     /// - Parameters:

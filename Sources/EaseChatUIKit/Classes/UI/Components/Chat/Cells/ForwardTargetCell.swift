@@ -1,6 +1,6 @@
 //
 //  ForwardTargetCell.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/2/19.
 //
@@ -52,7 +52,7 @@ import UIKit
         self.separateLine.frame = CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5)
     }
     
-    open func refresh(info: EaseProfileProtocol,keyword: String,forward state: ForwardTargetState) {
+    open func refresh(info: ChatUserProfileProtocol,keyword: String,forward state: ForwardTargetState) {
         let nickName = info.nickname.isEmpty ? info.id:info.nickname
         self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: nickName )
         self.avatar.image(with: info.avatarURL, placeHolder: Appearance.conversation.groupPlaceHolder)
@@ -73,7 +73,7 @@ import UIKit
         if !keyword.isEmpty {
             var range = (string as NSString).range(of: keyword, options: .caseInsensitive)
             while range.location != NSNotFound {
-                attributedString.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, range: range)
+                attributedString.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor, range: range)
                 attributedString.addAttribute(.font, value: UIFont.theme.titleMedium, range: range)
                 let remainingRange = NSRange(location: range.location + range.length, length: string.count - (range.location + range.length))
                 range = (string as NSString).range(of: keyword, options: .caseInsensitive, range: remainingRange)

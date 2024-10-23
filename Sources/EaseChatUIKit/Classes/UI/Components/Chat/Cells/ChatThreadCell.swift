@@ -1,6 +1,6 @@
 //
 //  ChatThreadCell.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2024/2/7.
 //
@@ -99,8 +99,8 @@ import UIKit
 
 extension ChatThreadCell: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
-        self.moreImage = UIImage(named: "thread_more", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5)
-        self.messageCount.setTitleColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, for: .normal)
+        self.moreImage = UIImage(named: "thread_more", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor)
+        self.messageCount.setTitleColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor, for: .normal)
         self.messageCount.setImage(self.moreImage, for: .normal)
         self.threadName.textColor = style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
         self.separatorLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9

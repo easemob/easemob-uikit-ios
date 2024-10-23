@@ -28,7 +28,7 @@ import UIKit
     /// - Parameters:
     ///   - indexPath: ``IndexPath``
     ///   - profile: Conform to ``EaseProfileProtocol`` object.
-    func didSelected(indexPath: IndexPath,profile: EaseProfileProtocol)
+    func didSelected(indexPath: IndexPath,profile: ChatUserProfileProtocol)
 }
 
 
@@ -48,11 +48,11 @@ import UIKit
     
     /// This method can be used when you want refresh some  display info  of datas.
     /// - Parameter infos: Array of conform to``EaseProfileProtocol`` object.
-    func refreshProfiles(infos: [EaseProfileProtocol])
+    func refreshProfiles(infos: [ChatUserProfileProtocol])
     
     /// This method can be used when pulling down to refresh.
     /// - Parameter infos: Array of conform to``EaseProfileProtocol`` objects.
-    func refreshList(infos: [EaseProfileProtocol])
+    func refreshList(infos: [ChatUserProfileProtocol])
     
     /// The method can be used when you want to refresh header of the contact list.
     /// - Parameter info: ``ContactListHeaderItemProtocol``
@@ -60,11 +60,11 @@ import UIKit
     
     /// The method can be used when you want to remove a contact.
     /// - Parameter info: ``EaseProfileProtocol``
-    func remove(info: EaseProfileProtocol)
+    func remove(info: ChatUserProfileProtocol)
     
     /// The method can be user when you want to add someone to contact list.
     /// - Parameter info: ``EaseProfileProtocol``
-    func appendThenRefresh(info: EaseProfileProtocol)
+    func appendThenRefresh(info: ChatUserProfileProtocol)
 }
 
 @objc open class ContactView: UIView {
@@ -73,11 +73,11 @@ import UIKit
     
     private var selectIndex = false
     
-    public private(set) var rawData = [EaseProfileProtocol]()
+    public private(set) var rawData = [ChatUserProfileProtocol]()
     
     public private(set) var headerStyle: ContactListHeaderStyle = .contact
     
-    public private(set) var contacts = [[EaseProfileProtocol]]()
+    public private(set) var contacts = [[ChatUserProfileProtocol]]()
     
     public private(set) var sectionTitles = [String]() {
         willSet {
@@ -89,12 +89,12 @@ import UIKit
         }
     }
     
-    public var selectClosure: ((EaseProfileProtocol) -> ())?
+    public var selectClosure: ((ChatUserProfileProtocol) -> ())?
     
     public var firstRefresh = true
     
     public private(set) lazy var header: ContactListHeader = {
-        ContactListHeader(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: CGFloat(Appearance.contact.headerRowHeight*CGFloat((self.headerStyle == .contact ? Appearance.contact.listHeaderExtensionActions.count:0)))), style: .plain).backgroundColor(.clear)
+        ContactListHeader(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: CGFloat(Appearance.contact.headerRowHeight*CGFloat((self.headerStyle == .contact ? Appearance.contact.listHeaderExtensionActions.count:0)))), style: .plain).backgroundColor(.clear)
     }()
     
     public private(set) lazy var empty: EmptyStateView = {
@@ -269,12 +269,12 @@ extension ContactView: IContactListDriver {
     }
     
     
-    public func appendThenRefresh(info: EaseProfileProtocol) {
+    public func appendThenRefresh(info: ChatUserProfileProtocol) {
         self.rawData.append(info)
         self.refreshList(infos: self.rawData)
     }
     
-    public func remove(info: EaseProfileProtocol) {
+    public func remove(info: ChatUserProfileProtocol) {
         var indexPath: IndexPath?
         for (section,sections) in self.contacts.enumerated() {
             if indexPath != nil {
@@ -318,7 +318,7 @@ extension ContactView: IContactListDriver {
         }
     }
     
-    public func refreshProfiles(infos: [EaseProfileProtocol]) {
+    public func refreshProfiles(infos: [ChatUserProfileProtocol]) {
         for info in infos {
             if let profile = self.rawData.first(where: { $0.id == info.id }) {
                 profile.nickname =  info.nickname.isEmpty ? info.id:info.nickname
@@ -329,7 +329,7 @@ extension ContactView: IContactListDriver {
         self.refreshList(infos: self.rawData)
     }
     
-    public func refreshList(infos: [EaseProfileProtocol]) {
+    public func refreshList(infos: [ChatUserProfileProtocol]) {
         self.empty.state = .empty
         self.contacts.removeAll()
         self.sectionTitles.removeAll()
@@ -360,14 +360,14 @@ extension ContactView: ThemeSwitchProtocol {
 
 //MARK: - ContactSorter
 struct ContactSorter {
-    static func sort(contacts: [EaseProfileProtocol]) -> ([[EaseProfileProtocol]],[String]) {
-        var contactMap = [String:EaseProfileProtocol]()
+    static func sort(contacts: [ChatUserProfileProtocol]) -> ([[ChatUserProfileProtocol]],[String]) {
+        var contactMap = [String:ChatUserProfileProtocol]()
         
         if contacts.count == 0 {
             return ([], [])
         }
         var sectionTitles: [String] = []
-        var result: [[EaseProfileProtocol]] = []
+        var result: [[ChatUserProfileProtocol]] = []
         let indexCollation = UILocalizedIndexedCollation.current()
         sectionTitles.append(contentsOf: indexCollation.sectionTitles)
         if !sectionTitles.contains("#") {
@@ -377,10 +377,10 @@ struct ContactSorter {
             result.append([])
         }
         var _: [String] = []
-        var userInfos: [EaseProfileProtocol] = []
+        var userInfos: [ChatUserProfileProtocol] = []
         for contact in contacts {
             contactMap[contact.id] = contact
-            let profile = EaseProfile()
+            let profile = ChatUserProfile()
             profile.id = contact.id
             var showName = contact.remark
             if showName.isEmpty {
@@ -400,7 +400,7 @@ struct ContactSorter {
         for user in userInfos {
             if let firstLetter = user.nickname.chat.pinYin.first?.uppercased() {
                 if let sectionIndex = sectionTitles.firstIndex(of: firstLetter) {
-                    let contact = EaseProfile()
+                    let contact = ChatUserProfile()
                     contact.id = user.id
                     contact.nickname = contactMap[contact.id]?.nickname ?? ""
                     contact.avatarURL = user.avatarURL
@@ -408,7 +408,7 @@ struct ContactSorter {
                     contact.selected = user.selected
                     result[sectionIndex].append(contact)
                 } else {
-                    let contact = EaseProfile()
+                    let contact = ChatUserProfile()
                     contact.id = user.id
                     contact.nickname = contactMap[contact.id]?.nickname ?? ""
                     contact.avatarURL = user.avatarURL

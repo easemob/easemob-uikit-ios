@@ -1,6 +1,6 @@
 //
 //  GroupListCell.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/24.
 //
@@ -40,10 +40,10 @@ import UIKit
         self.separateLine.frame = CGRect(x: self.nickName.frame.minX, y: self.contentView.frame.height-0.5, width: self.contentView.frame.width-self.nickName.frame.minX, height: 0.5)
     }
     
-    func refresh(info: EaseProfileProtocol,keyword: String) {
+    func refresh(info: ChatUserProfileProtocol,keyword: String) {
         let nickName = info.nickname.isEmpty ? info.id:info.nickname
         self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: nickName )
-        self.avatar.image(with: EaseChatUIKitContext.shared?.groupCache?[info.id]?.avatarURL ?? "", placeHolder: Appearance.conversation.groupPlaceHolder)
+        self.avatar.image(with: ChatUIKitContext.shared?.groupCache?[info.id]?.avatarURL ?? "", placeHolder: Appearance.conversation.groupPlaceHolder)
         self.separateLine.backgroundColor = Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
     
     }
@@ -55,7 +55,7 @@ import UIKit
         if !keyword.isEmpty {
             var range = (string as NSString).range(of: keyword, options: .caseInsensitive)
             while range.location != NSNotFound {
-                attributedString.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5, range: range)
+                attributedString.addAttribute(.foregroundColor, value: Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor, range: range)
                 let remainingRange = NSRange(location: range.location + range.length, length: string.count - (range.location + range.length))
                 range = (string as NSString).range(of: keyword, options: .caseInsensitive, range: remainingRange)
             }

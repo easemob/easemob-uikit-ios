@@ -1,6 +1,6 @@
 //
 //  ContactListHeaderCell.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/20.
 //
@@ -80,7 +80,7 @@ import UIKit
         self.imageView?.image = item.featureIcon
         self.textLabel?.text = item.featureName
         if item.showBadge {
-            self.badge.backgroundColor(Theme.style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).textColor(UIColor.theme.neutralColor98).textAlignment(.center)
+            self.badge.backgroundColor(Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor).textColor(UIColor.theme.neutralColor98).textAlignment(.center)
         } else {
             self.badge.textAlignment(.right).textColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).backgroundColor(.clear)
         }
@@ -107,7 +107,7 @@ import UIKit
 extension ContactListHeaderCell: ThemeSwitchProtocol {
 
     @objc open func switchTheme(style: ThemeStyle) {
-        self.badge.backgroundColor(style == .dark ? UIColor.theme.primaryColor6:UIColor.theme.primaryColor5).textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
+        self.badge.backgroundColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor).textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
         self.textLabel?.textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
         
         let image = UIImage(named: "chevron_right", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor3)

@@ -1,6 +1,6 @@
 //
 //  AlertMessageCell.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/12/4.
 //
@@ -43,7 +43,9 @@ import UIKit
     }
     
     open override func clickAction(gesture: UITapGestureRecognizer) {
-        
+        if !self.entity.message.alertMessageThreadId.isEmpty {
+            self.clickAction?(.cell,self.entity)
+        }
     }
     
     open override func layoutSubviews() {

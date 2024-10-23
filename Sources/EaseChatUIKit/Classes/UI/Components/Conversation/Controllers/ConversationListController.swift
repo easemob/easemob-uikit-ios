@@ -6,7 +6,7 @@ import UIKit
  */
 @objc open class ConversationListController: UIViewController {
     
-    public private(set) lazy var navigation: EaseChatNavigationBar = {
+    public private(set) lazy var navigation: ChatNavigationBar = {
         self.createNavigationBar()
     }()
     
@@ -29,8 +29,8 @@ import UIKit
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc open func createNavigationBar() -> EaseChatNavigationBar {
-        EaseChatNavigationBar( showLeftItem: false,rightImages: [UIImage(named: "add", in: .chatBundle, with: nil)!])
+    @objc open func createNavigationBar() -> ChatNavigationBar {
+        ChatNavigationBar( showLeftItem: false,rightImages: [UIImage(named: "add", in: .chatBundle, with: nil)!])
     }
     
     @objc open func createSearchBar() -> UIButton {
@@ -52,7 +52,7 @@ import UIKit
         super.viewWillAppear(animated)
         self.viewModel?.chatId = ""
         self.view.window?.backgroundColor = .white
-        self.navigation.avatarURL = EaseChatUIKitContext.shared?.currentUser?.avatarURL
+        self.navigation.avatarURL = ChatUIKitContext.shared?.currentUser?.avatarURL
         self.navigationController?.setNavigationBarHidden(true, animated: false)
         
     }
@@ -94,7 +94,7 @@ extension ConversationListController {
         - type: The type of navigation bar click event.
         - indexPath: The index path of the clicked item, if applicable.
      */
-    @objc open func navigationClick(type: EaseChatNavigationBarClickEvent, indexPath: IndexPath?) {
+    @objc open func navigationClick(type: ChatNavigationBarClickEvent, indexPath: IndexPath?) {
         switch type {
         case .back: self.pop()
         case .rightItems: self.rightActions(indexPath: indexPath ?? IndexPath())
@@ -198,7 +198,7 @@ extension ConversationListController {
      - Parameters:
         - profile: The contact profile to chat with.
      */
-    @objc open func chatToContact(profile: EaseProfileProtocol) {
+    @objc open func chatToContact(profile: ChatUserProfileProtocol) {
         if let info = self.conversationList.datas.first(where: { $0.id == profile.id }) {
             self.toChat(indexPath: IndexPath(row: 0, section: 0), info: info)
         } else {
@@ -213,11 +213,11 @@ extension ConversationListController {
         - profile: The profile of the user to create the chat with.
         - info: Additional information about the chat.
      */
-    @objc open func createChat(profile: EaseProfileProtocol, type: ChatConversationType, info: String) {
+    @objc open func createChat(profile: ChatUserProfileProtocol, type: ChatConversationType, info: String) {
         if type == .chat {
-            EaseChatUIKitContext.shared?.userCache?[profile.id] = profile
+            ChatUIKitContext.shared?.userCache?[profile.id] = profile
         } else {
-            EaseChatUIKitContext.shared?.groupCache?[profile.id] = profile
+            ChatUIKitContext.shared?.groupCache?[profile.id] = profile
         }
         if let conversation = self.viewModel?.loadIfNotExistCreate(profile: profile, type: type, text: info) {
             let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: conversation.id , chatType: conversation.type == .chat ? .chat:.group)
@@ -260,11 +260,11 @@ extension ConversationListController {
      
      This method creates a group conversation with the given profiles. It constructs the group name based on the profiles' nicknames or IDs, and then uses the `ChatGroupOption` to configure the group settings. Finally, it calls the `createGroup` method of the `ChatGroupManager` to create the group.
      */
-    @objc open func create(profiles: [EaseProfileProtocol]) {
+    @objc open func create(profiles: [ChatUserProfileProtocol]) {
         var name = ""
-        var users = [EaseProfileProtocol]()
-        let ownerId = EaseChatUIKitContext.shared?.currentUserId ?? ""
-        if let owner = EaseChatUIKitContext.shared?.userCache?[ownerId] {
+        var users = [ChatUserProfileProtocol]()
+        let ownerId = ChatUIKitContext.shared?.currentUserId ?? ""
+        if let owner = ChatUIKitContext.shared?.userCache?[ownerId] {
             users.append(owner)
             users.append(contentsOf: profiles)
         }
@@ -285,7 +285,7 @@ extension ConversationListController {
         option.style = .privateMemberCanInvite
         ChatClient.shared().groupManager?.createGroup(withSubject: name, description: "", invitees: ids, message: nil, setting: option, completion: { [weak self] group, error in
             if error == nil,let group = group {
-                let profile = EaseProfile()
+                let profile = ChatUserProfile()
                 profile.id = group.groupId
                 profile.nickname = group.groupName
                 self?.createChat(profile: profile, type: .groupChat,info: name)

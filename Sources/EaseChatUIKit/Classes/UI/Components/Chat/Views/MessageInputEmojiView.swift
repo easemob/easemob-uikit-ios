@@ -1,6 +1,6 @@
 //
 //  ChatEmojiView.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/8/30.
 //
@@ -114,9 +114,9 @@ extension MessageInputEmojiView: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         self.deleteEmoji.setImage(UIImage(named: style == .dark ? "delete_emoji_dark":"delete_emoji_light", in: .chatBundle, with: nil), for: .normal)
         if style == .dark {
-            self.sendEmoji.setImage(UIImage(named: "airplane", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor6), for: .normal)
+            self.sendEmoji.setImage(UIImage(named: "airplane", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryDarkColor), for: .normal)
         } else {
-            self.sendEmoji.setImage(UIImage(named: "airplane", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryColor5), for: .normal)
+            self.sendEmoji.setImage(UIImage(named: "airplane", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryLightColor), for: .normal)
         }
         self.gradient.image = UIImage(named: style == .dark ? "gradient_dark":"gradient_light", in: .chatBundle, with: nil)
     }

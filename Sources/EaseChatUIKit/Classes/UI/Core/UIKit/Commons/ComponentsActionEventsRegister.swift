@@ -1,6 +1,6 @@
 //
 //  ComponentViewsActionHooker.swift
-//  EaseChatUIKit
+//  ChatUIKit
 //
 //  Created by 朱继超 on 2023/11/7.
 //
@@ -55,7 +55,7 @@ import UIKit
      - indexPath: The index path of the selected contact.
      - profile: The profile of the selected contact conforming to EaseProfileProtocol.
      */
-    public var didSelectedContact: ((IndexPath, EaseProfileProtocol) -> Void)?
+    public var didSelectedContact: ((IndexPath, ChatUserProfileProtocol) -> Void)?
     
     /**
      A closure that is called when a group is created with the selected contact.
@@ -64,7 +64,7 @@ import UIKit
      - indexPath: The index path of the selected contact.
      - profile: The profile of the selected contact conforming to EaseProfileProtocol.
      */
-    public var groupWithSelected: ((IndexPath, EaseProfileProtocol) -> Void)?
+    public var groupWithSelected: ((IndexPath, ChatUserProfileProtocol) -> Void)?
 }
 
 /**
@@ -80,7 +80,7 @@ import UIKit
     
     public var bubbleLongPressed: ((MessageEntity) -> Void)?
     
-    public var avatarClicked: ((EaseProfileProtocol) -> Void)?
+    public var avatarClicked: ((ChatUserProfileProtocol) -> Void)?
     
-    public var avatarLongPressed: ((EaseProfileProtocol) -> Void)?
+    public var avatarLongPressed: ((ChatUserProfileProtocol) -> Void)?
 }
