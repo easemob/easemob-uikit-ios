@@ -125,7 +125,6 @@ import UIKit
         self.inputField.typingAttributes = self.typingAttributesText
         self.inputField.contentInsetAdjustmentBehavior = .never
         self.inputField.cornerRadius(Appearance.chat.inputBarCorner)
-        self.inputField.placeHolder = Appearance.chat.inputPlaceHolder.chat.localize
         self.inputField.contentInset = UIEdgeInsets(top: 4, left: Appearance.chat.inputBarCorner == .large ? 10:6, bottom: 4, right: 6)
         self.inputField.tintColor = UIColor.theme.primaryLightColor
         self.inputField.placeHolderColor = UIColor.theme.neutralColor6
@@ -138,9 +137,7 @@ import UIKit
         if text != nil {
             self.inputField.text = text
         }
-        if placeHolder != nil {
-            self.inputField.placeHolder = placeHolder ?? "Aa"
-        }
+        self.inputField.placeHolder = placeHolder ?? "Aa"
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)), name: UIApplication.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)), name: UIApplication.keyboardWillHideNotification, object: nil)
         
