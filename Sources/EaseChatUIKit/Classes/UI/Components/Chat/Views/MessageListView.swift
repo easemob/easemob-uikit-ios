@@ -223,7 +223,7 @@ public let MessageInputBarHeight = CGFloat(52)
     private var oldFrame = CGRect.zero
         
     public private(set) lazy var inputBar: MessageInputBar = {
-        MessageInputBar(frame: CGRect(x: 0, y: self.frame.height-MessageInputBarHeight-BottomBarHeight, width: self.frame.width, height: MessageInputBarHeight), text: "", placeHolder: "Aa")
+        MessageInputBar(frame: CGRect(x: 0, y: self.frame.height-MessageInputBarHeight-BottomBarHeight, width: self.frame.width, height: MessageInputBarHeight), text: "", placeHolder: Appearance.chat.inputPlaceHolder)
     }()
     
     public private(set) lazy var editBottomBar: MessageMultiSelectedBottomBar = {
@@ -308,15 +308,12 @@ public let MessageInputBarHeight = CGFloat(52)
         
         self.moreMessages.layer.masksToBounds = false
         let shadowPath0 = UIBezierPath(roundedRect: self.moreMessages.bounds, cornerRadius: 4)
-        let layer0 = CALayer()
-        layer0.shadowPath = shadowPath0.cgPath
-        layer0.shadowColor = UIColor(red: 0.275, green: 0.306, blue: 0.325, alpha: 0.15).cgColor
-        layer0.shadowOpacity = 1
-        layer0.shadowRadius = 8
-        layer0.shadowOffset = CGSize(width: 2, height: 4)
-        layer0.bounds = self.moreMessages.bounds
-        layer0.position = self.moreMessages.center
-        self.moreMessages.layer.addSublayer(layer0)
+        self.moreMessages.layer.shadowPath = shadowPath0.cgPath
+        self.moreMessages.layer.shadowColor = UIColor(red: 0.275, green: 0.306, blue: 0.325, alpha: 0.15).cgColor
+        self.moreMessages.layer.shadowOpacity = 1
+        self.moreMessages.layer.shadowRadius = 8
+        self.moreMessages.layer.shadowOffset = CGSize(width: 2, height: 4)
+        self.moreMessages.layer.cornerRadius = Appearance.avatarRadius == .large ? self.moreMessages.frame.height/2.0:CGFloat(Appearance.avatarRadius.rawValue)
         
         self.processInputBarAxisYChanged()
         
