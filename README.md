@@ -32,6 +32,7 @@
 - [设计指南](#设计指南)
 - [贡献](#贡献)
 - [许可证](#许可证)
+- [更新日志](#更新日志)
 
 # 开发环境
 
@@ -552,3 +553,8 @@ zjc19891106, [984065974@qq.com](mailto:984065974@qq.com)
 ## 许可证
 
 EaseChatUIKit 可在 MIT 许可下使用。 有关详细信息，请参阅许可证文件。
+
+## 更新日志
+
+[更新日志](https://doc.easemob.com/uikit/chatuikit/ios/releasenote.html)
+
