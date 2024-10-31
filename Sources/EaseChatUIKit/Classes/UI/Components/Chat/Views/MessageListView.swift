@@ -42,11 +42,11 @@ public let MessageInputBarHeight = CGFloat(52)
     func onMessageContentLongPressed(cell: MessageCell)
     
     /// The method will call on message avatar clicked
-    /// - Parameter profile: ``EaseProfileProtocol``
+    /// - Parameter profile: ``ChatUserProfileProtocol``
     func onMessageAvatarClicked(profile: ChatUserProfileProtocol)
     
     /// The method will call on message avatar long pressed.
-    /// - Parameter profile: ``EaseProfileProtocol``
+    /// - Parameter profile: ``ChatUserProfileProtocol``
     func onMessageAvatarLongPressed(profile: ChatUserProfileProtocol)
     
     /// The method will call on input box event occur.
@@ -374,7 +374,7 @@ public let MessageInputBarHeight = CGFloat(52)
                 let oldFrame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-MessageInputBarHeight)
                 if firstResponder {
                     consoleLogInfo("self.inputBar.keyboardHeight: \(self.inputBar.keyboardHeight)", type: .debug)
-                    var space = 0
+                    var space = -24
                     if self.inputBar.keyboardHeight == 132 || self.inputBar.keyboardHeight == 230 {
                         space = Int(BottomBarHeight*2)
                     }
