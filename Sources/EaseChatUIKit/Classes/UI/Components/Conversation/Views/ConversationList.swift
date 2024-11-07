@@ -94,7 +94,7 @@ extension ConversationList: UITableViewDelegate,UITableViewDataSource {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         guard let info = self.datas[safe: indexPath.row] else { return }
-        if let hooker = ComponentViewsActionHooker.shared.conversation.longPressed {
+        if let hooker = ComponentViewsActionHooker.shared.conversation.didSelected {
             hooker(indexPath,info)
         } else {
             for listener in self.eventHandlers.allObjects {
@@ -423,7 +423,7 @@ extension ConversationList: ThemeSwitchProtocol {
     func showNew(info: ConversationInfo)
     
     /// This method can be used when you want refresh some  display info  of datas.
-    /// - Parameter infos: Array of conform ``EaseProfileProtocol`` object.
+    /// - Parameter infos: Array of conform ``ChatUserProfileProtocol`` object.
     func refreshProfiles(infos: [ChatUserProfileProtocol])
     
     /// This method can be used when pulling down to refresh.
