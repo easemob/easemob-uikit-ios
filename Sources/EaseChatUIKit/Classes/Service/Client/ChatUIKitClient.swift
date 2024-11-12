@@ -1,8 +1,8 @@
 import Foundation
 
-public let ChatUIKit_VERSION = "4.10.0"
+public let ChatUIKit_VERSION = "4.10.1"
 
-public let cache_update_notification = "EaseChatUIKitContextUpdateCache"
+public let cache_update_notification = "ChatUIKitContextUpdateCache"
 
 @objcMembers public class ChatUIKitOptions: NSObject {
     
@@ -64,7 +64,7 @@ public let cache_update_notification = "EaseChatUIKitContextUpdateCache"
     
     /// Login user.
     /// - Parameters:
-    ///   - user: An instance that conforms to ``EaseProfileProtocol``.
+    ///   - user: An instance that conforms to ``ChatUserProfileProtocol``.
     ///   - token: The user chat token.
     @objc(loginWithUser:token:completion:)
     public func login(user: ChatUserProfileProtocol,token: String,completion: @escaping (ChatError?) -> Void) {
@@ -114,10 +114,10 @@ public let cache_update_notification = "EaseChatUIKitContextUpdateCache"
     
 //    /// Updates user information that is used for login with the `login(with user: UserInfoProtocol,token: String,use userProperties: Bool = true,completion: @escaping (ChatError?) -> Void)` method.
 //    /// - Parameters:
-//    ///   - info: An instance that conforms to ``EaseProfileProtocol``.
+//    ///   - info: An instance that conforms to ``ChatUserProfileProtocol``.
 //    ///   - completion: Callback.
 //    @objc(updateWithUserInfo:completion:)
-//    public func updateUserInfo(info: EaseProfileProtocol,completion: @escaping (ChatError?) -> Void) {
+//    public func updateUserInfo(info: ChatUserProfileProtocol,completion: @escaping (ChatError?) -> Void) {
 //        self.userService?.updateUserInfo(userInfo: info, completion: { success, error in
 //            completion(error)
 //        })
