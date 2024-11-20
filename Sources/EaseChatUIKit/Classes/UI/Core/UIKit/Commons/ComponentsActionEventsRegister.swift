@@ -53,7 +53,7 @@ import UIKit
      
      - Parameters:
      - indexPath: The index path of the selected contact.
-     - profile: The profile of the selected contact conforming to EaseProfileProtocol.
+     - profile: The profile of the selected contact conforming to ChatUserProfileProtocol.
      */
     public var didSelectedContact: ((IndexPath, ChatUserProfileProtocol) -> Void)?
     
@@ -62,7 +62,7 @@ import UIKit
      
      - Parameters:
      - indexPath: The index path of the selected contact.
-     - profile: The profile of the selected contact conforming to EaseProfileProtocol.
+     - profile: The profile of the selected contact conforming to ChatUserProfileProtocol.
      */
     public var groupWithSelected: ((IndexPath, ChatUserProfileProtocol) -> Void)?
 }

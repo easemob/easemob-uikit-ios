@@ -28,13 +28,13 @@ import UIKit
         ChatClient.shared().currentUsername ?? ""
     }
     
-    /// The cache of user information on the side of the message in the chat page. The key is the user ID and the value is an object that complies with the ``EaseProfileProtocol`` protocol.Display the info on chat page.
+    /// The cache of user information on the side of the message in the chat page. The key is the user ID and the value is an object that complies with the ``ChatUserProfileProtocol`` protocol.Display the info on chat page.
     public var chatCache: Dictionary<String,ChatUserProfileProtocol>? = Dictionary<String,ChatUserProfileProtocol>()
     
     /// The cache of user information on user. Display the info on contact-list&single-chat-conversation-item&user-profile page .
     public var userCache: Dictionary<String,ChatUserProfileProtocol>? = Dictionary<String,ChatUserProfileProtocol>()
     
-    /// The cache of user information on group-conversation-item. The key is the user ID and the value is an object that complies with the ``EaseProfileProtocol`` protocol.
+    /// The cache of user information on group-conversation-item. The key is the user ID and the value is an object that complies with the ``ChatUserProfileProtocol`` protocol.
     public var groupCache: Dictionary<String,ChatUserProfileProtocol>? = Dictionary<String,ChatUserProfileProtocol>()
     
     public var pinnedCache: Dictionary<String,Bool>? = Dictionary<String,Bool>()
@@ -72,7 +72,7 @@ import UIKit
     /// Update the cache of ``EaseChatUIKitCacheType`` type
     /// - Parameters:
     ///   - type: ``EaseChatUIKitCacheType``
-    ///   - profile: The object conform to ``EaseProfileProtocol``.
+    ///   - profile: The object conform to ``ChatUserProfileProtocol``.
     @objc(updateCacheWithType:profile:)
     public func updateCache(type: EaseChatUIKitCacheType,profile: ChatUserProfileProtocol) {
         switch type {

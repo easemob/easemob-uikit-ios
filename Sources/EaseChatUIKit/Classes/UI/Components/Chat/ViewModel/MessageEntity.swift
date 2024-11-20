@@ -513,7 +513,7 @@ public let urlPreviewImageHeight = CGFloat(137)
                         text.append(NSAttributedString {
                             AttributedText(something).foregroundColor(Theme.style == .dark ? Color.theme.neutralColor6:Color.theme.neutralColor7).font(UIFont.theme.bodySmall).lineHeight(multiple: 1.15, minimum: 14).alignment(.center)
                         })
-                        text.addAttribute(NSAttributedString.Key.foregroundColor, value: Theme.style == .dark ? Color.theme.primaryColor6:Color.theme.primaryColor5, range: range)
+                        text.addAttribute(NSAttributedString.Key.foregroundColor, value: Theme.style == .dark ? Color.theme.primaryDarkColor:Color.theme.primaryLightColor, range: range)
                     } else {
                         let user = self.message.user
                         var nickname = user?.remark ?? ""
@@ -840,7 +840,7 @@ public let urlPreviewImageHeight = CGFloat(137)
 
 extension ChatMessage {
     
-    /// ``EaseProfileProtocol``
+    /// ``ChatUserProfileProtocol``
     @objc public var user: ChatUserProfileProtocol? {
         let cacheUser = ChatUIKitContext.shared?.userCache?[self.from]
         if cacheUser != nil,let remark = cacheUser?.remark,!remark.isEmpty {

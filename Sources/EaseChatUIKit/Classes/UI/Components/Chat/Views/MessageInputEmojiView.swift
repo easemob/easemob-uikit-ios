@@ -37,11 +37,11 @@ import UIKit
     }()
     
     public lazy var sendEmoji: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.frame.width - 56, y: self.frame.height - 56, width: 44, height: 44)).addTargetFor(self, action: #selector(sendAction), for: .touchUpInside).isEnabled(true).cornerRadius(.large).backgroundColor(.clear)
+        UIButton(type: .custom).frame(CGRect(x: self.frame.width - 56, y: self.frame.height - 56, width: 44, height: 44)).addTargetFor(self, action: #selector(sendAction), for: .touchUpInside).isEnabled(true).cornerRadius(.large).backgroundColor(.clear).image(UIImage(named: "airplane", in: .chatBundle, with: nil), .normal)
     }()
     
     lazy var gradient: GradientEmojiView = {
-        GradientEmojiView(frame: CGRect(x: 0, y: self.frame.height-BottomBarHeight-32, width: self.frame.width, height: 32)).image(UIImage(named: "gradient_light", in: .chatBundle, with: nil))
+        GradientEmojiView(frame: CGRect(x: 0, y: self.frame.height-BottomBarHeight-31, width: self.frame.width, height: 32)).image(UIImage(named: "gradient_light", in: .chatBundle, with: nil))
     }()
 
     @objc required override public init(frame: CGRect) {
@@ -70,7 +70,7 @@ import UIKit
     
     open override func layoutSubviews() {
         super.layoutSubviews()
-        self.gradient.frame = CGRect(x: 0, y: self.frame.height-BottomBarHeight-32, width: self.frame.width, height: 32)
+        self.gradient.frame = CGRect(x: 0, y: self.frame.height-BottomBarHeight-31, width: self.frame.width, height: 31)
         self.deleteEmoji.frame = CGRect(x: self.frame.width - 112, y: self.frame.height - 56 - BottomBarHeight, width: 44, height: 44)
         self.sendEmoji.frame = CGRect(x: self.frame.width - 56, y: self.frame.height - 56 - BottomBarHeight, width: 44, height: 44)
         self.deleteEmoji.cornerRadius(Appearance.avatarRadius)
@@ -112,12 +112,11 @@ extension MessageInputEmojiView: UICollectionViewDelegate, UICollectionViewDataS
 
 extension MessageInputEmojiView: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
-        self.deleteEmoji.setImage(UIImage(named: style == .dark ? "delete_emoji_dark":"delete_emoji_light", in: .chatBundle, with: nil), for: .normal)
-        if style == .dark {
-            self.sendEmoji.setImage(UIImage(named: "airplane", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryDarkColor), for: .normal)
-        } else {
-            self.sendEmoji.setImage(UIImage(named: "airplane", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryLightColor), for: .normal)
-        }
+        let image = UIImage(named: "arrow_left_thick", in: .chatBundle, with: nil)
+        
+        self.deleteEmoji.setImage(style == .dark ? image?.withTintColor(UIColor.theme.neutralColor98):image?.withTintColor(UIColor.theme.neutralColor3), for: .normal)
+        self.deleteEmoji.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
+        self.sendEmoji.backgroundColor = style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor
         self.gradient.image = UIImage(named: style == .dark ? "gradient_dark":"gradient_light", in: .chatBundle, with: nil)
     }
 }

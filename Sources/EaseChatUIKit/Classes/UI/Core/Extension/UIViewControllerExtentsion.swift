@@ -73,8 +73,8 @@ extension UIViewController {
         toastView.contentView.addSubview(label)
         
         NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: toastView.leadingAnchor, constant: 10),
-            label.trailingAnchor.constraint(equalTo: toastView.trailingAnchor, constant: -10),
+            label.leadingAnchor.constraint(equalTo: toastView.leadingAnchor, constant: 16),
+            label.trailingAnchor.constraint(equalTo: toastView.trailingAnchor, constant: -16),
             label.topAnchor.constraint(equalTo: toastView.topAnchor, constant: 8),
             label.bottomAnchor.constraint(equalTo: toastView.bottomAnchor, constant: -8)
         ])

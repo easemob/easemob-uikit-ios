@@ -104,9 +104,9 @@ import UIKit
     open func createAvatarStatus() -> UIImageView {
         let r = self.avatar.frame.width / 2.0
         let length = CGFloat(sqrtf(Float(r)))
-        let x = (Appearance.avatarRadius == .large ? (r + length + 3):(self.avatar.frame.width-10))
-        let y = (Appearance.avatarRadius == .large ? (r + length + 3):(self.avatar.frame.height-10))
-        return UIImageView(frame: CGRect(x: self.avatar.frame.minX+x, y: self.avatar.frame.minY+y, width: 12, height: 12)).backgroundColor(UIColor.theme.secondaryColor5).cornerRadius(.large).layerProperties(UIColor.theme.neutralColor98, 2).contentMode(.scaleAspectFit)
+        let x = (Appearance.avatarRadius == .large ? (r + length + 1):(self.avatar.frame.width-12))
+        let y = (Appearance.avatarRadius == .large ? (r + length + 1):(self.avatar.frame.height-12))
+        return UIImageView(frame: CGRect(x: self.avatar.frame.minX+x, y: self.avatar.frame.minY+y, width: 14, height: 14)).backgroundColor(UIColor.theme.secondaryColor5).cornerRadius(.large).layerProperties(UIColor.theme.neutralColor98, 2).contentMode(.scaleAspectFit)
     }
     
     public private(set) lazy var titleLabel: UILabel = {

@@ -270,7 +270,7 @@ import UIKit
     
     /// When you mention somebody update mention user id array.
     /// - Parameters:
-    ///   - profile: ``EaseProfileProtocol``
+    ///   - profile: ``ChatUserProfileProtocol``
     @objc(updateMentionIdsWithProfile:type:)
     open func updateMentionIds(profile: ChatUserProfileProtocol,type: MentionUpdate) {
         if type == .add {
@@ -409,17 +409,20 @@ import UIKit
     }
     
     @objc open func deleteMessage(message: ChatMessage) {
-        if ChatUIKitClient.shared.option.option_UI.loadLocalHistoryMessages {
-            self.chatService?.removeLocalMessage(messageId: message.messageId)
-            self.driver?.processMessage(operation: .delete, message: message)
-        } else {
-            ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.removeMessages(fromServerMessageIds: [message.messageId], completion: { error in
-                if error == nil {
-                    self.driver?.processMessage(operation: .delete, message: message)
-                } else {
-                    consoleLogInfo("delete message error:\(error?.errorDescription ?? "")", type: .error)
-                }
-            })
+        DialogManager.shared.showAlert(title: "Delete Message Alert".chat.localize, content: "Delete warning".chat.localize, showCancel: true, showConfirm: true) { [weak self] _ in
+            guard let `self` = self else { return }
+            if ChatUIKitClient.shared.option.option_UI.loadLocalHistoryMessages {
+                self.chatService?.removeLocalMessage(messageId: message.messageId)
+                self.driver?.processMessage(operation: .delete, message: message)
+            } else {
+                ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.removeMessages(fromServerMessageIds: [message.messageId], completion: { [weak self] error in
+                    if error == nil {
+                        self?.driver?.processMessage(operation: .delete, message: message)
+                    } else {
+                        consoleLogInfo("delete message error:\(error?.errorDescription ?? "")", type: .error)
+                    }
+                })
+            }
         }
     }
     

@@ -28,10 +28,10 @@ import UIKit
         self.attributes[groupId] = usesAttributes
     }
     
-    /// Cache a conform ``EaseProfileProtocol`` object.
+    /// Cache a conform ``ChatUserProfileProtocol`` object.
     /// - Parameters:
     ///   - groupId: ID of the group.
-    ///   - profile: ``EaseProfileProtocol``
+    ///   - profile: ``ChatUserProfileProtocol``
     @objc public func cacheProfile(groupId: String,profile: ChatUserProfileProtocol) {
         self.profiles[groupId]?[profile.id] = profile
     }
@@ -48,10 +48,10 @@ import UIKit
         }
     }
     
-    /// Remove  a conform ``EaseProfileProtocol`` cache object..
+    /// Remove  a conform ``ChatUserProfileProtocol`` cache object..
     /// - Parameters:
     ///   - groupId: ID of the group.
-    ///   - profile: ``EaseProfileProtocol``
+    ///   - profile: ``ChatUserProfileProtocol``
     @objc(removeProfileCacheWithGroupId:profile:)
     public func removeCacheProfile(groupId: String,profile: ChatUserProfileProtocol) {
         self.profiles[groupId]?.removeValue(forKey: profile.id)

@@ -213,3 +213,9 @@
 "failed" = "failed";
 "No pinned messages" = "No pinned messages";
 "Please select greater than one message." = "Please select greater than one message.";
+
+"Delete Conversation Alert" = "Delete this conversation?";
+
+"Delete Message Alert" = "Delete this message?";
+
+"Delete warning" = "Deletion is irreversible.";

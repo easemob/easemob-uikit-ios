@@ -95,7 +95,7 @@ public let disturb_change = "EaseUIKit_do_not_disturb_changed"
     
     /// Load the session in the local database and create one if it does not exist
     /// - Parameters:
-    ///   - profile: ``EaseProfileProtocol``
+    ///   - profile: ``ChatUserProfileProtocol``
     ///   - text: Welcome message.
     /// - Returns: ``ConversationInfo`` object.
     @objc(loadIfNotExistCreateWithProfile:type:text:)
@@ -291,15 +291,20 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
     }
     
     @objc open func delete(info: ConversationInfo) {
-        self.service?.deleteConversation(conversationId: info.id) { [weak self] error in
+
+        DialogManager.shared.showAlert(title: "Delete Conversation Alert".chat.localize, content: "Deletion is irreversible.".chat.localize, showCancel: true, showConfirm: true) { [weak self] _ in
+            UIViewController.currentController?.dismiss(animated: true)
             guard let `self` = self else { return }
-            if error != nil {
-                consoleLogInfo("onConversationSwipe delete:\(error?.errorDescription ?? "")", type: .error)
-            } else {
-                if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
-                    self.driver?.refreshList(infos: self.mapper(objects: infos))
+            self.service?.deleteConversation(conversationId: info.id) { [weak self] error in
+                guard let `self` = self else { return }
+                if error != nil {
+                    consoleLogInfo("onConversationSwipe delete:\(error?.errorDescription ?? "")", type: .error)
+                } else {
+                    if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
+                        self.driver?.refreshList(infos: self.mapper(objects: infos))
+                    }
+                    self.updateUnreadCount()
                 }
-                self.updateUnreadCount()
             }
         }
     }
