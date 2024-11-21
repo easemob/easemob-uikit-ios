@@ -292,7 +292,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
     
     @objc open func delete(info: ConversationInfo) {
 
-        DialogManager.shared.showAlert(title: "Delete Conversation Alert".chat.localize, content: "Deletion is irreversible.".chat.localize, showCancel: true, showConfirm: true) { [weak self] _ in
+        DialogManager.shared.showAlert(title: "Delete Conversation Alert".chat.localize, content: "Delete warning".chat.localize, showCancel: true, showConfirm: true) { [weak self] _ in
             UIViewController.currentController?.dismiss(animated: true)
             guard let `self` = self else { return }
             self.service?.deleteConversation(conversationId: info.id) { [weak self] error in

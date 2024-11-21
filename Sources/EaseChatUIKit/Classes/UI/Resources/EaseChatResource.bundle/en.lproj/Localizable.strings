@@ -200,7 +200,7 @@
 "block" = "Block";
 "unblock" = "Unblock";
 "block contact" = "Block Contact";
-"Confirm Remove" = "Confirm Remove";
+"Confirm Remove" = "Confirm";
 "Sticky Message" = "Pin Message";
 "pinned a message" = "pinned a message";
 "unpinned a message" = "unpinned a message";

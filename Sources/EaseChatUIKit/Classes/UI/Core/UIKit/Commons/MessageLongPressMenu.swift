@@ -13,7 +13,7 @@ public let PopLeftRightMargin = CGFloat(4)
 public let PopTopBottomMargin = CGFloat(4)
 
 public let PopArrowSize = CGSize(width: 16, height: 10)
-public let HeaderTopBottomMargin = CGFloat(9)
+public let HeaderTopBottomMargin = CGFloat(12)
 
 @objc final public class MessageLongPressMenu: UIView {
 
@@ -334,15 +334,15 @@ public let HeaderTopBottomMargin = CGFloat(9)
         let targetCenter = self.targetViewCenter()
         let headerFrame = self.header?.frame ?? .zero
         let menuWidth = self.menuSize.width
-        let menuHeight = self.menuSize.height+headerFrame.height+HeaderTopBottomMargin*2
+        let menuHeight = self.menuSize.height
         let spac: CGFloat = 10.0
-        let lines: CGFloat = CGFloat((self.items.count+4)%5)
-        var popFrame = CGRect(x: (ScreenWidth-menuWidth)/2.0, y: 0, width: menuWidth, height: menuHeight+HeaderTopBottomMargin+(lines-1)*8)
+        let lines: CGFloat = CGFloat(ceilf(Float(CGFloat(self.items.count/5))))
+        var popFrame = CGRect(x: (ScreenWidth-menuWidth)/2.0, y: 0, width: menuWidth, height: menuHeight+HeaderTopBottomMargin*2+headerFrame.height+(lines-1)*8)
         
         let left = targetCenter.x / ScreenWidth < 0.5
         var top = targetFrame.minY < popFrame.height + PopArrowSize.height + StatusBarHeight
         if top {
-            popFrame = CGRect(x: (ScreenWidth-menuWidth)/2.0, y: 0, width: menuWidth, height: menuHeight+HeaderTopBottomMargin+(lines-1)*8+8)
+            popFrame = CGRect(x: (ScreenWidth-menuWidth)/2.0, y: 0, width: menuWidth, height: menuHeight+HeaderTopBottomMargin*2+headerFrame.height+(lines-1)*8)
         }
         if self.startRect != .zero {
             top = targetFrame.minY < popFrame.height + PopArrowSize.height + StatusBarHeight

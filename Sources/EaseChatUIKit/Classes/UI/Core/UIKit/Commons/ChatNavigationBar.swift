@@ -283,7 +283,8 @@ import UIKit
         } else {
             self.rightImages.append(contentsOf: images)
         }
-        self.rightItems.frame = CGRect(x: ScreenWidth-CGFloat(images.count*36)-8, y: (nearStatusBar ? StatusBarHeight:0)+8, width: CGFloat(images.count*36), height: 36)
+        self.rightItems.frame = CGRect(x: ScreenWidth-CGFloat(images.count*36)-8, y: (nearStatusBar ? StatusBarHeight:0)+6, width: CGFloat(images.count*36), height: 36)
+        self.rightItems.center = CGPoint(x: self.rightItems.center.x, y: self.avatar.center.y)
         self.rightItems.reloadData()
     }
 
@@ -345,6 +346,7 @@ extension ChatNavigationBar: ThemeSwitchProtocol {
         self.contentView.backgroundColor = .clear
         self.backgroundColor = .clear
         self.addSubview(self.imageView)
+        self.imageView.center = self.contentView.center
     }
     
     required public init?(coder: NSCoder) {

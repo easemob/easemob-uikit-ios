@@ -141,7 +141,7 @@ import UIKit
         case .newChat:
             text = "new_chat_button_click_menu_selectcontacts".chat.localize
         case .contact:
-            text = "Contact".chat.localize
+            text = "Contact"
         case .shareContact:
             text = "Share Contact".chat.localize
         case .addGroupParticipant:
