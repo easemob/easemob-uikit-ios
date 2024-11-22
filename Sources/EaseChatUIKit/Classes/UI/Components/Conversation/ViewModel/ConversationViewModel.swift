@@ -438,7 +438,7 @@ extension ConversationViewModel: ConversationServiceListener {
             self.driver?.refreshList(infos: items)
             
             if infos.count < 11 || self.firstLoadConversation {
-                let requestCount = infos.count < 11 ? (infos.count - 1):10
+                let requestCount = items.count < 11 ? (items.count - 1):10
                 if requestCount > 0 {
                     self.requestDisplayProfiles(ids: items.prefix(upTo: requestCount).map({ $0.id }))
                     self.firstLoadConversation = false
