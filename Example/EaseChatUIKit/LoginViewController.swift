@@ -44,20 +44,21 @@ extension LoginViewController {
     
     @objc private func loginAction() {
         self.view.endEditing(true)
-        EaseChatUIKitClient.shared.logout(unbindNotificationDeviceToken: false) { _ in
-        }
-        guard let userName = self.userNameField.text,let passWord = self.passWordField.text,!userName.isEmpty,!passWord.isEmpty else { return }
-        self.userName = userName.lowercased()
-        self.passWord = passWord
-        let profile = EaseProfile()
-        profile.id = userName.lowercased()
-        profile.nickname = "Tester 001"
-        profile.avatarURL = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/sample_avatar/sample_avatar_1.png"
-        EaseChatUIKitClient.shared.login(user: profile, token: passWord) { error in
-            if error == nil {
-                UIApplication.shared.chat.keyWindow?.rootViewController = MainViewController()
-            } else {
-                self.showToast(toast: "login error:\(error?.errorDescription ?? "")",duration: 3)
+        EaseChatUIKitClient.shared.logout(unbindNotificationDeviceToken: false) { [weak self] _ in
+            guard let `self` = self else { return }
+            guard let userName = self.userNameField.text,let passWord = self.passWordField.text,!userName.isEmpty,!passWord.isEmpty else { return }
+            self.userName = userName.lowercased()
+            self.passWord = passWord
+            let profile = EaseProfile()
+            profile.id = userName.lowercased()
+            profile.nickname = "Tester 001"
+            profile.avatarURL = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/sample_avatar/sample_avatar_1.png"
+            EaseChatUIKitClient.shared.login(user: profile, token: passWord) { error in
+                if error == nil {
+                    UIApplication.shared.chat.keyWindow?.rootViewController = MainViewController()
+                } else {
+                    self.showToast(toast: "login error:\(error?.errorDescription ?? "")",duration: 3)
+                }
             }
         }
         
