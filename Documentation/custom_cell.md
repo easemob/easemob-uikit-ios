@@ -31,6 +31,9 @@ class RedPackageCell: CustomMessageCell {
 
 ```
 
+
+[图示](./red_package_message.jpg)
+
 ## 2.根据需求继承`EaseChatUIKit`中的Cell的渲染模型`MessageEntity`，并给定气泡大小，其中`redPackageIdentifier`为红包的自定义消息的event事件
 
 ```Swift
@@ -67,6 +70,9 @@ final class MineMessageEntity: MessageEntity {
 ```
 
 ## 3.添加发送附件消息的类型
+
+
+[图示](./send_red_package.jpg)
 
 示例，增加发送红包消息
 
@@ -149,6 +155,9 @@ extension MessageListViewModel {
 ```
 
 - 这里`ComponentsRegister.shared.Conversation = MineConversationInfo.self`是为了修改自定义消息在会话列表中，会话收到新消息时显示的内容这里暂定为显示 "[红包]"，示例代码如下，主要更改在非文本消息类型的else中根据自定义消息的event显示对应的内容
+
+[图示](./red_package_placeholder.jpg)
+
 ```Swift
 import UIKit
 import EaseChatUIKit
