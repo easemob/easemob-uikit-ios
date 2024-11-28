@@ -183,6 +183,22 @@ extension MessageInputExtensionView: ThemeSwitchProtocol {
         self.switchTheme(style: Theme.style)
     }
     
+    open override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        // 首先检查触摸点是否在 cover 的范围内
+        if self.cover.frame.contains(point) {
+            // 将点从 self 的坐标系转换到 cover 的坐标系
+            let convertedPoint = self.convert(point, to: self.cover)
+            // 在 cover 中查找可以处理该事件的视图
+            if let hitView = self.cover.hitTest(convertedPoint, with: event) {
+                return hitView
+            }
+        }
+        
+        // 如果触摸点不在 cover 内或 cover 无法处理该事件，
+        // 则调用父类的 hitTest 方法
+        return super.hitTest(point, with: event)
+    }
+    
     @objc private func onTap() {
         self.cover.backgroundColor = Theme.style == .dark ? UIColor.theme.neutralColor3 : UIColor.theme.neutralColor9
         DispatchQueue.main.asyncAfter(wallDeadline: .now()+1) {

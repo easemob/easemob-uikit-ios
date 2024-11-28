@@ -11,6 +11,10 @@
 		0500149F2B2AAA7E000DA9CE /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0500149E2B2AAA7E000DA9CE /* MainViewController.swift */; };
 		0565FBB12B4D127700F75C4A /* CustomConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0565FBB02B4D127700F75C4A /* CustomConversationViewController.swift */; };
 		0575E8EE2B54C29A00166BF1 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 0575E8ED2B54C29A00166BF1 /* README.md */; };
+		059853312CF08A9B00A7825D /* RedPackageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059853302CF08A9B00A7825D /* RedPackageCell.swift */; };
+		059853332CF08ADE00A7825D /* CustomMessageListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059853322CF08ADE00A7825D /* CustomMessageListController.swift */; };
+		059853352CF08F9900A7825D /* MineMessageEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059853342CF08F9900A7825D /* MineMessageEntity.swift */; };
+		059853372CF0971400A7825D /* MineConversationInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059853362CF0971400A7825D /* MineConversationInfo.swift */; };
 		0598E6992B366F5D0079BF47 /* HueSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0598E6982B366F5D0079BF47 /* HueSettingViewController.swift */; };
 		05BF34412B2C2F29004639CE /* OptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BF34402B2C2F29004639CE /* OptionsViewController.swift */; };
 		0FD976A5382D36AF6B70D22C /* Pods_EaseChatUIKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93876C90F7ED383C7B3B2838 /* Pods_EaseChatUIKit_Example.framework */; };
@@ -28,6 +32,10 @@
 		0575E8ED2B54C29A00166BF1 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		057CC2ED2B396191008E8AD8 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		057CC2EE2B396191008E8AD8 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		059853302CF08A9B00A7825D /* RedPackageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RedPackageCell.swift; sourceTree = "<group>"; };
+		059853322CF08ADE00A7825D /* CustomMessageListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomMessageListController.swift; sourceTree = "<group>"; };
+		059853342CF08F9900A7825D /* MineMessageEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MineMessageEntity.swift; sourceTree = "<group>"; };
+		059853362CF0971400A7825D /* MineConversationInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MineConversationInfo.swift; sourceTree = "<group>"; };
 		0598E6982B366F5D0079BF47 /* HueSettingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HueSettingViewController.swift; sourceTree = "<group>"; };
 		059AD7A42B29A3BB0043D299 /* VoiceConvert.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = VoiceConvert.xcframework; path = ../Sources/EaseChatUIKit/Classes/UI/Core/UIKit/FrameWorks/VoiceConvert.xcframework; sourceTree = "<group>"; };
 		05BF34402B2C2F29004639CE /* OptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsViewController.swift; sourceTree = "<group>"; };
@@ -93,6 +101,10 @@
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
+				059853302CF08A9B00A7825D /* RedPackageCell.swift */,
+				059853322CF08ADE00A7825D /* CustomMessageListController.swift */,
+				059853342CF08F9900A7825D /* MineMessageEntity.swift */,
+				059853362CF0971400A7825D /* MineConversationInfo.swift */,
 			);
 			name = "Example for EaseChatUIKit";
 			path = EaseChatUIKit;
@@ -172,7 +184,7 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						DevelopmentTeam = JC854K845H;
+						DevelopmentTeam = 3Y5B6D2XFS;
 						LastSwiftMigration = 1500;
 					};
 				};
@@ -259,8 +271,8 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-EaseChatUIKit_Example/Pods-EaseChatUIKit_Example-resources.sh",
-				"${PODS_ROOT}/../../Sources/EaseChatUIKit/Classes/UI/Resources/EaseChatResource.bundle",
-				"${PODS_ROOT}/../../Sources/EaseChatUIKit/Classes/UI/Resources/PrivacyInfo.xcprivacy",
+				"${PODS_ROOT}/EaseChatUIKit/Sources/EaseChatUIKit/Classes/UI/Resources/EaseChatResource.bundle",
+				"${PODS_ROOT}/EaseChatUIKit/Sources/EaseChatUIKit/Classes/UI/Resources/PrivacyInfo.xcprivacy",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
@@ -282,9 +294,13 @@
 				0598E6992B366F5D0079BF47 /* HueSettingViewController.swift in Sources */,
 				0500149B2B2AA725000DA9CE /* LoginViewController.swift in Sources */,
 				607FACD81AFB9204008FA782 /* SettingViewController.swift in Sources */,
+				059853352CF08F9900A7825D /* MineMessageEntity.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
+				059853332CF08ADE00A7825D /* CustomMessageListController.swift in Sources */,
+				059853372CF0971400A7825D /* MineConversationInfo.swift in Sources */,
 				0500149F2B2AAA7E000DA9CE /* MainViewController.swift in Sources */,
 				0565FBB12B4D127700F75C4A /* CustomConversationViewController.swift in Sources */,
+				059853312CF08A9B00A7825D /* RedPackageCell.swift in Sources */,
 				05BF34412B2C2F29004639CE /* OptionsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -419,7 +435,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 58;
-				DEVELOPMENT_TEAM = JC854K845H;
+				DEVELOPMENT_TEAM = 3Y5B6D2XFS;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				INFOPLIST_FILE = EaseChatUIKit/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = EaseChat;
@@ -443,7 +459,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 58;
-				DEVELOPMENT_TEAM = JC854K845H;
+				DEVELOPMENT_TEAM = 3Y5B6D2XFS;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				INFOPLIST_FILE = EaseChatUIKit/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = EaseChat;

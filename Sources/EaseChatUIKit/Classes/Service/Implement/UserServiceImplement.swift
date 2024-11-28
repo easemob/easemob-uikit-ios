@@ -17,7 +17,7 @@ public var saveIdentifier: String {
     
     /// Init method
     /// - Parameters:
-    ///   - userInfo: ``EaseProfileProtocol``
+    ///   - userInfo: ``ChatUserProfileProtocol``
     ///   - token: Chat token
     ///   - completion: Callback,login successful or failure.
     @objc public init(userInfo: ChatUserProfileProtocol,token: String,completion: @escaping (ChatError?) -> Void) {
@@ -89,13 +89,13 @@ extension UserServiceImplement:UserServiceProtocol {
     }
     
     public func updateUserInfo(userInfo: ChatUserProfileProtocol, completion: @escaping (Bool, ChatError?) -> Void) {
-//        if userInfo.id == EaseChatUIKitContext.shared?.currentUserId ?? "" {
-//            EaseChatUIKitContext.shared?.currentUser = userInfo
-//            EaseChatUIKitContext.shared?.userCache?[userInfo.id] = userInfo
+//        if userInfo.id == ChatUIKitContext.shared?.currentUserId ?? "" {
+//            ChatUIKitContext.shared?.currentUser = userInfo
+//            ChatUIKitContext.shared?.userCache?[userInfo.id] = userInfo
 //        } else {
-//            EaseChatUIKitContext.shared?.updateCache(type: .chat, profile: userInfo)
-//            EaseChatUIKitContext.shared?.updateCache(type: .user, profile: userInfo)
-//            EaseChatUIKitContext.shared?.updateCache(type: .group, profile: userInfo)
+//            ChatUIKitContext.shared?.updateCache(type: .chat, profile: userInfo)
+//            ChatUIKitContext.shared?.updateCache(type: .user, profile: userInfo)
+//            ChatUIKitContext.shared?.updateCache(type: .group, profile: userInfo)
 //        }
     }
     

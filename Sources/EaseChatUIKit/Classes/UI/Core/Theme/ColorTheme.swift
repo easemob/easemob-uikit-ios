@@ -185,13 +185,13 @@ public extension UIColor {
         public static var gradientEndHue: CGFloat = 233/360.0
         
             
-        public lazy var primaryDarkColor: UIColor = {
+        public var primaryDarkColor: UIColor {
             UIColor.theme.primaryColor6
-        }()
+        }
         
-        public lazy var primaryLightColor: UIColor = {
+        public var primaryLightColor: UIColor {
             UIColor.theme.primaryColor5
-        }()
+        }
         
         /// UIColor Extension
         ///  `UIColor.theme.primaryColor0`

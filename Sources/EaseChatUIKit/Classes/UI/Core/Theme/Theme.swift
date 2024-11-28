@@ -56,9 +56,6 @@ import Foundation
     /// `Theme.switchTheme(style: .dark)`
     @MainActor public static func switchTheme(style: ThemeStyle) {
         self.style = style
-        if style == .custom {
-            UIColor.ColorTheme.switchHues(hues: [Appearance.primaryHue,Appearance.secondaryHue,Appearance.errorHue,Appearance.neutralHue,Appearance.neutralSpecialHue])
-        }
         for view in self.registerViews.allObjects {
             if view.conforms(to: ThemeSwitchProtocol.self) {
                 view.switchTheme(style: style)

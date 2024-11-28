@@ -3,7 +3,7 @@ import UIKit
 @objcMembers open class ContactViewController: UIViewController {
     
     /// A closure that is called when the user confirms the selection of profiles.
-    /// - Parameter profiles: An array of `EaseProfileProtocol` objects representing the selected profiles.
+    /// - Parameter profiles: An array of `ChatUserProfileProtocol` objects representing the selected profiles.
     public var confirmClosure: (([ChatUserProfileProtocol]) -> ())?
     
     public private(set) var style = ContactListHeaderStyle.contact
@@ -141,7 +141,7 @@ import UIKit
         case .newChat:
             text = "new_chat_button_click_menu_selectcontacts".chat.localize
         case .contact:
-            text = "Contact".chat.localize
+            text = "Contact"
         case .shareContact:
             text = "Share Contact".chat.localize
         case .addGroupParticipant:

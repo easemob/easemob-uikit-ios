@@ -27,7 +27,7 @@ import UIKit
     /// The method'll called on contact list cell clicked.
     /// - Parameters:
     ///   - indexPath: ``IndexPath``
-    ///   - profile: Conform to ``EaseProfileProtocol`` object.
+    ///   - profile: Conform to ``ChatUserProfileProtocol`` object.
     func didSelected(indexPath: IndexPath,profile: ChatUserProfileProtocol)
 }
 
@@ -47,11 +47,11 @@ import UIKit
     func occurError()
     
     /// This method can be used when you want refresh some  display info  of datas.
-    /// - Parameter infos: Array of conform to``EaseProfileProtocol`` object.
+    /// - Parameter infos: Array of conform to``ChatUserProfileProtocol`` object.
     func refreshProfiles(infos: [ChatUserProfileProtocol])
     
     /// This method can be used when pulling down to refresh.
-    /// - Parameter infos: Array of conform to``EaseProfileProtocol`` objects.
+    /// - Parameter infos: Array of conform to``ChatUserProfileProtocol`` objects.
     func refreshList(infos: [ChatUserProfileProtocol])
     
     /// The method can be used when you want to refresh header of the contact list.
@@ -59,11 +59,11 @@ import UIKit
     func refreshHeader(info: ContactListHeaderItemProtocol)
     
     /// The method can be used when you want to remove a contact.
-    /// - Parameter info: ``EaseProfileProtocol``
+    /// - Parameter info: ``ChatUserProfileProtocol``
     func remove(info: ChatUserProfileProtocol)
     
     /// The method can be user when you want to add someone to contact list.
-    /// - Parameter info: ``EaseProfileProtocol``
+    /// - Parameter info: ``ChatUserProfileProtocol``
     func appendThenRefresh(info: ChatUserProfileProtocol)
 }
 

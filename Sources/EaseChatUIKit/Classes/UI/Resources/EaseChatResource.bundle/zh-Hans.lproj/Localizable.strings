@@ -213,3 +213,11 @@
 "failed" = "失败";
 "No pinned messages" = "暂无置顶消息";
 "Please select greater than one message." = "请至少选择一条消息";
+
+
+
+"Delete Conversation Alert" = "删除此会话?";
+
+"Delete Message Alert" = "删除此消息?";
+
+"Delete warning" = "删除后不可恢复";

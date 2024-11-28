@@ -200,7 +200,7 @@
 "block" = "Block";
 "unblock" = "Unblock";
 "block contact" = "Block Contact";
-"Confirm Remove" = "Confirm Remove";
+"Confirm Remove" = "Confirm";
 "Sticky Message" = "Pin Message";
 "pinned a message" = "pinned a message";
 "unpinned a message" = "unpinned a message";
@@ -213,3 +213,9 @@
 "failed" = "failed";
 "No pinned messages" = "No pinned messages";
 "Please select greater than one message." = "Please select greater than one message.";
+
+"Delete Conversation Alert" = "Delete this conversation?";
+
+"Delete Message Alert" = "Delete this message?";
+
+"Delete warning" = "Deletion is irreversible.";

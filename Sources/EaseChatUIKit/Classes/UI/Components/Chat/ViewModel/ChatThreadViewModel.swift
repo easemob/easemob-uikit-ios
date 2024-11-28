@@ -307,14 +307,17 @@ import UIKit
     }
     
     @objc open func deleteMessage(message: ChatMessage) {
-        if let conversation = ChatClient.shared().chatManager?.getConversation(self.to, type: .groupChat, createIfNotExist: true, isThread: true) {
-            ChatClient.shared().chatManager?.removeMessagesFromServer(with: conversation, messageIds: [message.messageId], completion: { [weak self] error in
-                if error != nil {
-                    consoleLogInfo("delete message error:\(error?.errorDescription ?? "")", type: .error)
-                } else {
-                    self?.driver?.processMessage(operation: .delete, message: message)
-                }
-            })
+        DialogManager.shared.showAlert(title: "Delete Message Alert".chat.localize, content: "Delete warning".chat.localize, showCancel: true, showConfirm: true) { [weak self] _ in
+            guard let `self` = self else { return }
+            if let conversation = ChatClient.shared().chatManager?.getConversation(self.to, type: .groupChat, createIfNotExist: true, isThread: true) {
+                ChatClient.shared().chatManager?.removeMessagesFromServer(with: conversation, messageIds: [message.messageId], completion: { [weak self] error in
+                    if error != nil {
+                        consoleLogInfo("delete message error:\(error?.errorDescription ?? "")", type: .error)
+                    } else {
+                        self?.driver?.processMessage(operation: .delete, message: message)
+                    }
+                })
+            }
         }
         
     }

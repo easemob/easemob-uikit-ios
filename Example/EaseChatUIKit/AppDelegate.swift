@@ -18,9 +18,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        let option = ChatOptions(appkey: <#环信AppKey#>)
+        let option = ChatOptions(appkey: <#Your App Key#>)
         option.enableConsoleLog = true
         _ = EaseChatUIKitClient.shared.setup(option: option)
+        let redPackage = ActionSheetItem(title: "红包".chat.localize, type: .normal,tag: "Red",image: UIImage(named: "photo", in: .chatBundle, with: nil))
+        Appearance.chat.inputExtendActions.append(redPackage)
+        ComponentsRegister.shared.MessageRenderEntity = MineMessageEntity.self
+        ComponentsRegister.shared.Conversation = MineConversationInfo.self
+        ComponentsRegister.shared.MessageViewController = CustomMessageListController.self
+        ComponentsRegister.shared.registerCustomizeCellClass(cellType: RedPackageCell.self)
         return true
     }
 

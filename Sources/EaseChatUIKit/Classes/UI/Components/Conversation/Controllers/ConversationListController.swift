@@ -256,7 +256,7 @@ extension ConversationListController {
      Creates a group conversation with the given profiles.
      
      - Parameters:
-        - profiles: An array of `EaseProfileProtocol` objects representing the selected profiles for the group conversation.
+        - profiles: An array of `ChatUserProfileProtocol` objects representing the selected profiles for the group conversation.
      
      This method creates a group conversation with the given profiles. It constructs the group name based on the profiles' nicknames or IDs, and then uses the `ChatGroupOption` to configure the group settings. Finally, it calls the `createGroup` method of the `ChatGroupManager` to create the group.
      */

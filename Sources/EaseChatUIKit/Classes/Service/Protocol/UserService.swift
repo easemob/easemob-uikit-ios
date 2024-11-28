@@ -36,7 +36,7 @@ import Foundation
     
     /// Update user info.The frequency of api usage for free users is 100 times in 1 second.Upgrading the package can increase the usage.
     /// - Parameters:
-    ///   - userInfo: EaseProfileProtocol
+    ///   - userInfo: ChatUserProfileProtocol
     ///   - completion: 
     func updateUserInfo(userInfo: ChatUserProfileProtocol, completion: @escaping (Bool,ChatError?) -> Void)
     
