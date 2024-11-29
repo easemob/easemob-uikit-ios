@@ -265,15 +265,16 @@ public let HeaderTopBottomMargin = CGFloat(12)
         let headerFrame = self.header?.frame ?? .zero
         let itemCount = min(self.items.count, 5)
         let menuWidth = itemCount < 5 ? CGFloat(itemCount) * PopItemWidth + PopLeftRightMargin * 2 : self.menuSize.width
+        let lines: CGFloat = CGFloat(ceilf(Float(CGFloat(self.items.count/5))))
         let menuHeight = self.menuSize.height + headerFrame.height + HeaderTopBottomMargin * 2
         let spac: CGFloat = 10.0
-        var popFrame = CGRect(x: (ScreenWidth - menuWidth) / 2.0, y: 0, width: menuWidth, height: menuHeight + HeaderTopBottomMargin + (self.header != nil ? 16 : 0))
+        var popFrame = CGRect(x: (ScreenWidth-menuWidth)/2.0, y: 0, width: menuWidth, height: menuHeight+HeaderTopBottomMargin*2+headerFrame.height+(lines-1)*8+CGFloat(self.header == nil ? 0:20))
         
         let left = targetCenter.x / ScreenWidth < 0.5
         var top = targetFrame.minY < popFrame.height + PopArrowSize.height + StatusBarHeight
-        if top {
-            popFrame = CGRect(x: (ScreenWidth - menuWidth) / 2.0, y: 0, width: menuWidth, height: menuHeight + HeaderTopBottomMargin + (self.header != nil ? 16 : 0))
-        }
+//        if top {
+//            popFrame = CGRect(x: (ScreenWidth - menuWidth) / 2.0, y: 0, width: menuWidth, height: menuHeight + HeaderTopBottomMargin + (self.header != nil ? 16 : 0))
+//        }
         if self.startRect != .zero {
             top = targetFrame.minY < popFrame.height + PopArrowSize.height + StatusBarHeight
         }
@@ -337,13 +338,13 @@ public let HeaderTopBottomMargin = CGFloat(12)
         let menuHeight = self.menuSize.height
         let spac: CGFloat = 10.0
         let lines: CGFloat = CGFloat(ceilf(Float(CGFloat(self.items.count/5))))
-        var popFrame = CGRect(x: (ScreenWidth-menuWidth)/2.0, y: 0, width: menuWidth, height: menuHeight+HeaderTopBottomMargin*2+headerFrame.height+(lines-1)*8)
+        var popFrame = CGRect(x: (ScreenWidth-menuWidth)/2.0, y: 0, width: menuWidth, height: menuHeight+HeaderTopBottomMargin*2+headerFrame.height+(lines-1)*8+CGFloat(self.header == nil ? 0:20))
         
         let left = targetCenter.x / ScreenWidth < 0.5
         var top = targetFrame.minY < popFrame.height + PopArrowSize.height + StatusBarHeight
-        if top {
-            popFrame = CGRect(x: (ScreenWidth-menuWidth)/2.0, y: 0, width: menuWidth, height: menuHeight+HeaderTopBottomMargin*2+headerFrame.height+(lines-1)*8)
-        }
+//        if top {
+//            popFrame = CGRect(x: (ScreenWidth-menuWidth)/2.0, y: 0, width: menuWidth, height: menuHeight+HeaderTopBottomMargin*2+headerFrame.height+(lines-1)*8)
+//        }
         if self.startRect != .zero {
             top = targetFrame.minY < popFrame.height + PopArrowSize.height + StatusBarHeight
         }

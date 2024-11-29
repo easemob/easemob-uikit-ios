@@ -165,6 +165,8 @@ import UIKit
 extension MessageInputBar: UITextViewDelegate {
     
     public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        self.extensionMenus.isHidden = true
+        self.emoji?.isHidden = true
         if text == "\n" {
             self.sendMessage()
             return false
@@ -271,6 +273,7 @@ extension MessageInputBar: UITextViewDelegate {
             if textHeight >= Appearance.chat.maxInputHeight {
                 self.frame = CGRect(x: 0, y: self.rawFrame.maxY - (Appearance.chat.maxInputHeight) - self.keyboardHeight - (NavigationHeight <= 64 ? 36:0) - space, width: self.frame.width, height: Appearance.chat.maxInputHeight+16)
                 self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: Appearance.chat.maxInputHeight)
+                self.inputField.scrollRangeToVisible(NSMakeRange(self.inputField.attributedText.length, 1))
             } else {
                 self.frame = CGRect(x: 0, y: self.rawFrame.maxY - textHeight - self.keyboardHeight - (NavigationHeight <= 64 ? 36:0) - space, width: self.frame.width, height: textHeight+16)
                 self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: textHeight+4)
@@ -330,11 +333,16 @@ extension MessageInputBar: UITextViewDelegate {
             self.inputField.resignFirstResponder()
         } else {
             self.extensionMenus.isHidden = true
-            self.inputField.becomeFirstResponder()
+            if !self.rightView.isSelected {
+                self.inputField.becomeFirstResponder()
+            }
         }
-        self.keyboardHeight = self.extensionMenus.frame.height
+        self.keyboardHeight = (Appearance.chat.inputExtendActions.count > 4 ? 230:132)
+        self.frame = self.rawFrame
         self.attachment.isSelected = selected
-        self.showExtensionMenus()
+        if selected {
+            self.showExtensionMenus()
+        }
         self.textViewFirstResponder?(true)
     }
     
@@ -342,6 +350,7 @@ extension MessageInputBar: UITextViewDelegate {
         self.rightView.isSelected = false
         self.attachment.isSelected = false
         self.extensionMenus.isHidden = true
+        self.extensionMenus.isUserInteractionEnabled = false
         self.emoji?.isHidden = true
         self.inputField.text = nil
         self.inputField.attributedText = nil
@@ -359,6 +368,7 @@ extension MessageInputBar: UITextViewDelegate {
         self.attachment.frame = CGRect(x: self.frame.width - 42, y: self.inputField.frame.maxY-32, width: 30, height: 30)
         self.attachment.isSelected = false
         self.extensionMenus.isHidden = true
+        self.extensionMenus.isUserInteractionEnabled = false
     }
     
     public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
@@ -400,11 +410,11 @@ extension MessageInputBar: UITextViewDelegate {
             self.inputField.resignFirstResponder()
             self.showEmojiKeyboard()
         } else {
-            self.inputField.becomeFirstResponder()
+            if !self.rightView.isSelected {
+                self.inputField.becomeFirstResponder()
+            }
         }
-        if self.keyboardHeight <= 152 {
-            self.keyboardHeight = 256+BottomBarHeight
-        }
+        self.updateHeight()
         self.textViewFirstResponder?(true)
     }
     
@@ -441,19 +451,20 @@ extension MessageInputBar: UITextViewDelegate {
     }
     
     @objc open func showEmojiKeyboard() {
+        self.emoji?.isUserInteractionEnabled = true
         if self.rightView.isSelected {
             if self.keyboardHeight <= 152 {
                 self.keyboardHeight = 256+BottomBarHeight
             }
-            self.frame = CGRect(x: 0, y: self.frame.origin.y, width: self.frame.width, height: self.keyboardHeight + self.rawFrame.height)
+            let emojiHeight = self.keyboardHeight+self.inputField.frame.height+16+BottomBarHeight
+            self.frame = CGRect(x: 0, y: -emojiHeight, width: self.frame.width, height: emojiHeight)
             if self.emoji == nil{
                 let emoji = MessageInputEmojiView(frame: CGRect(x: 0, y: self.rawFrame.height, width: self.frame.width, height: self.keyboardHeight)).tag(124).backgroundColor(.clear)
                 self.emoji = emoji
                 self.addSubview(emoji)
             } else {
-                self.emoji?.frame = CGRect(x: 0, y: self.rawFrame.height, width: self.frame.width, height: self.keyboardHeight)
+                self.emoji?.frame = CGRect(x: 0, y: self.inputField.frame.maxY+8, width: self.frame.width, height: self.keyboardHeight)
             }
-            self.updateHeight()
             self.emoji?.sendClosure = { [weak self] in
                 self?.sendMessage()
             }
@@ -485,14 +496,15 @@ extension MessageInputBar: UITextViewDelegate {
     }
     
     @objc open func showExtensionMenus() {
+        self.extensionMenus.isUserInteractionEnabled = true
         if !self.subviews.contains(self.extensionMenus) {
             self.addSubview(self.extensionMenus)
         }
         self.extensionMenus.isHidden = false
         UIView.animate(withDuration: self.hiddenDuration) {
             if self.attachment.isSelected {
-                self.frame = CGRect(x: 0, y: self.frame.minY-self.extensionMenus.frame.height, width: self.frame.width, height: self.extensionMenus.frame.height + self.inputField.frame.height + 16)
                 self.extensionMenus.frame = CGRect(x: 0, y: self.inputField.frame.maxY+15, width: self.frame.width, height: (Appearance.chat.inputExtendActions.count > 4 ? 230:132))
+                self.frame = CGRect(x: 0, y: self.frame.minY-self.extensionMenus.frame.height-BottomBarHeight, width: self.frame.width, height: self.extensionMenus.frame.height + self.inputField.frame.height + BottomBarHeight)
             } else {
                 self.extensionMenus.isHidden = true
             }
