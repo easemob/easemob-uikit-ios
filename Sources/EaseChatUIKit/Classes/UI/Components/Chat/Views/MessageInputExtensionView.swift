@@ -114,16 +114,14 @@ import UIKit
         
         self.scrollView.contentSize = CGSize(width: pageWidth * CGFloat(numberOfPages), height: pageHeight)
         
-        // Calculate total content width
-        let totalColumns = min(self.items.count, 4)
-        let totalContentWidth = CGFloat(totalColumns) * itemWidth + CGFloat(totalColumns - 1) * horizontalSpacing
-        
-        // Calculate left margin to center the content
-        let leftMargin = (pageWidth - totalContentWidth) / 2
+        // Always start from the left margin
+        let leftMargin = horizontalMargin
         
         for (index, item) in self.items.enumerated() {
             let pageIndex = index / 8
             let itemIndex = index % 8
+            
+            // Calculate row and column based on itemIndex
             let row = itemIndex / 4
             let column = itemIndex % 4
             
@@ -136,6 +134,8 @@ import UIKit
             self.scrollView.addSubview(itemView)
         }
     }
+
+
 
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
