@@ -291,6 +291,12 @@ extension MessageInputBar: UITextViewDelegate {
             self.rightView.frame = CGRect(x: self.frame.width-80, y: self.inputField.frame.maxY-32, width: 30, height: 30)
             self.attachment.frame = CGRect(x: self.frame.width - 42, y: self.inputField.frame.maxY-32, width: 30, height: 30)
             self.frame = CGRect(x: 0, y: self.rawFrame.maxY - 16 - self.keyboardHeight - (NavigationHeight <= 64 ? 36:0) - space, width: self.frame.width, height: self.rawFrame.height)
+            if !(self.emoji?.isHidden ?? false) {
+                if self.keyboardHeight <= 152 {
+                    self.keyboardHeight = 256+BottomBarHeight
+                }
+                self.emoji?.frame = CGRect(x: 0, y: self.inputField.frame.maxY+8, width: self.frame.width, height: self.keyboardHeight)
+            }
         }
         self.recordedFrame = self.frame
     }
@@ -299,9 +305,16 @@ extension MessageInputBar: UITextViewDelegate {
      This function is called when the user taps on the send button in the chat input bar. It hides the input bar, deselects the right view, and sends the message if the input field is not empty. It also resets the input field and the frame of the input bar to their original values.
      */
     @objc func sendMessage() {
+        if self.rightView.isSelected {
+            self.showEmojiKeyboard()
+        }
+        if self.attachment.isSelected {
+            self.processAttachmentView(selected: self.attachment.isSelected)
+        }
         self.rightView.isSelected = false
         self.attachment.isSelected = false
         self.extensionMenus.isHidden = true
+        self.extensionMenus.isUserInteractionEnabled = false
         if !self.inputField.attributedText.toString().isEmpty {
             self.actionClosure?(.send,self.inputField.attributedText)
         }
@@ -390,6 +403,7 @@ extension MessageInputBar: UITextViewDelegate {
         self.attachment.isSelected = false
         self.emoji?.isHidden  = true
         self.extensionMenus.isHidden = true
+        self.extensionMenus.isUserInteractionEnabled = false
         self.attachment.setImage(self.attachmentImage, for: .normal)
         self.rightView.isSelected = false
         return super.hitTest(point, with: event)
@@ -422,6 +436,8 @@ extension MessageInputBar: UITextViewDelegate {
         if !self.inputField.isFirstResponder {
             return
         }
+        self.emoji?.isHidden = true
+        self.extensionMenus.isHidden = true
         guard let frame = notification.chat.keyboardEndFrame else { return }
         guard let duration = notification.chat.keyboardAnimationDuration else { return }
         self.keyboardHeight = frame.height
