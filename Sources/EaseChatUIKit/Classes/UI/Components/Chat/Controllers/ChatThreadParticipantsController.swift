@@ -28,7 +28,7 @@ import UIKit
     /// Creates and returns a navigation bar for the ChatThreadParticipantsController.
     /// - Returns: An instance of EaseChatNavigationBar.
     @objc open func createNavigation() -> ChatNavigationBar {
-        ChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: true, textAlignment: .left ,hiddenAvatar: true).backgroundColor(.clear)
+        ChatNavigationBar(show: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: true, textAlignment: .left ,hiddenAvatar: true).backgroundColor(.clear)
     }
 
     

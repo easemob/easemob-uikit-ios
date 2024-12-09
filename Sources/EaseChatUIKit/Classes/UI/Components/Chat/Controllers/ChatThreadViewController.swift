@@ -102,6 +102,7 @@ import AVFoundation
         self.view.backgroundColor = UIColor.theme.neutralColor98
         self.view.addSubViews([self.messageContainer,self.navigation])
         self.setupTitle()
+        print("ChatThreadViewController viewDidLoad:\(String(describing: self.profile.threadId))")
 //        if self.parentMessage != nil {
 //            self.messageContainer.messageList.tableHeaderView = self.messageHeader
 //        }

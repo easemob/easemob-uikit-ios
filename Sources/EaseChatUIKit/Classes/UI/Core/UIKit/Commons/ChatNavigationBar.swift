@@ -34,11 +34,11 @@ import UIKit
     
     public var clickClosure: ((ChatNavigationBarClickEvent,IndexPath?) -> ())?
     
-    private let backImage = UIImage(named: "back", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.neutralColor3)
+    public let backImage = UIImage(named: "back", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.neutralColor3)
     
-    private var rightImages = [UIImage]()
+    public var rightImages = [UIImage]()
     
-    private var showLeft = false
+    public var showLeft = false
     
     /// Title kind of the ``NSAttributedString``.
     public var titleAttribute: NSAttributedString? {
@@ -142,11 +142,11 @@ import UIKit
         UIButton(type: .custom).frame(CGRect(x: ScreenWidth-58, y: self.frame.height-36, width: 50, height: 28)).backgroundColor(.clear).title("barrage_long_press_menu_cancel".chat.localize, .normal).font(UIFont.theme.labelMedium).textColor(UIColor.theme.primaryLightColor, .normal).tag(4).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside)
     }()
     
-    private var originalRenderRightImage = false
+    public var originalRenderRightImage = false
     
-    private var nearStatusBar = true
+    public var nearStatusBar = true
 
-    internal override init(frame: CGRect) {
+    public override init(frame: CGRect) {
         super.init(frame: frame)
     }
     
@@ -158,7 +158,7 @@ import UIKit
     ///   - avatarURL: Avatar url.
     ///   - rightImages: Right buttons kind of `[UIImage]`.
     ///   - hiddenAvatar: Whether hide avatar or not.
-    @objc required public convenience init(frame: CGRect = CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: Bool, textAlignment: NSTextAlignment = .center, placeHolder: UIImage? = nil,avatarURL: String? = nil,rightImages: [UIImage] = [],hiddenAvatar: Bool = false,nearStatusBar: Bool = true) {
+    @objc public convenience init(show frame: CGRect = CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: Bool, textAlignment: NSTextAlignment = .center, placeHolder: UIImage? = nil,avatarURL: String? = nil,rightImages: [UIImage] = [],hiddenAvatar: Bool = false,nearStatusBar: Bool = true) {
         self.init(frame: frame)
         self.showLeft = showLeftItem
         self.nearStatusBar = nearStatusBar
@@ -216,7 +216,7 @@ import UIKit
     /// - Parameters:
     ///   - textAlignment: ``NSTextAlignment``
     ///   - rightTitle: Title of the right item.
-    @objc required public convenience init(frame: CGRect = CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: NSTextAlignment = .center,rightTitle: String? = nil) {
+    @objc public convenience init(show frame: CGRect = CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: NSTextAlignment = .center,rightTitle: String? = nil) {
         self.init(frame: frame)
         self.addSubViews([self.leftItem,self.titleLabel,self.detail,self.rightItem,self.separateLine,self.cancel])
         self.leftItem.setHitTestEdgeInsets(UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10))
@@ -242,7 +242,7 @@ import UIKit
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func addGesture() {
+    public func addGesture() {
         let gesture = UITapGestureRecognizer(target: self, action: #selector(clickAction(gesture:)))
         self.titleLabel.isUserInteractionEnabled = true
         self.avatar.isUserInteractionEnabled = true
