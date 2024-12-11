@@ -1,6 +1,6 @@
 import Foundation
 
-public let ChatUIKit_VERSION = "4.10.1"
+public let ChatUIKit_VERSION = "4.11.1"
 
 public let cache_update_notification = "ChatUIKitContextUpdateCache"
 

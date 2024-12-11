@@ -102,9 +102,6 @@ import AVFoundation
         self.view.backgroundColor = UIColor.theme.neutralColor98
         self.view.addSubViews([self.messageContainer,self.navigation])
         self.setupTitle()
-//        if self.parentMessage != nil {
-//            self.messageContainer.messageList.tableHeaderView = self.messageHeader
-//        }
         self.navigation.clickClosure = { [weak self] in
             self?.navigationClick(type: $0, indexPath: $1)
         }

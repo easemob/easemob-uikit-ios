@@ -21,7 +21,7 @@ open class BlockContactsViewController: UIViewController {
      - Returns: An instance of EaseChatNavigationBar.
      */
     @objc open func createNavigation() -> ChatNavigationBar {
-        ChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: .left).backgroundColor(.clear)
+        ChatNavigationBar(show: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: .left).backgroundColor(.clear)
     }
     
     public private(set) lazy var search: UIButton = {

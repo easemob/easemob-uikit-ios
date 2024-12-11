@@ -19,12 +19,12 @@ import UIKit
      */
     @objc open func createNavigation() -> ChatNavigationBar {
         if self.style == .newGroup  || self.style == .shareContact || self.style == .newChat {
-            return ChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "").backgroundColor(.clear)
+            return ChatNavigationBar(show: CGRect(x: 0, y: 0, width: ScreenWidth, height: 44),textAlignment: .left,rightTitle: "").backgroundColor(.clear)
         } else {
             if style == .addGroupParticipant {
-                return ChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: .left,rightTitle: "Add".chat.localize).backgroundColor(.clear)
+                return ChatNavigationBar(show: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),textAlignment: .left,rightTitle: "Add".chat.localize).backgroundColor(.clear)
             } else {
-                return ChatNavigationBar(frame: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: self.style != .contact, rightImages: self.style == .newChat ? []:[UIImage(named: "person_add", in: .chatBundle, with: nil)!],hiddenAvatar: self.style == .contact ? false:true).backgroundColor(.clear)
+                return ChatNavigationBar(show: CGRect(x: 0, y: 0, width: ScreenWidth, height: NavigationHeight),showLeftItem: self.style != .contact, rightImages: self.style == .newChat ? []:[UIImage(named: "person_add", in: .chatBundle, with: nil)!],hiddenAvatar: self.style == .contact ? false:true).backgroundColor(.clear)
             }
         }
     }
