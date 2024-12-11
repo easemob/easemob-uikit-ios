@@ -253,10 +253,12 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-EaseChatUIKit_Example/Pods-EaseChatUIKit_Example-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/AgoraInfra_iOS/aosl.framework/aosl",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/HyphenateChat/HyphenateChat.framework/HyphenateChat",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/aosl.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HyphenateChat.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -271,8 +273,8 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-EaseChatUIKit_Example/Pods-EaseChatUIKit_Example-resources.sh",
-				"${PODS_ROOT}/EaseChatUIKit/Sources/EaseChatUIKit/Classes/UI/Resources/EaseChatResource.bundle",
-				"${PODS_ROOT}/EaseChatUIKit/Sources/EaseChatUIKit/Classes/UI/Resources/PrivacyInfo.xcprivacy",
+				"${PODS_ROOT}/../../Sources/EaseChatUIKit/Classes/UI/Resources/EaseChatResource.bundle",
+				"${PODS_ROOT}/../../Sources/EaseChatUIKit/Classes/UI/Resources/PrivacyInfo.xcprivacy",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (

@@ -23,7 +23,7 @@ class SettingViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
 //        self.avatar.backgroundColor(.clear).cornerRadius(Appearance.avatarRadius)
-        self.nickname.text = EaseChatUIKitContext.shared?.currentUserId ?? ""
+        self.nickname.text = ChatUIKitContext.shared?.currentUserId ?? ""
         let avatarImage = ImageView(frame: .zero)
         self.avatar.addSubview(avatarImage)
         avatarImage.translatesAutoresizingMaskIntoConstraints = false
@@ -31,7 +31,7 @@ class SettingViewController: UIViewController {
         avatarImage.bottomAnchor.constraint(equalTo: self.avatar.bottomAnchor,constant: 0).isActive = true
         avatarImage.leftAnchor.constraint(equalTo: self.avatar.leftAnchor,constant: 0).isActive = true
         avatarImage.rightAnchor.constraint(equalTo: self.avatar.rightAnchor,constant: 0).isActive = true
-        if let avatarURL = EaseChatUIKitContext.shared?.currentUser?.avatarURL {
+        if let avatarURL = ChatUIKitContext.shared?.currentUser?.avatarURL {
             avatarImage.image(with: avatarURL, placeHolder: Appearance.avatarPlaceHolder)
         } else {
             self.avatar.image = Appearance.avatarPlaceHolder
@@ -46,12 +46,12 @@ class SettingViewController: UIViewController {
     
     @IBAction func logoutAction(_ sender: UIButton) {
         print("logout begin :\(Date().timeIntervalSince1970*1000)")
-        EaseChatUIKitClient.shared.logout(unbindNotificationDeviceToken: false) { error in
+        ChatUIKitClient.shared.logout(unbindNotificationDeviceToken: false) { error in
             consoleLogInfo("logout error:\(error?.errorDescription ?? "")", type: .error)
         }
         print("logout end :\(Date().timeIntervalSince1970*1000)")
         
-        EaseChatUIKitContext.shared?.cleanCache(type: .all)
+        ChatUIKitContext.shared?.cleanCache(type: .all)
         UIApplication.shared.chat.keyWindow?.rootViewController = LoginViewController()
     }
 }

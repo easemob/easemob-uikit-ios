@@ -18,7 +18,7 @@ final class MineConversationInfo: ConversationInfo {
         
         let from = message.from
         let mentionText = "Mentioned".chat.localize
-        let user = EaseChatUIKitContext.shared?.userCache?[from]
+        let user = ChatUIKitContext.shared?.userCache?[from]
         var nickName = user?.remark ?? ""
         if nickName.isEmpty {
             nickName = user?.nickname ?? ""

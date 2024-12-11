@@ -12,8 +12,8 @@ import EaseChatUIKit
 class CustomConversationViewController: ConversationListController {
     
     
-    override func createNavigationBar() -> EaseChatNavigationBar {
-        EaseChatNavigationBar()
+    override func createNavigationBar() -> ChatNavigationBar {
+        ChatNavigationBar()
     }
     
     override func createList() -> ConversationList {
