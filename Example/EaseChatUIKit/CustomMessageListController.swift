@@ -35,7 +35,7 @@ extension MessageListViewModel {
     func sendRedPackageMessage() {
         var ext = Dictionary<String,Any>()
         ext["something"] = "发红包"
-        let json = EaseChatUIKitContext.shared?.currentUser?.toJsonObject() ?? [:]
+        let json = ChatUIKitContext.shared?.currentUser?.toJsonObject() ?? [:]
         ext.merge(json) { _, new in
             new
         }
