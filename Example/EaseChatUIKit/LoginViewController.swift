@@ -53,7 +53,7 @@ extension LoginViewController {
             profile.id = userName.lowercased()
             profile.nickname = "Tester 001"
             profile.avatarURL = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/sample_avatar/sample_avatar_1.png"
-            ChatUIKitClient.shared.login(user: profile, token: passWord) { error in
+            ChatUIKitClient.shared.login(user: profile, token: "YWMtrBLRHrjtEe-IODH5J7D-t1zzvlQ7sUrSpVuQGlyIzFQLSg3AGHsR7bfQlcHY0wi4AwMAAAGTvYg04AAAjKBtZLdDVioXxzdjKdcRBpgxcIah52G6mqXF9GvrZUhB8g") { error in
                 if error == nil {
                     UIApplication.shared.chat.keyWindow?.rootViewController = MainViewController()
                 } else {

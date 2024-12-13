@@ -11,6 +11,37 @@ import EaseChatUIKit
 
 class CustomMessageListController: MessageListController {
     
+    override func processFollowInputAttachmentAction() {
+        if Appearance.chat.messageAttachmentMenuStyle == .followInput {
+            if let fileItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "File" }) {
+                fileItem.action = { [weak self] item,object in
+                    self?.handleAttachmentAction(item: item)
+                }
+            }
+            if let photoItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Photo" }) {
+                photoItem.action = { [weak self] item,object in
+                    self?.handleAttachmentAction(item: item)
+                }
+            }
+            if let cameraItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Camera" }) {
+                cameraItem.action = { [weak self] item,object in
+                    self?.handleAttachmentAction(item: item)
+                }
+            }
+            if let contactItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Contact" }) {
+                contactItem.action = { [weak self] item,object in
+                    self?.handleAttachmentAction(item: item)
+                }
+            }
+            if let redPackageItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Red" }) {
+                redPackageItem.action = { [weak self] item,object in
+                    self?.handleAttachmentAction(item: item)
+                }
+            }
+            
+        }
+    }
+    
     override func handleAttachmentAction(item: any ActionSheetItemProtocol) {
         switch item.tag {
         case "File": self.selectFile()
