@@ -17,16 +17,18 @@ class RedPackageCell: CustomMessageCell {
     
     override func refresh(entity: MessageEntity) {
         super.refresh(entity: entity)
-        
+        DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.25) {
+            if Appearance.chat.bubbleStyle == .withArrow {
+                self.bubbleWithArrow.arrow.image = UIImage(named: self.towards == .left ? "arrow_left": "arrow_right", in: .chatBundle, with: nil)?.withTintColor(.systemRed, renderingMode: .automatic)
+            } else {
+                self.bubbleMultiCorners.backgroundColor = .systemRed
+            }
+        }
     }
     
     override func updateAxis(entity: MessageEntity) {
         super.updateAxis(entity: entity)
-        if Appearance.chat.bubbleStyle == .withArrow {
-            self.bubbleWithArrow.arrow.image = UIImage(named: self.towards == .left ? "arrow_left": "arrow_right", in: .chatBundle, with: nil)?.withTintColor(self.towards == .left ? .systemRed:.systemRed)
-        } else {
-            self.bubbleMultiCorners.backgroundColor = .systemRed
-        }
+        
     }
 }
 

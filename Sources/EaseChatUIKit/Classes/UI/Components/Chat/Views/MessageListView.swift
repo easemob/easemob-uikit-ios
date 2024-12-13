@@ -607,7 +607,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                             let identifier = String(describing: Class.self)
                             cell = tableView.dequeueReusableCell(with: Class, reuseIdentifier: identifier)
                             if cell == nil {
-                                cell = ComponentsRegister.shared.ChatCustomMessageCell.init(towards: towards, reuseIdentifier: identifier)
+                                cell = Class.init(towards: towards, reuseIdentifier: identifier)
                             }
                             break
                         }
@@ -623,7 +623,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
                     let identifier = String(describing: Class.self)
                     cell = tableView.dequeueReusableCell(with: Class, reuseIdentifier: identifier)
                     if cell == nil {
-                        cell = ComponentsRegister.shared.ChatCustomMessageCell.init(towards: towards, reuseIdentifier: identifier)
+                        cell = Class.init(towards: towards, reuseIdentifier: identifier)
                     }
                     break
                 }
