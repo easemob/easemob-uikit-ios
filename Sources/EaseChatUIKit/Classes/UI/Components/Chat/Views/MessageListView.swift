@@ -216,6 +216,8 @@ public let MessageInputBarHeight = CGFloat(52)
     
     private var replyId = ""
     
+    private var CellTypes: [MessageCell.Type] = []
+    
     public private(set) lazy var messageList: UITableView = {
         UITableView(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-MessageInputBarHeight), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).separatorStyle(.none).backgroundColor(.clear)
     }()
@@ -279,6 +281,7 @@ public let MessageInputBarHeight = CGFloat(52)
     ///   - historyResult: Whether to enable the history result.
     @objc required public init(frame: CGRect,mention: Bool,showType: MessageListType = .normal) {
         super.init(frame: frame)
+        self.CellTypes.append(contentsOf: ComponentsRegister.shared.customCellClasses)
         self.oldFrame = frame
         self.canMention = mention
         self.showType = showType
@@ -495,6 +498,9 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = self.registerMessageCell(tableView: tableView, indexPath: indexPath)
+        if self.CellTypes.count > 0 {
+            self.CellTypes.removeFirst()
+        }
         if let info = self.messages[safe: indexPath.row] {
             cell?.editMode = self.editMode
             cell?.refresh(entity: info)
@@ -540,95 +546,59 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
         
     }
     
+    private func getMessageCell<T: MessageCell>(
+        cellClass: T.Type,
+        towards: BubbleTowards,
+        identifier: String
+    ) -> T? {
+        var cell = self.messageList.dequeueReusableCell(with: cellClass, reuseIdentifier: identifier)
+        if cell == nil {
+            cell = cellClass.init(towards: towards, reuseIdentifier: identifier)
+        }
+        return cell
+    }
+    
     private func registerMessageCell(tableView: UITableView,indexPath: IndexPath) -> MessageCell? {
         if let message = self.messages[safe: indexPath.row]?.message {
             let towards: BubbleTowards = message.direction.rawValue == 0 ? .right:.left
             switch message.body.type {
             case .text:
-                var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatTextMessageCell, reuseIdentifier: "EaseChatUIKit.ChatTextMessageCell")
-                if cell == nil {
-                    cell = ComponentsRegister.shared.ChatTextMessageCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatTextMessageCell")
-                }
-                return cell
+                return self.getMessageCell(cellClass: ComponentsRegister.shared.ChatTextMessageCell, towards: towards, identifier: "EaseChatUIKit.ChatTextMessageCell")
             case .image:
-                var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatImageMessageCell, reuseIdentifier: "EaseChatUIKit.ChatImageMessageCell")
-                if cell == nil {
-                    cell = ComponentsRegister.shared.ChatImageMessageCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatImageMessageCell")
-                }
-                return cell
+                return self.getMessageCell(cellClass: ComponentsRegister.shared.ChatImageMessageCell, towards: towards, identifier: "EaseChatUIKit.ChatImageMessageCell")
             case .video:
-                var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatVideoMessageCell, reuseIdentifier: "EaseChatUIKit.ChatVideoMessageCell")
-                if cell == nil {
-                    cell = ComponentsRegister.shared.ChatVideoMessageCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatVideoMessageCell")
-                }
-                return cell
+                return self.getMessageCell(cellClass: ComponentsRegister.shared.ChatVideoMessageCell, towards: towards, identifier: "EaseChatUIKit.ChatVideoMessageCell")
             case .voice:
-                var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatAudioMessageCell, reuseIdentifier: "EaseChatUIKit.ChatAudioMessageCell")
-                if cell == nil {
-                    cell = ComponentsRegister.shared.ChatAudioMessageCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatAudioMessageCell")
-                }
-                return cell
+                return self.getMessageCell(cellClass: ComponentsRegister.shared.ChatAudioMessageCell, towards: towards, identifier: "EaseChatUIKit.ChatAudioMessageCell")
             case .file:
-                var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatFileMessageCell, reuseIdentifier: "EaseChatUIKit.ChatFileMessageCell")
-                if cell == nil {
-                    cell = ComponentsRegister.shared.ChatFileMessageCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatFileMessageCell")
-                }
-                return cell
+                return self.getMessageCell(cellClass: ComponentsRegister.shared.ChatFileMessageCell, towards: towards, identifier: "EaseChatUIKit.ChatFileMessageCell")
             case .combine:
-                var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatCombineCell, reuseIdentifier: "EaseChatUIKit.ChatCombineCell")
-                if cell == nil {
-                    cell = ComponentsRegister.shared.ChatCombineCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatCombineCell")
-                }
-                return cell
+                return self.getMessageCell(cellClass: ComponentsRegister.shared.ChatCombineCell, towards: towards, identifier: "EaseChatUIKit.ChatCombineCell")
             case .location:
-                var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatLocationCell, reuseIdentifier: "EaseChatUIKit.ChatLocationCell")
-                if cell == nil {
-                    cell = ComponentsRegister.shared.ChatLocationCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatLocationCell")
-                }
-                return cell
+                return self.getMessageCell(cellClass: ComponentsRegister.shared.ChatLocationCell, towards: towards, identifier: "EaseChatUIKit.ChatLocationCell")
             case .custom:
                 if let body = message.body as? ChatCustomMessageBody {
                     switch body.event {
                     case EaseChatUIKit_user_card_message:
-                        var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatContactMessageCell, reuseIdentifier: "EaseChatUIKit.ChatContactMessageCell")
-                        if cell == nil {
-                            cell = ComponentsRegister.shared.ChatContactMessageCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatContactMessageCell")
-                        }
-                        return cell
+                        return self.getMessageCell(cellClass: ComponentsRegister.shared.ChatContactMessageCell, towards: towards, identifier: "EaseChatUIKit.ChatContactMessageCell")
                     case EaseChatUIKit_alert_message:
-                        var cell = tableView.dequeueReusableCell(with: ComponentsRegister.shared.ChatAlertCell, reuseIdentifier: "EaseChatUIKit.ChatAlertCell")
-                        if cell == nil {
-                            cell = ComponentsRegister.shared.ChatAlertCell.init(towards: towards, reuseIdentifier: "EaseChatUIKit.ChatAlertCell")
-                        }
-                        return cell
+                        return self.getMessageCell(cellClass: ComponentsRegister.shared.ChatAlertCell, towards: towards, identifier: "EaseChatUIKit.ChatAlertCell")
                     default:
-                        var cell: MessageCell?
-                        for Class in ComponentsRegister.shared.customCellClasses {
-                            let identifier = String(describing: Class.self)
-                            cell = tableView.dequeueReusableCell(with: Class, reuseIdentifier: identifier)
-                            if cell == nil {
-                                cell = Class.init(towards: towards, reuseIdentifier: identifier)
-                            }
-                            break
+                        if let cellClass = ComponentsRegister.shared.customCellMaps[body.event] {
+                            let identifier = String(describing: body.event)
+                            return self.getMessageCell(cellClass: cellClass, towards: towards, identifier: identifier)
                         }
-                        
-                        return cell
+                        return nil
                     }
                 } else {
                     return nil
                 }
             default:
-                var cell: MessageCell?
-                for Class in ComponentsRegister.shared.customCellClasses {
-                    let identifier = String(describing: Class.self)
-                    cell = tableView.dequeueReusableCell(with: Class, reuseIdentifier: identifier)
-                    if cell == nil {
-                        cell = Class.init(towards: towards, reuseIdentifier: identifier)
-                    }
-                    break
+                if let cellClass = self.CellTypes.first {
+                    let identifier = String(describing: cellClass.self)
+                    return self.getMessageCell(cellClass: cellClass, towards: towards, identifier: identifier)
                 }
-                
-                return cell
+                return nil
             }
         } else {
             return nil

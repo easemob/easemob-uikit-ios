@@ -24,8 +24,18 @@ public extension Bundle {
         if ChatResourceBundle != nil {
             return ChatResourceBundle!
         }
-        let bundlePath = Bundle.main.path(forResource: "EaseChatResource", ofType: "bundle") ?? ""
-        ChatResourceBundle = Bundle(path:  bundlePath) ?? .main
-        return ChatResourceBundle!
+#if COCOAPODS
+        return Bundle(for: Theme.self)
+    .url(forResource: "EaseChatResource", withExtension: "bundle")
+    .flatMap(Bundle.init(url:))!
+#elseif SWIFT_PACKAGE
+        return Bundle.module
+#elseif STATIC_LIBRARY
+        return Bundle.main
+    .url(forResource: "EaseChatResource", withExtension: "bundle")
+    .flatMap(Bundle.init(url:))!
+#else
+        return Bundle(for: Theme.self)
+#endif
     }
 }

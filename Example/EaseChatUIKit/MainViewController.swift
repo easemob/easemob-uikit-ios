@@ -238,6 +238,8 @@ extension MainViewController: ChatUserProfileProvider,ChatGroupProfileProvider {
         return resultProfiles
     }
 }
+
+
 //MARK: - ConversationEmergencyListener
 extension  MainViewController: ConversationEmergencyListener {
     func onResult(error: EaseChatUIKit.ChatError?, type: EaseChatUIKit.ConversationEmergencyType) {

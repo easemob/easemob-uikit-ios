@@ -23,6 +23,10 @@ final class MineMessageEntity: MessageEntity {
                 return CGSize(width: ScreenWidth-32, height: size.height+50)
             case redPackageIdentifier:
                 return CGSize(width: limitBubbleWidth, height: limitBubbleWidth*(5/3.0))
+            case giftIdentifier:
+                return CGSize(width: limitBubbleWidth, height: 70)
+            case musicIdentifier:
+                return CGSize(width: limitBubbleWidth, height: 80)
             default:
                 return .zero
             }

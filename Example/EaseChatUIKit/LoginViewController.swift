@@ -47,13 +47,13 @@ extension LoginViewController {
         ChatUIKitClient.shared.logout(unbindNotificationDeviceToken: false) { [weak self] _ in
             guard let `self` = self else { return }
             guard let userName = self.userNameField.text,let passWord = self.passWordField.text,!userName.isEmpty,!passWord.isEmpty else { return }
-            self.userName = userName.lowercased()
+            self.userName = userName.lowercased()   
             self.passWord = passWord
             let profile = ChatUserProfile()
             profile.id = userName.lowercased()
             profile.nickname = "Tester 001"
-            profile.avatarURL = "https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/sample_avatar/sample_avatar_1.png"
-            ChatUIKitClient.shared.login(user: profile, token: "YWMtrBLRHrjtEe-IODH5J7D-t1zzvlQ7sUrSpVuQGlyIzFQLSg3AGHsR7bfQlcHY0wi4AwMAAAGTvYg04AAAjKBtZLdDVioXxzdjKdcRBpgxcIah52G6mqXF9GvrZUhB8g") { error in
+            profile.avatarURL = "https://xxx"
+            ChatUIKitClient.shared.login(user: profile, token: "YWMtkwkhVL2yEe-2xC3XF4eANVzzvlQ7sUrSpVuQGlyIzFQLSg3AGHsR7bfQlcHY0wi4AwMAAAGT3MmC3QAAjKBqrphrK9x-6ij_PEZUKU1HNOreLMx2eoUvAl3HactSTg") { error in
                 if error == nil {
                     UIApplication.shared.chat.keyWindow?.rootViewController = MainViewController()
                 } else {

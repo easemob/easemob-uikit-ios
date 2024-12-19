@@ -66,7 +66,13 @@ final class MineConversationInfo: ConversationInfo {
         } else {
             var content = message.showContent
             if let body = message.body as? ChatCustomMessageBody,body.event == redPackageIdentifier {
-                content = "[红包]"
+                content = "[Red Package]"
+            }
+            if let body = message.body as? ChatCustomMessageBody,body.event == giftIdentifier {
+                content = "[Gift]"
+            }
+            if let body = message.body as? ChatCustomMessageBody,body.event == musicIdentifier {
+                content = "[Music]"
             }
             let showText = NSMutableAttributedString {
                 AttributedText((message.chatType == .chat ? content:(nickName+":"+content))).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).font(UIFont.theme.bodyMedium)

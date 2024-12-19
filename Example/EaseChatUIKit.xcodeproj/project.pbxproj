@@ -16,6 +16,8 @@
 		059853352CF08F9900A7825D /* MineMessageEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059853342CF08F9900A7825D /* MineMessageEntity.swift */; };
 		059853372CF0971400A7825D /* MineConversationInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 059853362CF0971400A7825D /* MineConversationInfo.swift */; };
 		0598E6992B366F5D0079BF47 /* HueSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0598E6982B366F5D0079BF47 /* HueSettingViewController.swift */; };
+		05AA4E392D13C47100E81E90 /* GiftCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AA4E382D13C47100E81E90 /* GiftCell.swift */; };
+		05AA4E3B2D13C7A300E81E90 /* MusicCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AA4E3A2D13C7A300E81E90 /* MusicCell.swift */; };
 		05BF34412B2C2F29004639CE /* OptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BF34402B2C2F29004639CE /* OptionsViewController.swift */; };
 		0FD976A5382D36AF6B70D22C /* Pods_EaseChatUIKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93876C90F7ED383C7B3B2838 /* Pods_EaseChatUIKit_Example.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
@@ -38,6 +40,8 @@
 		059853362CF0971400A7825D /* MineConversationInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MineConversationInfo.swift; sourceTree = "<group>"; };
 		0598E6982B366F5D0079BF47 /* HueSettingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HueSettingViewController.swift; sourceTree = "<group>"; };
 		059AD7A42B29A3BB0043D299 /* VoiceConvert.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = VoiceConvert.xcframework; path = ../Sources/EaseChatUIKit/Classes/UI/Core/UIKit/FrameWorks/VoiceConvert.xcframework; sourceTree = "<group>"; };
+		05AA4E382D13C47100E81E90 /* GiftCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GiftCell.swift; sourceTree = "<group>"; };
+		05AA4E3A2D13C7A300E81E90 /* MusicCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicCell.swift; sourceTree = "<group>"; };
 		05BF34402B2C2F29004639CE /* OptionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsViewController.swift; sourceTree = "<group>"; };
 		5BD01E2EA5ABF01A40AF9C88 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* EaseChatUIKit_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EaseChatUIKit_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -102,6 +106,8 @@
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
 				059853302CF08A9B00A7825D /* RedPackageCell.swift */,
+				05AA4E382D13C47100E81E90 /* GiftCell.swift */,
+				05AA4E3A2D13C7A300E81E90 /* MusicCell.swift */,
 				059853322CF08ADE00A7825D /* CustomMessageListController.swift */,
 				059853342CF08F9900A7825D /* MineMessageEntity.swift */,
 				059853362CF0971400A7825D /* MineConversationInfo.swift */,
@@ -294,12 +300,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				0598E6992B366F5D0079BF47 /* HueSettingViewController.swift in Sources */,
+				05AA4E3B2D13C7A300E81E90 /* MusicCell.swift in Sources */,
 				0500149B2B2AA725000DA9CE /* LoginViewController.swift in Sources */,
 				607FACD81AFB9204008FA782 /* SettingViewController.swift in Sources */,
 				059853352CF08F9900A7825D /* MineMessageEntity.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				059853332CF08ADE00A7825D /* CustomMessageListController.swift in Sources */,
 				059853372CF0971400A7825D /* MineConversationInfo.swift in Sources */,
+				05AA4E392D13C47100E81E90 /* GiftCell.swift in Sources */,
 				0500149F2B2AAA7E000DA9CE /* MainViewController.swift in Sources */,
 				0565FBB12B4D127700F75C4A /* CustomConversationViewController.swift in Sources */,
 				059853312CF08A9B00A7825D /* RedPackageCell.swift in Sources */,

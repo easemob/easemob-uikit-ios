@@ -180,26 +180,31 @@ import AVFoundation
    
     @objc open func processFollowInputAttachmentAction() {
         if Appearance.chat.messageAttachmentMenuStyle == .followInput {
-            if let fileItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "File" }) {
-                fileItem.action = { [weak self] item,object in
+            for item in Appearance.chat.inputExtendActions {
+                item.action = { [weak self] item,object in
                     self?.handleAttachmentAction(item: item)
                 }
             }
-            if let photoItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Photo" }) {
-                photoItem.action = { [weak self] item,object in
-                    self?.handleAttachmentAction(item: item)
-                }
-            }
-            if let cameraItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Camera" }) {
-                cameraItem.action = { [weak self] item,object in
-                    self?.handleAttachmentAction(item: item)
-                }
-            }
-            if let contactItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Contact" }) {
-                contactItem.action = { [weak self] item,object in
-                    self?.handleAttachmentAction(item: item)
-                }
-            }
+//            if let fileItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "File" }) {
+//                fileItem.action = { [weak self] item,object in
+//                    self?.handleAttachmentAction(item: item)
+//                }
+//            }
+//            if let photoItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Photo" }) {
+//                photoItem.action = { [weak self] item,object in
+//                    self?.handleAttachmentAction(item: item)
+//                }
+//            }
+//            if let cameraItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Camera" }) {
+//                cameraItem.action = { [weak self] item,object in
+//                    self?.handleAttachmentAction(item: item)
+//                }
+//            }
+//            if let contactItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Contact" }) {
+//                contactItem.action = { [weak self] item,object in
+//                    self?.handleAttachmentAction(item: item)
+//                }
+//            }
             
         }
     }
