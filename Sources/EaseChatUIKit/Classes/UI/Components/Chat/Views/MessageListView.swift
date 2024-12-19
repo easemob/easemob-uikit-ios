@@ -377,16 +377,8 @@ public let MessageInputBarHeight = CGFloat(52)
                 let oldFrame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-MessageInputBarHeight)
                 self.messageList.frame = oldFrame
                 if firstResponder {
-                    consoleLogInfo("self.inputBar.keyboardHeight: \(self.inputBar.keyboardHeight)", type: .debug)
-                    var space = -24
-                    if self.inputBar.keyboardHeight == 132 || self.inputBar.keyboardHeight == 230 {
-                        space = Int(-BottomBarHeight*2)
-                    }
-                    var raiseHeight = self.inputBar.keyboardHeight
-                    if raiseHeight > 336 {
-                        raiseHeight = 336
-                    }
-                    self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.frame.height-self.inputBar.rawFrame.height-raiseHeight+CGFloat(space))
+                    let textFirstResponder = self.inputBar.inputField.isFirstResponder
+                    self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.frame.height-self.inputBar.frame.minY-(textFirstResponder ? self.inputBar.frame.height+24:0))
                     
                     let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
                     if lastIndexPath.row >= 0 {
