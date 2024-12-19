@@ -375,17 +375,18 @@ public let MessageInputBarHeight = CGFloat(52)
             guard let `self` = self else { return }
             UIView.animate(withDuration: 0.22) {
                 let oldFrame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-MessageInputBarHeight)
+                self.messageList.frame = oldFrame
                 if firstResponder {
                     consoleLogInfo("self.inputBar.keyboardHeight: \(self.inputBar.keyboardHeight)", type: .debug)
                     var space = -24
                     if self.inputBar.keyboardHeight == 132 || self.inputBar.keyboardHeight == 230 {
-                        space = Int(BottomBarHeight*2)
+                        space = Int(-BottomBarHeight*2)
                     }
                     var raiseHeight = self.inputBar.keyboardHeight
                     if raiseHeight > 336 {
                         raiseHeight = 336
                     }
-                    self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.frame.height-self.inputBar.frame.height-raiseHeight+CGFloat(space))
+                    self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.frame.height-self.inputBar.rawFrame.height-raiseHeight+CGFloat(space))
                     
                     let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
                     if lastIndexPath.row >= 0 {
