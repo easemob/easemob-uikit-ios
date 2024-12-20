@@ -378,7 +378,11 @@ public let MessageInputBarHeight = CGFloat(52)
                 self.messageList.frame = oldFrame
                 if firstResponder {
                     let textFirstResponder = self.inputBar.inputField.isFirstResponder
-                    self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.frame.height-self.inputBar.frame.minY-(textFirstResponder ? self.inputBar.frame.height+24:0))
+                    if self.inputBar.extensionMenus.isHidden {
+                        self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.frame.height-self.inputBar.frame.minY-(textFirstResponder ? self.inputBar.frame.height+24:-BottomBarHeight))
+                    } else {
+                        self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.frame.height-self.inputBar.extensionMenus.frame.height-self.inputBar.frame.height-(textFirstResponder ? 0:-BottomBarHeight))
+                    }
                     
                     let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
                     if lastIndexPath.row >= 0 {
