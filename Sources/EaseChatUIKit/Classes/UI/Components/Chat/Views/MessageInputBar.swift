@@ -391,7 +391,8 @@ extension MessageInputBar: UITextViewDelegate {
     }
     
     public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        if !self.inputField.isFirstResponder {
+        let convertedPoint = self.convert(point, from: self.superview)
+        if self.point(inside: point, with: event) {
             for view in subviews {
                 if view.isKind(of: type(of: view)),view.frame.contains(point) {
                     if view is MessageInputEmojiView, view.isHidden {
@@ -412,6 +413,13 @@ extension MessageInputBar: UITextViewDelegate {
                     let childView = view.hitTest(childPoint, with: event)
                     return childView
                 }
+            }
+        } else {
+            
+            let diff = ScreenHeight-self.frame.maxY
+            print("diff: \(diff)")
+            if diff > 132 {
+                self.hiddenInput()
             }
         }
         self.attachment.isSelected = false
@@ -542,16 +550,14 @@ extension MessageInputBar: UITextViewDelegate {
         self.inputField.resignFirstResponder()
         UIView.animate(withDuration: self.hiddenDuration) {
             if self.recordedFrame.height > self.rawFrame.height {
-                self.frame = CGRect(x: 0, y: self.rawFrame.minY-(self.inputField.frame.height-36), width: self.frame.width, height: self.inputField.frame.height+16)
+                self.frame = CGRect(x: 0, y: self.rawFrame.maxY-self.inputField.frame.height-16, width: self.frame.width, height: self.inputField.frame.height+16)
             } else {
                 self.frame = CGRect(x: 0, y: self.rawFrame.minY, width: self.rawFrame.width, height: self.rawFrame.height)
             }
         }
         self.rightView.isSelected = false
         self.emoji?.isHidden = true
-        if self.extensionMenus.isHidden {
-            self.textViewFirstResponder?(false)
-        }
+        self.textViewFirstResponder?(false)
     }
     
     /// Raise input bar

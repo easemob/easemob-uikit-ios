@@ -237,7 +237,9 @@ let message_bubble_space = CGFloat(1)
     open override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
         if let touch = touches.first {
-            self.clickAction?(.cell,self.entity)
+            if self.editMode {
+                self.clickAction?(.cell,self.entity)
+            }
         }
     }
     

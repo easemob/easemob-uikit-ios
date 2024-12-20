@@ -475,8 +475,11 @@ public let MessageInputBarHeight = CGFloat(52)
         }
     }
     
-    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        self.inputBar.hiddenInput()
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        print("input frame \(self.inputBar.frame)")
+        if self.inputBar.frame.height > 132  || self.inputBar.inputField.isFirstResponder {
+            self.inputBar.hiddenInput()
+        }
     }
     
 }
@@ -615,7 +618,6 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
     }
     
     private func handleClick(area: MessageCellClickArea,entity: MessageEntity) {
-        self.inputBar.hiddenInput()
         if self.editMode {
             entity.selected = !entity.selected
             if let idx = self.messages.firstIndex(where: { $0.message.messageId == entity.message.messageId }) {
