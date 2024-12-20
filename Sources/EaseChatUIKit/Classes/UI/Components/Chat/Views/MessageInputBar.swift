@@ -144,6 +144,9 @@ import UIKit
         
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
+        
+        self.rightView.setHitTestEdgeInsets(UIEdgeInsets(top: -8, left: -10, bottom: -5, right: -5))
+        self.attachment.setHitTestEdgeInsets(UIEdgeInsets(top: -8, left: -5, bottom: -5, right: -10))
     }
     
     deinit {
@@ -357,7 +360,6 @@ extension MessageInputBar: UITextViewDelegate {
             }
         }
         self.keyboardHeight = (Appearance.chat.inputExtendActions.count > 4 ? 230:132)
-        self.frame = self.rawFrame
         self.attachment.isSelected = selected
         if selected {
             self.showExtensionMenus()
@@ -524,6 +526,7 @@ extension MessageInputBar: UITextViewDelegate {
         self.switchTheme(style: Theme.style)
         self.extensionMenus.isHidden = false
         UIView.animate(withDuration: self.hiddenDuration) {
+            self.frame = self.rawFrame
             if self.attachment.isSelected {
                 self.extensionMenus.frame = CGRect(x: 0, y: self.inputField.frame.maxY+15-(NavigationHeight > 64 ? 0:10), width: self.frame.width, height: (Appearance.chat.inputExtendActions.count > 4 ? 230:132)+(NavigationHeight > 64 ? 0:10))
                 self.frame = CGRect(x: 0, y: self.frame.minY-self.extensionMenus.frame.height-BottomBarHeight-(NavigationHeight > 64 ? 0:10), width: self.frame.width, height: self.extensionMenus.frame.height + self.inputField.frame.height + BottomBarHeight)
@@ -531,6 +534,7 @@ extension MessageInputBar: UITextViewDelegate {
                 self.extensionMenus.isHidden = true
             }
         }
+        self.textViewFirstResponder?(true)
     }
     
     @objc public func hiddenInputBar() {

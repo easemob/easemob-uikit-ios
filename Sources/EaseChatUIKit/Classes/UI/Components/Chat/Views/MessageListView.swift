@@ -467,6 +467,10 @@ public let MessageInputBarHeight = CGFloat(52)
         }
     }
     
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        self.inputBar.hiddenInput()
+    }
+    
 }
 
 extension MessageListView: ThemeSwitchProtocol {
