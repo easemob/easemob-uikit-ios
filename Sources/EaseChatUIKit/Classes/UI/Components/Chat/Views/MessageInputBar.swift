@@ -318,8 +318,6 @@ extension MessageInputBar: UITextViewDelegate {
         if self.attachment.isSelected {
             self.processAttachmentView(selected: self.attachment.isSelected)
         }
-        self.rightView.isSelected = false
-        self.attachment.isSelected = false
         self.extensionMenus.isHidden = true
         self.extensionMenus.isUserInteractionEnabled = false
         if !self.inputField.attributedText.toString().isEmpty {
@@ -373,10 +371,8 @@ extension MessageInputBar: UITextViewDelegate {
         self.extensionMenus.isHidden = true
         self.extensionMenus.isUserInteractionEnabled = false
         self.emoji?.isHidden = true
-        self.inputField.text = nil
-        self.inputField.attributedText = nil
-        self.updateHeight()
         self.inputField.isScrollEnabled = false
+        self.hiddenInput()
         self.actionClosure?(.audio,nil)
     }
     
@@ -509,6 +505,7 @@ extension MessageInputBar: UITextViewDelegate {
                 }
                 self?.updateHeight()
             }
+            self.updateHeight()
         } else {
             self.frame = CGRect(x: 0, y: self.frame.origin.y, width: self.frame.width, height: self.rawFrame.height)
         }
