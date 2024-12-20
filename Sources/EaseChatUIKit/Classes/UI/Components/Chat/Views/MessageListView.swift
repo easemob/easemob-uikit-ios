@@ -358,7 +358,7 @@ public let MessageInputBarHeight = CGFloat(52)
         self.inputBar.axisYChanged = { [weak self] value in
             guard let `self` = self else { return }
             DispatchQueue.main.async {
-                UIView.animate(withDuration: 0.22) {
+                UIView.animate(withDuration: 0.25) {
                     self.replyBar.frame = CGRect(x: 0, y: self.inputBar.frame.minY-MessageInputBarHeight, width: self.frame.width, height: 53)
                     if self.replyBar.isHidden  {
                         self.moreMessages.frame = CGRect(x: self.moreMessageAxisX, y: self.inputBar.frame.minY-44, width: 180, height: 36)
@@ -373,7 +373,7 @@ public let MessageInputBarHeight = CGFloat(52)
     private func processInputBarFirstResponder() {
         self.inputBar.textViewFirstResponder = { [weak self] firstResponder in
             guard let `self` = self else { return }
-            UIView.animate(withDuration: 0.22) {
+            UIView.animate(withDuration: 0.25) {
                 let oldFrame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-MessageInputBarHeight)
                 self.messageList.frame = oldFrame
                 if firstResponder {
