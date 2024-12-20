@@ -615,6 +615,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
     }
     
     private func handleClick(area: MessageCellClickArea,entity: MessageEntity) {
+        self.inputBar.hiddenInput()
         if self.editMode {
             entity.selected = !entity.selected
             if let idx = self.messages.firstIndex(where: { $0.message.messageId == entity.message.messageId }) {
