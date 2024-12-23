@@ -393,7 +393,7 @@ extension MessageInputBar: UITextViewDelegate {
     }
     
     public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        let convertedPoint = self.convert(point, from: self.superview)
+//        let convertedPoint = self.convert(point, from: self.superview)
         if self.point(inside: point, with: event) {
             for view in subviews {
                 if view.isKind(of: type(of: view)),view.frame.contains(point) {
@@ -417,12 +417,7 @@ extension MessageInputBar: UITextViewDelegate {
                 }
             }
         } else {
-            
-            let diff = ScreenHeight-self.frame.maxY
-            print("diff: \(diff)")
-            if diff > 132 {
-                self.hiddenInput()
-            }
+            self.hiddenInput()
         }
         self.attachment.isSelected = false
         self.emoji?.isHidden  = true
