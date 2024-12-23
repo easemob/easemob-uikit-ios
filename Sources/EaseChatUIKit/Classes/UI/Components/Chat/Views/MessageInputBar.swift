@@ -393,32 +393,29 @@ extension MessageInputBar: UITextViewDelegate {
     }
     
     public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-//        let convertedPoint = self.convert(point, from: self.superview)
-        if self.point(inside: point, with: event) {
-            for view in subviews {
-                if view.isKind(of: type(of: view)),view.frame.contains(point) {
-                    if view is MessageInputEmojiView, view.isHidden {
-                        if !self.extensionMenus.isHidden {
-                            let childPoint = self.convert(point, to: self.extensionMenus)
-                            let childView = self.extensionMenus.hitTest(childPoint, with: event)
-                            return childView
-                        }
+
+        for view in subviews {
+            if view.isKind(of: type(of: view)),view.frame.contains(point) {
+                if view is MessageInputEmojiView, view.isHidden {
+                    if !self.extensionMenus.isHidden {
+                        let childPoint = self.convert(point, to: self.extensionMenus)
+                        let childView = self.extensionMenus.hitTest(childPoint, with: event)
+                        return childView
                     }
-                    if view is MessageInputExtensionView , view.isHidden  {
-                        if !(self.emoji?.isHidden ?? true) {
-                            let childPoint = self.convert(point, to: self.emoji)
-                            let childView = self.emoji?.hitTest(childPoint, with: event)
-                            return childView
-                        }
-                    }
-                    let childPoint = self.convert(point, to: view)
-                    let childView = view.hitTest(childPoint, with: event)
-                    return childView
                 }
+                if view is MessageInputExtensionView , view.isHidden  {
+                    if !(self.emoji?.isHidden ?? true) {
+                        let childPoint = self.convert(point, to: self.emoji)
+                        let childView = self.emoji?.hitTest(childPoint, with: event)
+                        return childView
+                    }
+                }
+                let childPoint = self.convert(point, to: view)
+                let childView = view.hitTest(childPoint, with: event)
+                return childView
             }
-        } else {
-            self.hiddenInput()
         }
+        self.hiddenInput()
         self.attachment.isSelected = false
         self.emoji?.isHidden  = true
         self.extensionMenus.isHidden = true
