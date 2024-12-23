@@ -460,6 +460,9 @@ extension MessageInputBar: UITextViewDelegate {
         guard let frame = notification.chat.keyboardEndFrame else { return }
         guard let duration = notification.chat.keyboardAnimationDuration else { return }
         self.keyboardHeight = frame.height
+        if frame.height < 200 {
+            return
+        }
         self.attachment.isSelected = false
         self.switchTheme(style: Theme.style)
         UIView.animate(withDuration: duration) {

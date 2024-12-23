@@ -476,8 +476,7 @@ public let MessageInputBarHeight = CGFloat(52)
     }
     
     public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        print("input frame \(self.inputBar.frame)")
-        if self.inputBar.frame.height > 132  || self.inputBar.inputField.isFirstResponder {
+        if self.inputBar.extensionMenus.frame.height >= 132  || self.inputBar.inputField.isFirstResponder {
             self.inputBar.hiddenInput()
         }
     }
