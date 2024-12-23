@@ -457,6 +457,7 @@ extension MessageInputBar: UITextViewDelegate {
         if !self.inputField.isFirstResponder {
             return
         }
+        self.collapsedState = false
         self.emoji?.isHidden = true
         self.extensionMenus.isHidden = true
         guard let frame = notification.chat.keyboardEndFrame else { return }
@@ -489,6 +490,7 @@ extension MessageInputBar: UITextViewDelegate {
     
     @objc open func showEmojiKeyboard() {
         self.emoji?.isUserInteractionEnabled = true
+        self.collapsedState = false
         if self.rightView.isSelected {
             self.keyboardHeight = 256+BottomBarHeight
             let emojiHeight = self.keyboardHeight+self.inputField.frame.height+16
@@ -533,6 +535,7 @@ extension MessageInputBar: UITextViewDelegate {
     }
     
     @objc open func showExtensionMenus() {
+        self.collapsedState = false
         self.extensionMenus.isUserInteractionEnabled = true
         if !self.subviews.contains(self.extensionMenus) {
             self.addSubview(self.extensionMenus)

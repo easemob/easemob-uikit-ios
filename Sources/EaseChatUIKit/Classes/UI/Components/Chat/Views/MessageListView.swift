@@ -473,14 +473,22 @@ public let MessageInputBarHeight = CGFloat(52)
                 handler.onMoreMessagesClicked()
             }
         }
-    }
-    
-    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        if self.inputBar.extensionMenus.frame.height >= 132  || self.inputBar.inputField.isFirstResponder {
+        if self.inputBar.collapsedState == false {
             self.inputBar.hiddenInput()
         }
     }
     
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        if self.inputBar.collapsedState == false {
+            self.inputBar.hiddenInput()
+        }
+    }
+    
+    public func scrollViewDidScrollToTop(_ scrollView: UIScrollView) {
+        if self.inputBar.collapsedState == false {
+            self.inputBar.hiddenInput()
+        }
+    }
 }
 
 extension MessageListView: ThemeSwitchProtocol {
