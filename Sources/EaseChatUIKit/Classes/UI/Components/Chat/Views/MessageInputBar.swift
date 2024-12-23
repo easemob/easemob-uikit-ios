@@ -40,6 +40,8 @@ import UIKit
     
     public private(set) var selectedAttachmentImage = UIImage(named: "attachmentSelected", in: .chatBundle, with: nil)
     
+    public private(set) var collapsedState = false
+    
     private var style: NSParagraphStyle {
         let paragraph = NSMutableParagraphStyle()
         paragraph.lineHeightMultiple = 1.15
@@ -550,6 +552,10 @@ extension MessageInputBar: UITextViewDelegate {
     }
     
     @objc public func hiddenInputBar() {
+        if self.collapsedState {
+            return
+        }
+        self.collapsedState = true
         self.inputField.resignFirstResponder()
         UIView.animate(withDuration: self.hiddenDuration) {
             if self.recordedFrame.height > self.rawFrame.height {
