@@ -219,7 +219,7 @@ public let MessageInputBarHeight = CGFloat(52)
     private var CellTypes: [MessageCell.Type] = []
     
     public private(set) lazy var messageList: UITableView = {
-        UITableView(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-MessageInputBarHeight), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).separatorStyle(.none).backgroundColor(.clear)
+        UITableView(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-MessageInputBarHeight), style: .plain).delegate(self).dataSource(self).tableFooterView(UIView()).separatorStyle(.none).backgroundColor(.clear).tag(111)
     }()
     
     private var oldFrame = CGRect.zero

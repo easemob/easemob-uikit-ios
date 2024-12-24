@@ -445,7 +445,17 @@ extension MessageInputBar: UITextViewDelegate {
         self.textViewFirstResponder?(true)
     }
     
+    public func endSuperScroll() {
+        if let list = self.superview?.viewWithTag(111) as? UITableView {
+            let indexPath = IndexPath(row: list.numberOfRows(inSection: 0) - 1, section: 0)
+            if indexPath.row >= 0 {
+                list.scrollToRow(at: indexPath, at: .none, animated: false)
+            }
+        }
+    }
+    
     @objc private func keyboardWillShow(notification: Notification) {
+        self.endSuperScroll()
         if !self.inputField.isFirstResponder {
             return
         }
@@ -455,7 +465,7 @@ extension MessageInputBar: UITextViewDelegate {
         guard let frame = notification.chat.keyboardEndFrame else { return }
         guard let duration = notification.chat.keyboardAnimationDuration else { return }
         self.keyboardHeight = frame.height
-        if frame.height < 200 {
+        if frame.height < 216 {
             return
         }
         self.attachment.isSelected = false
@@ -482,6 +492,7 @@ extension MessageInputBar: UITextViewDelegate {
     
     @objc open func showEmojiKeyboard() {
         self.emoji?.isUserInteractionEnabled = true
+        self.endSuperScroll()
         self.collapsedState = false
         if self.rightView.isSelected {
             self.keyboardHeight = 256+BottomBarHeight
@@ -529,6 +540,7 @@ extension MessageInputBar: UITextViewDelegate {
     @objc open func showExtensionMenus() {
         self.collapsedState = false
         self.extensionMenus.isUserInteractionEnabled = true
+        self.endSuperScroll()
         if !self.subviews.contains(self.extensionMenus) {
             self.addSubview(self.extensionMenus)
         }
