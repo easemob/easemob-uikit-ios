@@ -487,6 +487,8 @@ extension MessageInputBar: UITextViewDelegate {
             self.hiddenDuration = duration
             self.showEmojiKeyboard()
             self.textViewFirstResponder?(true)
+        } else {
+            self.hiddenInput()
         }
     }
     
