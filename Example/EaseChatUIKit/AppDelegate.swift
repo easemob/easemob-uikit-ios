@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        let option = ChatOptions(appkey: "easemob#easeim")
+        let option = ChatOptions(appkey: <#环信AppKey#>)
         option.enableConsoleLog = true
         _ = ChatUIKitClient.shared.setup(option: option)
         let redPackage = ActionSheetItem(title: "Red".chat.localize, type: .normal,tag: "Red",image: UIImage(named: "photo", in: .chatBundle, with: nil))
