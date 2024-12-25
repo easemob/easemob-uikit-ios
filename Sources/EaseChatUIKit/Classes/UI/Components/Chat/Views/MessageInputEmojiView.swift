@@ -17,7 +17,7 @@ import UIKit
 
     public lazy var flowLayout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: (ScreenWidth - 20 - 60) / 7.0, height: (ScreenWidth - 20 - 60) / 7.0)
+        layout.itemSize = CGSize(width: (self.frame.width - 20 - 60) / 7.0, height: (self.frame.width - 20 - 60) / 7.0)
         layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         layout.minimumLineSpacing = 10
         layout.minimumInteritemSpacing = 10

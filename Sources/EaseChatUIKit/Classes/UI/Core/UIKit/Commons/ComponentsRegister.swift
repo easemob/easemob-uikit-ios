@@ -52,14 +52,26 @@ import UIKit
     
     //MARK: - About Message
     /// Register customize table view cell method.
-    /// - Parameter cellType: Cell's class type.
+    /// - Parameter cellType: Inherit from ``MessageCell`` class type.
     public func registerCustomizeCellClass(cellType: MessageCell.Type) {
         if !self.customCellClasses.contains(where: { $0 == cellType }) {
             self.customCellClasses.append(cellType)
         }
     }
+    
+    /// Register custom cell class with identifier.
+    /// - Parameters:
+    ///   - cellType: Inherit from ``CustomMessageCell``.
+    ///   - identifier: Event of ``ChatCustomMessageBody``.
+    public func registerCustomCellClasses(cellType: CustomMessageCell.Type,identifier: String) {
+        if !self.customCellMaps.keys.contains(identifier) {
+            self.customCellMaps[identifier] = cellType
+        }
+    }
         
     public internal(set) var customCellClasses: [MessageCell.Type] = []
+    
+    public internal(set) var customCellMaps: [String:MessageCell.Type] = [:]
     
     public var ChatCustomMessageCell: CustomMessageCell.Type = CustomMessageCell.self
     

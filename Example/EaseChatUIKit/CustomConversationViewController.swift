@@ -19,6 +19,8 @@ class CustomConversationViewController: ConversationListController {
     override func createList() -> ConversationList {
         ConversationList()
     }
+    
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()

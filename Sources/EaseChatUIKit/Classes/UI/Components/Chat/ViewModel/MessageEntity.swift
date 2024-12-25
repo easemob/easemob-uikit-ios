@@ -144,11 +144,7 @@ public let urlPreviewImageHeight = CGFloat(137)
     }()
     
     open func cellHeight() -> CGFloat {
-        if let body = self.message.body as? ChatCustomMessageBody,body.event == EaseChatUIKit_alert_message {
-            return self.bubbleSize.height
-        } else {
-            return 8+(Appearance.chat.contentStyle.contains(.withNickName) ? 28:2)+(Appearance.chat.contentStyle.contains(.withReply) ? self.replySize.height:2)+self.bubbleSize.height+(Appearance.chat.contentStyle.contains(.withDateAndTime) ? 22:6)+self.topicContentHeight()+self.reactionContentHeight()
-        }
+        return 8+(Appearance.chat.contentStyle.contains(.withNickName) ? 28:2)+(Appearance.chat.contentStyle.contains(.withReply) ? self.replySize.height:2)+self.bubbleSize.height+(Appearance.chat.contentStyle.contains(.withDateAndTime) ? 22:6)+self.topicContentHeight()+self.reactionContentHeight()
     }
     
     open func reactionMenuWidth() -> CGFloat {
@@ -460,17 +456,16 @@ public let urlPreviewImageHeight = CGFloat(137)
     
     open func customSize() -> CGSize {
         if let body = self.message.body as? ChatCustomMessageBody {
-            if body.event == EaseChatUIKit_user_card_message {
+            switch body.event {
+            case EaseChatUIKit_user_card_message:
                 return CGSize(width: self.historyMessage ? ScreenWidth-32:limitBubbleWidth, height: contactCardHeight)
-            } else {
-                if body.event == EaseChatUIKit_alert_message {
-                    let label = UILabel().numberOfLines(0).lineBreakMode(.byWordWrapping)
-                    label.attributedText = self.convertTextAttribute()
-                    let size = label.sizeThatFits(CGSize(width: ScreenWidth-32, height: 9999))
-                    return CGSize(width: ScreenWidth-32, height: size.height+50)
-                } else {
-                    return self.message.contentSize
-                }
+            case EaseChatUIKit_alert_message:
+                let label = UILabel().numberOfLines(0).lineBreakMode(.byWordWrapping)
+                label.attributedText = self.convertTextAttribute()
+                let size = label.sizeThatFits(CGSize(width: ScreenWidth-32, height: 9999))
+                return CGSize(width: ScreenWidth-32, height: size.height+50)
+            default:
+                return self.message.contentSize
             }
         } else {
             return .zero

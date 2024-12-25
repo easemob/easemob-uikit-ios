@@ -145,7 +145,7 @@ extension MainViewController: ThemeSwitchProtocol {
 //MARK: - EaseProfileProvider for conversations&contacts usage.
 //For example using conversations controller,as follows.
 extension MainViewController: ChatUserProfileProvider,ChatGroupProfileProvider {
-    //MARK: - EaseProfileProvider
+    //MARK: - ChatUserProfileProvider
     func fetchProfiles(profileIds: [String]) async -> [any EaseChatUIKit.ChatUserProfileProtocol] {
         return await withTaskGroup(of: [EaseChatUIKit.ChatUserProfileProtocol].self, returning: [EaseChatUIKit.ChatUserProfileProtocol].self) { group in
             var resultProfiles: [EaseChatUIKit.ChatUserProfileProtocol] = []
@@ -164,7 +164,7 @@ extension MainViewController: ChatUserProfileProvider,ChatGroupProfileProvider {
             return resultProfiles
         }
     }
-    //MARK: - EaseGroupProfileProvider
+    //MARK: - ChatGroupProfileProvider
     func fetchGroupProfiles(profileIds: [String]) async -> [any EaseChatUIKit.ChatUserProfileProtocol] {
         
         return await withTaskGroup(of: [EaseChatUIKit.ChatUserProfileProtocol].self, returning: [EaseChatUIKit.ChatUserProfileProtocol].self) { group in
@@ -238,6 +238,8 @@ extension MainViewController: ChatUserProfileProvider,ChatGroupProfileProvider {
         return resultProfiles
     }
 }
+
+
 //MARK: - ConversationEmergencyListener
 extension  MainViewController: ConversationEmergencyListener {
     func onResult(error: EaseChatUIKit.ChatError?, type: EaseChatUIKit.ConversationEmergencyType) {

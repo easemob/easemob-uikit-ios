@@ -54,6 +54,9 @@ class SettingViewController: UIViewController {
         ChatUIKitContext.shared?.cleanCache(type: .all)
         UIApplication.shared.chat.keyWindow?.rootViewController = LoginViewController()
     }
+    
+    
+    
 }
 
 
