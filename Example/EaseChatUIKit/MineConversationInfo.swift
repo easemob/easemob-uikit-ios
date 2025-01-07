@@ -64,7 +64,7 @@ final class MineConversationInfo: ConversationInfo {
                 return showText
             }
         } else {
-            var content = message.showContent
+            var content = message.showType
             if let body = message.body as? ChatCustomMessageBody,body.event == redPackageIdentifier {
                 content = "[Red Package]"
             }
