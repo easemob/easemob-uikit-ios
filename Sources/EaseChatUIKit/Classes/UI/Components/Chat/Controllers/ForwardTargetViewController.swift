@@ -264,6 +264,7 @@ extension ForwardTargetViewController: UITableViewDelegate,UITableViewDataSource
                     cell.refresh(info: profile, keyword: self.searchKeyWord, forward: .forwarded)
                 }
             } else {
+                self.showToast(toast: error?.errorDescription ?? "Failed to forward message")
                 consoleLogInfo("ForwardTargetViewController forwardMessages error:\(error?.errorDescription ?? "")", type: .error)
             }
         })

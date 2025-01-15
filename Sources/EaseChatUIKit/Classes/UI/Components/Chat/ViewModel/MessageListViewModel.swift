@@ -196,7 +196,7 @@ import UIKit
         ext.merge(json) { _, new in
             new
         }
-        var chatMessage = ChatMessage()
+        var chatMessage: ChatMessage?
         switch type {
         case .text:
             chatMessage = ChatMessage(conversationID: self.to, body: ChatTextMessageBody(text: text), ext: ext)
@@ -258,11 +258,11 @@ import UIKit
         }
         switch self.chatType {
         case .chat:
-            chatMessage.chatType = .chat
+            chatMessage?.chatType = .chat
         case .group:
-            chatMessage.chatType = .groupChat
+            chatMessage?.chatType = .groupChat
         case .chatroom:
-            chatMessage.chatType = .chatRoom
+            chatMessage?.chatType = .chatRoom
         }
         return chatMessage
     }

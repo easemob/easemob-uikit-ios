@@ -168,7 +168,7 @@ import UIKit
         ext.merge(json) { _, new in
             new
         }
-        var chatMessage = ChatMessage()
+        var chatMessage: ChatMessage?
         switch type {
         case .text:
             chatMessage = ChatMessage(conversationID: self.to, body: ChatTextMessageBody(text: text), ext: ext)
@@ -228,8 +228,8 @@ import UIKit
         default:
             break
         }
-        chatMessage.chatType = .groupChat
-        chatMessage.isChatThreadMessage = true
+        chatMessage?.chatType = .groupChat
+        chatMessage?.isChatThreadMessage = true
         return chatMessage
     }
     
@@ -613,7 +613,7 @@ extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
     }
     
     public func onMessageAvatarLongPressed(profile: ChatUserProfileProtocol) {
-        self.onMessageAvatarLongPressed(profile: profile)
+        self.messageAvatarLongPressed(profile: profile)
     }
     
     @objc open func messageAvatarLongPressed(profile: ChatUserProfileProtocol) {

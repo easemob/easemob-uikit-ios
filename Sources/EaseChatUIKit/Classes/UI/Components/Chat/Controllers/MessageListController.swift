@@ -139,6 +139,7 @@ import AVFoundation
         }
         self.navigation.title = nickname
         self.navigation.avatarURL = info.avatarURL
+        self.processFollowInputAttachmentAction()
     }
     
     open override func viewWillDisappear(_ animated: Bool) {
@@ -175,8 +176,9 @@ import AVFoundation
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
         self.view.addSubview(self.loadingView)
-        self.processFollowInputAttachmentAction()
     }
+    
+    
    
     @objc open func processFollowInputAttachmentAction() {
         if Appearance.chat.messageAttachmentMenuStyle == .followInput {
@@ -185,27 +187,6 @@ import AVFoundation
                     self?.handleAttachmentAction(item: item)
                 }
             }
-//            if let fileItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "File" }) {
-//                fileItem.action = { [weak self] item,object in
-//                    self?.handleAttachmentAction(item: item)
-//                }
-//            }
-//            if let photoItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Photo" }) {
-//                photoItem.action = { [weak self] item,object in
-//                    self?.handleAttachmentAction(item: item)
-//                }
-//            }
-//            if let cameraItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Camera" }) {
-//                cameraItem.action = { [weak self] item,object in
-//                    self?.handleAttachmentAction(item: item)
-//                }
-//            }
-//            if let contactItem = Appearance.chat.inputExtendActions.first(where: { $0.tag == "Contact" }) {
-//                contactItem.action = { [weak self] item,object in
-//                    self?.handleAttachmentAction(item: item)
-//                }
-//            }
-            
         }
     }
     
