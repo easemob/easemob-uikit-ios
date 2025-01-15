@@ -189,7 +189,7 @@ let message_bubble_space = CGFloat(1)
         if Appearance.chat.contentStyle.contains(.withAvatar) {
             self.contentView.addSubview(self.avatar)
             self.addGestureTo(view: self.avatar, target: self)
-            self.longPressGestureTo(view: self.bubbleWithArrow, target: self)
+            self.longPressGestureTo(view: self.avatar, target: self)
         }
         if Appearance.chat.bubbleStyle == .withArrow {
             self.contentView.addSubview(self.bubbleWithArrow)
