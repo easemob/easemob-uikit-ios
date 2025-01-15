@@ -733,7 +733,7 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
     }
     
     public func onMessageAvatarLongPressed(profile: ChatUserProfileProtocol) {
-        self.onMessageAvatarLongPressed(profile: profile)
+        self.messageAvatarLongPressed(profile: profile)
     }
     
     @objc open func messageAvatarLongPressed(profile: ChatUserProfileProtocol) {
