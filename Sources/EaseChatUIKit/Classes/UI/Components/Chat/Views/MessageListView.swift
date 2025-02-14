@@ -200,6 +200,16 @@ public let MessageInputBarHeight = CGFloat(52)
     
     public private(set) var canMention = false
     
+    open override var frame: CGRect {
+        didSet {
+            self.oldFrame = self.frame
+            self.messageList.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-MessageInputBarHeight)
+            self.inputBar.resetFrame(newFrame: CGRect(x: 0, y: self.frame.height-MessageInputBarHeight-BottomBarHeight, width: self.frame.width, height: MessageInputBarHeight))
+            self.editBottomBar.frame = CGRect(x: 0, y: self.frame.height-MessageInputBarHeight-BottomBarHeight, width: self.frame.width, height: 52)
+            self.replyBar.frame = CGRect(x: 0, y: self.inputBar.frame.minY-MessageInputBarHeight, width: self.frame.width, height: 53)
+        }
+    }
+    
     public var editMode = false {
         didSet {
             DispatchQueue.main.async {
@@ -344,15 +354,6 @@ public let MessageInputBarHeight = CGFloat(52)
         }
     }
     
-    public func resetFrame(newFrame: CGRect) {
-        self.frame = newFrame
-        self.oldFrame = newFrame
-        self.messageList.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-MessageInputBarHeight)
-        self.inputBar.resetFrame(newFrame: CGRect(x: 0, y: self.frame.height-MessageInputBarHeight-BottomBarHeight, width: self.frame.width, height: MessageInputBarHeight))
-        self.editBottomBar.frame = CGRect(x: 0, y: self.frame.height-MessageInputBarHeight-BottomBarHeight, width: self.frame.width, height: 52)
-        self.replyBar.frame = CGRect(x: 0, y: self.inputBar.frame.minY-MessageInputBarHeight, width: self.frame.width, height: 53)
-    }
-    
     func getLastVisibleCellCoordinate() -> CGRect {
         guard let visibleIndexPaths = self.messageList.indexPathsForVisibleRows else { return .zero }
         if let lastIndexPath = visibleIndexPaths.last {
@@ -386,12 +387,7 @@ public let MessageInputBarHeight = CGFloat(52)
                 let oldFrame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-MessageInputBarHeight)
                 self.messageList.frame = oldFrame
                 if firstResponder {
-                    let textFirstResponder = self.inputBar.inputField.isFirstResponder
-                    if self.inputBar.extensionMenus.isHidden {
-                        self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.frame.height-self.inputBar.frame.minY-(textFirstResponder ? self.inputBar.frame.height+24:-BottomBarHeight))
-                    } else {
-                        self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.frame.height-self.inputBar.extensionMenus.frame.height-self.inputBar.inputField.frame.height-16-BottomBarHeight-24)
-                    }
+                    self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.frame.height-self.inputBar.keyboardHeight-16-BottomBarHeight)
                     
                     let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
                     if lastIndexPath.row >= 0 {
