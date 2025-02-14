@@ -164,6 +164,20 @@ import UIKit
         fatalError("init(coder:) has not been implemented")
     }
     
+    public func resetFrame(newFrame: CGRect) {
+        self.frame = newFrame
+        self.rawFrame = self.frame
+        self.recordedFrame = self.frame
+        self.rawHeight = self.frame.height
+        self.rawTextHeight = self.rawHeight-16
+        self.rightView.frame = CGRect(x: self.frame.width-80, y: self.inputField.frame.maxY-32, width: 30, height: 30)
+        self.audio.frame = CGRect(x: 12, y: self.inputField.frame.maxY-32, width: 30, height: 30)
+        self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: 36)
+        self.attachment.frame = CGRect(x: self.frame.width - 42, y: self.inputField.frame.maxY-32, width: 30, height: 30)
+        self.line.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: 0.5)
+        self.emoji?.frame = CGRect(x: 0, y: self.inputField.frame.maxY+8, width: self.frame.width, height: self.keyboardHeight)
+        self.extensionMenus.frame = CGRect(x: 0, y: self.inputField.frame.maxY+15, width: self.frame.width, height: (Appearance.chat.inputExtendActions.count > 4 ? 230:132))
+    }
    
 }
 
@@ -470,9 +484,10 @@ extension MessageInputBar: UITextViewDelegate {
         }
         self.attachment.isSelected = false
         self.switchTheme(style: Theme.style)
+        print("rawFrame:\(self.rawFrame) frame:\(self.frame) keyboardHeight:\(frame.height)")
         UIView.animate(withDuration: duration) {
-            if self.inputField.text?.isEmpty ?? false {
-                self.frame = CGRect(x: 0, y: self.rawFrame.minY - frame.height + BottomBarHeight, width: self.frame.width, height: self.rawFrame.height)
+            if (self.inputField.text?.isEmpty ?? false),self.inputField.isFirstResponder {
+                self.frame = CGRect(x: 0, y: self.rawFrame.minY - frame.height + BottomBarHeight, width: self.rawFrame.width, height: self.rawFrame.height)
             } else {
                 self.frame = CGRect(x: 0, y: self.rawFrame.maxY - self.keyboardHeight - self.inputField.frame.height - 16 + BottomBarHeight, width: self.frame.width, height: self.inputField.frame.height + 16)
             }
@@ -561,6 +576,9 @@ extension MessageInputBar: UITextViewDelegate {
     }
     
     @objc public func hiddenInputBar() {
+//        if (self.inputField.text ?? "").isEmpty,!self.inputField.isFirstResponder {
+//            return
+//        }
         if self.collapsedState {
             return
         }

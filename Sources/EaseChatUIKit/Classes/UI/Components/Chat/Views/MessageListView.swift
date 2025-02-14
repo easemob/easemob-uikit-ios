@@ -344,6 +344,15 @@ public let MessageInputBarHeight = CGFloat(52)
         }
     }
     
+    public func resetFrame(newFrame: CGRect) {
+        self.frame = newFrame
+        self.oldFrame = newFrame
+        self.messageList.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-MessageInputBarHeight)
+        self.inputBar.resetFrame(newFrame: CGRect(x: 0, y: self.frame.height-MessageInputBarHeight-BottomBarHeight, width: self.frame.width, height: MessageInputBarHeight))
+        self.editBottomBar.frame = CGRect(x: 0, y: self.frame.height-MessageInputBarHeight-BottomBarHeight, width: self.frame.width, height: 52)
+        self.replyBar.frame = CGRect(x: 0, y: self.inputBar.frame.minY-MessageInputBarHeight, width: self.frame.width, height: 53)
+    }
+    
     func getLastVisibleCellCoordinate() -> CGRect {
         guard let visibleIndexPaths = self.messageList.indexPathsForVisibleRows else { return .zero }
         if let lastIndexPath = visibleIndexPaths.last {
