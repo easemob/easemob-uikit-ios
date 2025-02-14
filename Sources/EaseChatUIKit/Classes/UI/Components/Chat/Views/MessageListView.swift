@@ -387,12 +387,7 @@ public let MessageInputBarHeight = CGFloat(52)
                 let oldFrame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-MessageInputBarHeight)
                 self.messageList.frame = oldFrame
                 if firstResponder {
-                    self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.frame.height-self.inputBar.keyboardHeight-16-BottomBarHeight)
-                    
-                    let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
-                    if lastIndexPath.row >= 0 {
-                        self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: false)
-                    }
+                    self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.frame.height-self.inputBar.keyboardHeight-16-BottomBarHeight-(ScreenHeight <= 667 ? 28:0)-(self.inputBar.extensionMenus.isHidden ? 0:20))
                 
                 } else {
                     if self.inputBar.frame.height > MessageInputBarHeight {
@@ -400,10 +395,11 @@ public let MessageInputBarHeight = CGFloat(52)
                     } else {
                         self.messageList.frame = oldFrame
                     }
-                    let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
-                    if lastIndexPath.row >= 0 {
-                        self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: false)
-                    }
+                }
+                
+                let lastIndexPath = IndexPath(row: self.messages.count - 1, section: 0)
+                if lastIndexPath.row >= 0 {
+                    self.messageList.scrollToRow(at: lastIndexPath, at: .bottom, animated: false)
                 }
             }
         }
