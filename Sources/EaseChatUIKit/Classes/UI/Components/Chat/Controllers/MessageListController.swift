@@ -176,6 +176,7 @@ import AVFoundation
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
         self.view.addSubview(self.loadingView)
+        self.processFollowInputAttachmentAction()
     }
     
     
