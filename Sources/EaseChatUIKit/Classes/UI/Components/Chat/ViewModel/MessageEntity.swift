@@ -846,9 +846,6 @@ extension ChatMessage {
             chatUser?.nickname = cacheUser?.nickname ?? ""
         }
         if chatUser == nil,cacheUser != nil {
-            if let chatAvatarURL = chatUser?.avatarURL,!chatAvatarURL.isEmpty {
-                cacheUser?.avatarURL = chatAvatarURL
-            }
             return cacheUser
         }
         return chatUser
