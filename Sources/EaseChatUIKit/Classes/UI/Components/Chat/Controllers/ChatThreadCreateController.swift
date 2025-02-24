@@ -12,7 +12,7 @@ import AVFoundation
 
 @objcMembers open class ChatThreadCreateController: UIViewController {
     
-    public private(set) var message = ChatMessage()
+    public private(set) var message = ChatMessage(conversationID: "", body: ChatTextMessageBody(text: ""), ext: nil)
     
     //Thread id empty represents creating a new thread,constructing the first message, and then entering the chat thread send the first message.
     public private(set) lazy var viewModel: ChatThreadViewModel = {

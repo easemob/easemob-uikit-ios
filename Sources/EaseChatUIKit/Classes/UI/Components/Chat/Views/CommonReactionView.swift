@@ -16,7 +16,7 @@ fileprivate let space = Int((ScreenWidth-10-CGFloat((Appearance.chat.commonReact
     
     public private(set) var reactions = [Reaction]()
     
-    public private(set) var message = ChatMessage()
+    public private(set) var message = ChatMessage(conversationID: "", body: ChatTextMessageBody(text: ""), ext: nil)
     
     public private(set) lazy var layout: UICollectionViewFlowLayout = {
         let flow = UICollectionViewFlowLayout()
