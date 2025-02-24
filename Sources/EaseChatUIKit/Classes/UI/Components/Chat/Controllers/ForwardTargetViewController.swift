@@ -239,35 +239,36 @@ extension ForwardTargetViewController: UITableViewDelegate,UITableViewDataSource
     }
     
     @objc open func forwardMessages(indexPath: IndexPath) {
-        var body = self.messages.first?.body ?? ChatMessageBody()
-        if self.combineForward {
-            body = ChatCombineMessageBody(title: "Chat History".chat.localize, summary: self.forwardSummary(), compatibleText: "[Chat History]", messageIdList: self.messages.filter({ChatClient.shared().chatManager?.getMessageWithMessageId($0.messageId)?.status == .succeed}).map({ $0.messageId }))
-        }
-        
-        var conversationId = ""
-        if self.searchMode {
-            conversationId = self.searchResults[indexPath.row].id
-        } else {
-            conversationId = self.datas[indexPath.row].id
-        }
-        let message =  ChatMessage(conversationID: conversationId, body: body, ext: ChatUIKitContext.shared?.currentUser?.toJsonObject())
-        message.chatType = self.index == 0 ? .chat:.groupChat
-        ChatClient.shared().chatManager?.send(message, progress: nil, completion: { [weak self] successMessage, error in
-            guard let `self` = self else { return }
-            if error == nil {
-                self.forwarded = true
-                if let cell = self.targetsList.cellForRow(at: indexPath) as? ForwardTargetCell {
-                    var profile = ChatUserProfile()
-                    if let user = (self.searchMode ? self.searchResults:self.datas)[safe: indexPath.row] as? ChatUserProfile {
-                        profile = user
-                    }
-                    cell.refresh(info: profile, keyword: self.searchKeyWord, forward: .forwarded)
-                }
-            } else {
-                self.showToast(toast: error?.errorDescription ?? "Failed to forward message")
-                consoleLogInfo("ForwardTargetViewController forwardMessages error:\(error?.errorDescription ?? "")", type: .error)
+        if var body = self.messages.first?.body {
+            if self.combineForward {
+                body = ChatCombineMessageBody(title: "Chat History".chat.localize, summary: self.forwardSummary(), compatibleText: "[Chat History]", messageIdList: self.messages.filter({ChatClient.shared().chatManager?.getMessageWithMessageId($0.messageId)?.status == .succeed}).map({ $0.messageId }))
             }
-        })
+            
+            var conversationId = ""
+            if self.searchMode {
+                conversationId = self.searchResults[indexPath.row].id
+            } else {
+                conversationId = self.datas[indexPath.row].id
+            }
+            let message =  ChatMessage(conversationID: conversationId, body: body, ext: ChatUIKitContext.shared?.currentUser?.toJsonObject())
+            message.chatType = self.index == 0 ? .chat:.groupChat
+            ChatClient.shared().chatManager?.send(message, progress: nil, completion: { [weak self] successMessage, error in
+                guard let `self` = self else { return }
+                if error == nil {
+                    self.forwarded = true
+                    if let cell = self.targetsList.cellForRow(at: indexPath) as? ForwardTargetCell {
+                        var profile = ChatUserProfile()
+                        if let user = (self.searchMode ? self.searchResults:self.datas)[safe: indexPath.row] as? ChatUserProfile {
+                            profile = user
+                        }
+                        cell.refresh(info: profile, keyword: self.searchKeyWord, forward: .forwarded)
+                    }
+                } else {
+                    self.showToast(toast: error?.errorDescription ?? "Failed to forward message")
+                    consoleLogInfo("ForwardTargetViewController forwardMessages error:\(error?.errorDescription ?? "")", type: .error)
+                }
+            })
+        }
     }
     
     @objc open func forwardSummary() -> String {

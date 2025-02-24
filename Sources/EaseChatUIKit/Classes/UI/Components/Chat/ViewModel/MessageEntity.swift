@@ -46,7 +46,7 @@ public let urlPreviewImageHeight = CGFloat(137)
         super.init()
     }
     
-    public var message: ChatMessage = ChatMessage()
+    public var message: ChatMessage = ChatMessage(conversationID: "", body: ChatTextMessageBody(text: ""), ext: nil)
     
     public var urlPreview: URLPreviewManager.HTMLContent?
     
@@ -794,7 +794,7 @@ public let urlPreviewImageHeight = CGFloat(137)
         super.init()
     }
     
-    public var message: ChatMessage = ChatMessage()
+    public var message: ChatMessage = ChatMessage(conversationID: "", body: ChatTextMessageBody(text: ""), ext: nil)
     
     public var showUserName: String {
         if let remark = self.message.user?.remark,!remark.isEmpty {
@@ -846,9 +846,6 @@ extension ChatMessage {
             chatUser?.nickname = cacheUser?.nickname ?? ""
         }
         if chatUser == nil,cacheUser != nil {
-            if let chatAvatarURL = chatUser?.avatarURL,!chatAvatarURL.isEmpty {
-                cacheUser?.avatarURL = chatAvatarURL
-            }
             return cacheUser
         }
         return chatUser

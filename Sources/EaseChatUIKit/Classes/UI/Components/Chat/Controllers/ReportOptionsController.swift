@@ -11,7 +11,7 @@ import UIKit
     
     public private(set) var items: [Bool] = []
     
-    public private(set) var reportMessage: ChatMessage = ChatMessage()
+    public private(set) var reportMessage: ChatMessage = ChatMessage(conversationID: "", body: ChatTextMessageBody(text: ""), ext: nil)
     
     public private(set) var selectIndex = 0
     

@@ -117,8 +117,11 @@ extension ConversationServiceImplement: ConversationService {
     
     
     public func fetchSilentMode(conversationIds: [String], completion: @escaping (Dictionary<String, SilentModeResult>?, ChatError?) -> Void) {
-        let conversations = conversationIds.map {
-            ChatClient.shared().chatManager?.getConversationWithConvId($0) ?? ChatConversation()
+        var conversations = [ChatConversation]()
+        for id in conversationIds {
+            if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(id) {
+                conversations.append(conversation)
+            }
         }
         ChatClient.shared().pushManager?.getSilentMode(for: conversations,completion: { [weak self] result, error in
             self?.handleResult(error: error, type: .fetchSilent)

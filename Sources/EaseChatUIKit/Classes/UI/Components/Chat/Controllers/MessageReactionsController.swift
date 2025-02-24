@@ -14,7 +14,7 @@ import UIKit
     
     private var needRefresh: (() -> Void)?
     
-    public private(set) var message = ChatMessage()
+    public private(set) var message = ChatMessage(conversationID: "", body: ChatTextMessageBody(text: ""), ext: nil)
         
     public private(set) var reactions = [Reaction]()
     

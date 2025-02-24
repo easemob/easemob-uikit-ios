@@ -172,7 +172,7 @@ extension ConversationListCell: ThemeSwitchProtocol {
     
     public var nickname: String = ""
     
-    public var lastMessage: ChatMessage? = ChatMessage()
+    public var lastMessage: ChatMessage? = ChatMessage(conversationID: "", body: ChatTextMessageBody(text: ""), ext: nil)
     
     public var unreadCount: UInt = 0
     
