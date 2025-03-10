@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'EaseChatUIKit'
-  s.version          = '4.12.1'
+  s.version          = '4.13.0'
   s.summary          = 'A easy for use ChatUIKit.'
 
 # This description is used to generate tags and improve search results.
