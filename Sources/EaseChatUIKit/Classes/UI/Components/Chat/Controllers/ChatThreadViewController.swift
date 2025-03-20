@@ -9,6 +9,7 @@ import UIKit
 import MobileCoreServices
 import QuickLook
 import AVFoundation
+import PhotosUI
 
 @objcMembers open class ChatThreadViewController: UIViewController {
     
@@ -729,11 +730,46 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
     @objc open func handleAttachmentAction(item: ActionSheetItemProtocol) {
         switch item.tag {
         case "File": self.selectFile()
-        case "Photo": self.selectPhoto()
+        case "Photo": self.selectPhotoWithPHPicker()
         case "Camera": self.openCamera()
         case "Contact": self.selectContact()
         default:
             break
+        }
+    }
+    
+    @objc open func selectPhotoWithPHPicker() {
+        let processPHPicker = {
+            var config = PHPickerConfiguration()
+            config.selectionLimit = 1
+            config.preferredAssetRepresentationMode = .current // origin file
+            
+            let picker = PHPickerViewController(configuration: config)
+            picker.delegate = self
+            self.present(picker, animated: true)
+        }
+        let status = PHPhotoLibrary.authorizationStatus()
+        switch status {
+        case .notDetermined:
+            PHPhotoLibrary.requestAuthorization { status in
+                DispatchQueue.main.async {
+                    if status == .denied {
+                        DialogManager.shared.showAlert(title: "permissions disable".chat.localize, content: "photo_disable".chat.localize, showCancel: false, showConfirm: true) { _ in
+                            
+                        }
+                    } else {
+                        processPHPicker()
+                        return
+                    }
+                }
+            }
+        case .denied:
+            DialogManager.shared.showAlert(title: "permissions disable".chat.localize, content: "photo_disable".chat.localize, showCancel: false, showConfirm: true) { _ in
+                
+            }
+            return
+            
+        default: processPHPicker()
         }
     }
     
@@ -949,4 +985,76 @@ extension ChatThreadViewController: ThemeSwitchProtocol {
         self.navigation.updateRightItems(images: images)
     }
     
+}
+
+extension ChatThreadViewController: PHPickerViewControllerDelegate {
+    public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        // Dismiss picker first to improve UX
+        picker.dismiss(animated: true, completion: nil)
+        
+        // Handle case when no results are selected
+        guard !results.isEmpty else { return }
+        
+        // Process each selected item
+        for result in results {
+            let itemProvider = result.itemProvider
+            
+            // Determine file type and appropriate extension
+            var type: MessageCellStyle = .image
+            var fileExtension = "jpeg"
+            var typeIdentifier = UTType.image.identifier
+            var extensionInfo: [String: Any] = [:]
+            
+            // Check for GIF
+            if itemProvider.hasItemConformingToTypeIdentifier(UTType.gif.identifier) {
+                type = .gif
+                fileExtension = "gif"
+                typeIdentifier = UTType.gif.identifier
+            }
+            // Check for Video
+            else if itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
+                type = .video
+                fileExtension = "mp4"
+                typeIdentifier = UTType.movie.identifier
+            } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.mpeg4Movie.identifier) {
+                type = .video
+                fileExtension = "mp4"
+                typeIdentifier = UTType.mpeg4Movie.identifier
+            } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.quickTimeMovie.identifier) {
+                type = .video
+                fileExtension = "mov"
+                typeIdentifier = UTType.quickTimeMovie.identifier
+            }
+            
+            // Generate a unique filename with appropriate extension
+            let timestamp = Int(Date().timeIntervalSince1970 * 1000)
+            let fileName = "\(itemProvider.suggestedName ?? "media_\(timestamp)").\(fileExtension)"
+            
+            // Load the data representation for the selected item
+            itemProvider.loadDataRepresentation(forTypeIdentifier: typeIdentifier) { [weak self] data, error in
+                guard let self = self, let data = data else {
+                    if let error = error {
+                        consoleLogInfo("Error loading media: \(error.localizedDescription)", type: .error)
+                    }
+                    return
+                }
+                
+                // Create file path and save the data
+                let fileURL = URL(fileURLWithPath: MediaConvertor.filePath() + "/\(fileName)")
+                FileManager.default.createFile(atPath: fileURL.path, contents: data)
+                
+                // For video, get duration if possible
+                if type == .video {
+                    let asset = AVURLAsset(url: fileURL)
+                    let duration = asset.duration.value
+                    extensionInfo["duration"] = duration
+                }
+                
+                // Send the message on the main thread
+                DispatchQueue.main.async {
+                    self.viewModel.sendMessage(text: fileURL.path, type: type, extensionInfo: extensionInfo)
+                }
+            }
+        }
+    }
 }
