@@ -44,25 +44,6 @@ import FLAnimatedImage
             }
         }
     }
-    
-    /// Loads a GIF from a remote URL
-    /// - Parameters:
-    ///   - url: The URL of the GIF
-    ///   - placeHolder: A placeholder image to display while loading
-    public func loadGif(with url: String, placeHolder: UIImage?) {
-        self.animatedImageView.image = placeHolder
-        
-        guard let imageURL = URL(string: url) else { return }
-        
-        URLSession.shared.dataTask(with: imageURL) { [weak self] data, response, error in
-            guard let data = data, error == nil else { return }
-            
-            let image = FLAnimatedImage(animatedGIFData: data)
-            DispatchQueue.main.async {
-                self?.animatedImageView.animatedImage = image
-            }
-        }.resume()
-    }
 }
 
 @objc open class GIFMessageCell: MessageCell {
@@ -93,19 +74,23 @@ import FLAnimatedImage
         self.content.frame = CGRect(x: Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame.minX:self.bubbleMultiCorners.frame.minX, y: Appearance.chat.bubbleStyle == .withArrow ? self.bubbleWithArrow.frame.minY:self.bubbleMultiCorners.frame.minY, width: entity.bubbleSize.width, height: entity.bubbleSize.height)
         if let body = (entity.message.body as? ChatImageMessageBody), body.isGif {
             if entity.message.direction == .receive {
-                if let url = body.thumbnailLocalPath, !url.isEmpty, FileManager.default.fileExists(atPath: url) {
-                    self.content.loadGif(from: url)
+                if let thumbnailLocalPath = body.thumbnailLocalPath, !thumbnailLocalPath.isEmpty, FileManager.default.fileExists(atPath: thumbnailLocalPath) {
+                    self.content.loadGif(from: thumbnailLocalPath)
                 } else {
-                    self.content.loadGif(with: body.thumbnailRemotePath, placeHolder: Appearance.chat.imagePlaceHolder)
+                    if (body.thumbnailDownloadStatus != .downloading) {
+                        ChatClient.shared().chatManager?.downloadMessageThumbnail(entity.message, progress: nil)
+                    }
                 }
             } else {
-                if let path = body.localPath, !path.isEmpty, FileManager.default.fileExists(atPath: path) {
+                if let path = body.thumbnailLocalPath, !path.isEmpty, FileManager.default.fileExists(atPath: path) {
                     self.content.loadGif(from: path)
                 } else {
-                    if let url = body.thumbnailLocalPath, !url.isEmpty, FileManager.default.fileExists(atPath: url) {
-                        self.content.loadGif(from: url)
+                    if let localPath = body.localPath, !localPath.isEmpty, FileManager.default.fileExists(atPath: localPath) {
+                        self.content.loadGif(from: localPath)
                     } else {
-                        self.content.loadGif(with: body.thumbnailRemotePath, placeHolder: Appearance.chat.imagePlaceHolder)
+                        if (body.thumbnailDownloadStatus != .downloading) {
+                            ChatClient.shared().chatManager?.downloadMessageThumbnail(entity.message, progress: nil)
+                        }
                     }
                 }
             }
