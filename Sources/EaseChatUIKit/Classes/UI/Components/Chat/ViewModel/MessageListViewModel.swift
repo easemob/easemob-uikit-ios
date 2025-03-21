@@ -200,9 +200,12 @@ import UIKit
         switch type {
         case .text:
             chatMessage = ChatMessage(conversationID: self.to, body: ChatTextMessageBody(text: text), ext: ext)
-        case .image:
-            let displayName = text.components(separatedBy: "/").last ?? "\(Date().timeIntervalSince1970).jpeg"
+        case .image,.gif:
+            let displayName = text.components(separatedBy: "/").last ?? "\(Date().timeIntervalSince1970)" + (type == .gif ? ".gif" : ".jpeg")
             let imageBody = ChatImageMessageBody(localPath: text, displayName:  displayName.components(separatedBy: ".").count < 1 ? displayName+"jpeg":displayName)
+            if type == .gif {
+                imageBody.isGif = true
+            }
             imageBody.size = UIImage(contentsOfFile: text)?.size ?? .zero
             chatMessage = ChatMessage(conversationID: self.to, body: imageBody, ext: ext)
         case .voice:

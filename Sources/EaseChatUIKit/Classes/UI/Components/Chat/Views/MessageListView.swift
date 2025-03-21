@@ -586,7 +586,11 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
             case .text:
                 return self.getMessageCell(cellClass: ComponentsRegister.shared.ChatTextMessageCell, towards: towards, identifier: "EaseChatUIKit.ChatTextMessageCell")
             case .image:
-                return self.getMessageCell(cellClass: ComponentsRegister.shared.ChatImageMessageCell, towards: towards, identifier: "EaseChatUIKit.ChatImageMessageCell")
+                if let body = message.body as? ChatImageMessageBody, body.isGif {
+                    return self.getMessageCell(cellClass: ComponentsRegister.shared.ChatGIFMessageCell, towards: towards, identifier: "EaseChatUIKit.ChatGIFMessageCell")
+                } else {
+                    return self.getMessageCell(cellClass: ComponentsRegister.shared.ChatImageMessageCell, towards: towards, identifier: "EaseChatUIKit.ChatImageMessageCell")
+                }
             case .video:
                 return self.getMessageCell(cellClass: ComponentsRegister.shared.ChatVideoMessageCell, towards: towards, identifier: "EaseChatUIKit.ChatVideoMessageCell")
             case .voice:
