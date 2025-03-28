@@ -36,9 +36,10 @@
 
 # 开发环境
 
-- Xcode 15.0及以上版本 原因是UIKit中使用了部分检测音频AVAudioApplication api适配iOS17以上系统
+- Xcode 16.0及以上版本 原因是UIKit中使用了部分检测音频AVAudioApplication api适配iOS17以上系统
 - 最低支持系统：iOS 13.0
 - 请确保您的项目已设置有效的开发者签名
+- cocoapods v1.14.3 above
 
 # 安装
 
