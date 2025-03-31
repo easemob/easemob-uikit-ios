@@ -150,7 +150,7 @@ import EaseChatUIKit
 @UIApplicationMain
 class AppDelegate：UIResponder，UIApplicationDelegate {
 
-     var window：UIWindow？
+     var window: UIWindow？
 
      func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
          // 您可以在应用程序加载时或使用之前初始化 EaseChatUIKit。
