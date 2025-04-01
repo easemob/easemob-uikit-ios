@@ -225,6 +225,8 @@ public final class YourAppUser: NSObject, ChatUserProfileProtocol {
     public var id: String = ""
         
     public var nickname: String = ""
+    
+    var remark: String = ""
         
     public var selected: Bool = false
     
