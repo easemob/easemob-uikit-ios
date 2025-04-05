@@ -28,7 +28,7 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/easemob/easemob-uikit-ios.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '13.0'
+  s.ios.deployment_target = '14.0'
 
   s.xcconfig = {'ENABLE_BITCODE' => 'NO'}
 #  s.public_header_files = ['Sources/EaseChatUIKit/Classes/*/*.h']
@@ -37,6 +37,7 @@ TODO: Add long description of the pod here.
 #  s.private_header_files = ['Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*']
   s.resources = ['Sources/EaseChatUIKit/Classes/UI/**/*.bundle','Sources/EaseChatUIKit/Classes/UI/**/*.xcprivacy']
   s.dependency 'HyphenateChat','>= 4.10.1'
+  s.dependency 'FLAnimatedImage', '~> 1.0'
   s.static_framework = true
   
   s.swift_version = '5.0'
