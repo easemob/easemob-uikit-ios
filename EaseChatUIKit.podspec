@@ -35,7 +35,8 @@ TODO: Add long description of the pod here.
   
   s.source_files = [ 'Sources/EaseChatUIKit/Classes/**/*.{h,swift}' ]
 #  s.private_header_files = ['Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*']
-  s.resources = ['Sources/EaseChatUIKit/Classes/UI/**/*.bundle','Sources/EaseChatUIKit/Classes/UI/**/*.xcprivacy']
+  s.resources = 'Sources/EaseChatUIKit/Classes/UI/**/*.bundle'
+  s.resource_bundles = {'EaseChatUIKit': 'Sources/EaseChatUIKit/Classes/UI/**/*.xcprivacy'}
   s.dependency 'HyphenateChat','>= 4.10.1'
   s.static_framework = true
   
