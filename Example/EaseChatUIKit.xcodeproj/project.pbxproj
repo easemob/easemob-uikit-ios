@@ -449,7 +449,7 @@
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				INFOPLIST_FILE = EaseChatUIKit/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = EaseChat;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1;
 				MODULE_NAME = ExampleApp;
@@ -473,7 +473,7 @@
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				INFOPLIST_FILE = EaseChatUIKit/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = EaseChat;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1;
 				MODULE_NAME = ExampleApp;
