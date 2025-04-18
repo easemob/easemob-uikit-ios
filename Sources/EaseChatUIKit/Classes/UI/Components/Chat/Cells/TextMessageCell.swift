@@ -132,7 +132,7 @@ import UIKit
         fatalError("init(coder:) has not been implemented")
     }
     
-    public override func refresh(entity: MessageEntity) {
+    open override func refresh(entity: MessageEntity) {
         super.refresh(entity: entity)
         self.onThemeChanged()
         let textSize = entity.textSize()

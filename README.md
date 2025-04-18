@@ -36,9 +36,10 @@
 
 # 开发环境
 
-- Xcode 15.0及以上版本 原因是UIKit中使用了部分检测音频AVAudioApplication api适配iOS17以上系统
+- Xcode 16.0及以上版本 原因是UIKit中使用了部分检测音频AVAudioApplication api适配iOS17以上系统
 - 最低支持系统：iOS 13.0
 - 请确保您的项目已设置有效的开发者签名
+- cocoapods v1.14.3 above
 
 # 安装
 
@@ -149,7 +150,7 @@ import EaseChatUIKit
 @UIApplicationMain
 class AppDelegate：UIResponder，UIApplicationDelegate {
 
-     var window：UIWindow？
+     var window: UIWindow？
 
      func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
          // 您可以在应用程序加载时或使用之前初始化 EaseChatUIKit。
@@ -224,6 +225,8 @@ public final class YourAppUser: NSObject, ChatUserProfileProtocol {
     public var id: String = ""
         
     public var nickname: String = ""
+    
+    var remark: String = ""
         
     public var selected: Bool = false
     
