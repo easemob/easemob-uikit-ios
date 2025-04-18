@@ -1,6 +1,6 @@
 use_frameworks!
 
-platform :ios, '13.0'
+platform :ios, '14.0'
 
 target 'EaseChatUIKit_Example' do
   pod 'EaseChatUIKit', :path => '../'
@@ -8,7 +8,7 @@ target 'EaseChatUIKit_Example' do
     installer.generated_projects.each do |project|
       project.targets.each do |target|
         target.build_configurations.each do |config|
-          config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "13.0"
+          config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "14.0"
           config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
           config.build_settings["DEVELOPMENT_TEAM"] = "JC854K845H"
         end

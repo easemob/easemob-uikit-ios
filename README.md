@@ -37,7 +37,7 @@
 # 开发环境
 
 - Xcode 16.0及以上版本 原因是UIKit中使用了部分检测音频AVAudioApplication api适配iOS17以上系统
-- 最低支持系统：iOS 13.0
+- 最低支持系统：iOS 14.0
 - 请确保您的项目已设置有效的开发者签名
 - cocoapods v1.14.3 above
 
@@ -51,7 +51,7 @@
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '13.0'
+platform :ios, '14.0'
 
 target 'YourTarget' do
   use_frameworks!
@@ -62,7 +62,7 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
       config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
     end
   end
