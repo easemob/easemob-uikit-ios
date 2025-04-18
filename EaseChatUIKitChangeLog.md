@@ -1,4 +1,7 @@
 # EaseChatUIKit change log
+## 4.14.0
+1. 支持gif消息
+2. 依赖的SDK升级到4.14.0
 
 ## 4.8.0
 1.消息页面新增功能
