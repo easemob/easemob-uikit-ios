@@ -79,6 +79,8 @@ import UIKit
     
     public var ChatImageMessageCell: ImageMessageCell.Type = ImageMessageCell.self
     
+    public var ChatGIFMessageCell: GIFMessageCell.Type = GIFMessageCell.self
+    
     public var ChatAudioMessageCell: AudioMessageCell.Type = AudioMessageCell.self
     
     public var ChatVideoMessageCell: VideoMessageCell.Type = VideoMessageCell.self

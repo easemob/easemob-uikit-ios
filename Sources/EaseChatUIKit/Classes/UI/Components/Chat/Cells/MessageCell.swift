@@ -23,6 +23,7 @@ public let checkBoxTag = 189
 @objc public enum MessageCellStyle: UInt {
     case text
     case image
+    case gif
     case video
     case location
     case voice
