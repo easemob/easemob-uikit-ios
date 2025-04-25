@@ -1,6 +1,6 @@
 import Foundation
 
-public let ChatUIKit_VERSION = "4.12.1"
+public let ChatUIKit_VERSION = "4.15.0"
 
 public let cache_update_notification = "ChatUIKitContextUpdateCache"
 
@@ -53,10 +53,13 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
     @objc(setupWithAppKey:option:)
     public func setup(appKey: String? = nil,option: ChatOptions? = nil) -> ChatError? {
         if let options = option {
+            options.uikitVersion = ChatUIKit_VERSION
             return ChatClient.shared().initializeSDK(with: options)
         } else {
             if let key = appKey {
-                return ChatClient.shared().initializeSDK(with: ChatOptions(appkey: key))
+                let options = ChatOptions(appkey: key)
+                options.uikitVersion = ChatUIKit_VERSION
+                return ChatClient.shared().initializeSDK(with: options)
             }
             return ChatError(description: "App key can't be nil", code: .invalidAppkey)
         }

@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'EaseChatUIKit'
-  s.version          = '4.14.0'
+  s.version          = '4.15.0'
   s.summary          = 'A easy for use ChatUIKit.'
 
 # This description is used to generate tags and improve search results.
@@ -36,7 +36,7 @@ TODO: Add long description of the pod here.
   s.source_files = [ 'Sources/EaseChatUIKit/Classes/**/*.{h,swift}' ]
 #  s.private_header_files = ['Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*']
   s.resources = ['Sources/EaseChatUIKit/Classes/UI/**/*.bundle','Sources/EaseChatUIKit/Classes/UI/**/*.xcprivacy']
-  s.dependency 'HyphenateChat','>= 4.14.0'
+  s.dependency 'HyphenateChat','>= 4.15.0'
   s.dependency 'FLAnimatedImage', '~> 1.0'
   s.static_framework = true
   
