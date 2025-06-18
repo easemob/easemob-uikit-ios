@@ -52,6 +52,9 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
     /// Returns the initialization success or an error that includes the description of the cause of the failure.
     @objc(setupWithAppKey:option:)
     public func setup(appKey: String? = nil,option: ChatOptions? = nil) -> ChatError? {
+        if ChatUIKitClient.shared.option.option_UI.enableContact {
+            ChatClient.shared().contactManager?.add(self, delegateQueue: nil)
+        }
         if let options = option {
             options.uiKitVersion = ChatUIKit_VERSION
             return ChatClient.shared().initializeSDK(with: options)
@@ -71,9 +74,6 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
     ///   - token: The user chat token.
     @objc(loginWithUser:token:completion:)
     public func login(user: ChatUserProfileProtocol,token: String,completion: @escaping (ChatError?) -> Void) {
-        if ChatUIKitClient.shared.option.option_UI.enableContact {
-            ChatClient.shared().contactManager?.add(self, delegateQueue: nil)
-        }
         ChatUIKitContext.shared?.currentUser = user
         ChatUIKitContext.shared?.chatCache?[user.id] = user
         ChatUIKitContext.shared?.userCache?[user.id] = user
