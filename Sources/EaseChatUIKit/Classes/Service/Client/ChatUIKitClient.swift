@@ -52,20 +52,22 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
     /// Returns the initialization success or an error that includes the description of the cause of the failure.
     @objc(setupWithAppKey:option:)
     public func setup(appKey: String? = nil,option: ChatOptions? = nil) -> ChatError? {
-        if ChatUIKitClient.shared.option.option_UI.enableContact {
-            ChatClient.shared().contactManager?.add(self, delegateQueue: nil)
-        }
+        var error: ChatError?
         if let options = option {
             options.uiKitVersion = ChatUIKit_VERSION
-            return ChatClient.shared().initializeSDK(with: options)
+            error = ChatClient.shared().initializeSDK(with: options)
         } else {
             if let key = appKey {
                 let options = ChatOptions(appkey: key)
                 options.uiKitVersion = ChatUIKit_VERSION
-                return ChatClient.shared().initializeSDK(with: options)
+                error = ChatClient.shared().initializeSDK(with: options)
             }
-            return ChatError(description: "App key can't be nil", code: .invalidAppkey)
+            error = ChatError(description: "App key can't be nil", code: .invalidAppkey)
         }
+        if ChatUIKitClient.shared.option.option_UI.enableContact {
+            ChatClient.shared().contactManager?.add(self, delegateQueue: nil)
+        }
+        return error
     }
     
     /// Login user.
