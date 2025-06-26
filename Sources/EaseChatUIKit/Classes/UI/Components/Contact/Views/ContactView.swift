@@ -215,7 +215,9 @@ extension ContactView: UITableViewDelegate,UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        
+        if !self.firstRefresh {
+            self.requestDisplayInfo()
+        }
     }
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -337,8 +339,14 @@ extension ContactView: IContactListDriver {
         
         if self.firstRefresh {
             self.firstRefresh = false
+            var unknownInfoIds = [String]()
+            for info in infos {
+                if info.nickname.isEmpty || info.avatarURL.isEmpty {
+                    unknownInfoIds.append(info.id)
+                }
+            }
             for eventHandle in self.eventsDelegates.allObjects {
-                eventHandle.onContactListEndScrollNeededDisplayInfos(ids: infos.map({ $0.id }))
+                eventHandle.onContactListEndScrollNeededDisplayInfos(ids: unknownInfoIds)
             }
         }
         let tuple = ContactSorter.sort(contacts: self.rawData)

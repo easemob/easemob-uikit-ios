@@ -57,8 +57,14 @@ import UIKit
     }
     
     @objc open func requestProfiles() {
+        var userIds = [String]()
+        for user in self.datas {
+            if let userCache = ChatUIKitContext.shared?.userCache?[user.userId],!userCache.nickname.isEmpty {
+                continue
+            }
+            userIds.append(user.userId)
+        }
         if ChatUIKitContext.shared?.userProfileProvider != nil {
-            let userIds = self.datas.map { $0.userId }
             Task(priority: .background) {
                 let profiles = await ChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: userIds) ?? []
                 for profile in profiles {
@@ -73,7 +79,7 @@ import UIKit
             }
         } else {
             if ChatUIKitContext.shared?.userProfileProviderOC != nil {
-                ChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: self.datas.map { $0.userId }, completion: { [weak self] profiles in
+                ChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: userIds, completion: { [weak self] profiles in
                     for profile in profiles {
                         if let info = self?.datas.first(where: { $0.userId == profile.id }) {
                             info.nickname = profile.nickname
