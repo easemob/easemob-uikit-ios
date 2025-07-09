@@ -17,16 +17,24 @@ class MusicCell: CustomMessageCell {
     
     required init(towards: BubbleTowards, reuseIdentifier: String) {
         super.init(towards: towards, reuseIdentifier: reuseIdentifier)
-        self.bubbleWithArrow.isHidden = true
-        self.bubbleMultiCorners.isHidden = false
-        self.contentView.addSubview(self.music)
+        self.bubbleWithArrow.backgroundColor = .purple
+        self.bubbleWithArrow.arrow.isHidden = true
+        self.bubbleMultiCorners.backgroundColor = .purple
+        self.content.addSubview(self.music)
     }
     
     @MainActor required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func createContent() -> UIView {
+        UIView(frame: self.contentView.bounds).backgroundColor(.clear).tag(bubbleTag)
+    }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        self.music.frame = self.content.bounds
+    }
     
     override func refresh(entity: MessageEntity) {
         super.refresh(entity: entity)
