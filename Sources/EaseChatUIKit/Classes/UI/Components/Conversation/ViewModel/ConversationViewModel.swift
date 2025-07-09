@@ -152,8 +152,14 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         for id in ids {
             if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(id) {
                 if conversation.type == .chat {
+                    if let userCache = ChatUIKitContext.shared?.userCache?[id],!userCache.nickname.isEmpty {
+                        continue
+                    }
                     privateChats.append(id)
                 } else {
+                    if let groupCache = ChatUIKitContext.shared?.groupCache?[id],!groupCache.nickname.isEmpty {
+                        continue
+                    }
                     groupChats.append(id)
                 }
             }
@@ -438,7 +444,7 @@ extension ConversationViewModel: ConversationServiceListener {
             self.driver?.refreshList(infos: items)
             
             if infos.count < 11 || self.firstLoadConversation {
-                let requestCount = items.count < 11 ? (items.count - 1):10
+                let requestCount = items.count < 11 ? items.count:10
                 if requestCount > 0 {
                     self.requestDisplayProfiles(ids: items.prefix(upTo: requestCount).map({ $0.id }))
                     self.firstLoadConversation = false
