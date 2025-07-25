@@ -144,7 +144,11 @@ public let urlPreviewImageHeight = CGFloat(137)
     }()
     
     open func cellHeight() -> CGFloat {
-        return 8+(Appearance.chat.contentStyle.contains(.withNickName) ? 28:2)+(Appearance.chat.contentStyle.contains(.withReply) ? self.replySize.height:2)+self.bubbleSize.height+(Appearance.chat.contentStyle.contains(.withDateAndTime) ? 22:6)+self.topicContentHeight()+self.reactionContentHeight()
+        if message.body.type != .custom {
+            return 8+(Appearance.chat.contentStyle.contains(.withNickName) ? 28:2)+(Appearance.chat.contentStyle.contains(.withReply) ? self.replySize.height:2)+self.bubbleSize.height+(Appearance.chat.contentStyle.contains(.withDateAndTime) ? 22:6)+self.topicContentHeight()+self.reactionContentHeight()
+        } else {
+            return self.bubbleSize.height
+        }
     }
     
     open func reactionMenuWidth() -> CGFloat {

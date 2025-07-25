@@ -65,8 +65,8 @@ import PhotosUI
         LoadingView(frame: self.view.bounds)
     }
     
-    public private(set) lazy var viewModel: ChatThreadViewModel = {
-        ChatThreadViewModel(chatThread: self.profile)
+    public private(set) lazy var viewModel: ChatThreadViewModel  = {
+        ComponentsRegister.shared.ThreadViewModel.init(chatThread: self.profile)
     }()
     
     public private(set) var firstMessage: ChatMessage?

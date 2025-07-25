@@ -171,7 +171,7 @@ import UIKit
     ///   - type: ``MessageCellStyle``
     ///   - extensionInfo: Extended information to be carried in the message.
     @objc(sendMessageWithText:type:extensionInfo:)
-    public func sendMessage(text: String,type: MessageCellStyle,extensionInfo: Dictionary<String,Any> = [:]) {
+    open func sendMessage(text: String,type: MessageCellStyle,extensionInfo: Dictionary<String,Any> = [:]) {
         if let message = self.constructMessage(text: text, type: type,extensionInfo: extensionInfo) {
             self.driver?.showMessage(message: message)
             self.chatService?.send(message: message) { [weak self] error, message in

@@ -97,6 +97,8 @@ import UIKit
         
     public var MessagesViewModel: MessageListViewModel.Type = MessageListViewModel.self
     
+    public var ThreadViewModel: ChatThreadViewModel.Type = ChatThreadViewModel.self
+    
     /// Message cell render entity.
     public var MessageRenderEntity: MessageEntity.Type = MessageEntity.self
     
