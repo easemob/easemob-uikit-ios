@@ -855,6 +855,9 @@ extension MessageListView: IMessageListViewDriver {
             if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }),indexPath.row >= 0 {
                 self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
                 self.messageList.reloadData()
+            } else {
+                self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
+                self.messageList.reloadData()
             }
         }
     }

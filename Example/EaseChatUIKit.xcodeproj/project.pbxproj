@@ -259,11 +259,13 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-EaseChatUIKit_Example/Pods-EaseChatUIKit_Example-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/FLAnimatedImage/FLAnimatedImage.framework",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/AgoraInfra_iOS/aosl.framework/aosl",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/HyphenateChat/HyphenateChat.framework/HyphenateChat",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FLAnimatedImage.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/aosl.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HyphenateChat.framework",
 			);
