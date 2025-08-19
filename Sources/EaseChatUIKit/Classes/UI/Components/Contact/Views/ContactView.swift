@@ -246,7 +246,7 @@ extension ContactView: UITableViewDelegate,UITableViewDataSource {
         if let visiblePaths = self.contactList.indexPathsForVisibleRows {
             for indexPath in visiblePaths {
                 if let item = self.contacts[safe: indexPath.section]?[safe: indexPath.row] {
-                    if item.nickname.isEmpty || item.avatarURL.isEmpty {
+                    if item.nickname.isEmpty, item.avatarURL.isEmpty {
                         unknownInfoIds.append(item.id)
                     }
                 }
