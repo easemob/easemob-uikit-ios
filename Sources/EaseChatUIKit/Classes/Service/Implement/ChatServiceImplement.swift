@@ -120,7 +120,7 @@ extension ChatServiceImplement: ChatService {
                 if error == nil,let messages = messages {
                     for message in messages {
                         if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-                            if let user = ChatUIKitContext.shared?.chatCache?[message.from] as? ChatUserProfile,user.modifyTime < message.timestamp {
+                            if let user = ChatUIKitContext.shared?.userCache?[message.from] as? ChatUserProfile,user.modifyTime < message.timestamp {
                                 let user = ChatUserProfile()
                                 user.setValuesForKeys(dic)
                                 if user.id.isEmpty {
