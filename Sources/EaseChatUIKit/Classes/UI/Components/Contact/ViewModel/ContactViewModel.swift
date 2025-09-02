@@ -288,9 +288,11 @@ extension ContactViewModel: ContactListActionEventsDelegate {
     
     @objc open func cacheProfiles(profiles: [ChatUserProfileProtocol]) {
         for profile in profiles {
-            ChatUIKitContext.shared?.userCache?[profile.id]?.nickname = profile.nickname
-            ChatUIKitContext.shared?.userCache?[profile.id]?.remark = profile.remark
-            ChatUIKitContext.shared?.userCache?[profile.id]?.avatarURL = profile.avatarURL
+            if let user = ChatUIKitContext.shared?.userCache?[profile.id] {
+                user.nickname = profile.nickname
+                user.remark = profile.remark
+                user.avatarURL = profile.avatarURL
+            }
         }
     }
     
