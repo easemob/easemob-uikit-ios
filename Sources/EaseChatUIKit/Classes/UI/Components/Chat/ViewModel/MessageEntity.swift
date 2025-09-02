@@ -849,6 +849,9 @@ extension ChatMessage {
         if chatUser?.nickname.isEmpty ?? true {
             chatUser?.nickname = cacheUser?.nickname ?? ""
         }
+        if from == ChatClient.shared().currentUsername ?? "",let currentUser = ChatUIKitContext.shared?.currentUser {
+            return currentUser
+        }
         if chatUser == nil,cacheUser != nil {
             return cacheUser
         }
