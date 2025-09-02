@@ -147,6 +147,9 @@ public let urlPreviewImageHeight = CGFloat(137)
         if message.body.type != .custom {
             return 8+(Appearance.chat.contentStyle.contains(.withNickName) ? 28:2)+(Appearance.chat.contentStyle.contains(.withReply) ? self.replySize.height:2)+self.bubbleSize.height+(Appearance.chat.contentStyle.contains(.withDateAndTime) ? 22:6)+self.topicContentHeight()+self.reactionContentHeight()
         } else {
+            if let body = self.message.body as? ChatCustomMessageBody,body.event == EaseChatUIKit_user_card_message {
+                return 8+(Appearance.chat.contentStyle.contains(.withNickName) ? 28:2)+(Appearance.chat.contentStyle.contains(.withReply) ? self.replySize.height:2)+self.bubbleSize.height+(Appearance.chat.contentStyle.contains(.withDateAndTime) ? 22:6)+self.topicContentHeight()+self.reactionContentHeight()
+            }
             return self.bubbleSize.height
         }
     }
