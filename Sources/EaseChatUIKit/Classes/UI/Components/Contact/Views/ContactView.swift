@@ -246,7 +246,7 @@ extension ContactView: UITableViewDelegate,UITableViewDataSource {
         if let visiblePaths = self.contactList.indexPathsForVisibleRows {
             for indexPath in visiblePaths {
                 if let item = self.contacts[safe: indexPath.section]?[safe: indexPath.row] {
-                    if item.nickname.isEmpty || item.avatarURL.isEmpty {
+                    if item.nickname.isEmpty, item.avatarURL.isEmpty {
                         unknownInfoIds.append(item.id)
                     }
                 }
@@ -321,14 +321,16 @@ extension ContactView: IContactListDriver {
     }
     
     public func refreshProfiles(infos: [ChatUserProfileProtocol]) {
-        for info in infos {
-            if let profile = self.rawData.first(where: { $0.id == info.id }) {
-                profile.nickname =  info.nickname.isEmpty ? info.id:info.nickname
-                profile.avatarURL = info.avatarURL
-                profile.remark = info.remark
+        for sectionData in self.contacts {
+            for item in sectionData {
+                if let profile = infos.first(where: { $0.id == item.id }) {
+                    item.nickname = profile.nickname.isEmpty ? profile.id:profile.nickname
+                    item.avatarURL = profile.avatarURL
+                    item.remark = profile.remark
+                    item.selected = profile.selected
+                }
             }
         }
-        self.refreshList(infos: self.rawData)
     }
     
     public func refreshList(infos: [ChatUserProfileProtocol]) {

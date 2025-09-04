@@ -90,14 +90,14 @@ import UIKit
             self.searchResults = self.datas.filter({ $0.nickname.lowercased().contains(self.searchText) || $0.id.lowercased().contains(self.searchText) || $0.remark.lowercased().contains(self.searchText)})
             self.searchList.reloadData()
         }
-        self.searchHeader.textFieldState = { [weak self] in
-            self?.active = $0 == .began
+        self.searchHeader.textFieldState = { [weak self] _ in
+//            self?.active = $0 == .began
         }
         self.searchHeader.actionClosure = { [weak self] in
-            self?.active = false
-            self?.searchText = ""
-            self?.searchList.reloadData()
             if $0 == .cancel {
+                self?.active = false
+                self?.searchText = ""
+                self?.searchList.reloadData()
                 self?.pop()
             }
         }

@@ -859,6 +859,14 @@ extension MessageListView: IMessageListViewDriver {
         }
     }
     
+    public func reloadCallMessage(message: ChatMessage) {
+        if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
+            self.messages.replaceSubrange(index...index, with: [self.convertMessage(message: message)])
+            self.messageList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            self.messageList.scrollToRow(at: IndexPath(row: index, section: 0), at: .bottom, animated: true)
+        }
+    }
+    
     public func updateGroupMessageChatThreadChanged(message: ChatMessage) {
         if let index = self.messages.firstIndex(where: { $0.message.messageId == message.messageId }) {
             if let indexPath = self.messageList.indexPathsForVisibleRows?.first(where: { $0.row == index }),let entity = self.messages[safe: index] {

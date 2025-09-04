@@ -890,16 +890,11 @@ extension MessageListViewModel: ChatResponseListener {
         - recallInfo: The recall information containing the recalled message.
      */
     @objc open func messageDidRecalled(recallInfo: RecallInfo) {
-        if let recallMessage = recallInfo.recallMessage,recallMessage.conversationId == self.to {
-            recallMessage.from = recallInfo.recallBy
-            self.recallAction(message: recallMessage)
-        } else {
-            if let recall = self.constructMessage(text: "recalled a message".chat.localize, type: .alert, extensionInfo: [:]) {
-                recall.messageId = recallInfo.recallMessageId
-                recall.timestamp = Int64(Date().timeIntervalSince1970*1000)
-                recall.from = recallInfo.recallBy
-                self.driver?.processMessage(operation: .recall, message: recall)
-            }
+        if let recall = self.constructMessage(text: "recalled a message".chat.localize, type: .alert, extensionInfo: [:]) {
+            recall.messageId = recallInfo.recallMessageId
+            recall.timestamp = Int64(Date().timeIntervalSince1970*1000)
+            recall.from = recallInfo.recallBy
+            self.driver?.processMessage(operation: .recall, message: recall)
         }
         self.pinDriver?.refresh(entities: self.showPinnedMessages())
     }
