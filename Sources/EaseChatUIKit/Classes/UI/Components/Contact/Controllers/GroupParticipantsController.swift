@@ -213,7 +213,7 @@ import UIKit
     }
 
     @objc open func fetchParticipants() {
-        if self.recursiveCount > 0 {
+        if self.participants.count < Appearance.chat.groupParticipantsLimitCount {
             self.service.fetchParticipants(groupId: self.chatGroup.groupId, cursor: self.cursor, pageSize: self.pageSize) { [weak self] result, error in
                 guard let `self` = self else { return }
                 if error == nil {
@@ -249,6 +249,9 @@ import UIKit
                                     }
                                     self.participants.insert(profile, at: 0)
                                 }
+                                self.loadFinished = true
+                                self.participantsList.reloadData()
+                                return
                             }
                         } else {
                             self.participants.append(contentsOf: list.map({
