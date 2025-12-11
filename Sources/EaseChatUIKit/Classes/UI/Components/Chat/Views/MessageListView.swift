@@ -640,7 +640,7 @@ extension MessageListView: UITableViewDelegate,UITableViewDataSource {
         }
         switch area {
         case .avatar:
-            if ComponentViewsActionHooker.shared.chat.bubbleClicked != nil {
+            if ComponentViewsActionHooker.shared.chat.avatarClicked != nil {
                 if let user = entity.message.user {
                     ComponentViewsActionHooker.shared.chat.avatarClicked?(user)
                 } else {

@@ -464,6 +464,10 @@ ComponentsRegister.shared.ChatLocationCell = CustomLocationMessageCell.self
 
 [详见文档](./Documentation/custom_cell.md)
 
+## 5.可重载Api概览
+
+[详见文档](./Documentation/API_README.md)
+
 # 主题
 - 切换到 EaseChatUIKit 附带的浅色或深色主题。在初始化单群聊UIKit视图之前切换主题切换主题即可更改默认主题，在视图使用中也可以切换由开发者判断系统当前主题后切换你想对应的主题即可。
 
