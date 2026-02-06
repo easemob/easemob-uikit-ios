@@ -788,11 +788,6 @@ extension MessageListController: MessageListDriverEventsListener {
      - body: The custom message body containing contact information.
      */
     @objc open func viewContact(body: ChatCustomMessageBody) {
-        Appearance.chat.inputExtendActions.append(ActionSheetItem(title: "1", type: .normal, tag: "1", image: nil))
-        Appearance.chat.inputExtendActions.removeAll {$0.tag == "1"}
-        Appearance.chat.inputExtendActions = Appearance.chat.inputExtendActions.sorted { lhs, rhs in
-            return lhs.tag > rhs.tag
-        }
         var userId = body.customExt?["userId"] as? String
         if userId == nil {
             userId = body.customExt?["uid"] as? String
