@@ -48,7 +48,7 @@ import UIKit
         let nickName = profile.nickname.isEmpty ? profile.id:profile.nickname
         self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: nickName)
         self.avatar.image(with: profile.avatarURL, placeHolder: Appearance.avatarPlaceHolder)
-        self.checkbox.image = UIImage(named: profile.selected ? "select":"unselect", in: .chatBundle, compatibleWith: nil)
+        self.checkbox.image = UIImage(chatNamed: profile.selected ? "select":"unselect")
         self.separatorLine.backgroundColor = Theme.style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9
     }
     

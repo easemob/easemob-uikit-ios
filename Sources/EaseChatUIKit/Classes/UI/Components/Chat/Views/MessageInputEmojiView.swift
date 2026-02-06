@@ -37,11 +37,11 @@ import UIKit
     }()
     
     public lazy var sendEmoji: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.frame.width - 56, y: self.frame.height - 56, width: 44, height: 44)).addTargetFor(self, action: #selector(sendAction), for: .touchUpInside).isEnabled(true).cornerRadius(.large).backgroundColor(.clear).image(UIImage(named: "airplane", in: .chatBundle, with: nil), .normal)
+        UIButton(type: .custom).frame(CGRect(x: self.frame.width - 56, y: self.frame.height - 56, width: 44, height: 44)).addTargetFor(self, action: #selector(sendAction), for: .touchUpInside).isEnabled(true).cornerRadius(.large).backgroundColor(.clear).image(UIImage(chatNamed: "airplane"), .normal)
     }()
     
     lazy var gradient: GradientEmojiView = {
-        GradientEmojiView(frame: CGRect(x: 0, y: self.frame.height-BottomBarHeight-31, width: self.frame.width, height: 32)).image(UIImage(named: "gradient_light", in: .chatBundle, with: nil))
+        GradientEmojiView(frame: CGRect(x: 0, y: self.frame.height-BottomBarHeight-31, width: self.frame.width, height: 32)).image(UIImage(chatNamed: "gradient_light"))
     }()
 
     @objc required override public init(frame: CGRect) {
@@ -100,7 +100,7 @@ extension MessageInputEmojiView: UICollectionViewDelegate, UICollectionViewDataS
 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ChatEmojiCell", for: indexPath) as? ChatEmojiCell
-        cell?.icon.image = ChatEmojiConvertor.shared.emojiMap.isEmpty ? UIImage(named: ChatEmojiConvertor.shared.emojis[indexPath.row], in: .chatBundle, with: nil):ChatEmojiConvertor.shared.emojiMap[ChatEmojiConvertor.shared.emojis[indexPath.row]]
+        cell?.icon.image = ChatEmojiConvertor.shared.emojiMap.isEmpty ? UIImage(chatNamed: ChatEmojiConvertor.shared.emojis[indexPath.row]):ChatEmojiConvertor.shared.emojiMap[ChatEmojiConvertor.shared.emojis[indexPath.row]]
         return cell ?? ChatEmojiCell()
     }
 
@@ -112,12 +112,12 @@ extension MessageInputEmojiView: UICollectionViewDelegate, UICollectionViewDataS
 
 extension MessageInputEmojiView: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
-        let image = UIImage(named: "arrow_left_thick", in: .chatBundle, with: nil)
+        let image = UIImage(chatNamed: "arrow_left_thick")
         
         self.deleteEmoji.setImage(style == .dark ? image?.withTintColor(UIColor.theme.neutralColor98):image?.withTintColor(UIColor.theme.neutralColor3), for: .normal)
         self.deleteEmoji.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor95
         self.sendEmoji.backgroundColor = style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor
-        self.gradient.image = UIImage(named: style == .dark ? "gradient_dark":"gradient_light", in: .chatBundle, with: nil)
+        self.gradient.image = UIImage(chatNamed: style == .dark ? "gradient_dark":"gradient_light")
     }
 }
 

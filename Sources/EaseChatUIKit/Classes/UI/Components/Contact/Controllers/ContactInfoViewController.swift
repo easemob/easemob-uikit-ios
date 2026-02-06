@@ -86,7 +86,7 @@ import UIKit
      - Returns: An instance of EaseChatNavigationBar.
      */
     @objc open func createNavigation() -> ChatNavigationBar {
-        ChatNavigationBar(showLeftItem: true, rightImages: self.showMenu ? [UIImage(named: "more_detail", in: .chatBundle, with: nil)!] : [], hiddenAvatar: true)
+        ChatNavigationBar(showLeftItem: true, rightImages: self.showMenu ? [UIImage(chatNamed: "more_detail")!] : [], hiddenAvatar: true)
     }
     
     public private(set) lazy var header: DetailInfoHeader = {
@@ -99,7 +99,7 @@ import UIKit
      - Returns: An instance of DetailInfoHeader.
      */
     @objc open func createHeader() -> DetailInfoHeader {
-        DetailInfoHeader(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 284), showMenu: self.showMenu, placeHolder: UIImage(named: "single", in: .chatBundle, with: nil)).backgroundColor(.clear)
+        DetailInfoHeader(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 284), showMenu: self.showMenu, placeHolder: UIImage(chatNamed: "single")).backgroundColor(.clear)
     }
     
     public lazy var showMenu: Bool = {

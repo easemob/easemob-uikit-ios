@@ -34,7 +34,7 @@ open class BlockContactsViewController: UIViewController {
      - Returns: The created search button.
      */
     @objc open func createSearch() -> UIButton {
-        UIButton(type: .custom).frame(CGRect(x: 16, y: self.navigation.frame.maxY + 5, width: self.view.frame.width-32, height: 36)).backgroundColor(UIColor.theme.neutralColor95).textColor(UIColor.theme.neutralColor6, .normal).title("Search".chat.localize, .normal).image(UIImage(named: "search", in: .chatBundle, with: nil), .normal).addTargetFor(self, action: #selector(searchAction), for: .touchUpInside).cornerRadius(Appearance.avatarRadius)
+        UIButton(type: .custom).frame(CGRect(x: 16, y: self.navigation.frame.maxY + 5, width: self.view.frame.width-32, height: 36)).backgroundColor(UIColor.theme.neutralColor95).textColor(UIColor.theme.neutralColor6, .normal).title("Search".chat.localize, .normal).image(UIImage(chatNamed: "search"), .normal).addTargetFor(self, action: #selector(searchAction), for: .touchUpInside).cornerRadius(Appearance.avatarRadius)
     }
     
     public private(set) lazy var contactList: ContactView = {

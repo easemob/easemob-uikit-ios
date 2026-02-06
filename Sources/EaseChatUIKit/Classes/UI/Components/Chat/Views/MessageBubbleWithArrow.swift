@@ -45,7 +45,7 @@ import UIKit
     
     open override func layoutSubviews() {
         super.layoutSubviews()
-        self.arrow.image = UIImage(named: self.towards == .left ? "arrow_left": "arrow_right", in: .chatBundle, with: nil)?.withTintColor(self.towards == .left ? self.receiveBubbleColor:self.sendBubbleColor)
+        self.arrow.image = UIImage(chatNamed: self.towards == .left ? "arrow_left": "arrow_right")?.withTintColor(self.towards == .left ? self.receiveBubbleColor:self.sendBubbleColor)
         self.bubble.backgroundColor = towards == .left ? self.receiveBubbleColor:self.sendBubbleColor
         self.arrow.frame = CGRect(x: self.towards == .left ? 0:self.frame.width-5, y: self.frame.height-10-8, width: 5, height: 8)
         self.bubble.frame = CGRect(x: self.towards == .left ? 5:0, y: 0, width: self.frame.width-5, height: self.frame.height)

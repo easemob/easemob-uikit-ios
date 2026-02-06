@@ -53,7 +53,7 @@ import UIKit
     public static var actionSheetRowHeight: CGFloat = 56
     
     /// The placeholder image of the avatar image view of ``MessageCell``.
-    public static var avatarPlaceHolder: UIImage? = UIImage(named: "default_avatar", in: .chatBundle, with: nil)
+    public static var avatarPlaceHolder: UIImage? = UIImage(chatNamed: "default_avatar")
     
     /// Conversation Component
     public static var conversation = ConversationAppearance()
@@ -64,7 +64,7 @@ import UIKit
     /// Chat Component
     public static var chat = ChatAppearance()
     
-    
+    public static var resourceBundle: Bundle?
 }
 
 @objcMembers final public class ConversationAppearance: NSObject {
@@ -79,10 +79,10 @@ import UIKit
     public var swipeRightActions: [UIContextualActionType] = [.more,.read]
     
     /// Single chat default place holder of avatar.
-    public var singlePlaceHolder = UIImage(named: "single", in: .chatBundle, with: nil)
+    public var singlePlaceHolder = UIImage(chatNamed: "single")
     
     /// Group chat default place holder of avatar.
-    public var groupPlaceHolder = UIImage(named: "group", in: .chatBundle, with: nil)
+    public var groupPlaceHolder = UIImage(chatNamed: "group")
     
     /// Setting this property changes the date format displayed on conversation last message updated.
     public var dateFormatToday = "HH:mm"
@@ -100,9 +100,9 @@ import UIKit
     /// Shown menus on ``ConversationListController`` right item clicked.
     lazy public var listMoreActions: [ActionSheetItemProtocol] = {
         [
-            ActionSheetItem(title: "new_chat_button_click_menu_selectcontacts".chat.localize, type: .normal, tag: "SelectContacts", image: UIImage(named: "chatWith", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "new_chat_button_click_menu_addcontacts".chat.localize, type: .normal, tag: "AddContact", image: UIImage(named: "person_add_fill", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryLightColor)),
-            ActionSheetItem(title: "new_chat_button_click_menu_creategroup".chat.localize, type: .normal, tag: "CreateGroup", image: UIImage(named: "create_group", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.primaryLightColor))
+            ActionSheetItem(title: "new_chat_button_click_menu_selectcontacts".chat.localize, type: .normal, tag: "SelectContacts", image: UIImage(chatNamed: "chatWith")),
+            ActionSheetItem(title: "new_chat_button_click_menu_addcontacts".chat.localize, type: .normal, tag: "AddContact", image: UIImage(chatNamed: "person_add_fill")?.withTintColor(UIColor.theme.primaryLightColor)),
+            ActionSheetItem(title: "new_chat_button_click_menu_creategroup".chat.localize, type: .normal, tag: "CreateGroup", image: UIImage(chatNamed: "create_group")?.withTintColor(UIColor.theme.primaryLightColor))
         ]
     }()
 }
@@ -127,18 +127,18 @@ import UIKit
     /// ActionSheet data source of the message being long pressed.``ActionSheetItemProtocol``
     lazy public var messageLongPressedActions: [ActionSheetItemProtocol] = {
         [
-            ActionSheetItem(title: "barrage_long_press_menu_copy".chat.localize, type: .normal,tag: "Copy",image: UIImage(named: "message_action_copy", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "barrage_long_press_menu_forward".chat.localize, type: .normal,tag: "Forward",image: UIImage(named: "message_action_forward", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "barrage_long_press_menu_topic".chat.localize, type: .normal,tag: "Topic",image: UIImage(named: "message_action_topic", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "barrage_long_press_menu_reply".chat.localize, type: .normal,tag: "Reply",image: UIImage(named: "message_action_reply", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "barrage_long_press_menu_recall".chat.localize, type: .normal,tag: "Recall",image: UIImage(named: "message_action_recall", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "barrage_long_press_menu_edit".chat.localize, type: .normal,tag: "Edit",image: UIImage(named: "message_action_edit", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "barrage_long_press_menu_multi_select".chat.localize, type: .normal,tag: "MultiSelect",image: UIImage(named: "message_action_multi_select", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "barrage_long_press_menu_pin".chat.localize, type: .normal,tag: "Pin",image: UIImage(named: "message_action_pin", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "barrage_long_press_menu_translate".chat.localize, type: .normal,tag: "Translate",image: UIImage(named: "message_action_translation", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "barrage_long_press_menu_show_original_text".chat.localize, type: .normal,tag: "OriginalText",image: UIImage(named: "message_action_translation", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "barrage_long_press_menu_report".chat.localize, type: .normal,tag: "Report",image: UIImage(named: "message_action_report", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "barrage_long_press_menu_delete".chat.localize, type: .normal,tag: "Delete",image: UIImage(named: "message_action_delete", in: .chatBundle, with: nil))
+            ActionSheetItem(title: "barrage_long_press_menu_copy".chat.localize, type: .normal,tag: "Copy",image: UIImage(chatNamed: "message_action_copy")),
+            ActionSheetItem(title: "barrage_long_press_menu_forward".chat.localize, type: .normal,tag: "Forward",image: UIImage(chatNamed: "message_action_forward")),
+            ActionSheetItem(title: "barrage_long_press_menu_topic".chat.localize, type: .normal,tag: "Topic",image: UIImage(chatNamed: "message_action_topic")),
+            ActionSheetItem(title: "barrage_long_press_menu_reply".chat.localize, type: .normal,tag: "Reply",image: UIImage(chatNamed: "message_action_reply")),
+            ActionSheetItem(title: "barrage_long_press_menu_recall".chat.localize, type: .normal,tag: "Recall",image: UIImage(chatNamed: "message_action_recall")),
+            ActionSheetItem(title: "barrage_long_press_menu_edit".chat.localize, type: .normal,tag: "Edit",image: UIImage(chatNamed: "message_action_edit")),
+            ActionSheetItem(title: "barrage_long_press_menu_multi_select".chat.localize, type: .normal,tag: "MultiSelect",image: UIImage(chatNamed: "message_action_multi_select")),
+            ActionSheetItem(title: "barrage_long_press_menu_pin".chat.localize, type: .normal,tag: "Pin",image: UIImage(chatNamed: "message_action_pin")),
+            ActionSheetItem(title: "barrage_long_press_menu_translate".chat.localize, type: .normal,tag: "Translate",image: UIImage(chatNamed: "message_action_translation")),
+            ActionSheetItem(title: "barrage_long_press_menu_show_original_text".chat.localize, type: .normal,tag: "OriginalText",image: UIImage(chatNamed: "message_action_translation")),
+            ActionSheetItem(title: "barrage_long_press_menu_report".chat.localize, type: .normal,tag: "Report",image: UIImage(chatNamed: "message_action_report")),
+            ActionSheetItem(title: "barrage_long_press_menu_delete".chat.localize, type: .normal,tag: "Delete",image: UIImage(chatNamed: "message_action_delete"))
         ]
     }()
     
@@ -164,10 +164,10 @@ import UIKit
     /// A menu item pops up when you click the `+` button on the input box
     lazy public var inputExtendActions: [ActionSheetItemProtocol] = {
         [
-            ActionSheetItem(title: "input_extension_menu_photo".chat.localize, type: .normal,tag: "Photo",image: UIImage(named: "photo", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "input_extension_menu_camera".chat.localize, type: .normal,tag: "Camera",image: UIImage(named: "camera_fill", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "input_extension_menu_file".chat.localize, type: .normal,tag: "File",image: UIImage(named: "file", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "input_extension_menu_contact".chat.localize, type: .normal,tag: "Contact",image: UIImage(named: "person_single_fill", in: .chatBundle, with: nil))
+            ActionSheetItem(title: "input_extension_menu_photo".chat.localize, type: .normal,tag: "Photo",image: UIImage(chatNamed: "photo")),
+            ActionSheetItem(title: "input_extension_menu_camera".chat.localize, type: .normal,tag: "Camera",image: UIImage(chatNamed: "camera_fill")),
+            ActionSheetItem(title: "input_extension_menu_file".chat.localize, type: .normal,tag: "File",image: UIImage(chatNamed: "file")),
+            ActionSheetItem(title: "input_extension_menu_contact".chat.localize, type: .normal,tag: "Contact",image: UIImage(chatNamed: "person_single_fill"))
         ]
     }()
     
@@ -182,16 +182,16 @@ import UIKit
     
     /// The resource image of the audio animation played after the recipient of the audio message clicks
     public var receiveAudioAnimationImages = [
-        UIImage(named: Theme.style == .dark ? "audio_play_left_dark01":"audio_play_left_light01", in: .chatBundle, with: nil)!,
-        UIImage(named: Theme.style == .dark ? "audio_play_left_dark02":"audio_play_left_light02", in: .chatBundle, with: nil)!,
-        UIImage(named: Theme.style == .dark ? "audio_play_left_dark03":"audio_play_left_light03", in: .chatBundle, with: nil)!
+        UIImage(chatNamed: Theme.style == .dark ? "audio_play_left_dark01":"audio_play_left_light01")!,
+        UIImage(chatNamed: Theme.style == .dark ? "audio_play_left_dark02":"audio_play_left_light02")!,
+        UIImage(chatNamed: Theme.style == .dark ? "audio_play_left_dark03":"audio_play_left_light03")!
     ]
     
     /// The resource image of the audio animation played after the sender of the audio message clicks
     public var sendAudioAnimationImages = [
-        UIImage(named: Theme.style == .dark ? "audio_play_right_dark01":"audio_play_right_light01", in: .chatBundle, with: nil)!,
-        UIImage(named: Theme.style == .dark ? "audio_play_right_dark02":"audio_play_right_light02", in: .chatBundle, with: nil)!,
-        UIImage(named: Theme.style == .dark ? "audio_play_right_dark03":"audio_play_right_light03", in: .chatBundle, with: nil)!
+        UIImage(chatNamed: Theme.style == .dark ? "audio_play_right_dark01":"audio_play_right_light01")!,
+        UIImage(chatNamed: Theme.style == .dark ? "audio_play_right_dark02":"audio_play_right_light02")!,
+        UIImage(chatNamed: Theme.style == .dark ? "audio_play_right_dark03":"audio_play_right_light03")!
     ]
     /// The color of the recipient of the text message.
     public var receiveTextColor: UIColor {
@@ -230,10 +230,10 @@ import UIKit
     public var imageMessageCorner = CGFloat(4)
     
     /// Default placeholder image for picture messages.
-    public var imagePlaceHolder = UIImage(named: "image_message_placeHolder", in: .chatBundle, with: nil)
+    public var imagePlaceHolder = UIImage(chatNamed: "image_message_placeHolder")
     
     /// Default placeholder image for video messages.
-    public var videoPlaceHolder = UIImage(named: "video_message_placeHolder", in: .chatBundle, with: nil)
+    public var videoPlaceHolder = UIImage(chatNamed: "video_message_placeHolder")
     
     /// The maximum time limit for message withdrawal needs to be adjusted from the console before adjusting this configuration of the client.
     public var recallExpiredTime = UInt(120)
@@ -248,7 +248,7 @@ import UIKit
     public var commonReactions = ["👍", "❤️", "😄", "😱", "😡", "🎉"]
     
     /// Commonly used reaction emoticon responses map.
-    public var commonReactionMap = ["👍":UIImage(named: "👍", in: .chatBundle, with: nil), "❤️":UIImage(named: "❤️", in: .chatBundle, with: nil), "😄":UIImage(named: "😄", in: .chatBundle, with: nil), "😱":UIImage(named: "😱", in: .chatBundle, with: nil), "😡":UIImage(named: "😡", in: .chatBundle, with: nil), "🎉":UIImage(named: "🎉", in: .chatBundle, with: nil)]
+    public var commonReactionMap = ["👍":UIImage(chatNamed: "👍"), "❤️":UIImage(chatNamed: "❤️"), "😄":UIImage(chatNamed: "😄"), "😱":UIImage(chatNamed: "😱"), "😡":UIImage(chatNamed: "😡"), "🎉":UIImage(chatNamed: "🎉")]
     
     /// The alert position on received lots of messages.
     public var moreMessageAlertPosition = MoreMessagePosition.center
@@ -309,9 +309,9 @@ import UIKit
     
     /// The contact info header extension items.
     lazy public var detailExtensionActionItems: [ContactListHeaderItemProtocol] = {
-        [ContactListHeaderItem(featureIdentify: "Chat", featureName: "Chat".chat.localize, featureIcon: UIImage(named: "chatTo", in: .chatBundle, with: nil)),ContactListHeaderItem(featureIdentify: "SearchMessages", featureName: "SearchMessages".chat.localize, featureIcon: UIImage(named: "search_history_messages", in: .chatBundle, with: nil))]
+        [ContactListHeaderItem(featureIdentify: "Chat", featureName: "Chat".chat.localize, featureIcon: UIImage(chatNamed: "chatTo")),ContactListHeaderItem(featureIdentify: "SearchMessages", featureName: "SearchMessages".chat.localize, featureIcon: UIImage(chatNamed: "search_history_messages"))]
     }()
-//    ,ContactListHeaderItem(featureIdentify: "AudioCall", featureName: "AudioCall".chat.localize, featureIcon: UIImage(named: "voice_call", in: .chatBundle, with: nil)),ContactListHeaderItem(featureIdentify: "VideoCall", featureName: "VideoCall".chat.localize, featureIcon: UIImage(named: "video_call", in: .chatBundle, with: nil))
+//    ,ContactListHeaderItem(featureIdentify: "AudioCall", featureName: "AudioCall".chat.localize, featureIcon: UIImage(chatNamed: "voice_call")),ContactListHeaderItem(featureIdentify: "VideoCall", featureName: "VideoCall".chat.localize, featureIcon: UIImage(chatNamed: "video_call"))
     
     /// ActionSheet menu configuration items after clicking more buttons in a single session side sliding menu.
     /// How to use?

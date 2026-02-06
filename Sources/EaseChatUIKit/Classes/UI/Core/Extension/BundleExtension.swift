@@ -21,21 +21,22 @@ public extension Bundle {
      This computed property returns the ChatroomResourceBundle. If the ChatroomResourceBundle is already initialized, it returns the existing instance. Otherwise, it initializes the ChatroomResourceBundle with the path of the "ChatRoomResource.bundle" file in the main bundle. If the bundle is not found, it returns the main bundle.
      */
     class var chatBundle: Bundle {
-        if ChatResourceBundle != nil {
-            return ChatResourceBundle!
-        }
+        if Appearance.resourceBundle != nil {
+            return Appearance.resourceBundle!
+        } else {
 #if COCOAPODS
-        return Bundle(for: Theme.self)
-    .url(forResource: "EaseChatResource", withExtension: "bundle")
-    .flatMap(Bundle.init(url:))!
+            return Bundle(for: Theme.self)
+                .url(forResource: "EaseChatResource", withExtension: "bundle")
+                .flatMap(Bundle.init(url:))!
 #elseif SWIFT_PACKAGE
-        return Bundle.module
+            return Bundle.module
 #elseif STATIC_LIBRARY
-        return Bundle.main
-    .url(forResource: "EaseChatResource", withExtension: "bundle")
-    .flatMap(Bundle.init(url:))!
+            return Bundle.main
+                .url(forResource: "EaseChatResource", withExtension: "bundle")
+                .flatMap(Bundle.init(url:))!
 #else
-        return Bundle(for: Theme.self)
+            return Bundle(for: Theme.self)
 #endif
+        }
     }
 }

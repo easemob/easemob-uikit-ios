@@ -26,7 +26,7 @@ import UIKit
     }()
     
     public private(set) lazy var play: UIImageView = {
-        UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 64, height: 64))).image(UIImage(named: "video_message_play", in: .chatBundle, with: nil)).contentMode(.scaleAspectFit)
+        UIImageView(frame: CGRect(origin: .zero, size: CGSize(width: 64, height: 64))).image(UIImage(chatNamed: "video_message_play")).contentMode(.scaleAspectFit)
     }()
     
     public private(set) lazy var separatorLine: UIView = {

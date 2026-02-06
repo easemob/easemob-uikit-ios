@@ -36,7 +36,7 @@ import PhotosUI
     /// Right images of the ``EaseChatNavigationBar``.
     /// - Returns: `[UIImage]`
     @objc open func rightImages() -> [UIImage] {
-        var images = [UIImage(named: "message_action_topic", in: .chatBundle, with: nil)!,UIImage(named: "pinned_messages", in: .chatBundle, with: nil)!]
+        var images = [UIImage(chatNamed: "message_action_topic")!,UIImage(chatNamed: "pinned_messages")!]
         if self.chatType == .chat {
             images = []
         }
@@ -166,7 +166,6 @@ import PhotosUI
         if Appearance.chat.enablePinMessage,self.chatType == .group {
             self.pinContainer.isHidden = true
         }
-        
         self.navigation.clickClosure = { [weak self] in
             self?.navigationClick(type: $0, indexPath: $1)
         }

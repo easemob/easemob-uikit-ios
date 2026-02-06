@@ -30,7 +30,7 @@ import UIKit
     }()
     
     public private(set) lazy var empty: EmptyStateView = {
-        EmptyStateView(frame: CGRect(x: 0, y: 0, width: self.requestList.frame.width, height: self.requestList.frame.height),emptyImage: UIImage(named: "empty",in: .chatBundle, with: nil), onRetry: {
+        EmptyStateView(frame: CGRect(x: 0, y: 0, width: self.requestList.frame.width, height: self.requestList.frame.height),emptyImage: UIImage(chatNamed: "empty"), onRetry: {
             
         }).backgroundColor(.clear)
     }()

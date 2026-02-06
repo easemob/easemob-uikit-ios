@@ -9,11 +9,11 @@ import UIKit
 
 @objc open class MessageReplyView: UIView {
     
-    private var replyPhotoImage = UIImage(named: "reply_image", in: .chatBundle, with: nil)
-    private var replyAudioImage = UIImage(named: "reply_audio", in: .chatBundle, with: nil)
-    private var replyVideoImage = UIImage(named: "reply_video", in: .chatBundle, with: nil)
-    private var replyFileImage = UIImage(named: "reply_file", in: .chatBundle, with: nil)
-    private var replyContactImage = UIImage(named: "reply_contact", in: .chatBundle, with: nil)
+    private var replyPhotoImage = UIImage(chatNamed: "reply_image")
+    private var replyAudioImage = UIImage(chatNamed: "reply_audio")
+    private var replyVideoImage = UIImage(chatNamed: "reply_video")
+    private var replyFileImage = UIImage(chatNamed: "reply_file")
+    private var replyContactImage = UIImage(chatNamed: "reply_contact")
     
     
     public private(set) lazy var replyUser: UILabel = {
@@ -29,7 +29,7 @@ import UIKit
     }()
     
     public private(set) lazy var videoPlay: UIImageView = {
-        UIImageView(frame: CGRect(x: 6, y: 6, width: 24, height: 24)).contentMode(.scaleAspectFit).image(UIImage(named: "video_icon", in: .chatBundle, with: nil))
+        UIImageView(frame: CGRect(x: 6, y: 6, width: 24, height: 24)).contentMode(.scaleAspectFit).image(UIImage(chatNamed: "video_icon"))
     }()
 
     public override init(frame: CGRect) {

@@ -304,7 +304,7 @@ let message_bubble_space = CGFloat(1)
         self.updateAxis(entity: entity)
         
         if !self.checkbox.isHidden {
-            self.checkbox.image = UIImage(named: entity.selected ? "select":"unselect", in: .chatBundle, with: nil)
+            self.checkbox.image = UIImage(chatNamed: entity.selected ? "select":"unselect")
         }
         if entity.message.direction == .send {
             self.nickName.isHidden = true
@@ -445,7 +445,7 @@ let message_bubble_space = CGFloat(1)
         self.checkbox.isHidden = !self.editMode
         
         if !self.checkbox.isHidden {
-            self.checkbox.image = UIImage(named: entity.selected ? "select":"unselect", in: .chatBundle, with: nil)
+            self.checkbox.image = UIImage(chatNamed: entity.selected ? "select":"unselect")
         }
     }
     

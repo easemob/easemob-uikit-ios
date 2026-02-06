@@ -32,7 +32,7 @@ import UIKit
     }()
     
     public private(set) lazy var empty: EmptyStateView = {
-        EmptyStateView(frame: self.topicList.bounds,emptyImage: UIImage(named: "empty",in: .chatBundle, with: nil), onRetry: { [weak self] in
+        EmptyStateView(frame: self.topicList.bounds,emptyImage: UIImage(chatNamed: "empty"), onRetry: { [weak self] in
 
         }).backgroundColor(.clear)
     }()

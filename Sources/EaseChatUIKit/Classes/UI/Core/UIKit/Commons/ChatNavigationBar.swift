@@ -34,7 +34,7 @@ import UIKit
     
     public var clickClosure: ((ChatNavigationBarClickEvent,IndexPath?) -> ())?
     
-    public let backImage = UIImage(named: "back", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.neutralColor3)
+    public let backImage = UIImage(chatNamed: "back")?.withTintColor(UIColor.theme.neutralColor3)
     
     public var rightImages = [UIImage]()
     

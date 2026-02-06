@@ -507,6 +507,8 @@ Theme.switchTheme(style: .custom)
 
 # 文档
 
+## [详细使用文档](/chatuikit_documentation/)
+
 ## [文档](/Documentation/EaseChatUIKit.doccarchive)
 
 您可以在 Xcode 中打开“EaseChatUIKit.doccarchive”文件来查看其中的文件。

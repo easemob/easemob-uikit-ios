@@ -56,7 +56,7 @@ import UIKit
      - Returns: An instance of EaseChatNavigationBar.
      */
     @objc open func createNavigation() -> ChatNavigationBar {
-        ChatNavigationBar(showLeftItem: true, textAlignment: .left, rightImages: self.chatGroup.isDisabled ? []:[UIImage(named: "more_detail", in: .chatBundle, with: nil)!] ,hiddenAvatar: true).backgroundColor(.clear)
+        ChatNavigationBar(showLeftItem: true, textAlignment: .left, rightImages: self.chatGroup.isDisabled ? []:[UIImage(chatNamed: "more_detail")!] ,hiddenAvatar: true).backgroundColor(.clear)
     }
     
     @UserDefault("EaseChatUIKit_conversation_mute_map", defaultValue: Dictionary<String,Dictionary<String,Int>>()) private var muteMap
@@ -99,7 +99,7 @@ import UIKit
     /// Creates a detail header view for the group info.
     /// - Returns: A `DetailInfoHeader` instance.
     @objc open func createDetailHeader() -> DetailInfoHeader {
-        DetailInfoHeader(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 284), showMenu: true, placeHolder: UIImage(named: "group", in: .chatBundle, with: nil)).backgroundColor(.clear)
+        DetailInfoHeader(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 284), showMenu: true, placeHolder: UIImage(chatNamed: "group")).backgroundColor(.clear)
     }
     
     public private(set) lazy var menuList: UITableView = {

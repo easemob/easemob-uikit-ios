@@ -88,7 +88,7 @@ extension FileMessageView: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         
         self.fileIcon.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor98
-        var image = UIImage(named: "file_message_icon", in: .chatBundle, with: nil)
+        var image = UIImage(chatNamed: "file_message_icon")
         if style == .dark {
             image = image?.withTintColor(UIColor.theme.neutralColor6)
         }

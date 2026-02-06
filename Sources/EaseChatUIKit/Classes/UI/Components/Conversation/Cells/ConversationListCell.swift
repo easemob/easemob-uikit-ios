@@ -116,7 +116,7 @@ import UIKit
             AttributedText(nickName).font(UIFont.theme.titleMedium).foregroundColor(Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
             
         }
-        let image = UIImage(named: "bell_slash", in: .chatBundle, with: nil)
+        let image = UIImage(chatNamed: "bell_slash")
         if Theme.style == .dark {
             image?.withTintColor(UIColor.theme.neutralColor5)
         }

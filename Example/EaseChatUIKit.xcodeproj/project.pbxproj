@@ -190,7 +190,7 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						DevelopmentTeam = 3Y5B6D2XFS;
+						DevelopmentTeam = JC854K845H;
 						LastSwiftMigration = 1500;
 					};
 				};
@@ -447,7 +447,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 58;
-				DEVELOPMENT_TEAM = 3Y5B6D2XFS;
+				DEVELOPMENT_TEAM = JC854K845H;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				INFOPLIST_FILE = EaseChatUIKit/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = EaseChat;
@@ -471,7 +471,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 58;
-				DEVELOPMENT_TEAM = 3Y5B6D2XFS;
+				DEVELOPMENT_TEAM = JC854K845H;
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				INFOPLIST_FILE = EaseChatUIKit/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = EaseChat;

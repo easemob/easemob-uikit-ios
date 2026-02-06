@@ -9,13 +9,14 @@ import UIKit
 
 @objc public class MessageInputReplyView: UIView {
     
-    private var replyPhotoImage = UIImage(named: "reply_image", in: .chatBundle, with: nil)
-    private var replyAudioImage = UIImage(named: "reply_audio", in: .chatBundle, with: nil)
-    private var replyVideoImage = UIImage(named: "reply_video", in: .chatBundle, with: nil)
-    private var replyFileImage = UIImage(named: "reply_file", in: .chatBundle, with: nil)
-    private var replyContactImage = UIImage(named: "reply_contact", in: .chatBundle, with: nil)
+    private var replyPhotoImage = UIImage(chatNamed: "reply_image")
+    private var replyAudioImage = UIImage(chatNamed: "reply_audio")
+    private var replyVideoImage = UIImage(chatNamed: "reply_video")
+    private var replyFileImage = UIImage(chatNamed: "reply_file")
+    private var replyContactImage = UIImage(chatNamed: "reply_contact")
+    private var replyHistoryImage = UIImage(chatNamed: "reply_history")
     
-    private var cancelImage = UIImage(named: "reply_cancel", in: .chatBundle, with: nil)
+    private var cancelImage = UIImage(chatNamed: "reply_cancel")
     
     public private(set) lazy var line: UIView = {
         UIView(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: 0.5)).backgroundColor(UIColor.theme.neutralColor8)
@@ -107,6 +108,7 @@ import UIKit
         case .voice: return self.replyAudioImage
         case .video: return self.replyVideoImage
         case .file: return self.replyFileImage
+        case .combine: return self.replyHistoryImage
         case .custom:
             if let body = message.body as? ChatCustomMessageBody {
                 if body.event == EaseChatUIKit_user_card_message {

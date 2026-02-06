@@ -31,7 +31,7 @@ import UIKit
     public var textFieldState: ((SearchFieldState) -> Void)?
     
     lazy var back: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: 8, y: (self.frame.height-24)/2.0, width: 24, height: 24)).image(UIImage(named: "back", in: .chatBundle, with: nil), .normal).tag(0).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside).backgroundColor(.clear)
+        UIButton(type: .custom).frame(CGRect(x: 8, y: (self.frame.height-24)/2.0, width: 24, height: 24)).image(UIImage(chatNamed: "back"), .normal).tag(0).addTargetFor(self, action: #selector(buttonAction(sender:)), for: .touchUpInside).backgroundColor(.clear)
     }()
     
     lazy var leftView: UIView = {
@@ -107,8 +107,8 @@ extension SearchHeaderBar: UITextFieldDelegate {
 
 extension SearchHeaderBar: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
-        var image = UIImage(named: "back", in: .chatBundle, with: nil)
-        var searchIcon = UIImage(named: "search",in: .chatBundle,with: nil)?.withTintColor(UIColor.theme.neutralColor4, renderingMode: .automatic)
+        var image = UIImage(chatNamed: "back")
+        var searchIcon = UIImage(chatNamed: "search")?.withTintColor(UIColor.theme.neutralColor4, renderingMode: .automatic)
         if style == .light {
             image = image?.withTintColor(UIColor.theme.neutralColor3, renderingMode: .automatic)
             searchIcon = searchIcon?.withTintColor(UIColor.theme.neutralColor6, renderingMode: .automatic)

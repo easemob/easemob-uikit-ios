@@ -45,7 +45,7 @@ import UIKit
             if let string = self.detailText {
                 let text = NSMutableAttributedString(string: ("UserId".chat.localize+" "+string),attributes: [.font:UIFont.theme.bodySmall,.foregroundColor:(Theme.style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor6)])
                 let imageAttachment = NSTextAttachment()
-                imageAttachment.image = UIImage(named: "copy", in: .chatBundle, with: nil)?.withTintColor(Theme.style == .dark ? UIColor.theme.neutralColor4:UIColor.theme.neutralColor6)
+                imageAttachment.image = UIImage(chatNamed: "copy")?.withTintColor(Theme.style == .dark ? UIColor.theme.neutralColor4:UIColor.theme.neutralColor6)
                 imageAttachment.bounds = CGRect(x: 0, y: -3, width: imageAttachment.image?.size.width ?? 0, height: imageAttachment.image?.size.height ?? 0)
                 let imageAttribute = NSAttributedString(attachment: imageAttachment)
                 text.append(imageAttribute)

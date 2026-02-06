@@ -88,7 +88,7 @@ import UIKit
         } else {
             self.avatar.image = Appearance.conversation.singlePlaceHolder
         }
-        var image = UIImage(named: "reaction_trash", in: .chatBundle, with: nil)
+        var image = UIImage(chatNamed: "reaction_trash")
         if Theme.style == .dark {
             image = image?.withTintColor(UIColor.theme.neutralColor7)
         }

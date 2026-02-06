@@ -20,7 +20,7 @@ import UIKit
     }()
     
     public private(set) lazy var moreReaction: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: self.frame.width-30, y: 2, width: 24, height: 24)).image(UIImage(named: "reaction_more", in: .chatBundle, with: nil), .normal).addTargetFor(self, action: #selector(moreAction), for: .touchUpInside).cornerRadius(Appearance.avatarRadius)
+        UIButton(type: .custom).frame(CGRect(x: self.frame.width-30, y: 2, width: 24, height: 24)).image(UIImage(chatNamed: "reaction_more"), .normal).addTargetFor(self, action: #selector(moreAction), for: .touchUpInside).cornerRadius(Appearance.avatarRadius)
     }()
 
     public override init(frame: CGRect) {
@@ -151,7 +151,7 @@ extension MessageReaction {
     @objc open func convertReactionAttribute() -> NSAttributedString? {
         if let content = self.reaction {
             let symbol = ChatEmojiConvertor.shared.reactionEmojis[content] ?? content
-            let image = ChatEmojiConvertor.shared.emojiReactionMap.isEmpty ? UIImage(named: symbol, in: .chatBundle, with: nil):ChatEmojiConvertor.shared.emojiReactionMap[symbol]
+            let image = ChatEmojiConvertor.shared.emojiReactionMap.isEmpty ? UIImage(chatNamed: symbol):ChatEmojiConvertor.shared.emojiReactionMap[symbol]
             
             var attribute = NSMutableAttributedString()
             if image == nil {
