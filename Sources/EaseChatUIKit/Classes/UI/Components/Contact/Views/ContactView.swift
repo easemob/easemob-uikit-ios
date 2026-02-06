@@ -98,7 +98,7 @@ import UIKit
     }()
     
     public private(set) lazy var empty: EmptyStateView = {
-        EmptyStateView(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height),emptyImage: UIImage(named: "empty",in: .chatBundle, with: nil), onRetry: { [weak self] in
+        EmptyStateView(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height),emptyImage: UIImage(chatNamed: "empty"), onRetry: { [weak self] in
             guard let `self` = self else { return }
             for listener in self.eventsDelegates.allObjects {
                 listener.onContactListOccurErrorWhenFetchServer()

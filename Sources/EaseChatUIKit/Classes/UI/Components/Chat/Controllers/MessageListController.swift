@@ -36,7 +36,7 @@ import PhotosUI
     /// Right images of the ``EaseChatNavigationBar``.
     /// - Returns: `[UIImage]`
     @objc open func rightImages() -> [UIImage] {
-        var images = [UIImage(named: "message_action_topic", in: .chatBundle, with: nil)!,UIImage(named: "pinned_messages", in: .chatBundle, with: nil)!]
+        var images = [UIImage(chatNamed: "message_action_topic")!,UIImage(chatNamed: "pinned_messages")!]
         if self.chatType == .chat {
             images = []
         }
@@ -166,7 +166,6 @@ import PhotosUI
         if Appearance.chat.enablePinMessage,self.chatType == .group {
             self.pinContainer.isHidden = true
         }
-        
         self.navigation.clickClosure = { [weak self] in
             self?.navigationClick(type: $0, indexPath: $1)
         }
@@ -789,6 +788,11 @@ extension MessageListController: MessageListDriverEventsListener {
      - body: The custom message body containing contact information.
      */
     @objc open func viewContact(body: ChatCustomMessageBody) {
+        Appearance.chat.inputExtendActions.append(ActionSheetItem(title: "1", type: .normal, tag: "1", image: nil))
+        Appearance.chat.inputExtendActions.removeAll {$0.tag == "1"}
+        Appearance.chat.inputExtendActions = Appearance.chat.inputExtendActions.sorted { lhs, rhs in
+            return lhs.tag > rhs.tag
+        }
         var userId = body.customExt?["userId"] as? String
         if userId == nil {
             userId = body.customExt?["uid"] as? String

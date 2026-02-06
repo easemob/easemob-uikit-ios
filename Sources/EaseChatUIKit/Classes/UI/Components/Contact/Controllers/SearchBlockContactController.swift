@@ -33,7 +33,7 @@ import UIKit
     }()
         
     public private(set) lazy var empty: EmptyStateView = {
-        EmptyStateView(frame: CGRect(x: 0, y: 0, width: self.tableView.frame.width, height: self.tableView.frame.height),emptyImage: UIImage(named: "empty",in: .chatBundle, with: nil)) {
+        EmptyStateView(frame: CGRect(x: 0, y: 0, width: self.tableView.frame.width, height: self.tableView.frame.height),emptyImage: UIImage(chatNamed: "empty")) {
             
         }
     }()

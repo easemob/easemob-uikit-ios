@@ -58,10 +58,10 @@ import UIKit
 extension AudioMessageView: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         if self.towards == .left {
-            self.audioIcon.image = UIImage(named: "audio_message_icon_show_left", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5)
+            self.audioIcon.image = UIImage(chatNamed: "audio_message_icon_show_left")?.withTintColor(style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5)
             self.audioIcon.animationImages = Appearance.chat.receiveAudioAnimationImages
         } else {
-            self.audioIcon.image = UIImage(named: "audio_message_icon_show_right", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralColor98)
+            self.audioIcon.image = UIImage(chatNamed: "audio_message_icon_show_right")?.withTintColor(style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralColor98)
             self.audioIcon.animationImages = Appearance.chat.sendAudioAnimationImages
         }
     }

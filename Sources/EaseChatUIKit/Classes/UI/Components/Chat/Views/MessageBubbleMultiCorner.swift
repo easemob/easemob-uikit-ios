@@ -40,7 +40,7 @@ import UIKit
         fatalError("init(coder:) has not been implemented")
     }
     
-    func updateBubbleCorner() {
+    public func updateBubbleCorner() {
         let shapeLayer = CAShapeLayer()
         let receiveColor = Theme.style == .dark ? UIColor.theme.primaryColor2:UIColor.theme.primaryColor95
         let sendColor = Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor
@@ -62,7 +62,7 @@ import UIKit
 
         let bottomLeftCenterX = minX + cornerRadius.bottomLeft
         let bottomLeftCenterY = maxY - cornerRadius.bottomLeft
-
+        
         let bottomRightCenterX = maxX - cornerRadius.bottomRight
         let bottomRightCenterY = maxY - cornerRadius.bottomRight
 

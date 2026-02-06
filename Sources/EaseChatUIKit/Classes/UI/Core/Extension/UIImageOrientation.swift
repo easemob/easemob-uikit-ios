@@ -65,3 +65,22 @@ extension UIImage {
         return self
     }
 }
+
+
+
+extension UIImage {
+    /// 自定义初始化方法：优先加载主工程图片，如果没有则加载 SDK 图片
+    ///
+    /// - Parameter chatNamed: 图片名称
+    @objc convenience init?(chatNamed name: String) {
+        // 1. 先尝试判断主工程 (Main Bundle) 是否有这张图
+        // 注意：UIImage(chatNamed: ) 本身就有缓存机制，所以这里检查一下性能开销很小
+        if UIImage(named: name) != nil {
+            // 2. 如果主工程有，直接用主工程的初始化 (默认就是 Main Bundle)
+            self.init(named: name)
+        } else {
+            // 3. 如果主工程没有，指定去 .chatBundle 加载
+            self.init(named: name, in: .chatBundle, with: nil)
+        }
+    }
+}

@@ -10,7 +10,7 @@ import UIKit
 @objc open class PinnedIndicatorView: UIView {
 
     public lazy var icon: UIImageView = {
-        UIImageView(frame: CGRect(x: 8, y: (self.frame.height-18)/2.0, width: 18, height: 18)).contentMode(.scaleAspectFill).image(UIImage(named: "pinned_messages", in: .chatBundle, with: nil)).backgroundColor(.clear)
+        UIImageView(frame: CGRect(x: 8, y: (self.frame.height-18)/2.0, width: 18, height: 18)).contentMode(.scaleAspectFill).image(UIImage(chatNamed: "pinned_messages")).backgroundColor(.clear)
     }()
     
     public lazy var content: UILabel = {
@@ -37,9 +37,9 @@ extension PinnedIndicatorView: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         self.content.textColor = style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1
         if style == .dark {
-            self.icon.image = UIImage(named: "pinned_messages", in: .chatBundle, with: nil)
+            self.icon.image = UIImage(chatNamed: "pinned_messages")
         } else {
-            self.icon.image = UIImage(named: "pinned_messages", in: .chatBundle, with: nil)?.withTintColor(UIColor.theme.neutralColor3)
+            self.icon.image = UIImage(chatNamed: "pinned_messages")?.withTintColor(UIColor.theme.neutralColor3)
         }
         
     }

@@ -100,7 +100,7 @@ extension DetailInfoListCell: ThemeSwitchProtocol {
         self.detailLabel.textColor = style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5
         self.switchMenu.onTintColor = style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor
         
-        let image = UIImage(named: "chevron_right", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor3)
+        let image = UIImage(chatNamed: "chevron_right")?.withTintColor(style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor3)
         self.indicator.image = image
         
         

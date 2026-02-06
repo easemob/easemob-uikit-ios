@@ -25,7 +25,7 @@ import UIKit
     }
     
     @objc open func refresh(reaction: Reaction) {
-        if let imageName = ChatEmojiConvertor.shared.emojiReactionMap.isEmpty ? reaction.emoji:ChatEmojiConvertor.shared.reactionEmojis[reaction.emoji],let image = UIImage(named: imageName, in: .chatBundle, with: nil) {
+        if let imageName = ChatEmojiConvertor.shared.emojiReactionMap.isEmpty ? reaction.emoji:ChatEmojiConvertor.shared.reactionEmojis[reaction.emoji],let image = UIImage(chatNamed: imageName) {
             self.icon.image = image
         }
         var addedColor = UIColor.clear

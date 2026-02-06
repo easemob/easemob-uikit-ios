@@ -156,7 +156,7 @@ import UIKit
         if entity.message.edited {
             self.edit.isHidden = false
             self.edit.frame = CGRect(x: 12, y: self.content.frame.maxY, width: entity.bubbleSize.width-24, height: 16)
-            let image = UIImage(named: "text_message_edited", in: .chatBundle, with: nil)
+            let image = UIImage(chatNamed: "text_message_edited")
             self.edit.image(image?.withTintColor(stateColor), .normal)
             self.edit.setTitle("Edited".chat.localize, for: .normal)
         } else {
@@ -178,7 +178,7 @@ import UIKit
             }
             self.translateSymbol.frame = CGRect(x: 12, y: symbolY, width: entity.bubbleSize.width-24, height: 16)
             self.translateSymbol.setTitle("Translated".chat.localize, for: .normal)
-            let image = UIImage(named: "text_message_translated", in: .chatBundle, with: nil)
+            let image = UIImage(chatNamed: "text_message_translated")
             self.translateSymbol.image(image?.withTintColor(stateColor), .normal)
         } else {
             self.separatorLine.frame = CGRect(x: 12, y: (entity.message.edited ? self.edit.frame.maxY+6:self.content.frame.maxY+6), width: entity.bubbleSize.width-24, height: 0.5)

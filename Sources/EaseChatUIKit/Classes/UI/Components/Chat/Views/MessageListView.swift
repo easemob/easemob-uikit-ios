@@ -498,7 +498,7 @@ extension MessageListView: ThemeSwitchProtocol {
         self.moreMessages.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
         self.moreMessages.layerProperties(style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9, 0.5)
         self.moreMessages.setTitleColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor, for: .normal)
-        self.moreMessages.image(UIImage(named: "more_messages", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor), .normal)
+        self.moreMessages.image(UIImage(chatNamed: "more_messages")?.withTintColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor), .normal)
         self.messageList.reloadData()
     }
     

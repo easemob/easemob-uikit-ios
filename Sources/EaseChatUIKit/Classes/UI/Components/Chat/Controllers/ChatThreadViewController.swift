@@ -24,7 +24,7 @@ import PhotosUI
     /// Creates a navigation bar for the MessageListController.
     /// - Returns: An instance of EaseChatNavigationBar.
     @objc open func createNavigation() -> ChatNavigationBar {
-        ChatNavigationBar(showLeftItem: true,textAlignment: .left,rightImages: [UIImage(named: "more_detail", in: .chatBundle, with: nil)!],hiddenAvatar: true).backgroundColor(.clear)
+        ChatNavigationBar(showLeftItem: true,textAlignment: .left,rightImages: [UIImage(chatNamed: "more_detail")!],hiddenAvatar: true).backgroundColor(.clear)
     }
         
     public private(set) lazy var entity: MessageEntity = {
@@ -224,17 +224,17 @@ extension ChatThreadViewController {
     
     open func filterActions() -> [ActionSheetItemProtocol] {
         var items = [
-            ActionSheetItem(title: "Topic Members", type: .normal, tag: "TopicMembers", image: UIImage(named: "create_group", in: .chatBundle, with: nil)),
-            ActionSheetItem(title: "Leave Topic", type: .destructive, tag: "LeaveTopic", image: UIImage(named: "quit", in: .chatBundle, with: nil))
+            ActionSheetItem(title: "Topic Members", type: .normal, tag: "TopicMembers", image: UIImage(chatNamed: "create_group")),
+            ActionSheetItem(title: "Leave Topic", type: .destructive, tag: "LeaveTopic", image: UIImage(chatNamed: "quit"))
         ]
         let group = ChatGroup(id: self.profile.parentId)
         if group?.owner == ChatUIKitContext.shared?.currentUserId ?? "" {
             items.removeLast()
-            items.append(ActionSheetItem(title: "Disband Topic", type: .destructive, tag: "DisbandTopic", image: UIImage(named: "quit", in: .chatBundle, with: nil)))
+            items.append(ActionSheetItem(title: "Disband Topic", type: .destructive, tag: "DisbandTopic", image: UIImage(chatNamed: "quit")))
 
         }
         if group?.owner == ChatUIKitContext.shared?.currentUserId ?? "" || self.profile.owner == ChatUIKitContext.shared?.currentUserId ?? ""{
-            items.insert(ActionSheetItem(title: "Edit Topic", type: .normal, tag: "EditTopic", image: UIImage(named: "message_action_edit", in: .chatBundle, with: nil)), at: 0)
+            items.insert(ActionSheetItem(title: "Edit Topic", type: .normal, tag: "EditTopic", image: UIImage(chatNamed: "message_action_edit")), at: 0)
         }
         return items
     }
@@ -434,7 +434,7 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
                 messageActions.removeAll { $0.tag == "Recall" }
             }
         }
-        messageActions.removeAll { $0.tag == "Recall" }
+//        messageActions.removeAll { $0.tag == "Recall" }
         messageActions.removeAll { $0.tag == "Delete" }
         return messageActions
     }
@@ -978,7 +978,7 @@ extension ChatThreadViewController: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
         self.navigation.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
         self.view.backgroundColor = style == .dark ? UIColor.theme.neutralColor1:UIColor.theme.neutralColor98
-        var images = [UIImage(named: "more_detail", in: .chatBundle, with: nil)!]
+        var images = [UIImage(chatNamed: "more_detail")!]
         if style == .light {
             images = images.map({ $0.withTintColor(UIColor.theme.neutralColor3) })
         }

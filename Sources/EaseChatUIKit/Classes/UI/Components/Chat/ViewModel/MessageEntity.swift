@@ -116,15 +116,15 @@ public let urlPreviewImageHeight = CGFloat(137)
     open func getStateImage() -> UIImage? {
         switch self.state {
         case .sending:
-            return UIImage(named: "message_status_spinner", in: .chatBundle, with: nil)
+            return UIImage(chatNamed: "message_status_spinner")
         case .succeed:
-            return UIImage(named: "message_status_succeed", in: .chatBundle, with: nil)
+            return UIImage(chatNamed: "message_status_succeed")
         case .failure:
-            return UIImage(named: "message_status_failure", in: .chatBundle, with: nil)
+            return UIImage(chatNamed: "message_status_failure")
         case .delivered:
-            return UIImage(named: "message_status_delivery", in: .chatBundle, with: nil)
+            return UIImage(chatNamed: "message_status_delivery")
         case .read:
-            return UIImage(named: "message_status_read", in: .chatBundle, with: nil)
+            return UIImage(chatNamed: "message_status_read")
         }
     }
     
@@ -926,21 +926,21 @@ extension ChatMessage {
     @objc open var replyIcon: UIImage? {
         switch self.body.type {
         case .image:
-            return UIImage(named: "reply_image", in: .chatBundle, with: nil)
+            return UIImage(chatNamed: "reply_image")
         case .voice:
-            return UIImage(named: "reply_audio", in: .chatBundle, with: nil)
+            return UIImage(chatNamed: "reply_audio")
         case .video:
-            return UIImage(named: "reply_video", in: .chatBundle, with: nil)
+            return UIImage(chatNamed: "reply_video")
         case .file:
-            return UIImage(named: "reply_file", in: .chatBundle, with: nil)
+            return UIImage(chatNamed: "reply_file")
         case .combine:
-            return UIImage(named: "reply_history", in: .chatBundle, with: nil)
+            return UIImage(chatNamed: "reply_history")
         case .location:
-            return UIImage(named: "reply_location", in: .chatBundle, with: nil)
+            return UIImage(chatNamed: "reply_location")
         case .custom:
             if let body = self.body as? ChatCustomMessageBody {
                 if body.event == EaseChatUIKit_user_card_message {
-                    return UIImage(named: "reply_contact", in: .chatBundle, with: nil)
+                    return UIImage(chatNamed: "reply_contact")
                 }
             }
             return nil

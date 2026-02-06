@@ -56,7 +56,7 @@ extension MessageReaction {
     @objc open func convertReactionDetailAttribute() -> NSAttributedString? {
         if let content = self.reaction {
             let symbol = ChatEmojiConvertor.shared.reactionEmojis[content] ?? content
-            let image = ChatEmojiConvertor.shared.emojiReactionMap.isEmpty ? UIImage(named: symbol, in: .chatBundle, with: nil):ChatEmojiConvertor.shared.emojiReactionMap[symbol]
+            let image = ChatEmojiConvertor.shared.emojiReactionMap.isEmpty ? UIImage(chatNamed: symbol):ChatEmojiConvertor.shared.emojiReactionMap[symbol]
             
             var attribute = NSMutableAttributedString()
             if image == nil {

@@ -9,7 +9,7 @@ import UIKit
 
 @objcMembers open class ChatThreadCell: UITableViewCell {
     
-    private var moreImage = UIImage(named: "thread_more", in: .chatBundle, with: nil)
+    private var moreImage = UIImage(chatNamed: "thread_more")
     
     public private(set) lazy var threadName: UILabel = {
         UILabel(frame: CGRect(x: 16, y: 13, width: self.contentView.frame.width-30-30, height: 20)).font(UIFont.theme.titleSmall)
@@ -99,7 +99,7 @@ import UIKit
 
 extension ChatThreadCell: ThemeSwitchProtocol {
     public func switchTheme(style: ThemeStyle) {
-        self.moreImage = UIImage(named: "thread_more", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor)
+        self.moreImage = UIImage(chatNamed: "thread_more")?.withTintColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor)
         self.messageCount.setTitleColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor, for: .normal)
         self.messageCount.setImage(self.moreImage, for: .normal)
         self.threadName.textColor = style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1

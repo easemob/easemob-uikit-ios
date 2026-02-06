@@ -16,7 +16,7 @@ import UIKit
     private lazy var activityIndicatorView: CustomActivityIndicator = {
         let activityIndicatorView = CustomActivityIndicator(frame: .zero)
         activityIndicatorView.translatesAutoresizingMaskIntoConstraints = false
-        activityIndicatorView.setImage(UIImage(named: "spinner", in: .chatBundle, with: nil))
+        activityIndicatorView.setImage(UIImage(chatNamed: "spinner"))
         return activityIndicatorView
     }()
     

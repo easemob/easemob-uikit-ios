@@ -34,11 +34,11 @@ import UIKit
     public var textViewFirstResponder: ((Bool) -> Void)?
     
     
-    public private(set) var audioImage = UIImage(named: "audio", in: .chatBundle, with: nil)
+    public private(set) var audioImage = UIImage(chatNamed: "audio")
     
-    public private(set) var attachmentImage = UIImage(named: "attachment", in: .chatBundle, with: nil)
+    public private(set) var attachmentImage = UIImage(chatNamed: "attachment")
     
-    public private(set) var selectedAttachmentImage = UIImage(named: "attachmentSelected", in: .chatBundle, with: nil)
+    public private(set) var selectedAttachmentImage = UIImage(chatNamed: "attachmentSelected")
     
     public private(set) var collapsedState = false
     
@@ -119,8 +119,8 @@ import UIKit
         self.rawTextHeight = self.rawHeight-16
         super.init(frame: frame)
         self.addSubViews([self.audio,self.inputField, self.rightView,self.attachment,self.line])
-        self.rightView.setImage(UIImage(named: "emojiKeyboard", in: Bundle.chatBundle, with: nil)?.withTintColor(UIColor.theme.neutralColor3), for: .normal)
-        self.rightView.setImage(UIImage(named: "textKeyboard", in: Bundle.chatBundle, with: nil)?.withTintColor(UIColor.theme.neutralColor3), for: .selected)
+        self.rightView.setImage(UIImage(chatNamed: "emojiKeyboard")?.withTintColor(UIColor.theme.neutralColor3), for: .normal)
+        self.rightView.setImage(UIImage(chatNamed: "textKeyboard")?.withTintColor(UIColor.theme.neutralColor3), for: .selected)
         self.attachment.setImage(self.attachmentImage, for: .normal)
         self.attachment.setImage(self.selectedAttachmentImage, for: .selected)
         self.inputField.returnKeyType = .send
@@ -619,7 +619,7 @@ extension MessageInputBar: UITextViewDelegate {
         let attribute = NSMutableAttributedString(attributedString: text!)
         attribute.addAttributes([.foregroundColor:Theme.style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1,.font:UIFont.theme.bodyLarge], range: NSMakeRange(0, attribute.length))
         let attachment = NSTextAttachment()
-        attachment.image = ChatEmojiConvertor.shared.emojiMap.isEmpty ? UIImage(named: key, in: .chatBundle, with: nil):ChatEmojiConvertor.shared.emojiMap[key]
+        attachment.image = ChatEmojiConvertor.shared.emojiMap.isEmpty ? UIImage(chatNamed: key):ChatEmojiConvertor.shared.emojiMap[key]
         attachment.bounds = CGRect(x: 0, y: -3.5, width: 18, height: 18)
         let imageText = NSMutableAttributedString(attachment: attachment)
         if #available(iOS 11.0, *) {
@@ -645,8 +645,8 @@ extension MessageInputBar: UITextViewDelegate {
 extension MessageInputBar: ThemeSwitchProtocol {
     
     public func switchTheme(style: ThemeStyle) {
-        self.rightView.setImage(UIImage(named: "emojiKeyboard", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.neutralColor95:UIColor.theme.neutralColor3, renderingMode: .automatic), for: .normal)
-        self.rightView.setImage(UIImage(named: "textKeyboard", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.neutralColor95:UIColor.theme.neutralColor3, renderingMode: .automatic), for: .selected)
+        self.rightView.setImage(UIImage(chatNamed: "emojiKeyboard")?.withTintColor(style == .dark ? UIColor.theme.neutralColor95:UIColor.theme.neutralColor3, renderingMode: .automatic), for: .normal)
+        self.rightView.setImage(UIImage(chatNamed: "textKeyboard")?.withTintColor(style == .dark ? UIColor.theme.neutralColor95:UIColor.theme.neutralColor3, renderingMode: .automatic), for: .selected)
         if style == .light {
             self.selectedAttachmentImage = self.selectedAttachmentImage?.withTintColor(UIColor.theme.neutralColor3)
             self.attachmentImage = self.attachmentImage?.withTintColor(UIColor.theme.neutralColor3)
@@ -689,4 +689,6 @@ public extension NSAttributedString {
         return result.string
     }
 }
+
+
 

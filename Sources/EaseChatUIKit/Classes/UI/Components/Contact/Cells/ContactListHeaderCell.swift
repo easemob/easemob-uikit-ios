@@ -110,7 +110,7 @@ extension ContactListHeaderCell: ThemeSwitchProtocol {
         self.badge.backgroundColor(style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor).textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
         self.textLabel?.textColor(style == .dark ? UIColor.theme.neutralColor98:UIColor.theme.neutralColor1)
         
-        let image = UIImage(named: "chevron_right", in: .chatBundle, with: nil)?.withTintColor(style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor3)
+        let image = UIImage(chatNamed: "chevron_right")?.withTintColor(style == .dark ? UIColor.theme.neutralColor5:UIColor.theme.neutralColor3)
         self.indicator.image = image
         
         self.separatorLine.backgroundColor = style == .dark ? UIColor.theme.neutralColor2:UIColor.theme.neutralColor9

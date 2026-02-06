@@ -56,7 +56,7 @@ import UIKit
     
     private var rightImages: [UIImage] {
         ((self.chatGroup.owner == ChatUIKitContext.shared?.currentUserId ?? "" && !self.chatGroup
-            .isDisabled)&&self.operation == .normal) ? [UIImage(named: "person_add", in: .chatBundle, with: nil)!,UIImage(named: "members_remove", in: .chatBundle, with: nil)!]:[]
+            .isDisabled)&&self.operation == .normal) ? [UIImage(chatNamed: "person_add")!,UIImage(chatNamed: "members_remove")!]:[]
     }
     
     public private(set) lazy var participantsList: UITableView = {

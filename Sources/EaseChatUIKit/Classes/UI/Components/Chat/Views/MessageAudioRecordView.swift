@@ -48,11 +48,11 @@ import UIKit
     
     private var timer: Timer?
     
-    private var icon = UIImage(named: "mic_on", in: .chatBundle, with: nil)
+    private var icon = UIImage(chatNamed: "mic_on")
     
-    private var trashIcon = UIImage(named: "trash", in: .chatBundle, with: nil)
+    private var trashIcon = UIImage(chatNamed: "trash")
     
-    private var sendIcon = UIImage(named: "send_audio", in: .chatBundle, with: nil)
+    private var sendIcon = UIImage(chatNamed: "send_audio")
     
     public private(set) lazy var recordCover: UIView = {
         UIView(frame: CGRect(x: self.frame.width/2.0-45, y: 60, width: 90, height: 68)).cornerRadius(.large).backgroundColor(UIColor.theme.primaryColor95)

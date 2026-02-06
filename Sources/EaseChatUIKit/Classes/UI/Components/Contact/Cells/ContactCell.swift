@@ -71,7 +71,7 @@ import UIKit
         self.avatar.image(with: avatarURL, placeHolder: Appearance.conversation.singlePlaceHolder)
         self.nickName.text = showName
         if self.display == .withCheckBox {
-            self.checkbox.image = UIImage(named: profile.selected ? "select":"unselect", in: .chatBundle, with: nil)
+            self.checkbox.image = UIImage(chatNamed: profile.selected ? "select":"unselect")
         }
         self.checkbox.isHidden = self.display != .withCheckBox
     }
@@ -91,7 +91,7 @@ import UIKit
         self.nickName.attributedText = self.highlightKeywords(keyword: keyword, in: showName)
         self.avatar.image(with: avatarURL, placeHolder: Appearance.conversation.singlePlaceHolder)
         if self.display == .withCheckBox {
-            self.checkbox.image = UIImage(named: profile.selected ? "select":"unselect", in: .chatBundle, with: nil)
+            self.checkbox.image = UIImage(chatNamed: profile.selected ? "select":"unselect")
         }
         self.checkbox.isHidden = self.display != .withCheckBox
     }

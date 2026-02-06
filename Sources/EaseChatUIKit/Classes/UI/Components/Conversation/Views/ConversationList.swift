@@ -24,7 +24,7 @@ import UIKit
     private var indexMap: [String:Int] = [:]
         
     private lazy var empty: EmptyStateView = {
-        EmptyStateView(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height),emptyImage: UIImage(named: "empty",in: .chatBundle, with: nil), onRetry: { [weak self] in
+        EmptyStateView(frame: CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height),emptyImage: UIImage(chatNamed: "empty"), onRetry: { [weak self] in
             guard let `self` = self else { return }
             for listener in self.eventHandlers.allObjects {
                 listener.onConversationListOccurErrorWhenFetchServer()
@@ -160,35 +160,35 @@ extension ConversationList: UITableViewDelegate,UITableViewDataSource {
                         listener.onConversationSwipe(type: .more, info: info)
                     }
                     completion(true)
-                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).icon(image: UIImage(named: "more", in: .chatBundle, with: nil))
+                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.neutralColor6:UIColor.theme.neutralColor5).icon(image: UIImage(chatNamed: "more"))
             case .read:
                 return UIContextualActionChatUIKit(title: "conversation_right_slide_menu_read".chat.localize, style: .normal, actionType: $0) { (action, view, completion) in
                     for listener in self.eventHandlers.allObjects {
                         listener.onConversationSwipe(type: .read, info: info)
                     }
                     completion(true)
-                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5).icon(image: UIImage(named: "read", in: .chatBundle, with: nil))
+                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5).icon(image: UIImage(chatNamed: "read"))
             case .delete:
                 return UIContextualActionChatUIKit(title: "conversation_right_slide_menu_delete".chat.localize, style: .normal, actionType: $0) { (action, view, completion) in
                     for listener in self.eventHandlers.allObjects {
                         listener.onConversationSwipe(type: .delete, info: info)
                     }
                     completion(true)
-                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.errorColor6:UIColor.theme.errorColor5).icon(image: UIImage(named: "trash", in: .chatBundle, with: nil))
+                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.errorColor6:UIColor.theme.errorColor5).icon(image: UIImage(chatNamed: "trash"))
             case .mute:
                 return UIContextualActionChatUIKit(title: "conversation_right_slide_menu_mute".chat.localize, style: .normal, actionType: $0) { (action, view, completion) in
                     for listener in self.eventHandlers.allObjects {
                         listener.onConversationSwipe(type: .mute, info: info)
                     }
                     completion(true)
-                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5).icon(image: UIImage(named: "mute", in: .chatBundle, with: nil))
+                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5).icon(image: UIImage(chatNamed: "mute"))
             case .pin:
                 return UIContextualActionChatUIKit(title: "conversation_left_slide_menu_pin".chat.localize, style: .normal, actionType: $0) { (action, view, completion) in
                     for listener in self.eventHandlers.allObjects {
                         listener.onConversationSwipe(type: .pin, info: info)
                     }
                     completion(true)
-                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor).icon(image: UIImage(named: "pin", in: .chatBundle, with: nil))
+                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor).icon(image: UIImage(chatNamed: "pin"))
             case .unpin:
                 return UIContextualActionChatUIKit(title: "conversation_left_slide_menu_unpin".chat.localize, style: .normal, actionType: $0) { (action, view, completion) in
                     if let hooker = ComponentViewsActionHooker.shared.conversation.swipeAction {
@@ -199,14 +199,14 @@ extension ConversationList: UITableViewDelegate,UITableViewDataSource {
                         }
                     }
                     completion(true)
-                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor).icon(image: UIImage(named: "unpin", in: .chatBundle, with: nil))
+                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.primaryDarkColor:UIColor.theme.primaryLightColor).icon(image: UIImage(chatNamed: "unpin"))
             case .unmute:
                 return UIContextualActionChatUIKit(title: "conversation_left_slide_menu_unmute".chat.localize, style: .normal, actionType: $0) { (action, view, completion) in
                     for listener in self.eventHandlers.allObjects {
                         listener.onConversationSwipe(type: .unmute, info: info)
                     }
                     completion(true)
-                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5).icon(image: UIImage(named: "unmute", in: .chatBundle, with: nil))
+                }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5).icon(image: UIImage(chatNamed: "unmute"))
             }
         }
     }
