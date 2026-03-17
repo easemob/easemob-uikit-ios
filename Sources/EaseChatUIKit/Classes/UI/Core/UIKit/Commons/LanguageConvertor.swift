@@ -96,13 +96,14 @@ public enum LanguageType: Equatable {
         if !Appearance.ease_chat_language.rawValue.isEmpty {
             lang = Appearance.ease_chat_language.rawValue
         }
-        if let value = self.string(forKey: key, language: lang, in: .main),!value.isEmpty {
-            return value
-        }
+        
         let path = Bundle.chatBundle.path(forResource: lang, ofType: "lproj") ?? ""
         let pathBundle = Bundle(path: path) ?? .main
-        let value = pathBundle.localizedString(forKey: key, value: nil, table: nil)
-        return value
+        let defaultValue = pathBundle.localizedString(forKey: key, value: nil, table: nil)
+        if let value = self.string(forKey: key, language: lang, in: .main),!value.isEmpty,value != key,value != defaultValue {
+            return value
+        }
+        return defaultValue
     }
     
     // 辅助方法：在指定 Bundle 中查找特定语言的字符串
