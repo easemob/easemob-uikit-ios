@@ -108,14 +108,16 @@ import UIKit
     }
     
     @objc private func refreshList() {
-        for participant in participants {
-            if let user = ChatUIKitContext.shared?.userCache?[participant.id]{
-                participant.nickname = user.nickname
-                participant.remark = user.remark
-                participant.avatarURL = user.avatarURL
+        DispatchQueue.main.async {
+            for participant in self.participants {
+                if let user = ChatUIKitContext.shared?.userCache?[participant.id]{
+                    participant.nickname = user.nickname
+                    participant.remark = user.remark
+                    participant.avatarURL = user.avatarURL
+                }
             }
+            self.participantsList.reloadData()
         }
-        self.participantsList.reloadData()
     }
     
     private func setupTitle() {
