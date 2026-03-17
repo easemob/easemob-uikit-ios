@@ -96,9 +96,9 @@ public enum LanguageType: Equatable {
         if !Appearance.ease_chat_language.rawValue.isEmpty {
             lang = Appearance.ease_chat_language.rawValue
         }
-        if let value = self.string(forKey: key, language: lang, in: .main),!value.isEmpty {
-            return value
-        }
+//        if let value = self.string(forKey: key, language: lang, in: .main),!value.isEmpty,value != key {
+//            return value
+//        }
         let path = Bundle.chatBundle.path(forResource: lang, ofType: "lproj") ?? ""
         let pathBundle = Bundle(path: path) ?? .main
         let value = pathBundle.localizedString(forKey: key, value: nil, table: nil)
