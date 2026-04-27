@@ -26,6 +26,18 @@ public struct ImageLoader {
     public static let shared = ImageLoader()
     private let cache = ImageCacheManager.shared
     
+    private let session: URLSession = {
+        let config = URLSessionConfiguration.default
+        // 图片很多时并发过高会放大同时下载/解码带来的内存峰值，这里保守一些更稳。
+        config.httpMaximumConnectionsPerHost = 9
+        config.timeoutIntervalForRequest = 15
+        config.timeoutIntervalForResource = 30
+        
+        config.requestCachePolicy = .useProtocolCachePolicy
+        config.urlCache = URLCache(memoryCapacity: 500 * 1024 * 1024,diskCapacity: 500 * 1024 * 1024,diskPath: "EaseChatUIKit.ImageLoader")
+        return URLSession(configuration: config)
+    }()
+    
     /// Load image from url.
     /// - Parameter url: image url
     /// - Returns: An
@@ -34,10 +46,10 @@ public struct ImageLoader {
         if let cachedImage = cache.image(for: url.absoluteString) {
             return Just(cachedImage).eraseToAnyPublisher()
         } else {
-            return URLSession.shared.dataTaskPublisher(for: url)
+            return self.session.dataTaskPublisher(for: url)
                 .map({
                     if ($0.response as? HTTPURLResponse)?.statusCode ?? 0 != 200 {
-                        return Appearance.chat.imagePlaceHolder ?? UIImage()
+                        return Appearance.avatarPlaceHolder ?? UIImage()
                     } else {
                         return UIImage(data: $0.data) ?? UIImage()
                     }
@@ -49,7 +61,7 @@ public struct ImageLoader {
                     }
                     return UIImage()
                 })
-                .replaceError(with: Appearance.chat.imagePlaceHolder)
+                .replaceError(with: Appearance.avatarPlaceHolder)
                 .receive(on: DispatchQueue.main)
                 .eraseToAnyPublisher()
         }

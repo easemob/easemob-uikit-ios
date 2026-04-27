@@ -325,18 +325,26 @@ typealias ElementTuple = (range: NSRange, element: LinkTextViewActiveElement, ty
     }
     
     func touchURL(urlString: String) {
-        var urlString = urlString.lowercased()
+        var url = urlString
+        if urlString.contains("?") {
+            let rawURL = url.components(separatedBy: "?").first ?? urlString
+            let queryParams = url.components(separatedBy: "?").last ?? ""
+            url = rawURL.lowercased() + queryParams
+        } else {
+            url = url.lowercased()
+        }
+        
         if self.isLongPress {
             return
         }
-        if !urlString.hasPrefix("http://"), !urlString.hasPrefix("https://") {
-            urlString = "https://" + urlString
+        if !url.hasPrefix("http://"), !url.hasPrefix("https://") {
+            url = "https://" + url
         } else {
-            if urlString.hasPrefix("http://") {
-                urlString.insert("s", at: 4)
+            if url.hasPrefix("http://") {
+                url.insert("s", at: 4)
             }
         }
-        if let validateURL = URL(string: urlString) {
+        if let validateURL = URL(string: url) {
             UIApplication.shared.open(validateURL)
         }
     }
