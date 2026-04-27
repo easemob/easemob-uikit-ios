@@ -386,7 +386,7 @@ public let MessageInputBarHeight = CGFloat(52)
             UIView.animate(withDuration: 0.25) {
                 let oldFrame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height-BottomBarHeight-MessageInputBarHeight)
                 self.messageList.frame = oldFrame
-                let space = -(ScreenHeight <= 667 ? 28:0)-(self.inputBar.extensionMenus.isHidden ? 0:(self.inputBar.extensionMenus.frame.height <= 132 ? 20:-60))
+                let space = -((ScreenHeight <= CGFloat(667) ? CGFloat(28):CGFloat(0))-(self.inputBar.extensionMenus.isHidden ? 0:(self.inputBar.extensionMenus.frame.height <= CGFloat(132) ? CGFloat(20):CGFloat(-60))))
                 if firstResponder {
                     self.messageList.frame = CGRect(x: 0, y: 0, width: self.messageList.frame.width, height: self.frame.height-self.inputBar.keyboardHeight-16-BottomBarHeight-CGFloat(space))
                 
