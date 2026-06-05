@@ -861,6 +861,7 @@ extension MessageListController: MessageListDriverEventsListener {
      The selected participant's profile ID is used to update the mention IDs in the view model.
      */
     @objc open func mentionAction() {
+        self.messageContainer.inputBar.hiddenInput()
         let vc = ComponentsRegister.shared.GroupParticipantController.init(groupId: self.profile.id, operation: .mention)
         vc.mentionClosure = { [weak self] in
             self?.viewModel.updateMentionIds(profile: $0, type: .add)
