@@ -42,6 +42,10 @@ import UIKit
     
     public private(set) var collapsedState = false
     
+    var isInputActive: Bool {
+        self.inputField.isFirstResponder || self.frame.minY != self.rawFrame.minY || self.frame.height != self.rawFrame.height || !(self.emoji?.isHidden ?? true) || !self.extensionMenus.isHidden
+    }
+    
     private var style: NSParagraphStyle {
         let paragraph = NSMutableParagraphStyle()
         paragraph.lineHeightMultiple = 1.15
@@ -173,6 +177,25 @@ import UIKit
         self.rightView.frame = CGRect(x: self.frame.width-80, y: self.inputField.frame.maxY-32, width: 30, height: 30)
         self.audio.frame = CGRect(x: 12, y: self.inputField.frame.maxY-32, width: 30, height: 30)
         self.inputField.frame = CGRect(x: 50, y: 8, width: self.frame.width-142, height: 36)
+        self.attachment.frame = CGRect(x: self.frame.width - 42, y: self.inputField.frame.maxY-32, width: 30, height: 30)
+        self.line.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: 0.5)
+        self.emoji?.frame = CGRect(x: 0, y: self.inputField.frame.maxY+8, width: self.frame.width, height: self.keyboardHeight)
+        self.extensionMenus.frame = CGRect(x: 0, y: self.inputField.frame.maxY+15, width: self.frame.width, height: (Appearance.chat.inputExtendActions.count > 4 ? 230:132))
+    }
+    
+    func updateContainerFrame(newFrame: CGRect, preserveInputState: Bool) {
+        if !preserveInputState {
+            self.resetFrame(newFrame: newFrame)
+            return
+        }
+        self.rawFrame = newFrame
+        self.rawHeight = newFrame.height
+        self.rawTextHeight = max(self.inputField.frame.height, self.rawHeight-16)
+        self.frame = CGRect(x: self.frame.minX, y: self.frame.minY, width: newFrame.width, height: self.frame.height)
+        self.recordedFrame = self.frame
+        self.rightView.frame = CGRect(x: self.frame.width-80, y: self.inputField.frame.maxY-32, width: 30, height: 30)
+        self.audio.frame = CGRect(x: 12, y: self.inputField.frame.maxY-32, width: 30, height: 30)
+        self.inputField.frame = CGRect(x: 50, y: self.inputField.frame.minY, width: self.frame.width-142, height: self.inputField.frame.height)
         self.attachment.frame = CGRect(x: self.frame.width - 42, y: self.inputField.frame.maxY-32, width: 30, height: 30)
         self.line.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: 0.5)
         self.emoji?.frame = CGRect(x: 0, y: self.inputField.frame.maxY+8, width: self.frame.width, height: self.keyboardHeight)
@@ -579,7 +602,7 @@ extension MessageInputBar: UITextViewDelegate {
 //        if (self.inputField.text ?? "").isEmpty,!self.inputField.isFirstResponder {
 //            return
 //        }
-        if self.collapsedState {
+        if self.collapsedState,self.frame.minY == self.rawFrame.minY,self.frame.height == self.rawFrame.height,!self.inputField.isFirstResponder {
             return
         }
         self.collapsedState = true
@@ -689,6 +712,3 @@ public extension NSAttributedString {
         return result.string
     }
 }
-
-
-
