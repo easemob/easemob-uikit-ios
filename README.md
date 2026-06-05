@@ -2,7 +2,7 @@
 
 # 单群聊 UIKit
 
-本指南将介绍环信新单群聊UIKit（V4.10.0）。新单群聊UIKit致力于为开发者提供高效集成、即插即用、高自由度定制化的UI组件库，助力构建功能全面、设计美观的IM应用，轻松满足即时通信绝大多数场景。请下载示例进行体验。
+本指南将介绍环信新单群聊UIKit（V4.22.0）。新单群聊UIKit致力于为开发者提供高效集成、即插即用、高自由度定制化的UI组件库，助力构建功能全面、设计美观的IM应用，轻松满足即时通信绝大多数场景。请下载示例进行体验。
 
 # 示例Demo
 
@@ -37,7 +37,7 @@
 # 开发环境
 
 - Xcode 26.0及以上版本 原因是UIKit中使用了部分检测音频AVAudioApplication api适配iOS17以上系统
-- 最低支持系统：iOS 14.0
+- 最低支持系统：iOS 15.0
 - 请确保您的项目已设置有效的开发者签名
 - cocoapods v1.16.3 above
 
@@ -51,7 +51,7 @@
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '14.0'
+platform :ios, '15.0'
 
 target 'YourTarget' do
   use_frameworks!
