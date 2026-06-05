@@ -1050,8 +1050,8 @@ extension MessageListController:UIImagePickerControllerDelegate, UINavigationCon
                 let fileName = imageURL.lastPathComponent
                 let fileURL = URL(fileURLWithPath: MediaConvertor.filePath()+"/\(fileName)")
                 do {
-                    let image = UIImage(contentsOfFile: imageURL.path)
-                    try image?.jpegData(compressionQuality: 1)?.write(to: fileURL)
+                    let imageData = try Data(contentsOf: imageURL)
+                    try imageData.write(to: fileURL)
                 } catch {
                     consoleLogInfo("write image error:\(error.localizedDescription)", type: .error)
                 }
