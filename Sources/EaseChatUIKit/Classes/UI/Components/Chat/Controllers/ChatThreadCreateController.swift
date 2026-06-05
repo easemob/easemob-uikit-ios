@@ -557,7 +557,7 @@ extension ChatThreadCreateController: PHPickerViewControllerDelegate {
                 
                 // Send the message on the main thread
                 DispatchQueue.main.async {
-                    self.viewModel.sendMessage(text: fileURL.path, type: type, extensionInfo: extensionInfo)
+                    self.createChatThread(text: fileURL.path, type: type, extensionInfo: extensionInfo)
                 }
             }
         }
