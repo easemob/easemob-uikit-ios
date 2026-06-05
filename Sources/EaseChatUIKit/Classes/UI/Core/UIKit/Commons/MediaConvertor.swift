@@ -11,9 +11,9 @@ import Photos
 //import AssetsLibrary
 import AVFAudio
 
-final class MediaConvertor: NSObject {
+open class MediaConvertor: NSObject {
 
-    static func videoConvertor(videoURL: URL) -> URL? {
+    static public func videoConvertor(videoURL: URL) -> URL? {
         var url: URL? = nil
         let avAsset = AVURLAsset(url: videoURL, options: nil)
         let compatiblePresets = AVAssetExportSession.exportPresets(compatibleWith: avAsset)
@@ -46,7 +46,7 @@ final class MediaConvertor: NSObject {
         return url
     }
     
-    static func filePath() -> String {
+    static public func filePath() -> String {
         var path = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true)[0]
         path = (path as NSString).appendingPathComponent("appdata/chatbuffer/")
         if !FileManager.default.fileExists(atPath: path) {
