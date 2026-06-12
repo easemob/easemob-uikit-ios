@@ -74,7 +74,8 @@ extension UIImage {
     func writeImage(
         to url: URL,
         metadata: [String: Any]? = nil,
-        compression: CGFloat = 0.95
+        compression: CGFloat = 0.95,
+        typeIdentifier: String = UTType.jpeg.identifier
     ) throws {
 
         guard let cgImage = self.cgImage else {
@@ -83,7 +84,7 @@ extension UIImage {
 
         guard let destination = CGImageDestinationCreateWithURL(
             url as CFURL,
-            UTType.jpeg.identifier as CFString,
+            typeIdentifier as CFString,
             1,
             nil
         ) else {
@@ -102,6 +103,21 @@ extension UIImage {
         guard CGImageDestinationFinalize(destination) else {
             throw NSError(domain: "image", code: -3)
         }
+    }
+
+    static func preferredCameraImageRepresentation() -> (typeIdentifier: String, fileExtension: String) {
+        if self.canWriteImage(typeIdentifier: UTType.heic.identifier) {
+            return (UTType.heic.identifier, "heic")
+        }
+        if self.canWriteImage(typeIdentifier: UTType.heif.identifier) {
+            return (UTType.heif.identifier, "heif")
+        }
+        return (UTType.jpeg.identifier, "jpeg")
+    }
+
+    private static func canWriteImage(typeIdentifier: String) -> Bool {
+        let identifiers = CGImageDestinationCopyTypeIdentifiers() as NSArray
+        return identifiers.contains(typeIdentifier)
     }
 }
 

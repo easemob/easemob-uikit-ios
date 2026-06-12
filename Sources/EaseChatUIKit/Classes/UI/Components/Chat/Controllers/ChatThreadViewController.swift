@@ -889,10 +889,11 @@ extension ChatThreadViewController:UIImagePickerControllerDelegate, UINavigation
             } else {
                 guard let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else { return }
                 guard let metaData = info[.mediaMetadata] as? [String: Any] else { return }
-                let fileName = "\(Int(Date().timeIntervalSince1970)).jpeg"
+                let representation = UIImage.preferredCameraImageRepresentation()
+                let fileName = "\(Int(Date().timeIntervalSince1970)).\(representation.fileExtension)"
                 let fileURL = URL(fileURLWithPath: MediaConvertor.filePath()+"/\(fileName)")
                 do {
-                    try image.writeImage(to: fileURL,metadata: metaData,compression: 1)
+                    try image.writeImage(to: fileURL,metadata: metaData,compression: 1,typeIdentifier: representation.typeIdentifier)
                 } catch {
                     consoleLogInfo("write camera fixOrientation image error:\(error.localizedDescription)", type: .error)
                 }
@@ -980,63 +981,15 @@ extension ChatThreadViewController: PHPickerViewControllerDelegate {
         for result in results {
             let itemProvider = result.itemProvider
             
-            // Determine file type and appropriate extension
-            var type: MessageCellStyle = .image
-            var fileExtension = ""
-            var typeIdentifier = UTType.image.identifier
-            var extensionInfo: [String: Any] = [:]
-            // Check for GIF
-            if itemProvider.hasItemConformingToTypeIdentifier(UTType.gif.identifier) {
-                type = .gif
-                fileExtension = "gif"
-                typeIdentifier = UTType.gif.identifier
-            } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.jpeg.identifier) {
-                type = .image
-                fileExtension = "jpeg"
-                typeIdentifier = UTType.jpeg.identifier
-            } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.png.identifier) {
-                type = .image
-                fileExtension = "png"
-                typeIdentifier = UTType.png.identifier
-            } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.heic.identifier) {
-                type = .image
-                fileExtension = "heic"
-                typeIdentifier = UTType.heic.identifier
-             } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.heif.identifier) {
-                type = .image
-                fileExtension = "heif"
-                typeIdentifier = UTType.heif.identifier
-             } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.livePhoto.identifier) {
-                 type = .image
-                 fileExtension = "live"
-                 typeIdentifier = UTType.livePhoto.identifier
-             }
-            // Check for Video
-            else if itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
-                type = .video
-                fileExtension = "mov"
-                typeIdentifier = UTType.movie.identifier
-            } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.mpeg4Movie.identifier) {
-                type = .video
-                fileExtension = "mp4"
-                typeIdentifier = UTType.mpeg4Movie.identifier
-            } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.quickTimeMovie.identifier) {
-                type = .video
-                fileExtension = "mov"
-                typeIdentifier = UTType.quickTimeMovie.identifier
-            } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.appleProtectedMPEG4Video.identifier) {
-                type = .video
-                fileExtension = "m4v"
-                typeIdentifier = UTType.appleProtectedMPEG4Video.identifier
-            } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.avi.identifier) {
-                type = .video
-                fileExtension = "m4v"
-                typeIdentifier = UTType.appleProtectedMPEG4Video.identifier
-            } else {
-                // Unsupported type
+            guard let representation = PHPickerMediaResolver.resolve(itemProvider: itemProvider) else {
                 consoleLogInfo("Unsupported media type selected", type: .error)
                 continue
             }
+
+            let type = representation.type
+            let fileExtension = representation.fileExtension
+            let typeIdentifier = representation.typeIdentifier
+            var extensionInfo: [String: Any] = [:]
             
             // Generate a unique filename with appropriate extension
             let timestamp = Int(Date().timeIntervalSince1970 * 1000)
