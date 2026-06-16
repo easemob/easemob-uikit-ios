@@ -164,10 +164,6 @@ import UIKit
     @objc open func constructMessage(text: String,type: MessageCellStyle,extensionInfo: Dictionary<String,Any> = [:]) -> ChatMessage? {
         
         var ext = extensionInfo
-        let json = ChatUIKitContext.shared?.currentUser?.toJsonObject() ?? [:]
-        ext.merge(json) { _, new in
-            new
-        }
         var chatMessage: ChatMessage?
         switch type {
         case .text:
@@ -692,19 +688,6 @@ extension ChatThreadViewModel: ChatResponseListener {
         if message.conversationId == self.to {
             if let alreadyShow = self.driver?.dataSource.contains(where: { $0.messageId == message.messageId }),alreadyShow {
                 return
-            }
-            if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-                let profile = ChatUserProfile()
-                profile.setValuesForKeys(dic)
-                profile.id = message.from
-                profile.modifyTime = message.timestamp
-                ChatUIKitContext.shared?.chatCache?[message.from] = profile
-                if ChatUIKitContext.shared?.userCache?[message.from] == nil {
-                    ChatUIKitContext.shared?.userCache?[message.from] = profile
-                } else {
-                    ChatUIKitContext.shared?.userCache?[message.from]?.nickname = profile.nickname
-                    ChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
-                }
             }
             if let dic = message.ext?["ease_chat_uikit_text_url_preview"] as? Dictionary<String,String>,let url = dic["url"] {
                 let content = URLPreviewManager.HTMLContent()

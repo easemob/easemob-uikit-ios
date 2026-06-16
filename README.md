@@ -176,10 +176,6 @@ public final class YourAppUser: NSObject, ChatUserProfileProtocol {
     var nickname: String = ""
     
     var avatarURL: String = ""
-    
-    public func toJsonObject() -> Dictionary<String, Any>? {
-        ["ease_chat_uikit_user_info":["nickname":self.nickname,"avatarURL":self.avatarURL,"userId":self.id,"remark":""]]
-    }
 
 }
 // 使用当前用户对象符合`ChatUserProfileProtocol`协议的用户信息登录EaseChatUIKit。
@@ -216,11 +212,6 @@ let error = ChatUIKitClient.shared.setup(option: ChatOptions(appkey: appKey))
 
 ```Swift
 public final class YourAppUser: NSObject, ChatUserProfileProtocol {
-
-            public func toJsonObject() -> Dictionary<String, Any>? {
-        ["ease_chat_uikit_user_info":["nickname":self.nickname,"avatarURL":self.avatarURL,"userId":self.id]]
-    }
-    
     
     public var id: String = ""
         
@@ -320,6 +311,37 @@ extension MainViewController: ChatUserProfileProvider,ChatGroupProfileProvider {
         if unknownIds.isEmpty {
             return resultProfiles
         }
+        
+        if let localInfoMap = ChatClient.shared().userInfoManager?.getUserInfoByIds(unknownIds) {
+            var remainingUnknownIds = [String]()
+            for userId in unknownIds {
+                if let info = localInfoMap[userId] {
+                    let profile = ChatUserProfile()
+                    let nickname = info.nickname ?? ""
+                    profile.id = userId
+                    profile.nickname = nickname
+                    if let remark = ChatClient.shared().contactManager?.getContact(userId)?.remark {
+                        profile.remark = remark
+                    }
+                    profile.avatarURL = info.avatarUrl ?? ""
+                    resultProfiles.append(profile)
+                    if (ChatUIKitContext.shared?.userCache?[userId]) != nil {
+                        profile.updateFFDB()
+                    } else {
+                        profile.insert()
+                    }
+                    ChatUIKitContext.shared?.userCache?[userId] = profile
+                } else {
+                    remainingUnknownIds.append(userId)
+                }
+            }
+            unknownIds = remainingUnknownIds
+        }
+        
+        if unknownIds.isEmpty {
+            return resultProfiles
+        }
+        
         let result = await ChatClient.shared().userInfoManager?.fetchUserInfo(byId: unknownIds)
         if result?.1 == nil,let infoMap = result?.0 {
             for (userId,info) in infoMap {
@@ -341,7 +363,7 @@ extension MainViewController: ChatUserProfileProvider,ChatGroupProfileProvider {
             }
             return resultProfiles
         }
-        return []
+        return resultProfiles.isEmpty ? [] : resultProfiles
     }
     
     private func requestGroupsInfo(groupIds: [String]) async -> [ChatUserProfileProtocol]? {

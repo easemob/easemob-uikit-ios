@@ -56,11 +56,16 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
         if let options = option {
             options.uiKitVersion = ChatUIKit_VERSION
             error = ChatClient.shared().initializeSDK(with: options)
+            if options.enableUserInfo {
+                ChatClient.shared().userInfoManager?.add(self, delegateQueue: nil)
+            }
         } else {
             if let key = appKey {
                 let options = ChatOptions(appkey: key)
                 options.uiKitVersion = ChatUIKit_VERSION
+                options.enableUserInfo = true
                 error = ChatClient.shared().initializeSDK(with: options)
+                ChatClient.shared().userInfoManager?.add(self, delegateQueue: nil)
             }
             error = ChatError(description: "App key can't be nil", code: .invalidAppkey)
         }
@@ -134,6 +139,25 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
     public func refreshToken(token: String) {
         ChatClient.shared().renewToken(token)
     }
+    
+    /// Converts an array of SDK UserInfo objects into an array of user protocol types used internally by ChatUIKit
+    /// - Parameter userInfos: Array of user information returned by the SDK, containing basic information such as user ID, nickname, and avatar
+    /// - Returns: An array of user objects that conform to the ChatUserProfileProtocol, suitable for UI display
+    public func transformUserInfos(userInfos: [UserInfo]) -> [ChatUserProfileProtocol] {
+        // Array to store the converted user objects
+        var resultProfiles = [ChatUserProfileProtocol]()
+        for info in userInfos {
+            let profile = ChatUserProfile()
+            profile.id = info.userId ?? ""
+            profile.nickname = info.nickname ?? ""
+            if let remark = ChatClient.shared().contactManager?.getContact(profile.id)?.remark {
+                profile.remark = remark
+            }
+            profile.avatarURL = info.avatarUrl ?? ""
+            resultProfiles.append(profile)
+        }
+        return resultProfiles
+    }
 }
 
 extension ChatUIKitClient: ContactEventsListener {
@@ -164,3 +188,16 @@ extension ChatUIKitClient: ContactEventsListener {
         conversation?.insert(message, error: nil)
     }
 }
+
+extension ChatUIKitClient: UserInfoManagerDelegate {
+    public func onSelfUserInfoUpdate(_ aUserInfo: UserInfo) {
+        if let profile = transformUserInfos(userInfos: [aUserInfo]).first {
+            ChatUIKitContext.shared?.updateChatAndUserTypeCaches(profiles: [profile])
+        }
+    }
+    
+    public func onUserInfoUpdate(_ aUserInfos: [String : UserInfo]) {
+        ChatUIKitContext.shared?.updateChatAndUserTypeCaches(profiles: transformUserInfos(userInfos: Array(aUserInfos.values)))
+    }
+}
+

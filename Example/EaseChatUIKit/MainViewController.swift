@@ -202,23 +202,35 @@ extension MainViewController: ChatUserProfileProvider,ChatGroupProfileProvider {
         if unknownIds.isEmpty {
             return resultProfiles
         }
+        
+        if let localInfoMap = ChatClient.shared().userInfoManager?.getUserInfo(byIds: unknownIds) {
+            var remainingUnknownIds = [String]()
+            for userId in unknownIds {
+                if let info = localInfoMap[userId] {
+                    let profile = ChatUIKitClient.shared.transformUserInfos(userInfos: [info])[0]
+                    resultProfiles.append(profile)
+                    ChatUIKitContext.shared?.userCache?[userId] = profile
+                } else {
+                    remainingUnknownIds.append(userId)
+                }
+            }
+            unknownIds = remainingUnknownIds
+        }
+        
+        if unknownIds.isEmpty {
+            return resultProfiles
+        }
+        
         let result = await ChatClient.shared().userInfoManager?.fetchUserInfo(byId: unknownIds)
         if result?.1 == nil,let infoMap = result?.0 {
             for (userId,info) in infoMap {
-                let profile = ChatUserProfile()
-                let nickname = info.nickname ?? ""
-                profile.id = userId
-                profile.nickname = nickname
-                if let remark = ChatClient.shared().contactManager?.getContact(userId)?.remark {
-                    profile.remark = remark
-                }
-                profile.avatarURL = info.avatarUrl ?? ""
+                let profile = ChatUIKitClient.shared.transformUserInfos(userInfos: [info])[0]
                 resultProfiles.append(profile)
                 ChatUIKitContext.shared?.userCache?[userId] = profile
             }
             return resultProfiles
         }
-        return []
+        return resultProfiles.isEmpty ? [] : resultProfiles
     }
     
     private func requestGroupsInfo(groupIds: [String]) async -> [ChatUserProfileProtocol]? {

@@ -250,7 +250,7 @@ extension ForwardTargetViewController: UITableViewDelegate,UITableViewDataSource
             } else {
                 conversationId = self.datas[indexPath.row].id
             }
-            let message =  ChatMessage(conversationID: conversationId, body: body, ext: ChatUIKitContext.shared?.currentUser?.toJsonObject())
+            let message =  ChatMessage(conversationID: conversationId, body: body, ext: nil)
             message.chatType = self.index == 0 ? .chat:.groupChat
             ChatClient.shared().chatManager?.send(message, progress: nil, completion: { [weak self] successMessage, error in
                 guard let `self` = self else { return }
