@@ -59,9 +59,17 @@ extension LoginViewController {
                             return
                         }
                         if let userInfos = userInfos {
-                            let profile = ChatUIKitClient.shared.transformUserInfos(userInfos: Array(userInfos.values))
-                            ChatUIKitContext.shared?.currentUser = profile[0]
-                            ChatUIKitContext.shared?.updateChatAndUserTypeCaches(profiles: profile)
+                            let profiles = userInfos.values.map { info in
+                                let profile = ChatUserProfile()
+                                profile.id = info.userId ?? ""
+                                profile.nickname = info.nickname ?? ""
+                                profile.avatarURL = info.avatarUrl ?? ""
+                                return profile
+                            }
+                            if let profile = profiles.first {
+                                ChatUIKitContext.shared?.currentUser = profile
+                            }
+                            ChatUIKitContext.shared?.updateChatAndUserTypeCaches(profiles: profiles)
                         }
                         UIApplication.shared.chat.keyWindow?.rootViewController = MainViewController()
                     })

@@ -22,6 +22,8 @@ import UIKit
     private var searchKeyWord = ""
     
     private var searchMode = false
+    
+    private lazy var contactService: ContactServiceProtocol = ChatUIKitClient.shared.contactService ?? ContactServiceImplement()
         
     private var datas = [ChatUserProfileProtocol]() {
         didSet {
@@ -93,6 +95,10 @@ import UIKit
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        self.contactService.unregisterEmergencyListener(listener: self)
+    }
+    
     open override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.dismissClosure?(self.forwarded)
@@ -104,6 +110,7 @@ import UIKit
         self.view.addSubViews([self.indicator,self.toolBar,self.targetsList])
         // Do any additional setup after loading the view.
         self.targetsList.keyboardDismissMode = .onDrag
+        self.contactService.registerEmergencyListener(listener: self)
         self.fillDatas(refresh: true)
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
@@ -126,39 +133,25 @@ import UIKit
     }
    
     open func fetchContacts() {
-        if !UserDefaults.standard.bool(forKey: "EaseChatUIKit_contact_fetch_server_finished"+saveIdentifier) {
-            ChatClient.shared().contactManager?.getAllContactsFromServer(completion: { [weak self] contacts, error in
-                if error == nil {
-                    UserDefaults.standard.set(true, forKey: "EaseChatUIKit_contact_fetch_server_finished"+saveIdentifier)
-                    if let contacts = ChatClient.shared().contactManager?.getAllContacts() {
-                        self?.datas.removeAll()
-                        self?.datas = contacts.map {
-                            let profile = ChatUserProfile()
-                            profile.id = $0.userId
-                            profile.nickname = ChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
-                            profile.remark = $0.remark ?? ""
-                            profile.avatarURL = ChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
-                            return profile
-                        }
-                        self?.targetsList.reloadData()
-                    }
-                } else {
-                    consoleLogInfo("ForwardTargetViewController fetchContacts error:\(error?.errorDescription ?? "")", type: .error)
-                }
-            })
-        } else {
-            let contacts = ChatClient.shared().contactManager?.getAllContacts() ?? []
-            self.datas.removeAll()
-            self.datas = contacts.map {
-                let profile = ChatUserProfile()
-                profile.id = $0.userId
-                profile.nickname = ChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
-                profile.remark = $0.remark ?? ""
-                profile.avatarURL = ChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
-                return profile
+        self.contactService.contacts { [weak self] error, contacts in
+            guard let self = self else { return }
+            if let error = error {
+                consoleLogInfo("ForwardTargetViewController fetchContacts error:\(error.errorDescription ?? "")", type: .error)
+                return
             }
+            self.datas.removeAll()
+            self.datas = contacts.map { self.profile(from: $0) }
             self.targetsList.reloadData()
         }
+    }
+    
+    private func profile(from contact: Contact) -> ChatUserProfileProtocol {
+        let profile = ChatUserProfile()
+        profile.id = contact.userId
+        profile.nickname = contact.userInfo?.nickname ?? ChatUIKitContext.shared?.userCache?[contact.userId]?.nickname ?? ""
+        profile.remark = contact.remark ?? ""
+        profile.avatarURL = contact.userInfo?.avatarUrl ?? ChatUIKitContext.shared?.userCache?[contact.userId]?.avatarURL ?? ""
+        return profile
     }
     
     open func fetchGroups() {
@@ -183,6 +176,15 @@ import UIKit
             }
         })
         
+    }
+}
+
+extension ForwardTargetViewController: ContactEmergencyListener {
+    public func onResult(error: ChatError?, type: ContactEmergencyType, operatorId: String) {
+        guard type == .fetchContacts,self.index == 0 else { return }
+        DispatchQueue.main.async { [weak self] in
+            self?.fetchContacts()
+        }
     }
 }
 

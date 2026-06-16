@@ -39,10 +39,14 @@ public var saveIdentifier: String {
     
     @objc public func registerEventListener() {
         ChatClient.shared().add(self, delegateQueue: nil)
+        if ChatClient.shared().options.enableUserInfo {
+            ChatClient.shared().userInfoManager?.add(self, delegateQueue: nil)
+        }
     }
     
     @objc public func removeEventListener() {
         ChatClient.shared().removeDelegate(self)
+        ChatClient.shared().userInfoManager?.remove(self)
     }
     
     deinit {
@@ -111,10 +115,13 @@ extension UserServiceImplement:UserServiceProtocol {
         }
     }
     
-    private func convertToUser(info: UserInfo) -> ChatUserProfile {
+    fileprivate func convertToUser(info: UserInfo) -> ChatUserProfile {
         let user = ChatUserProfile()
         user.id = info.userId ?? ""
         user.nickname = info.nickname ?? ""
+        if let remark = ChatClient.shared().contactManager?.getContact(user.id)?.remark {
+            user.remark = remark
+        }
         user.avatarURL = info.avatarUrl ?? ""
         return user
     }
@@ -129,7 +136,6 @@ extension UserServiceImplement:UserServiceProtocol {
     
 }
 
-//MARK: - ChatClientDelegate
 //MARK: - ChatClientDelegate
 extension UserServiceImplement: ChatClientListener {
     public func tokenDidExpire(_ aErrorCode: ChatErrorCode) {
@@ -180,6 +186,16 @@ extension UserServiceImplement: ChatClientListener {
         for response in self.responseDelegates.allObjects {
             response.onUserAutoLoginCompletion(error: aError)
         }
+    }
+}
+
+extension UserServiceImplement: UserInfoManagerDelegate {
+    public func onSelfUserInfoUpdate(_ aUserInfo: UserInfo) {
+        ChatUIKitContext.shared?.updateChatAndUserTypeCaches(profiles: [self.convertToUser(info: aUserInfo)])
+    }
+    
+    public func onUserInfoUpdate(_ aUserInfos: [String : UserInfo]) {
+        ChatUIKitContext.shared?.updateChatAndUserTypeCaches(profiles: aUserInfos.values.map { self.convertToUser(info: $0) })
     }
 }
 

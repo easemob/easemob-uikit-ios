@@ -41,10 +41,11 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
     /// User-related protocol implementation class.
     public private(set) lazy var userService: UserServiceProtocol? = nil
     
+    /// Contact-related protocol implementation class.
+    public private(set) lazy var contactService: ContactServiceProtocol? = nil
+    
     /// Options function wrapper.
     public var option: ChatUIKitOptions = ChatUIKitOptions()
-    
-    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Array<Dictionary<String,Any>>>()) private var newFriends
     
     /// Initializes the ease chat UIKit.
     /// - Parameters:
@@ -57,20 +58,21 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
             options.uiKitVersion = ChatUIKit_VERSION
             error = ChatClient.shared().initializeSDK(with: options)
             if options.enableUserInfo {
-                ChatClient.shared().userInfoManager?.add(self, delegateQueue: nil)
+                self.userService = UserServiceImplement()
             }
         } else {
             if let key = appKey {
                 let options = ChatOptions(appkey: key)
                 options.uiKitVersion = ChatUIKit_VERSION
                 options.enableUserInfo = true
+                options.enableAutoSyncContacts = true
                 error = ChatClient.shared().initializeSDK(with: options)
-                ChatClient.shared().userInfoManager?.add(self, delegateQueue: nil)
+                self.userService = UserServiceImplement()
             }
             error = ChatError(description: "App key can't be nil", code: .invalidAppkey)
         }
         if ChatUIKitClient.shared.option.option_UI.enableContact {
-            ChatClient.shared().contactManager?.add(self, delegateQueue: nil)
+            self.contactService = ContactServiceImplement()
         }
         return error
     }
@@ -95,8 +97,6 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
     
     /// Logout user
     @objc public func logout(unbindNotificationDeviceToken: Bool = false,completion: @escaping (ChatError?) -> Void) {
-        UserDefaults.standard.removeObject(forKey: "EaseChatUIKit_contact_fetch_server_finished"+saveIdentifier)
-        
         ChatClient.shared().logout(unbindNotificationDeviceToken) { error in
             completion(error)
         }
@@ -140,64 +140,5 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
         ChatClient.shared().renewToken(token)
     }
     
-    /// Converts an array of SDK UserInfo objects into an array of user protocol types used internally by ChatUIKit
-    /// - Parameter userInfos: Array of user information returned by the SDK, containing basic information such as user ID, nickname, and avatar
-    /// - Returns: An array of user objects that conform to the ChatUserProfileProtocol, suitable for UI display
-    public func transformUserInfos(userInfos: [UserInfo]) -> [ChatUserProfileProtocol] {
-        // Array to store the converted user objects
-        var resultProfiles = [ChatUserProfileProtocol]()
-        for info in userInfos {
-            let profile = ChatUserProfile()
-            profile.id = info.userId ?? ""
-            profile.nickname = info.nickname ?? ""
-            if let remark = ChatClient.shared().contactManager?.getContact(profile.id)?.remark {
-                profile.remark = remark
-            }
-            profile.avatarURL = info.avatarUrl ?? ""
-            resultProfiles.append(profile)
-        }
-        return resultProfiles
-    }
-}
-
-extension ChatUIKitClient: ContactEventsListener {
-    public func friendRequestDidReceive(fromUser aUsername: String, message aMessage: String?) {
-        let requestInfo: [String:Any] = ["userId":aUsername,"timestamp":Date().timeIntervalSince1970*1000,"groupApply":0,"read":0]
-        var exist = self.newFriends[saveIdentifier]
-        if exist == nil {
-            self.newFriends[saveIdentifier] = [requestInfo]
-        } else {
-            if exist?.first(where: { $0["userId"] as? String == aUsername }) == nil {
-                exist?.append(requestInfo)
-                self.newFriends[saveIdentifier] = exist
-            }
-        }
-        if let index = Appearance.contact.listHeaderExtensionActions.firstIndex(where: { $0.featureIdentify == "NewFriendRequest" }) {
-            let item = Appearance.contact.listHeaderExtensionActions[index]
-            item.showBadge = true
-            let unreadCount = self.newFriends[saveIdentifier]?.filter({ $0["read"] as? Int == 0 }).count ?? 0
-            item.numberCount = UInt(unreadCount)
-            Appearance.contact.listHeaderExtensionActions[index].numberCount = UInt(unreadCount)
-        }
-    }
-    
-    public func friendRequestDidApprove(byUser aUsername: String) {
-        let conversation = ChatClient.shared().chatManager?.getConversation(aUsername, type: .chat, createIfNotExist: true)
-        let ext = ["something":("You have added".chat.localize+" "+aUsername+" "+"to say hello".chat.localize)]
-        let message = ChatMessage(conversationID: aUsername, body: ChatCustomMessageBody(event: EaseChatUIKit_alert_message, customExt: nil), ext: ext)
-        conversation?.insert(message, error: nil)
-    }
-}
-
-extension ChatUIKitClient: UserInfoManagerDelegate {
-    public func onSelfUserInfoUpdate(_ aUserInfo: UserInfo) {
-        if let profile = transformUserInfos(userInfos: [aUserInfo]).first {
-            ChatUIKitContext.shared?.updateChatAndUserTypeCaches(profiles: [profile])
-        }
-    }
-    
-    public func onUserInfoUpdate(_ aUserInfos: [String : UserInfo]) {
-        ChatUIKitContext.shared?.updateChatAndUserTypeCaches(profiles: transformUserInfos(userInfos: Array(aUserInfos.values)))
-    }
 }
 

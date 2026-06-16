@@ -207,7 +207,7 @@ extension MainViewController: ChatUserProfileProvider,ChatGroupProfileProvider {
             var remainingUnknownIds = [String]()
             for userId in unknownIds {
                 if let info = localInfoMap[userId] {
-                    let profile = ChatUIKitClient.shared.transformUserInfos(userInfos: [info])[0]
+                    let profile = self.profile(from: info)
                     resultProfiles.append(profile)
                     ChatUIKitContext.shared?.userCache?[userId] = profile
                 } else {
@@ -224,13 +224,21 @@ extension MainViewController: ChatUserProfileProvider,ChatGroupProfileProvider {
         let result = await ChatClient.shared().userInfoManager?.fetchUserInfo(byId: unknownIds)
         if result?.1 == nil,let infoMap = result?.0 {
             for (userId,info) in infoMap {
-                let profile = ChatUIKitClient.shared.transformUserInfos(userInfos: [info])[0]
+                let profile = self.profile(from: info)
                 resultProfiles.append(profile)
                 ChatUIKitContext.shared?.userCache?[userId] = profile
             }
             return resultProfiles
         }
         return resultProfiles.isEmpty ? [] : resultProfiles
+    }
+    
+    private func profile(from info: UserInfo) -> ChatUserProfileProtocol {
+        let profile = ChatUserProfile()
+        profile.id = info.userId ?? ""
+        profile.nickname = info.nickname ?? ""
+        profile.avatarURL = info.avatarUrl ?? ""
+        return profile
     }
     
     private func requestGroupsInfo(groupIds: [String]) async -> [ChatUserProfileProtocol]? {
