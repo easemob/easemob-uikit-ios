@@ -86,6 +86,7 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
         ChatUIKitContext.shared?.currentUser = user
         ChatUIKitContext.shared?.chatCache?[user.id] = user
         ChatUIKitContext.shared?.userCache?[user.id] = user
+        updateUserInfoIfNeed(user: user)
         if self.userService != nil {
             self.userService?.login(userId: user.id, token: token, completion: { success, error in
                 completion(error)
@@ -140,5 +141,24 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
         ChatClient.shared().renewToken(token)
     }
     
+    
+    private func updateUserInfoIfNeed(user: ChatUserProfileProtocol) {
+        guard let profiles = ChatClient.shared().userInfoManager?.getUserInfo(byIds: [user.id]),
+           let profile = profiles[user.id] else {
+            let userInfo = UserInfo()
+            userInfo.userId = user.id
+            userInfo.avatarUrl = user.avatarURL
+            ChatClient.shared().userInfoManager?.updateOwn(userInfo)
+            return
+        }
+        if user.nickname == profile.nickname,
+           user.avatarURL == profile.avatarUrl {
+            return
+        }
+        let userInfo = profile
+        userInfo.nickname = user.nickname
+        userInfo.avatarUrl = user.avatarURL
+        ChatClient.shared().userInfoManager?.updateOwn(userInfo)
+    }
 }
 
