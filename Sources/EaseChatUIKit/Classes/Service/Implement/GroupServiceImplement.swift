@@ -17,6 +17,7 @@ import UIKit
     public override init() {
         super.init()
         ChatClient.shared().groupManager?.add(self, delegateQueue: .main)
+        ChatClient.shared().add(self, delegateQueue: .main)
         if Appearance.chat.contentStyle.contains(.withMessageThread) {
             ChatClient.shared().threadManager?.add(self, delegateQueue: .main)
         }
@@ -24,6 +25,7 @@ import UIKit
     
     deinit {
         ChatClient.shared().groupManager?.removeDelegate(self)
+        ChatClient.shared().removeDelegate(self)
         ChatClient.shared().threadManager?.remove(self)
     }
 }
@@ -62,16 +64,14 @@ extension GroupServiceImplement: GroupService {
         }
     }
     
-    public func createGroup(subject: String, description: String, inviterIds: [String], message: String, option: ChatGroupOption, completion: @escaping (ChatGroup?, ChatError?) -> Void) {
-        ChatClient.shared().groupManager?.createGroup(withSubject: subject, description: description, invitees: inviterIds, message: message, setting: option, completion: { group, error in
+    public func createGroup(subject: String, avatar: String?, description: String, inviterIds: [String], message: String, option: ChatGroupOption, completion: @escaping (ChatGroup?, ChatError?) -> Void) {
+        ChatClient.shared().groupManager?.createGroup(withSubject: subject, avatar: avatar, description: description, invitees: inviterIds, message: message, setting: option, completion: { group, error in
             completion(group,error)
         })
     }
     
-    public func getJoinedGroups(page: UInt, pageSize: UInt, needMemberCount: Bool, needRole: Bool, completion: @escaping ([ChatGroup]?, ChatError?) -> Void) {
-        ChatClient.shared().groupManager?.getJoinedGroupsFromServer(withPage: Int(page), pageSize: Int(pageSize), needMemberCount: needMemberCount, needRole: needRole, completion: { groups, error in
-            completion(groups,error)
-        })
+    public func loadLocalJoinedGroups() -> [ChatGroup] {
+        ChatClient.shared().groupManager?.getJoinedGroups() ?? []
     }
     
     public func invite(userIds: [String], to groupId: String, message: String, completion: @escaping (ChatGroup?, ChatError?) -> Void) {
@@ -314,6 +314,34 @@ extension GroupServiceImplement: GroupChatThreadListener {
     public func onUserKickOutOfChatThread(_ event: GroupChatThreadEvent) {
         for listener in self.threadDelegates.allObjects {
             listener.onGroupChatThreadEventOccur(type: .userKicked, event: event)
+        }
+    }
+}
+
+//MARK: - ChatClientListener data sync
+extension GroupServiceImplement: ChatClientListener {
+    
+    public func onDatabaseOpened(_ error: ChatError?, username: String) {
+        // The local database opens before data sync. Joined groups are queryable now, so ask pages
+        // to reload the local list immediately instead of waiting for the sync to finish (which may
+        // be delayed or not fire).
+        guard error == nil else { return }
+        for listener in self.responseDelegates.allObjects {
+            listener.onJoinedGroupsNeedReload?()
+        }
+    }
+    
+    public func syncDataStart(with type: DataSyncType) {
+        guard type.contains(.joinedGroups) else { return }
+        for listener in self.responseDelegates.allObjects {
+            listener.onJoinedGroupsSyncingStatusChanged?(syncing: true, error: nil)
+        }
+    }
+    
+    public func syncDataFinished(_ error: ChatError?, type: DataSyncType) {
+        guard type.contains(.joinedGroups) else { return }
+        for listener in self.responseDelegates.allObjects {
+            listener.onJoinedGroupsSyncingStatusChanged?(syncing: false, error: error)
         }
     }
 }

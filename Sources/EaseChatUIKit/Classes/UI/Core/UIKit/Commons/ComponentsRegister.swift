@@ -104,7 +104,4 @@ import UIKit
     
     /// Message list page controller.
     public var MessageViewController: MessageListController.Type = MessageListController.self
-    
-    /// Report message controller.
-    public var ReportViewController: ReportOptionsController.Type = ReportOptionsController.self
 }

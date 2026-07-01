@@ -18,6 +18,15 @@ import UIKit
         self.createList()
     }()
     
+    public private(set) lazy var loadingView: LoadingView = {
+        self.createLoading()
+    }()
+    
+    /// Creates the loading view shown while conversations are syncing after login.
+    @objc open func createLoading() -> LoadingView {
+        LoadingView(frame: self.conversationList.frame)
+    }
+    
     public private(set) var viewModel: ConversationViewModel?
     
     @objc public required init() {
@@ -63,8 +72,18 @@ import UIKit
     
     open override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.addSubViews([self.navigation,self.search,self.conversationList])
+        self.view.addSubViews([self.navigation,self.search,self.conversationList,self.loadingView])
         self.navigation.title = "Chats".chat.localize
+        //Show loading while the SDK is syncing conversations after login, hide it when finished.
+        self.viewModel?.conversationSyncClosure = { [weak self] syncing in
+            DispatchQueue.main.async {
+                if syncing {
+                    self?.loadingView.startAnimating()
+                } else {
+                    self?.loadingView.stopAnimating()
+                }
+            }
+        }
         //Bind UI driver and service
         self.viewModel?.bind(driver: self.conversationList)
         //Conversation list click push to message list controller.
@@ -282,8 +301,9 @@ extension ConversationListController {
         let option = ChatGroupOption()
         option.isInviteNeedConfirm = false
         option.maxUsers = Appearance.chat.groupParticipantsLimitCount
-        option.style = .privateMemberCanInvite
-        ChatClient.shared().groupManager?.createGroup(withSubject: name, description: "", invitees: ids, message: nil, setting: option, completion: { [weak self] group, error in
+        option.isPublic = false
+        option.allowInvites = true
+        ChatClient.shared().groupManager?.createGroup(withSubject: name, avatar: "", description: "", invitees: ids, message: nil, setting: option, completion: { [weak self] group, error in
             if error == nil,let group = group {
                 let profile = ChatUserProfile()
                 profile.id = group.groupId

@@ -53,7 +53,7 @@ public typealias ChatConversation = EMConversation
 public typealias ChatConversationType = EMConversationType
 public typealias GroupLeaveReason = EMGroupLeaveReason
 public typealias ChatGroup = EMGroup
-public typealias ChatGroupOption = EMGroupOptions
+public typealias ChatGroupOption = EMGroupConfigs
 public typealias SilentModeResult = EMSilentModeResult
 public typealias SilentModeParam = EMSilentModeParam
 public typealias Contact = EMContact
@@ -64,6 +64,9 @@ public typealias GroupChatThread = EMChatThread
 public typealias MessagePinOperation = EMMessagePinOperation
 public typealias MessagePinInfo = EMMessagePinInfo
 public typealias UserInfoManagerDelegate = EMUserInfoManagerDelegate
+public typealias DataSyncType = EMDataSyncType
+public typealias LoginExtensionInfo = EMLoginExtensionInfo
+public typealias ChatFetchServerMessagesOption = EMFetchServerMessagesOption
 #elseif canImport(AgoraChat)
 import AgoraChat
 public typealias ChatClient = AgoraChatClient
@@ -115,6 +118,9 @@ public typealias GroupChatThread = AgoraChatThread
 public typealias MessagePinOperation = AgoraChatMessagePinOperation
 public typealias MessagePinInfo = AgoraChatMessagePinInfo
 public typealias UserInfoManagerDelegate = AgoraChatUserInfoManagerDelegate
+public typealias DataSyncType = AgoraChatDataSyncType
+public typealias LoginExtensionInfo = AgoraChatLoginExtensionInfo
+public typealias ChatFetchServerMessagesOption = AgoraChatFetchServerMessagesOption
 #endif
 
 

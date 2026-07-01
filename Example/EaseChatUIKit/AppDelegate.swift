@@ -6,37 +6,100 @@
 //  Copyright (c) 2023 zjc19891106. All rights reserved.
 //
 
-import UIKit
 import EaseChatUIKit
-
+import UIKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions:
+            [UIApplicationLaunchOptionsKey: Any]?
+    ) -> Bool {
         // Override point for customization after application launch.
+        // TODO: Replace with your own AppKey before running the demo.
         let option = ChatOptions(appkey: <#AppKey#>)
         option.enableConsoleLog = true
         option.enableUserInfo = true
-        option.enableAutoSyncContacts = true
+        option.dataSyncType = [.conversations, .contacts, .joinedGroups]
         _ = ChatUIKitClient.shared.setup(option: option)
-        let redPackage = ActionSheetItem(title: "Red".chat.localize, type: .normal,tag: "Red",image: UIImage(named: "photo", in: .chatBundle, with: nil))
-        let gift = ActionSheetItem(title: "Gift".chat.localize, type: .normal,tag: "Gift",image: UIImage(named: "photo", in: .chatBundle, with: nil))
-        let music = ActionSheetItem(title: "Music".chat.localize, type: .normal,tag: "Music",image: UIImage(named: "photo", in: .chatBundle, with: nil))
-        ComponentsRegister.shared.registerCustomCellClasses(cellType: RedPackageCell.self, identifier: redPackageIdentifier)
-        ComponentsRegister.shared.registerCustomCellClasses(cellType: GiftCell.self, identifier: giftIdentifier)
-        ComponentsRegister.shared.registerCustomCellClasses(cellType: MusicCell.self, identifier: musicIdentifier)
-        
+        let redPackage = ActionSheetItem(
+            title: "Red".chat.localize,
+            type: .normal,
+            tag: "Red",
+            image: UIImage(named: "photo", in: .chatBundle, with: nil)
+        )
+        let gift = ActionSheetItem(
+            title: "Gift".chat.localize,
+            type: .normal,
+            tag: "Gift",
+            image: UIImage(named: "photo", in: .chatBundle, with: nil)
+        )
+        let music = ActionSheetItem(
+            title: "Music".chat.localize,
+            type: .normal,
+            tag: "Music",
+            image: UIImage(named: "photo", in: .chatBundle, with: nil)
+        )
+        ComponentsRegister.shared.registerCustomCellClasses(
+            cellType: RedPackageCell.self,
+            identifier: redPackageIdentifier
+        )
+        ComponentsRegister.shared.registerCustomCellClasses(
+            cellType: GiftCell.self,
+            identifier: giftIdentifier
+        )
+        ComponentsRegister.shared.registerCustomCellClasses(
+            cellType: MusicCell.self,
+            identifier: musicIdentifier
+        )
+
         Appearance.chat.inputExtendActions.append(redPackage)
         Appearance.chat.inputExtendActions.append(gift)
         Appearance.chat.inputExtendActions.append(music)
         ComponentsRegister.shared.MessageRenderEntity = MineMessageEntity.self
         ComponentsRegister.shared.Conversation = MineConversationInfo.self
-        ComponentsRegister.shared.MessageViewController = CustomMessageListController.self
+        ComponentsRegister.shared.MessageViewController =
+            CustomMessageListController.self
+        self.window = UIWindow(frame: UIScreen.main.bounds)
+        self.window?.backgroundColor = .white
+        self.window?.rootViewController = self.entryViewController()
+        self.window?.makeKeyAndVisible()
         return true
+    }
+
+    /// Decide the launch entry
+    private func entryViewController() -> UIViewController {
+        let userName =
+            UserDefaults.standard.string(forKey: "ChatUserName") ?? ""
+        let token = UserDefaults.standard.string(forKey: "ChatPassword") ?? ""
+        let hasCredentials = !userName.isEmpty && !token.isEmpty
+        if hasCredentials {
+            // There is no need to wait for a successful login.
+            // Return `MainViewController` immediately; the conversation/contact/group
+            // lists fill in via the `onDatabaseOpened` / data-sync listeners.
+            let profile = ChatUserProfile()
+            profile.id = userName
+            ChatUIKitClient.shared.login(user: profile, token: token) {
+                [weak self] error in
+                if error == nil {
+                    self?.window?.rootViewController?.showToast(
+                        toast: "login sucessfully",
+                        duration: 2
+                    )
+                } else {
+                    self?.window?.rootViewController?.showToast(
+                        toast: "login error:\(error?.errorDescription ?? "")",
+                        duration: 2
+                    )
+                }
+            }
+            return MainViewController()
+        }
+        return LoginViewController()
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -61,6 +124,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
-
 }
-

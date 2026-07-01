@@ -65,7 +65,7 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
                 let options = ChatOptions(appkey: key)
                 options.uiKitVersion = ChatUIKit_VERSION
                 options.enableUserInfo = true
-                options.enableAutoSyncContacts = true
+                options.dataSyncType = [.conversations, .contacts, .joinedGroups]
                 error = ChatClient.shared().initializeSDK(with: options)
                 self.userService = UserServiceImplement()
             }

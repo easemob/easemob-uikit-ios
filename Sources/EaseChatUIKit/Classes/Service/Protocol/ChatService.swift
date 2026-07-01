@@ -72,13 +72,16 @@ public let EaseChatUIKit_user_card_message = "userCard"
     ///   - completion: Request a callback, returning an array of message objects if successful, or an error if failed
     func loadMessages(start messageId: String,pageSize: UInt,searchMessage: Bool,completion: @escaping (ChatError?,[ChatMessage]) -> Void)
     
-    /// Load messages from server.
+    /// Load chat-thread messages from server.
+    ///
+    /// SDK 5.0 pages server history with an opaque cursor (``EMCursorResult/cursor``) held by the
+    /// service, so no anchor message id is needed here.
     /// - Parameters:
     ///   - conversationId: The id of the ChatThread.
-    ///   - messageId: The start id of the message.
+    ///   - refresh: `true` to load the first page (resets the cursor); `false` to load the next page from the cursor returned by the previous fetch.
     ///   - pageSize: The size number.
     ///   - completion: Request a callback, returning an array of message objects if successful, or an error if failed
-    func fetchChatThreadHistoryMessages(conversationId: String, start messageId: String, pageSize: UInt, completion: @escaping (ChatError?,[ChatMessage]) -> Void)
+    func fetchChatThreadHistoryMessages(conversationId: String, refresh: Bool, pageSize: UInt, completion: @escaping (ChatError?,[ChatMessage]) -> Void)
     
     
     /// Search message from database.

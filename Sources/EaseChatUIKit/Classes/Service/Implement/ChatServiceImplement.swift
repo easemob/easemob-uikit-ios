@@ -12,6 +12,18 @@ import UIKit
     
     public private(set) var to = ""
     
+    /// Opaque pagination cursor (``EMCursorResult/cursor``) for loading more server history of `to`.
+    private var historyCursor: String?
+    
+    /// Whether the server has no more older history for `to`.
+    private var historyNoMore = false
+    
+    /// Opaque pagination cursor for loading more chat-thread history from the server.
+    private var threadHistoryCursor: String?
+    
+    /// Whether the server has no more chat-thread history.
+    private var threadHistoryNoMore = false
+    
     @objc required public init(to: String) {
         super.init()
         self.to = to
@@ -24,8 +36,26 @@ import UIKit
 }
 
 extension ChatServiceImplement: ChatService {
-    public func fetchChatThreadHistoryMessages(conversationId: String, start messageId: String, pageSize: UInt, completion: @escaping (ChatError?, [ChatMessage]) -> Void) {
-        ChatClient.shared().chatManager?.asyncFetchHistoryMessages(fromServer: conversationId, conversationType: .groupChat, startMessageId: messageId, fetch: .down, pageSize: Int32(pageSize), completion: { result, error in
+    public func fetchChatThreadHistoryMessages(conversationId: String, refresh: Bool, pageSize: UInt, completion: @escaping (ChatError?, [ChatMessage]) -> Void) {
+        // SDK 5.0: the server fetch pages via an opaque cursor (``EMCursorResult/cursor``). `refresh`
+        // means "load the first page", so reset the cursor; otherwise continue from the cursor
+        // returned by the previous fetch.
+        if refresh {
+            self.threadHistoryCursor = nil
+            self.threadHistoryNoMore = false
+        } else if self.threadHistoryNoMore {
+            completion(nil, [])
+            return
+        }
+        let option = ChatFetchServerMessagesOption()
+        option.direction = .down
+        ChatClient.shared().chatManager?.fetchMessagesFromServer(by: conversationId, conversationType: .groupChat, cursor: self.threadHistoryCursor, pageSize: pageSize, option: option, completion: { [weak self] result, error in
+            if error == nil {
+                self?.threadHistoryCursor = result?.cursor
+                if (result?.cursor?.isEmpty ?? true) || (result?.list?.isEmpty ?? true) {
+                    self?.threadHistoryNoMore = true
+                }
+            }
             completion(error, result?.list ?? [])
         })
     }
@@ -56,7 +86,7 @@ extension ChatServiceImplement: ChatService {
         if let rawBody = rawMessage?.body as? ChatTextMessageBody {
             body.targetLanguages = rawBody.targetLanguages
         }
-        ChatClient.shared().chatManager?.modifyMessage(messageId, body: body, completion: { error, message in
+        ChatClient.shared().chatManager?.modifyMessage(messageId, body: body, ext: nil, completion: { error, message in
             completion(error,message)
         })
     }
@@ -153,22 +183,54 @@ extension ChatServiceImplement: ChatService {
             })
         } else {
             let type = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.type ?? .chat
-            ChatClient.shared().chatManager?.asyncFetchHistoryMessages(fromServer: self.to, conversationType: type, startMessageId: messageId, fetch: searchMessage ? .down:.up, pageSize: Int32(pageSize),completion: { result, error in
-                if error == nil,let messages = result?.list {
-                    for message in messages {
-                        guard message.senderInfo == nil else { continue }
-                        if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-                            let user = ChatUIKitContext.shared?.userCache?[message.from] as? ChatUserProfile
-                            if user?.modifyTime ?? 0 < message.timestamp {
-                                let user = ChatUserProfile()
-                                user.setValuesForKeys(dic)
-                                if user.id.isEmpty {
-                                    user.id = message.from
-                                }
-                                user.modifyTime = message.timestamp
-                                ChatUIKitContext.shared?.chatCache?[message.from] = user
-                            }
+            let option = ChatFetchServerMessagesOption()
+            option.direction = searchMessage ? .down:.up
+            let cacheSenderInfo: (ChatMessage) -> Void = { message in
+                guard message.senderInfo == nil else { return }
+                if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
+                    let user = ChatUIKitContext.shared?.userCache?[message.from] as? ChatUserProfile
+                    if user?.modifyTime ?? 0 < message.timestamp {
+                        let user = ChatUserProfile()
+                        user.setValuesForKeys(dic)
+                        if user.id.isEmpty {
+                            user.id = message.from
                         }
+                        user.modifyTime = message.timestamp
+                        ChatUIKitContext.shared?.chatCache?[message.from] = user
+                    }
+                }
+            }
+            if searchMessage {
+                // Anchored jump to a specific (locally available) message: page forward from its
+                // timestamp. The new server API has no message-id anchor, so we use the time window.
+                if let timestamp = ChatClient.shared().chatManager?.getMessageWithMessageId(messageId)?.timestamp {
+                    option.startTime = Int(timestamp) + 1
+                }
+                ChatClient.shared().chatManager?.fetchMessagesFromServer(by: self.to, conversationType: type, cursor: nil, pageSize: pageSize, option: option, completion: { result, error in
+                    if error == nil, let messages = result?.list {
+                        for message in messages { cacheSenderInfo(message) }
+                    }
+                    completion(error,result?.list ?? [])
+                })
+                return
+            }
+            // Load older page. SDK 5.0 pages via an opaque cursor returned from the previous fetch,
+            // not a message id. An empty `messageId` means the first page, so reset the cursor.
+            if messageId.isEmpty {
+                self.historyCursor = nil
+                self.historyNoMore = false
+            } else if self.historyNoMore {
+                completion(nil, [])
+                return
+            }
+            ChatClient.shared().chatManager?.fetchMessagesFromServer(by: self.to, conversationType: type, cursor: self.historyCursor, pageSize: pageSize, option: option, completion: { [weak self] result, error in
+                if error == nil {
+                    self?.historyCursor = result?.cursor
+                    if (result?.cursor?.isEmpty ?? true) || (result?.list?.isEmpty ?? true) {
+                        self?.historyNoMore = true
+                    }
+                    if let messages = result?.list {
+                        for message in messages { cacheSenderInfo(message) }
                     }
                 }
                 completion(error,result?.list ?? [])

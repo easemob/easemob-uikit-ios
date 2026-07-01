@@ -14,6 +14,10 @@ import UIKit
     
     @objc public var viewContact: ((ChatUserProfileProtocol) -> Void)?
     
+    /// Callback when the contact data-sync status changes after login.
+    /// `true` means the SDK is syncing contacts (show loading), `false` means finished (hide loading).
+    @objc public var contactSyncClosure: ((Bool) -> Void)?
+    
     public var notifySelf = false
     
     @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Array<Dictionary<String,Any>>>()) private var newFriends
@@ -169,6 +173,13 @@ extension ContactViewModel: ContactEmergencyListener {
     public func onResult(error: ChatError?, type: ContactEmergencyType, operatorId: String) {
         guard type == .fetchContacts else { return }
         self.loadAllContacts()
+    }
+    
+    public func onContactSyncingStatusChanged(syncing: Bool, error: ChatError?) {
+        self.contactSyncClosure?(syncing)
+        if !syncing {
+            self.loadAllContacts()
+        }
     }
 }
 

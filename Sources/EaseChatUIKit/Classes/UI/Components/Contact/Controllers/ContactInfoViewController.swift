@@ -184,10 +184,17 @@ import UIKit
                 }
             })
         } else {
-            let blocked = ChatClient.shared().contactManager?.getBlackList()?.contains(self.profile.id) ?? false
-            self.blockUserRefresh(blocked: blocked)
-            self.datas.first?.switchValue = blocked
-            self.menuList.reloadData()
+            ChatClient.shared().contactManager?.getBlackListFromServer(completion: { [weak self] users, error in
+                guard let `self` = self else { return }
+                if error != nil {
+                    consoleLogInfo("fetchBlockList error:\(error?.errorDescription ?? "")", type: .error)
+                } else {
+                    let blocked = users?.contains(self.profile.id) ?? false
+                    self.blockUserRefresh(blocked: blocked)
+                    self.datas.first?.switchValue = blocked
+                    self.menuList.reloadData()
+                }
+            })
         }
     }
     
@@ -239,20 +246,18 @@ import UIKit
      This method first checks if there are any locally stored contacts. If there are, it updates the `contacts` array with the locally stored contacts and calls the `setup()` method. If there are no locally stored contacts, it fetches the contacts from the server using the `getContactsFromServer(completion:)` method of the `ChatClient`'s `contactManager`. Once the contacts are fetched, it updates the `contacts` array and calls the `setup()` method.
      */
     @objc open func fetchAllContactIds() {
-        if let allContacts = ChatClient.shared().contactManager?.getContacts() {
-            if allContacts.count > 0 {
-                self.contacts = allContacts
-                self.setup()
-                self.fetchBlockList()
-            } else {
-                ChatClient.shared().contactManager?.getContactsFromServer(completion: { [weak self] contacts, error in
-                    if error == nil {
-                        self?.contacts = contacts ?? []
-                        self?.setup()
-                        self?.fetchBlockList()
-                    }
-                })
+        // SDK 5.0 removed the server fetch API. Contacts are synced by the SDK after login,
+        // so read them from the local database via the contact service. The service also queues
+        // the completion until the initial friend sync finishes.
+        self.service.contacts { [weak self] error, contacts in
+            guard let self = self else { return }
+            if let error = error {
+                consoleLogInfo("fetchAllContactIds error:\(error.errorDescription ?? "")", type: .error)
+                return
             }
+            self.contacts = contacts.map { $0.userId }
+            self.setup()
+            self.fetchBlockList()
         }
     }
     

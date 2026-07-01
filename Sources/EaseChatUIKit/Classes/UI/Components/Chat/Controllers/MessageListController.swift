@@ -689,8 +689,6 @@ extension MessageListController: MessageListDriverEventsListener {
             self.viewModel.processMessage(operation: .originalText, message: message)
         case "Delete":
             self.viewModel.processMessage(operation: .delete, message: message)
-        case "Report":
-            self.reportAction(message: message)
         case "Topic":
             self.toCreateThread(message: message)
         case "MultiSelect":
@@ -740,12 +738,6 @@ extension MessageListController: MessageListDriverEventsListener {
             DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.2) {
                 editor.editor.textView.becomeFirstResponder()
             }
-            
-        }
-    }
-    
-    @objc open func reportAction(message: ChatMessage) {
-        DialogManager.shared.showReportDialog(message: message) { error in
             
         }
     }

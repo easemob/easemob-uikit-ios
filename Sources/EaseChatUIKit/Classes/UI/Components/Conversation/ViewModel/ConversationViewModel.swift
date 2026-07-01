@@ -19,6 +19,10 @@ public let disturb_change = "EaseUIKit_do_not_disturb_changed"
     /// When conversation clicked.
     @objc public var toChat: ((IndexPath,ConversationInfo) -> Void)?
     
+    /// Callback when the conversation data-sync status changes after login.
+    /// `true` means the SDK is syncing conversations (show loading), `false` means finished (hide loading).
+    @objc public var conversationSyncClosure: ((Bool) -> Void)?
+    
     @objc public var chatId = ""
     
     public required override init() {
@@ -432,6 +436,10 @@ extension ConversationViewModel: ConversationServiceListener {
         AudioServicesAddSystemSoundCompletion(soundID, nil, nil, completion, nil)
     }
     
+    
+    public func onConversationSyncingStatusChanged(syncing: Bool, error: ChatError?) {
+        self.conversationSyncClosure?(syncing)
+    }
     
     public func onChatConversationListDidChanged(list: [ConversationInfo]) {
         if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {

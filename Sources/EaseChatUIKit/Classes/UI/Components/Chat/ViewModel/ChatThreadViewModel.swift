@@ -101,15 +101,15 @@ import UIKit
     }
     
     @objc open func loadMessages() {
-        let firstMessageId = self.driver?.dataSource.last?.messageId ?? ""
-        self.chatService?.fetchChatThreadHistoryMessages(conversationId: self.to, start: firstMessageId, pageSize: 20, completion: { [weak self] error, messages in
+        let firstLoad = (self.driver?.firstMessageId ?? "").isEmpty
+        self.chatService?.fetchChatThreadHistoryMessages(conversationId: self.to, refresh: firstLoad, pageSize: 20, completion: { [weak self] error, messages in
             if error == nil {
                 if messages.count < 20 {
                     self?.driver?.updateThreadLoadMessagesFinished(finished: true)
                 }
                 if (self?.driver?.firstMessageId ?? "").isEmpty {
                     self?.driver?.refreshMessages(messages: messages)
-                    if firstMessageId.isEmpty {
+                    if firstLoad {
                         self?.threadCreateAlert()
                     }
                 } else {

@@ -37,22 +37,20 @@ import Foundation
     
     /// Create a group.
     /// - Parameters:
+    ///   - avatar: Group's avatar.
     ///   - subject: Group's subject.
     ///   - description: Group's description.
     ///   - inviterIds: Array of user IDs of users invited by the group owner.
     ///   - message: Invitation extension
     ///   - option: ``ChatGroupOption``
     ///   - completion: The request callback contains the group object and error information. If successful, a non-empty group object will be returned. If failed, a non-empty group object will be returned.
-    func createGroup(subject: String,description: String,inviterIds: [String],message: String,option: ChatGroupOption,completion: @escaping (ChatGroup?,ChatError?) -> Void)
+    func createGroup(subject: String,avatar: String?, description: String,inviterIds: [String],message: String,option: ChatGroupOption,completion: @escaping (ChatGroup?,ChatError?) -> Void)
     
-    /// Get joined groups.
-    /// - Parameters:
-    ///   - page: Page number.
-    ///   - pageSize: Size number of the page.
-    ///   - needMemberCount: Whether the number of returned group members is included in the group object in the callback.
-    ///   - needRole: Whether the current user role of returned group in the group object in the callback.
-    ///   - completion: The request callback contains the group object and error information. If successful, a non-empty group object will be returned. If failed, a non-empty  `Array<ChatGroup>` object will be returned.
-    func getJoinedGroups(page: UInt,pageSize: UInt,needMemberCount: Bool,needRole: Bool,completion: @escaping ([ChatGroup]?,ChatError?) -> Void)
+    /// Get the joined groups from the local database.
+    /// Since SDK 5.0 removed the server fetch API, joined groups are synchronized by the SDK after login
+    /// and surfaced through the data-sync callback. Use this method to read the local data.
+    /// - Returns: The joined groups stored locally.
+    func loadLocalJoinedGroups() -> [ChatGroup]
     
     /// Fetch group info from server.
     /// - Parameters:
@@ -289,6 +287,19 @@ import Foundation
     ///   - operatorId: ID of the opeartor.
     ///   - attributes: Changed user attribute dictionary。
     @objc optional func onAttributesChangedOfGroupMember(groupId: String,userId: String,operatorId: String,attributes: Dictionary<String,String>)
+    
+    /// The local database has been opened and joined groups are queryable. Reload the local list.
+    ///
+    /// This fires before the data sync (and independently of whether the sync runs), so the joined
+    /// groups page can show cached data as soon as it is available.
+    @objc optional func onJoinedGroupsNeedReload()
+    
+    /// The joined-groups data-sync status changed after login.
+    /// You can use this callback to show or hide a loading indicator until the local data is available.
+    /// - Parameters:
+    ///   - syncing: Whether the SDK is synchronizing joined-groups data.
+    ///   - error: The error information when sync finished. It is nil when syncing or succeeded.
+    @objc optional func onJoinedGroupsSyncingStatusChanged(syncing: Bool, error: ChatError?)
     
 }
 

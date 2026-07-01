@@ -34,14 +34,6 @@ final class MainViewController: UITabBarController {
         return setting as! SettingViewController
     }()
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        if UIApplication.shared.chat.keyWindow != nil {
-            tabBar.frame = CGRect(x: 0, y: ScreenHeight-BottomBarHeight-49, width: ScreenWidth, height: BottomBarHeight+49)
-        }
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         self.tabBar.insetsLayoutMarginsFromSafeArea = false

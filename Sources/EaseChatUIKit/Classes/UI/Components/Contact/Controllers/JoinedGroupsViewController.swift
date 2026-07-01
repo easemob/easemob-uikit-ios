@@ -11,10 +11,6 @@ import UIKit
     
     private let groupService = GroupServiceImplement()
     
-    private var page = UInt(0)
-    
-    private var loadFinished = false
-    
     public private(set) var datas: [ChatUserProfileProtocol] = [] {
         didSet {
             if self.datas.count <= 0 {
@@ -39,9 +35,18 @@ import UIKit
     
     private lazy var empty: EmptyStateView = {
         EmptyStateView(frame: CGRect(x: 0, y: 0, width: self.groupList.frame.width, height: self.groupList.frame.height),emptyImage: UIImage(chatNamed: "empty"), onRetry: { [weak self] in
-            self?.requestGroups()
+            self?.loadLocalGroups()
         }).backgroundColor(.clear)
     }()
+    
+    public private(set) lazy var loadingView: LoadingView = {
+        self.createLoading()
+    }()
+    
+    /// Creates the loading view shown while joined groups are syncing after login.
+    @objc open func createLoading() -> LoadingView {
+        LoadingView(frame: self.groupList.frame)
+    }
 
 
     open override func viewDidLoad() {
@@ -49,14 +54,15 @@ import UIKit
         // Do any additional setup after loading the view.
         self.view.backgroundColor = UIColor.theme.neutralColor98
         self.navigation.title = "Groups".chat.localize
-        self.view.addSubViews([self.navigation,self.groupList])
+        self.view.addSubViews([self.navigation,self.groupList,self.loadingView])
         //Back button click of the navigation
         self.navigation.clickClosure = { [weak self] in
             self?.navigationClick(type: $0, indexPath: $1)
         }
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
-        self.requestGroups()
+        self.groupService.bindGroupEventsListener(listener: self)
+        self.loadLocalGroups()
         NotificationCenter.default.addObserver(self, selector: #selector(removeGroup(notification:)), name: Notification.Name("EaseChatUIKit_leaveGroup"), object: nil)
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: cache_update_notification), object: nil, queue: .main) { [weak self] notify in
             guard let `self` = self else { return }
@@ -86,33 +92,38 @@ import UIKit
         }
     }
     
-    @objc open func requestGroups() {
-        if !self.loadFinished {
-            self.groupService.getJoinedGroups(page: self.page, pageSize: 20, needMemberCount: true, needRole: true) { [weak self] groups, error in
-                guard let `self` = self else { return }
-                if error == nil {
-                    if let groups = groups {
-                        self.datas.append(contentsOf: groups.map({
-                            let profile = ChatUserProfile()
-                            profile.id = $0.groupId
-                            profile.nickname = $0.groupName
-                            profile.avatarURL = ChatUIKitContext.shared?.groupCache?[$0.groupId]?.avatarURL ?? ""
-                            return profile
-                        }))
-                        self.groupList.reloadData()
-                        if groups.count >= 20 {
-                            self.page += 1
-                        } else {
-                            self.loadFinished = true
-                        }
-                    }
-                } else {
-                    consoleLogInfo("requestGroups error:\(error?.errorDescription ?? "")", type: .error)
-                }
+    @objc open func loadLocalGroups() {
+        let groups = self.groupService.loadLocalJoinedGroups()
+        self.datas = groups.map({
+            let profile = ChatUserProfile()
+            profile.id = $0.groupId
+            profile.nickname = $0.groupName
+            profile.avatarURL = ChatUIKitContext.shared?.groupCache?[$0.groupId]?.avatarURL ?? ""
+            return profile
+        })
+        self.groupList.reloadData()
+    }
+
+}
+
+extension JoinedGroupsViewController: GroupServiceListener {
+    public func onJoinedGroupsNeedReload() {
+        DispatchQueue.main.async { [weak self] in
+            self?.loadLocalGroups()
+        }
+    }
+    
+    public func onJoinedGroupsSyncingStatusChanged(syncing: Bool, error: ChatError?) {
+        DispatchQueue.main.async { [weak self] in
+            guard let `self` = self else { return }
+            if syncing {
+                self.loadingView.startAnimating()
+            } else {
+                self.loadingView.stopAnimating()
+                self.loadLocalGroups()
             }
         }
     }
-
 }
 
 
@@ -144,11 +155,6 @@ extension JoinedGroupsViewController: UITableViewDelegate,UITableViewDataSource 
         }
     }
     
-    public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row > self.datas.count-3,!self.loadFinished {
-            self.requestGroups()
-        }
-    }
     
     @objc open func chatTo(group: String) {
         let vc = ComponentsRegister.shared.GroupInfoController.init(group: group) { [weak self] groupId, name in

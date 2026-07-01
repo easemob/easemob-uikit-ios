@@ -150,11 +150,9 @@ extension UserServiceImplement: ChatClientListener {
         }
     }
     
-    public func userAccountDidLogin(fromOtherDevice aDeviceName: String?) {
+    public func userAccountDidLoginFromOtherDevice(with info: LoginExtensionInfo?) {
         for response in self.responseDelegates.allObjects {
-            if let device = aDeviceName {
-                response.onUserLoginOtherDevice(device: device)
-            }
+            response.onUserLoginOtherDevice(device: info?.deviceName ?? "")
         }
     }
     
@@ -182,9 +180,21 @@ extension UserServiceImplement: ChatClientListener {
         }
     }
     
-    public func autoLoginDidCompleteWithError(_ aError: ChatError?) {
+    public func onDatabaseOpened(_ error: ChatError?, username: String) {
         for response in self.responseDelegates.allObjects {
-            response.onUserAutoLoginCompletion(error: aError)
+            response.onUserDatabaseOpened?(error: error, userId: username)
+        }
+    }
+    
+    public func syncDataStart(with type: DataSyncType) {
+        for response in self.responseDelegates.allObjects {
+            response.onUserDataSyncStart?(type: type)
+        }
+    }
+    
+    public func syncDataFinished(_ error: ChatError?, type: DataSyncType) {
+        for response in self.responseDelegates.allObjects {
+            response.onUserDataSyncFinished?(error: error, type: type)
         }
     }
 }
