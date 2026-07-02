@@ -30,12 +30,6 @@ import Foundation
     /// and surfaced through the data-sync callback. Use this method to read the local data.
     func loadExistConversations()
     
-    /// Get the session where the server is set to silent state
-    /// - Parameters:
-    ///   - conversationIds: `[String]`
-    ///   - completion: Callback. If successful, the silent state corresponding to the session ID will be returned. If failed, the failure reason will be returned.
-    func fetchSilentMode(conversationIds: [String],completion: @escaping (Dictionary<String,SilentModeResult>?,ChatError?) -> Void)
-    
     /// Set a session to silent state
     /// - Parameters:
     ///   - conversationId: The id of the conversation.
@@ -91,13 +85,6 @@ import Foundation
     ///   - message: ``ChatMessage``
     ///   - info: ``ConversationInfo``
     func onConversationLastMessageUpdate(message: ChatMessage,info: ConversationInfo)
-    
-    /// The conversation data-sync status changed after login.
-    /// You can use this callback to show or hide a loading indicator until the local data is available.
-    /// - Parameters:
-    ///   - syncing: Whether the SDK is synchronizing conversation data.
-    ///   - error: The error information when sync finished. It is nil when syncing or succeeded.
-    @objc optional func onConversationSyncingStatusChanged(syncing: Bool, error: ChatError?)
 }
 
 @objc public enum ConversationEmergencyType: UInt8 {

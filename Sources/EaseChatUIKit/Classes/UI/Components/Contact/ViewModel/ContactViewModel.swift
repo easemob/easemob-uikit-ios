@@ -58,7 +58,13 @@ import UIKit
         self.multiService?.unbindMultiDeviceListener(listener: self)
         self.multiService?.bindMultiDeviceListener(listener: self)
         self.driver?.addActionHandler(actionHandler: self)
+        ChatUIKitClient.shared.addDataSyncListener(self)
         self.loadAllContacts()
+    }
+    
+    deinit {
+        ChatUIKitClient.shared.removeDataSyncListener(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
     /// Register to monitor when certain emergencies occur
@@ -80,24 +86,7 @@ import UIKit
     }
     
     @objc open func addFriendRefreshList() {
-        DispatchQueue.main.async {
-            self.service?.contacts(completion: { [weak self] error, contacts in
-                if error == nil {
-                    if let infos = self?.filterContacts(contacts: contacts) {
-                        self?.driver?.refreshList(infos: infos)
-                        if infos.count < 7 {
-                            self?.requestDisplayInfos(ids: infos.map({ $0.id }))
-                        }
-                        DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {
-                            self?.notifySelf = false
-                        }
-                    }
-                } else {
-                    self?.driver?.occurError()
-                    consoleLogInfo("loadAllContacts error:\(error?.errorDescription ?? "")", type: .error)
-                }
-            })
-        }
+        loadAllContacts()
     }
     
     @objc open func loadAllContacts() {
@@ -105,22 +94,16 @@ import UIKit
             if self.notifySelf {
                 return
             }
-            self.service?.contacts(completion: { [weak self] error, contacts in
-                if error == nil {
-                    if let infos = self?.filterContacts(contacts: contacts) {
-                        self?.driver?.refreshList(infos: infos)
-                        if infos.count < 7 {
-                            self?.requestDisplayInfos(ids: infos.map({ $0.id }))
-                        }
-                        DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {
-                            self?.notifySelf = false
-                        }
-                    }
-                } else {
-                    self?.driver?.occurError()
-                    consoleLogInfo("loadAllContacts error:\(error?.errorDescription ?? "")", type: .error)
+            if let contacts = ChatClient.shared().contactManager?.getAllContacts() {
+                let infos = self.filterContacts(contacts: contacts)
+                self.driver?.refreshList(infos: infos)
+                if infos.count < 7 {
+                    self.requestDisplayInfos(ids: infos.map({ $0.id }))
                 }
-            })
+                DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {
+                    self.notifySelf = false
+                }
+            }
         }
     }
     
@@ -174,12 +157,24 @@ extension ContactViewModel: ContactEmergencyListener {
         guard type == .fetchContacts else { return }
         self.loadAllContacts()
     }
+}
+
+//MARK: - ChatDataSyncListener (post-login data sync dispatched by ChatUIKitClient)
+extension ContactViewModel: ChatDataSyncListener {
     
-    public func onContactSyncingStatusChanged(syncing: Bool, error: ChatError?) {
-        self.contactSyncClosure?(syncing)
-        if !syncing {
-            self.loadAllContacts()
-        }
+    public var interestedSyncType: DataSyncType { .contacts }
+    
+    public func onChatDatabaseOpened() {
+        self.loadAllContacts()
+    }
+    
+    public func onChatDataSyncStart() {
+        self.contactSyncClosure?(true)
+    }
+    
+    public func onChatDataSyncFinished(error: ChatError?) {
+        self.contactSyncClosure?(false)
+        self.loadAllContacts()
     }
 }
 

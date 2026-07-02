@@ -112,8 +112,8 @@
 "conversation_left_slide_menu_delete" = "删除";
 "conversation_left_slide_menu_pin" = "置顶";
 "conversation_left_slide_menu_unpin" = "取消置顶";
-"conversation_left_slide_menu_mute" = "接受通知";
-"conversation_left_slide_menu_unmute" = "关闭通知";
+"conversation_left_slide_menu_mute" = "关闭通知";
+"conversation_left_slide_menu_unmute" = "接受通知";
 "conversation_right_slide_menu_read" = "标记已读";
 "conversation_right_slide_menu_more" = "更多";
 

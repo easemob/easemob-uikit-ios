@@ -39,29 +39,18 @@ import UIKit
         }).backgroundColor(.clear)
     }()
     
-    public private(set) lazy var loadingView: LoadingView = {
-        self.createLoading()
-    }()
-    
-    /// Creates the loading view shown while joined groups are syncing after login.
-    @objc open func createLoading() -> LoadingView {
-        LoadingView(frame: self.groupList.frame)
-    }
-
-
     open override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         self.view.backgroundColor = UIColor.theme.neutralColor98
         self.navigation.title = "Groups".chat.localize
-        self.view.addSubViews([self.navigation,self.groupList,self.loadingView])
+        self.view.addSubViews([self.navigation,self.groupList])
         //Back button click of the navigation
         self.navigation.clickClosure = { [weak self] in
             self?.navigationClick(type: $0, indexPath: $1)
         }
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
-        self.groupService.bindGroupEventsListener(listener: self)
         self.loadLocalGroups()
         NotificationCenter.default.addObserver(self, selector: #selector(removeGroup(notification:)), name: Notification.Name("EaseChatUIKit_leaveGroup"), object: nil)
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: cache_update_notification), object: nil, queue: .main) { [weak self] notify in
@@ -104,26 +93,6 @@ import UIKit
         self.groupList.reloadData()
     }
 
-}
-
-extension JoinedGroupsViewController: GroupServiceListener {
-    public func onJoinedGroupsNeedReload() {
-        DispatchQueue.main.async { [weak self] in
-            self?.loadLocalGroups()
-        }
-    }
-    
-    public func onJoinedGroupsSyncingStatusChanged(syncing: Bool, error: ChatError?) {
-        DispatchQueue.main.async { [weak self] in
-            guard let `self` = self else { return }
-            if syncing {
-                self.loadingView.startAnimating()
-            } else {
-                self.loadingView.stopAnimating()
-                self.loadLocalGroups()
-            }
-        }
-    }
 }
 
 

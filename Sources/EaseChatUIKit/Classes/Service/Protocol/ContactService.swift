@@ -25,13 +25,6 @@ import Foundation
     /// - Parameter listener: ``ContactEmergencyListener``
     func unregisterEmergencyListener(listener: ContactEmergencyListener)
     
-    /// Get contacts from the local database.
-    /// Since SDK 5.0 removed the server fetch API, contacts are synchronized by the SDK after login.
-    /// If a sync is in progress, the completion is queued and invoked once the sync finishes.
-    /// - Parameters:
-    ///   - completion: Callback, if successful it will return a ``Contact`` array, if it fails it will return an error.
-    func contacts(completion: @escaping (ChatError?,[Contact]) -> Void)
-    
     /// Add contact.
     /// - Parameters:
     ///   - userId: The ID of the user you want to add as a friend.
@@ -129,12 +122,5 @@ import Foundation
     ///   - type: ``ContactEmergencyType``
     ///   - operatorId: The id of operator.
     func onResult(error: ChatError?,type: ContactEmergencyType,operatorId: String)
-    
-    /// The contact data-sync status changed after login.
-    /// You can use this callback to show or hide a loading indicator until the local data is available.
-    /// - Parameters:
-    ///   - syncing: Whether the SDK is synchronizing contact data.
-    ///   - error: The error information when sync finished. It is nil when syncing or succeeded.
-    @objc optional func onContactSyncingStatusChanged(syncing: Bool, error: ChatError?)
     
 }

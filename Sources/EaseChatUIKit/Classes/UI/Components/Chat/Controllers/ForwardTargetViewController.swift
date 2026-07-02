@@ -121,12 +121,7 @@ import UIKit
     }
    
     open func fetchContacts() {
-        self.contactService.contacts { [weak self] error, contacts in
-            guard let self = self else { return }
-            if let error = error {
-                consoleLogInfo("ForwardTargetViewController fetchContacts error:\(error.errorDescription ?? "")", type: .error)
-                return
-            }
+        if let contacts = ChatClient.shared().contactManager?.getAllContacts() {
             self.datas.removeAll()
             self.datas = contacts.map { self.profile(from: $0) }
             self.targetsList.reloadData()

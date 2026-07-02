@@ -27,6 +27,10 @@ import UIKit
         
     public private(set) var multiService: MultiDeviceService? = MultiDeviceServiceImplement()
     
+    private var threadHistoryCursor: String?
+    
+    private var threadHistoryNoMore = false
+    
     var handlers: NSHashTable<MessageListDriverEventsListener> = NSHashTable<MessageListDriverEventsListener>.weakObjects()
     
     @objc public required init(chatThread: GroupChatThread?) {
@@ -102,8 +106,19 @@ import UIKit
     
     @objc open func loadMessages() {
         let firstLoad = (self.driver?.firstMessageId ?? "").isEmpty
-        self.chatService?.fetchChatThreadHistoryMessages(conversationId: self.to, refresh: firstLoad, pageSize: 20, completion: { [weak self] error, messages in
+        if firstLoad {
+            self.threadHistoryCursor = nil
+            self.threadHistoryNoMore = false
+        } else if self.threadHistoryNoMore {
+            self.driver?.updateThreadLoadMessagesFinished(finished: true)
+            return
+        }
+        self.chatService?.fetchChatThreadHistoryMessages(conversationId: self.to, cursor: self.threadHistoryCursor, pageSize: 20, completion: { [weak self] error, messages, cursor in
             if error == nil {
+                self?.threadHistoryCursor = cursor
+                if (cursor?.isEmpty ?? true) || messages.isEmpty {
+                    self?.threadHistoryNoMore = true
+                }
                 if messages.count < 20 {
                     self?.driver?.updateThreadLoadMessagesFinished(finished: true)
                 }

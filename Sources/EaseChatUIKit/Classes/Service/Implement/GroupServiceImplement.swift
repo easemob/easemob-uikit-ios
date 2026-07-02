@@ -17,7 +17,6 @@ import UIKit
     public override init() {
         super.init()
         ChatClient.shared().groupManager?.add(self, delegateQueue: .main)
-        ChatClient.shared().add(self, delegateQueue: .main)
         if Appearance.chat.contentStyle.contains(.withMessageThread) {
             ChatClient.shared().threadManager?.add(self, delegateQueue: .main)
         }
@@ -25,7 +24,6 @@ import UIKit
     
     deinit {
         ChatClient.shared().groupManager?.removeDelegate(self)
-        ChatClient.shared().removeDelegate(self)
         ChatClient.shared().threadManager?.remove(self)
     }
 }
@@ -318,30 +316,3 @@ extension GroupServiceImplement: GroupChatThreadListener {
     }
 }
 
-//MARK: - ChatClientListener data sync
-extension GroupServiceImplement: ChatClientListener {
-    
-    public func onDatabaseOpened(_ error: ChatError?, username: String) {
-        // The local database opens before data sync. Joined groups are queryable now, so ask pages
-        // to reload the local list immediately instead of waiting for the sync to finish (which may
-        // be delayed or not fire).
-        guard error == nil else { return }
-        for listener in self.responseDelegates.allObjects {
-            listener.onJoinedGroupsNeedReload?()
-        }
-    }
-    
-    public func syncDataStart(with type: DataSyncType) {
-        guard type.contains(.joinedGroups) else { return }
-        for listener in self.responseDelegates.allObjects {
-            listener.onJoinedGroupsSyncingStatusChanged?(syncing: true, error: nil)
-        }
-    }
-    
-    public func syncDataFinished(_ error: ChatError?, type: DataSyncType) {
-        guard type.contains(.joinedGroups) else { return }
-        for listener in self.responseDelegates.allObjects {
-            listener.onJoinedGroupsSyncingStatusChanged?(syncing: false, error: error)
-        }
-    }
-}

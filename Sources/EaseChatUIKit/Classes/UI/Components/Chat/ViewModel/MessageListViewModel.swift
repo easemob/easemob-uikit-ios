@@ -69,6 +69,16 @@ import UIKit
     
     public private(set) var chatType = ChatType.chat
     
+    /// Opaque server-history pagination cursor. Owned here because the chat service is stateless.
+    /// Only meaningful when loading server history (``UIOptions/loadLocalHistoryMessages`` is `false`).
+    private var historyCursor: String?
+    
+    /// Whether the server has no more older history for this conversation (server history only).
+    private var historyNoMore = false
+    
+    /// Whether history is loaded from the local database (vs. the server).
+    private var loadLocalHistory: Bool { ChatUIKitClient.shared.option.option_UI.loadLocalHistoryMessages }
+    
     public private(set) weak var driver: IMessageListViewDriver?
     
     public private(set) weak var pinDriver: IPinnedMessagesContainerDriver?
@@ -135,7 +145,7 @@ import UIKit
     
     open func loadSearchMessage() {
         let searchId = self.searchMessageId
-        self.chatService?.loadMessages(start: self.searchMessageId, pageSize: 20, searchMessage: true, completion: { [weak self] error, messages in
+        self.chatService?.loadMessages(start: self.searchMessageId, cursor: nil, pageSize: 20, searchMessage: true, completion: { [weak self] error, messages, _ in
             if error == nil {
                 if let searchMessage = ChatClient.shared().chatManager?.getMessageWithMessageId(searchId) {
                     var refreshMessages = messages
@@ -149,20 +159,36 @@ import UIKit
     }
     
     @objc open func loadMessages() {
-        if let start = self.driver?.firstMessageId {
-            self.chatService?.loadMessages(start: start, pageSize: 20, searchMessage: false, completion: { [weak self] error, messages in
-                self?.driver?.endRefreshing()
-                if error == nil,messages.count > 0 {
-                    if (self?.driver?.firstMessageId ?? "").isEmpty {
-                        self?.driver?.refreshMessages(messages: messages)
-                    } else {
-                        self?.driver?.insertMessages(messages: messages)
-                    }
-                } else {
-                    consoleLogInfo("loadMessages error:\(error?.errorDescription ?? "")", type: .error)
-                }
-            })
+        guard let start = self.driver?.firstMessageId else { return }
+        // The ViewModel owns the pagination state. An empty `firstMessageId` means "load the first page",
+        // so reset the cursor; otherwise stop early if the server already reported no more history.
+        if start.isEmpty {
+            self.historyCursor = nil
+            self.historyNoMore = false
+        } else if !self.loadLocalHistory, self.historyNoMore {
+            self.driver?.endRefreshing()
+            return
         }
+        self.chatService?.loadMessages(start: start, cursor: self.historyCursor, pageSize: 20, searchMessage: false, completion: { [weak self] error, messages, cursor in
+            guard let self = self else { return }
+            self.driver?.endRefreshing()
+            // Cursor bookkeeping only applies to server history; local history is anchored by message id.
+            if !self.loadLocalHistory, error == nil {
+                self.historyCursor = cursor
+                if (cursor?.isEmpty ?? true) || messages.isEmpty {
+                    self.historyNoMore = true
+                }
+            }
+            if error == nil, messages.count > 0 {
+                if (self.driver?.firstMessageId ?? "").isEmpty {
+                    self.driver?.refreshMessages(messages: messages)
+                } else {
+                    self.driver?.insertMessages(messages: messages)
+                }
+            } else {
+                consoleLogInfo("loadMessages error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        })
     }
 
     /// Send message with text&type&extension info.
@@ -807,12 +833,14 @@ extension MessageListViewModel: ChatResponseListener {
     }
     
     public func onMessageStickiedTop(conversationId: String, messageId: String, operation: MessagePinOperation, info: MessagePinInfo) {
-        self.pinAlert(info: info,operation: operation)
         let message = ChatClient.shared().chatManager?.getMessageWithMessageId(messageId)
         if message == nil {
             ChatUIKitContext.shared?.pinnedCache?.removeValue(forKey: conversationId)
         }
-        self.pinDriver?.refresh(entities: self.showPinnedMessages())
+        if conversationId == self.to {
+            self.pinAlert(info: info,operation: operation)
+            self.pinDriver?.refresh(entities: self.showPinnedMessages())
+        }
     }
     
     public func onMessageDidReceived(message: ChatMessage) {

@@ -13,9 +13,6 @@ public let disturb_change = "EaseUIKit_do_not_disturb_changed"
 /// Bind service and driver
 @objc open class ConversationViewModel: NSObject {
     
-    /// Map to store session settings do not disturb.
-    @UserDefault("EaseChatUIKit_conversation_mute_map", defaultValue: Dictionary<String,Dictionary<String,Int>>()) public private(set) var muteMap
-    
     /// When conversation clicked.
     @objc public var toChat: ((IndexPath,ConversationInfo) -> Void)?
     
@@ -74,6 +71,7 @@ public let disturb_change = "EaseUIKit_do_not_disturb_changed"
         self.multiService?.unbindMultiDeviceListener(listener: self)
         self.multiService?.bindMultiDeviceListener(listener: self)
         self.driver?.addActionHandler(actionHandler: self)
+        ChatUIKitClient.shared.addDataSyncListener(self)
         self.loadExistLocalDataIfEmptyFetchServer()
     }
     
@@ -128,6 +126,7 @@ public let disturb_change = "EaseUIKit_do_not_disturb_changed"
         self.driver?.removeActionHandler(actionHandler: self)
         self.service?.unbindConversationEventsListener(listener: self)
         self.multiService?.unbindMultiDeviceListener(listener: self)
+        ChatUIKitClient.shared.removeDataSyncListener(self)
         self.driver = nil
         self.service = nil
         self.multiService = nil
@@ -272,14 +271,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
             if error != nil {
                 consoleLogInfo("onConversationSwipe mute:\(error?.errorDescription ?? "")", type: .error)
             } else {
-                let currentUser = ChatUIKitContext.shared?.currentUserId ?? ""
-                var conversationMap = self?.muteMap[currentUser]
-                if conversationMap != nil {
-                    conversationMap?[info.id] = 1
-                } else {
-                    conversationMap = [info.id:1]
-                }
-                self?.muteMap[currentUser] = conversationMap
+                info.doNotDisturb = true
                 self?.driver?.swipeMenuOperation(info: info, type: .mute)
                 self?.updateUnreadCount()
             }
@@ -325,14 +317,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
             if error != nil {
                 consoleLogInfo("onConversationSwipe unmute:\(error?.errorDescription ?? "")", type: .error)
             } else {
-                let currentUser = ChatUIKitContext.shared?.currentUserId ?? ""
-                var conversationMap = self.muteMap[currentUser]
-                if conversationMap != nil {
-                    conversationMap?[info.id] = 0
-                } else {
-                    conversationMap = [info.id:0]
-                }
-                self.muteMap[currentUser] = conversationMap
+                info.doNotDisturb = false
                 self.driver?.swipeMenuOperation(info: info, type: .unmute)
                 self.updateUnreadCount()
             }
@@ -437,9 +422,6 @@ extension ConversationViewModel: ConversationServiceListener {
     }
     
     
-    public func onConversationSyncingStatusChanged(syncing: Bool, error: ChatError?) {
-        self.conversationSyncClosure?(syncing)
-    }
     
     public func onChatConversationListDidChanged(list: [ConversationInfo]) {
         if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
@@ -534,13 +516,31 @@ extension ConversationViewModel: MultiDeviceListener {
             conversation.nickname = profile?.nickname ?? ""
             conversation.remark = profile?.remark ?? ""
             conversation.avatarURL = profile?.avatarURL ?? ""
-            conversation.doNotDisturb = false
-            if let silentMode = self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""]?[$0.conversationId] {
-                conversation.doNotDisturb = silentMode != 0
-            }
+            conversation.doNotDisturb = $0.disturbType != .all
             
             _ = conversation.showContent
             return conversation
+        }
+    }
+}
+
+//MARK: - ChatDataSyncListener
+extension ConversationViewModel: ChatDataSyncListener {
+    
+    public var interestedSyncType: DataSyncType { .conversations }
+    
+    public func onChatDatabaseOpened() {
+        self.service?.loadExistConversations()
+    }
+    
+    public func onChatDataSyncStart() {
+        self.conversationSyncClosure?(true)
+    }
+    
+    public func onChatDataSyncFinished(error: ChatError?) {
+        self.conversationSyncClosure?(false)
+        if error == nil {
+            self.service?.loadExistConversations()
         }
     }
 }

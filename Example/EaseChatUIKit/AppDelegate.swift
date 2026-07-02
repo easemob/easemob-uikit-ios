@@ -21,7 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ) -> Bool {
         // Override point for customization after application launch.
         // TODO: Replace with your own AppKey before running the demo.
-        let option = ChatOptions(appkey: <#AppKey#>)
+        let option = ChatOptions(appkey: "")
         option.enableConsoleLog = true
         option.enableUserInfo = true
         option.dataSyncType = [.conversations, .contacts, .joinedGroups]
@@ -64,42 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ComponentsRegister.shared.Conversation = MineConversationInfo.self
         ComponentsRegister.shared.MessageViewController =
             CustomMessageListController.self
-        self.window = UIWindow(frame: UIScreen.main.bounds)
-        self.window?.backgroundColor = .white
-        self.window?.rootViewController = self.entryViewController()
-        self.window?.makeKeyAndVisible()
         return true
-    }
-
-    /// Decide the launch entry
-    private func entryViewController() -> UIViewController {
-        let userName =
-            UserDefaults.standard.string(forKey: "ChatUserName") ?? ""
-        let token = UserDefaults.standard.string(forKey: "ChatPassword") ?? ""
-        let hasCredentials = !userName.isEmpty && !token.isEmpty
-        if hasCredentials {
-            // There is no need to wait for a successful login.
-            // Return `MainViewController` immediately; the conversation/contact/group
-            // lists fill in via the `onDatabaseOpened` / data-sync listeners.
-            let profile = ChatUserProfile()
-            profile.id = userName
-            ChatUIKitClient.shared.login(user: profile, token: token) {
-                [weak self] error in
-                if error == nil {
-                    self?.window?.rootViewController?.showToast(
-                        toast: "login sucessfully",
-                        duration: 2
-                    )
-                } else {
-                    self?.window?.rootViewController?.showToast(
-                        toast: "login error:\(error?.errorDescription ?? "")",
-                        duration: 2
-                    )
-                }
-            }
-            return MainViewController()
-        }
-        return LoginViewController()
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

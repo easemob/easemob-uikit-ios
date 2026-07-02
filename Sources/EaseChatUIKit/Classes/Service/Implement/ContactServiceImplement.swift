@@ -15,19 +15,13 @@ import UIKit
     
     @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Array<Dictionary<String,Any>>>()) private var newFriends
     
-    private var isFriendSyncing = false
-    
-    private var pendingContactCompletions = [(ChatError?, [Contact]) -> Void]()
-    
     @objc public override init() {
         super.init()
         ChatClient.shared().contactManager?.add(self, delegateQueue: .main)
-        ChatClient.shared().add(self, delegateQueue: .main)
     }
     
     deinit {
         ChatClient.shared().contactManager?.removeDelegate(self)
-        ChatClient.shared().removeDelegate(self)
     }
 }
 
@@ -57,14 +51,6 @@ extension ContactServiceImplement: ContactServiceProtocol {
         if self.responseDelegates.contains(listener) {
             self.responseDelegates.remove(listener)
         }
-    }
-    
-    public func contacts(completion: @escaping (ChatError?, [Contact]) -> Void) {
-        if self.isFriendSyncing {
-            self.pendingContactCompletions.append(completion)
-            return
-        }
-        completion(nil,ChatClient.shared().contactManager?.getAllContacts() ?? [])
     }
     
     public func addContact(userId: String, invitation: String, completion: @escaping (ChatError?, String) -> Void) {
@@ -208,39 +194,4 @@ extension ContactServiceImplement: ContactEventsListener {
     
 }
 
-//MARK: - ChatClientListener data sync
-extension ContactServiceImplement: ChatClientListener {
-    
-    public func onDatabaseOpened(_ error: ChatError?, username: String) {
-        // The local database opens before friend sync. Pages may already be visible, so trigger a
-        // local contacts reload as soon as the data is queryable instead of waiting for the sync to
-        // finish (which may be delayed or not fire). `.fetchContacts` drives the same reload path as
-        // a normal contact refresh.
-        guard error == nil else { return }
-        self.handleResult(error: nil, type: .fetchContacts, operatorId: ChatUIKitContext.shared?.currentUserId ?? "")
-    }
-    
-    public func syncDataStart(with type: DataSyncType) {
-        guard type.contains(.contacts) else { return }
-        self.isFriendSyncing = true
-        for listener in self.eventsNotifiers.allObjects {
-            listener.onContactSyncingStatusChanged?(syncing: true, error: nil)
-        }
-    }
-    
-    public func syncDataFinished(_ error: ChatError?, type: DataSyncType) {
-        guard type.contains(.contacts) else { return }
-        self.isFriendSyncing = false
-        let contacts = ChatClient.shared().contactManager?.getAllContacts() ?? []
-        let completions = self.pendingContactCompletions
-        self.pendingContactCompletions.removeAll()
-        for completion in completions {
-            completion(error, contacts)
-        }
-        self.handleResult(error: error, type: .fetchContacts, operatorId: ChatUIKitContext.shared?.currentUserId ?? "")
-        for listener in self.eventsNotifiers.allObjects {
-            listener.onContactSyncingStatusChanged?(syncing: false, error: error)
-        }
-    }
-}
 

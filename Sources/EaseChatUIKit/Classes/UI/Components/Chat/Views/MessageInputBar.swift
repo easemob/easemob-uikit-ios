@@ -40,7 +40,7 @@ import UIKit
     
     public private(set) var selectedAttachmentImage = UIImage(chatNamed: "attachmentSelected")
     
-    public private(set) var collapsedState = false
+    public private(set) var collapsedState = true
     
     var isInputActive: Bool {
         self.inputField.isFirstResponder || self.frame.minY != self.rawFrame.minY || self.frame.height != self.rawFrame.height || !(self.emoji?.isHidden ?? true) || !self.extensionMenus.isHidden
@@ -452,13 +452,15 @@ extension MessageInputBar: UITextViewDelegate {
                 return childView
             }
         }
-        self.hiddenInput()
-        self.attachment.isSelected = false
-        self.emoji?.isHidden  = true
-        self.extensionMenus.isHidden = true
-        self.extensionMenus.isUserInteractionEnabled = false
-        self.attachment.setImage(self.attachmentImage, for: .normal)
-        self.rightView.isSelected = false
+        if self.collapsedState {
+            self.hiddenInput()
+            self.attachment.isSelected = false
+            self.emoji?.isHidden  = true
+            self.extensionMenus.isHidden = true
+            self.extensionMenus.isUserInteractionEnabled = false
+            self.attachment.setImage(self.attachmentImage, for: .normal)
+            self.rightView.isSelected = false
+        }
         return super.hitTest(point, with: event)
     }
 

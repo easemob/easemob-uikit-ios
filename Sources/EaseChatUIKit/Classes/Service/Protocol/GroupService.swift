@@ -288,19 +288,6 @@ import Foundation
     ///   - attributes: Changed user attribute dictionary。
     @objc optional func onAttributesChangedOfGroupMember(groupId: String,userId: String,operatorId: String,attributes: Dictionary<String,String>)
     
-    /// The local database has been opened and joined groups are queryable. Reload the local list.
-    ///
-    /// This fires before the data sync (and independently of whether the sync runs), so the joined
-    /// groups page can show cached data as soon as it is available.
-    @objc optional func onJoinedGroupsNeedReload()
-    
-    /// The joined-groups data-sync status changed after login.
-    /// You can use this callback to show or hide a loading indicator until the local data is available.
-    /// - Parameters:
-    ///   - syncing: Whether the SDK is synchronizing joined-groups data.
-    ///   - error: The error information when sync finished. It is nil when syncing or succeeded.
-    @objc optional func onJoinedGroupsSyncingStatusChanged(syncing: Bool, error: ChatError?)
-    
 }
 
 @objc public enum GroupChatThreadEventType: UInt {

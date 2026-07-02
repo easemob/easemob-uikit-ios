@@ -11,8 +11,6 @@ import UIKit
 
 @objc public class ConversationServiceImplement: NSObject {
     
-    @UserDefault("EaseChatUIKit_conversation_mute_map", defaultValue: Dictionary<String,Dictionary<String,Int>>()) private var muteMap
-    
     private var responseDelegates: NSHashTable<ConversationServiceListener> = NSHashTable<ConversationServiceListener>.weakObjects()
     
     public private(set) var eventsNotifiers: NSHashTable<ConversationEmergencyListener> = NSHashTable<ConversationEmergencyListener>.weakObjects()
@@ -20,12 +18,10 @@ import UIKit
     public override init() {
         super.init()
         ChatClient.shared().chatManager?.add(self, delegateQueue: .main)
-        ChatClient.shared().add(self, delegateQueue: .main)
     }
     
     deinit {
         ChatClient.shared().chatManager?.remove(self)
-        ChatClient.shared().removeDelegate(self)
     }
 }
 
@@ -41,47 +37,9 @@ extension ConversationServiceImplement: ConversationService {
     
     public func loadExistConversations() {
         let conversations = ChatClient.shared().chatManager?.getAllConversations(true) ?? []
-        let notifyLocalConversations: () -> Void = { [weak self] in
-            guard let `self` = self else { return }
-            for listener in self.responseDelegates.allObjects {
-                listener.onChatConversationListDidChanged(list: self.mapper(objects: conversations))
-            }
+        for listener in self.responseDelegates.allObjects {
+            listener.onChatConversationListDidChanged(list: self.mapper(objects: conversations))
         }
-        guard !conversations.isEmpty else {
-            notifyLocalConversations()
-            return
-        }
-        self.fetchSilentMode(conversationIds: conversations.map({ $0.conversationId })) { [weak self] resultSilent, silentError in
-            if silentError == nil {
-                self?.updateMuteMap(result: resultSilent)
-            }
-            notifyLocalConversations()
-        }
-    }
-    
-    /// Update the local do-not-disturb map according to the silent mode result of conversations.
-    private func updateMuteMap(result: Dictionary<String, SilentModeResult>?) {
-        guard let result = result else { return }
-        let currentUser = ChatUIKitContext.shared?.currentUserId ?? ""
-        var conversationMap = self.muteMap[currentUser] ?? [:]
-        for (conversationId, silentResult) in result {
-            conversationMap[conversationId] = silentResult.remindType.rawValue
-        }
-        self.muteMap[currentUser] = conversationMap
-    }
-    
-    
-    public func fetchSilentMode(conversationIds: [String], completion: @escaping (Dictionary<String, SilentModeResult>?, ChatError?) -> Void) {
-        var conversations = [ChatConversation]()
-        for id in conversationIds {
-            if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(id) {
-                conversations.append(conversation)
-            }
-        }
-        ChatClient.shared().pushManager?.getSilentMode(for: conversations,completion: { [weak self] result, error in
-            self?.handleResult(error: error, type: .fetchSilent)
-            completion(result,error)
-        })
     }
     
     public func setSilentMode(conversationId: String, completion: @escaping (SilentModeResult?, ChatError?) -> Void) {
@@ -226,10 +184,7 @@ extension ConversationServiceImplement: ConversationService {
                     }
                 }
             }
-            conversation.doNotDisturb = false
-            if let silentMode = self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""]?[$0.conversationId] {
-                conversation.doNotDisturb = silentMode != 0
-            }
+            conversation.doNotDisturb = $0.disturbType != .all
             
             _ = conversation.showContent
             return conversation
@@ -325,31 +280,3 @@ extension ConversationServiceImplement: ChatEventsListener {
 
 }
 
-//MARK: - ChatClientListener data sync
-extension ConversationServiceImplement: ChatClientListener {
-    
-    public func onDatabaseOpened(_ error: ChatError?, username: String) {
-        // The local database is the earliest point at which cached conversations are queryable
-        // (it opens before data sync). Pages may already be visible by now, so load the local data
-        // immediately instead of waiting for the sync to finish (which may be delayed or not fire).
-        guard error == nil else { return }
-        self.loadExistConversations()
-    }
-    
-    public func syncDataStart(with type: DataSyncType) {
-        guard type.contains(.conversations) else { return }
-        for listener in self.responseDelegates.allObjects {
-            listener.onConversationSyncingStatusChanged?(syncing: true, error: nil)
-        }
-    }
-    
-    public func syncDataFinished(_ error: ChatError?, type: DataSyncType) {
-        guard type.contains(.conversations) else { return }
-        if error == nil {
-            self.loadExistConversations()
-        }
-        for listener in self.responseDelegates.allObjects {
-            listener.onConversationSyncingStatusChanged?(syncing: false, error: error)
-        }
-    }
-}

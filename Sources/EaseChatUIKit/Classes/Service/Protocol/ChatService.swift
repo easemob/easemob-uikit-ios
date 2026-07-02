@@ -65,23 +65,28 @@ public let EaseChatUIKit_user_card_message = "userCard"
     /// Mark all of the history messages as already read.
     func markAllMessagesAsRead()
     
-    /// Load messages from database.
+    /// Load history messages.
+    ///
+    /// When loading local history the `messageId` anchor is used; when loading
+    /// server history pagination is driven by the opaque `cursor` (``EMCursorResult/cursor``).
     /// - Parameters:
-    ///   - messageId: The start id of the message.
+    ///   - messageId: The anchor message id.
+    ///   - cursor: The opaque server pagination cursor from the previous page; pass `nil` for the first page (server history only).
     ///   - pageSize: The size number.
-    ///   - completion: Request a callback, returning an array of message objects if successful, or an error if failed
-    func loadMessages(start messageId: String,pageSize: UInt,searchMessage: Bool,completion: @escaping (ChatError?,[ChatMessage]) -> Void)
+    ///   - searchMessage: `true` to fetch a page anchored at `messageId` (used to jump to a searched message).
+    ///   - completion: Callback returning the messages and the next server cursor. The cursor is `nil` for local history or anchored searches; a nil/empty next cursor means the server has no more history.
+    func loadMessages(start messageId: String,cursor: String?,pageSize: UInt,searchMessage: Bool,completion: @escaping (ChatError?,[ChatMessage],String?) -> Void)
     
     /// Load chat-thread messages from server.
     ///
-    /// SDK 5.0 pages server history with an opaque cursor (``EMCursorResult/cursor``) held by the
-    /// service, so no anchor message id is needed here.
+    /// This method is stateless: the caller owns the pagination cursor and the "no more" flag. SDK 5.0
+    /// pages server history with an opaque cursor (``EMCursorResult/cursor``).
     /// - Parameters:
     ///   - conversationId: The id of the ChatThread.
-    ///   - refresh: `true` to load the first page (resets the cursor); `false` to load the next page from the cursor returned by the previous fetch.
+    ///   - cursor: The opaque pagination cursor from the previous page; pass `nil` to load the first page.
     ///   - pageSize: The size number.
-    ///   - completion: Request a callback, returning an array of message objects if successful, or an error if failed
-    func fetchChatThreadHistoryMessages(conversationId: String, refresh: Bool, pageSize: UInt, completion: @escaping (ChatError?,[ChatMessage]) -> Void)
+    ///   - completion: Callback returning the messages and the next cursor. A nil/empty next cursor means the server has no more history.
+    func fetchChatThreadHistoryMessages(conversationId: String, cursor: String?, pageSize: UInt, completion: @escaping (ChatError?,[ChatMessage],String?) -> Void)
     
     
     /// Search message from database.

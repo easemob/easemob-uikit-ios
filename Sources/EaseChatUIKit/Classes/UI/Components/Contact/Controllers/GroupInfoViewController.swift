@@ -59,11 +59,13 @@ import UIKit
         ChatNavigationBar(showLeftItem: true, textAlignment: .left, rightImages: self.chatGroup.isDisabled ? []:[UIImage(chatNamed: "more_detail")!] ,hiddenAvatar: true).backgroundColor(.clear)
     }
     
-    @UserDefault("EaseChatUIKit_conversation_mute_map", defaultValue: Dictionary<String,Dictionary<String,Int>>()) private var muteMap
+    public var isConversationMuted: Bool {
+        (ChatClient.shared().chatManager?.getConversationWithConvId(self.chatGroup.groupId)?.disturbType ?? .all) != .all
+    }
     
     private lazy var jsons: [[Dictionary<String,Any>]] = {
         [
-            [["title":"group_details_button_members".chat.localize,"detail":"\(self.chatGroup.occupantsCount)","withSwitch": false,"switchValue":false],["title":"contact_details_switch_donotdisturb".chat.localize,"detail":"","withSwitch": true,"switchValue":self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""]?[self.chatGroup.groupId] ?? 0 == 1],
+            [["title":"group_details_button_members".chat.localize,"detail":"\(self.chatGroup.occupantsCount)","withSwitch": false,"switchValue":false],["title":"contact_details_switch_donotdisturb".chat.localize,"detail":"","withSwitch": true,"switchValue":self.isConversationMuted],
                 ["title":"contact_details_button_clearchathistory".chat.localize,"detail":"","withSwitch": false,"switchValue":false]
          ],
          [
@@ -632,12 +634,6 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
     }
     
     @objc open func processSilentMode(name: String,isOn: Bool) {
-        if var userMap = self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""] {
-            userMap[self.chatGroup.groupId] = isOn ? 1:0
-            self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""] = userMap
-        } else {
-            self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""] = [self.chatGroup.groupId:isOn ? 1:0]
-        }
         if name == "contact_details_switch_donotdisturb".chat.localize,let groupId = self.chatGroup.groupId {
             NotificationCenter.default.post(name: Notification.Name(rawValue: disturb_change), object: nil,userInfo: ["id":groupId,"value":isOn])
         }

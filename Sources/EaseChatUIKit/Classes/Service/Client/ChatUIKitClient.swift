@@ -47,6 +47,9 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
     /// Options function wrapper.
     public var option: ChatUIKitOptions = ChatUIKitOptions()
     
+    /// Business objects that want to be notified about the data-sync lifecycle.
+    private let dataSyncListeners = NSHashTable<ChatDataSyncListener>.weakObjects()
+    
     /// Initializes the ease chat UIKit.
     /// - Parameters:
     ///   - option: The unique identifier that Chat assigns to each app.``ChatOptions``
@@ -74,7 +77,38 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
         if ChatUIKitClient.shared.option.option_UI.enableContact {
             self.contactService = ContactServiceImplement()
         }
+        ChatClient.shared().add(self, delegateQueue: .main)
         return error
+    }
+    
+    /// Registers a listener to receive the unified data-sync lifecycle events.
+    /// - Parameter listener: ``ChatDataSyncListener``
+    @objc public func addDataSyncListener(_ listener: ChatDataSyncListener) {
+        if !self.dataSyncListeners.contains(listener) {
+            self.dataSyncListeners.add(listener)
+        }
+    }
+    
+    /// Removes a previously registered data-sync listener.
+    /// - Parameter listener: ``ChatDataSyncListener``
+    @objc public func removeDataSyncListener(_ listener: ChatDataSyncListener) {
+        if self.dataSyncListeners.contains(listener) {
+            self.dataSyncListeners.remove(listener)
+        }
+    }
+    
+    /// Fans an action out to every registered listener (invoked on the main thread).
+    fileprivate func dispatchToDataSyncListeners(_ action: (ChatDataSyncListener) -> Void) {
+        for listener in self.dataSyncListeners.allObjects {
+            action(listener)
+        }
+    }
+    
+    /// Fans an action out to listeners whose interested type is contained in `type` (main thread).
+    fileprivate func dispatchToDataSyncListeners(type: DataSyncType, action: (ChatDataSyncListener) -> Void) {
+        for listener in self.dataSyncListeners.allObjects where type.contains(listener.interestedSyncType) {
+            action(listener)
+        }
     }
     
     /// Login user.
@@ -166,6 +200,23 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
         userInfo.nickname = user.nickname
         userInfo.avatarUrl = user.avatarURL
         ChatClient.shared().userInfoManager?.updateOwn(userInfo)
+    }
+}
+
+//MARK: - ChatClientListener
+extension ChatUIKitClient: ChatClientListener {
+    
+    public func onDatabaseOpened(_ error: ChatError?, username: String) {
+        guard error == nil else { return }
+        self.dispatchToDataSyncListeners { $0.onChatDatabaseOpened?() }
+    }
+    
+    public func syncDataStart(with type: DataSyncType) {
+        self.dispatchToDataSyncListeners(type: type) { $0.onChatDataSyncStart?() }
+    }
+    
+    public func syncDataFinished(_ error: ChatError?, type: DataSyncType) {
+        self.dispatchToDataSyncListeners(type: type) { $0.onChatDataSyncFinished?(error: error) }
     }
 }
 

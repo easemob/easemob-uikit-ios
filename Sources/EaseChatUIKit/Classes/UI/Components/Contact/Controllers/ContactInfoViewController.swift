@@ -32,7 +32,9 @@ import UIKit
     
     private var contacts = [String]()
     
-    @UserDefault("EaseChatUIKit_conversation_mute_map", defaultValue: Dictionary<String,Dictionary<String,Int>>()) public private(set) var muteMap
+    public var isConversationMuted: Bool {
+        (ChatClient.shared().chatManager?.getConversationWithConvId(self.profile.id)?.disturbType ?? .all) != .all
+    }
     
     @UserDefault("EaseChatUIKit_contact_block_list_exist", defaultValue: Dictionary<String,Bool>()) public private(set) var blockListExist
     
@@ -47,7 +49,7 @@ import UIKit
             ["title":"contact_details_switch_donotdisturb".chat.localize,
              "detail":"",
              "withSwitch": true,
-             "switchValue":self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
+             "switchValue":self.isConversationMuted],
             ["title":"contact_details_switch_block".chat.localize,
              "detail":"",
              "withSwitch": true,
@@ -60,7 +62,7 @@ import UIKit
             ["title":"contact_details_switch_donotdisturb".chat.localize,
              "detail":"",
              "withSwitch": true,
-             "switchValue":self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
+             "switchValue":self.isConversationMuted],
             ["title":"contact_details_button_clearchathistory".chat.localize,
              "detail":"",
              "withSwitch": false,
@@ -205,7 +207,7 @@ import UIKit
             ["title":"contact_details_switch_donotdisturb".chat.localize,
              "detail":"",
              "withSwitch": true,
-             "switchValue":self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
+             "switchValue":self.isConversationMuted],
             ["title":"contact_details_switch_block".chat.localize,
              "detail":"",
              "withSwitch": true,
@@ -225,7 +227,7 @@ import UIKit
             ["title":"contact_details_switch_donotdisturb".chat.localize,
              "detail":"",
              "withSwitch": true,
-             "switchValue":self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""]?[self.profile.id] ?? 0 == 1],
+             "switchValue":self.isConversationMuted],
             ["title":"contact_details_button_clearchathistory".chat.localize,
              "detail":"",
              "withSwitch": false,
@@ -246,16 +248,8 @@ import UIKit
      This method first checks if there are any locally stored contacts. If there are, it updates the `contacts` array with the locally stored contacts and calls the `setup()` method. If there are no locally stored contacts, it fetches the contacts from the server using the `getContactsFromServer(completion:)` method of the `ChatClient`'s `contactManager`. Once the contacts are fetched, it updates the `contacts` array and calls the `setup()` method.
      */
     @objc open func fetchAllContactIds() {
-        // SDK 5.0 removed the server fetch API. Contacts are synced by the SDK after login,
-        // so read them from the local database via the contact service. The service also queues
-        // the completion until the initial friend sync finishes.
-        self.service.contacts { [weak self] error, contacts in
-            guard let self = self else { return }
-            if let error = error {
-                consoleLogInfo("fetchAllContactIds error:\(error.errorDescription ?? "")", type: .error)
-                return
-            }
-            self.contacts = contacts.map { $0.userId }
+        if let contacts = ChatClient.shared().contactManager?.getContacts() {
+            self.contacts = contacts
             self.setup()
             self.fetchBlockList()
         }
@@ -610,12 +604,6 @@ extension ContactInfoViewController: UITableViewDelegate,UITableViewDataSource {
     }
     
     @objc open func processSilentMode(name: String,isOn: Bool) {
-        if var userMap = self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""] {
-            userMap[self.profile.id] = isOn ? 1:0
-            self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""] = userMap
-        } else {
-            self.muteMap[ChatUIKitContext.shared?.currentUserId ?? ""] = [self.profile.id:isOn ? 1:0]
-        }
         if name == "contact_details_switch_donotdisturb".chat.localize {
             NotificationCenter.default.post(name: Notification.Name(rawValue: disturb_change), object: nil,userInfo: ["id":self.profile.id,"value":isOn])
         }
