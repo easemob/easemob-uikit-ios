@@ -69,25 +69,20 @@ import UIKit
     }
     
     @objc public func loadAllBlockUsers() {
-        ChatClient.shared().contactManager?.getBlackListFromServer(completion: { [weak self] users, error in
-            guard let `self` = self else { return }
-            if error == nil, let users = users {
-                let infos = users.map({
-                    let profile = ChatUserProfile()
-                    profile.id = $0
-                    profile.nickname = ChatUIKitContext.shared?.userCache?[$0]?.nickname ?? ""
-                    profile.avatarURL = ChatUIKitContext.shared?.userCache?[$0]?.avatarURL ?? ""
-                    profile.remark = ChatUIKitContext.shared?.userCache?[$0]?.remark ?? ""
-                    return profile
-                })
-                self.rawDatas.removeAll()
-                self.searchResults.removeAll()
-                self.rawDatas = infos
-            } else if let error = error {
-                consoleLogInfo("loadAllBlockUsers error:\(error.errorDescription ?? "")", type: .error)
-            }
-            self.tableView.reloadData()
-        })
+        if let users = ChatClient.shared().contactManager?.getBlackList() {
+            let infos = users.map({
+                let profile = ChatUserProfile()
+                profile.id = $0
+                profile.nickname = ChatUIKitContext.shared?.userCache?[$0]?.nickname ?? ""
+                profile.avatarURL = ChatUIKitContext.shared?.userCache?[$0]?.avatarURL ?? ""
+                profile.remark = ChatUIKitContext.shared?.userCache?[$0]?.remark ?? ""
+                return profile
+            })
+            self.rawDatas.removeAll()
+            self.searchResults.removeAll()
+            self.rawDatas = infos
+        }
+        self.tableView.reloadData()
     }
 
     // MARK: - Table view data source

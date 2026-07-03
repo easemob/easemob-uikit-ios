@@ -271,14 +271,14 @@ import Foundation
     /// When some user joined group.
     /// - Parameters:
     ///   - groupId: ID of the group.
-    ///   - userId: ID of the user.
-    @objc optional func onUserJoinedGroup(groupId: String,userId: String)
+    ///   - userIds: ID of the users.
+    @objc optional func onUserJoinedGroup(groupId: String,userIds: [String])
     
     /// When some user left group.
     /// - Parameters:
     ///   - groupId: ID of the group.
-    ///   - userId: ID of the user.
-    @objc optional func onUserLeaveGroup(groupId: String,userId: String)
+    ///   - userIds: ID of the users.
+    @objc optional func onUserLeaveGroup(groupId: String,userIds: [String])
     
     /// When attributes changed of some group member.
     /// - Parameters:

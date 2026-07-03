@@ -270,15 +270,15 @@ extension GroupServiceImplement: GroupEventsListener {
         }
     }
     
-    public func userDidJoin(_ aGroup: ChatGroup, user aUsername: String) {
+    public func userDidJoin(_ group: ChatGroup, users userIds: [String]) {
         for listener in self.responseDelegates.allObjects {
-            listener.onUserJoinedGroup?(groupId: aGroup.groupId, userId: aUsername)
+            listener.onUserJoinedGroup?(groupId: group.groupId, userIds: userIds)
         }
     }
     
-    public func userDidLeave(_ aGroup: ChatGroup, user aUsername: String) {
+    public func userDidLeave(_ group: ChatGroup, users userIds: [String]) {
         for listener in self.responseDelegates.allObjects {
-            listener.onUserLeaveGroup?(groupId: aGroup.groupId, userId: aUsername)
+            listener.onUserLeaveGroup?(groupId: group.groupId, userIds: userIds)
         }
     }
     

@@ -186,17 +186,10 @@ import UIKit
                 }
             })
         } else {
-            ChatClient.shared().contactManager?.getBlackListFromServer(completion: { [weak self] users, error in
-                guard let `self` = self else { return }
-                if error != nil {
-                    consoleLogInfo("fetchBlockList error:\(error?.errorDescription ?? "")", type: .error)
-                } else {
-                    let blocked = users?.contains(self.profile.id) ?? false
-                    self.blockUserRefresh(blocked: blocked)
-                    self.datas.first?.switchValue = blocked
-                    self.menuList.reloadData()
-                }
-            })
+            let blocked = ChatClient.shared().contactManager?.getBlackList()?.contains(self.profile.id) ?? false
+            self.blockUserRefresh(blocked: blocked)
+            self.datas.first?.switchValue = blocked
+            self.menuList.reloadData()
         }
     }
     

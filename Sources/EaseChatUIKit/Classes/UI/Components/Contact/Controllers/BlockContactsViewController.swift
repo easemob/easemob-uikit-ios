@@ -104,13 +104,7 @@ open class BlockContactsViewController: UIViewController {
                 }
             })
         } else {
-            ChatClient.shared().contactManager?.getBlackListFromServer(completion: { [weak self] users, error in
-                if error != nil {
-                    consoleLogInfo("fetchBlockList error:\(error?.errorDescription ?? "")", type: .error)
-                } else {
-                    self?.mirrorIdsToProfiles(users: users)
-                }
-            })
+            self.mirrorIdsToProfiles(users: ChatClient.shared().contactManager?.getBlackList())
         }
     }
     
