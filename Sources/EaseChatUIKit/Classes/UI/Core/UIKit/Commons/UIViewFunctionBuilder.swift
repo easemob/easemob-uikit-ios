@@ -59,7 +59,7 @@ extension UIView {
 extension UIScrollView {
     
     func isVisibleOnScreen() -> Bool {
-        guard let superview = self.superview else { return false }
+        guard let _ = self.superview else { return false }
         
         let scrollViewFrame = self.convert(self.bounds, to: nil)
         let visibleFrame = UIScreen.main.bounds

@@ -348,7 +348,7 @@ import UIKit
     @objc open func alreadyChat() {
         ChatClient.shared().chatManager?.ackConversationRead(self.profile.id)
         if let count = self.navigationController?.viewControllers.count {
-            if let previousViewController = self.navigationController?.viewControllers[safe: count - 2] as? MessageListController {
+            if let _ = self.navigationController?.viewControllers[safe: count - 2] as? MessageListController {
                 if let root = self.navigationController?.viewControllers[safe: count - 3] {
                     self.navigationController?.popToViewController(root, animated: true)
                     let vc = ComponentsRegister.shared.MessageViewController.init(conversationId: self.profile.id)

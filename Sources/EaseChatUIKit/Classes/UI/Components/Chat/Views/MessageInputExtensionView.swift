@@ -211,7 +211,6 @@ extension MessageInputExtensionView: ThemeSwitchProtocol {
     
     open override func layoutSubviews() {
         super.layoutSubviews()
-        let itemWidth = min(self.frame.width, self.frame.height)
         self.cover.frame = CGRect(x: 0, y: 0, width: 64, height: 64)
         self.icon.frame = CGRect(x: self.cover.frame.width / 2.0 - 16, y: self.cover.frame.height / 2.0 - 16, width: 32, height: 32)
         self.name.frame = CGRect(x: 0, y: self.cover.frame.maxY + 8, width: self.frame.width, height: 18)

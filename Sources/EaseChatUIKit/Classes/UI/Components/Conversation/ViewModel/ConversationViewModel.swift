@@ -173,9 +173,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
                 guard let `self` = self else { return }
                 let profiles = await ChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: userIds) ?? []
                 self.cacheUser(profiles: profiles)
-                DispatchQueue.main.async {
-                    self.renderDriver(infos: profiles)
-                }
+                self.renderDriver(infos: profiles)
             }
         }
         if ChatUIKitContext.shared?.groupProfileProvider != nil {
@@ -184,9 +182,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
                 guard let `self` = self else { return }
                 let profiles = await ChatUIKitContext.shared?.groupProfileProvider?.fetchGroupProfiles(profileIds: groupIds) ?? []
                 self.cacheGroup(profiles: profiles)
-                DispatchQueue.main.async {
-                    self.driver?.refreshProfiles(infos: profiles)
-                }
+                self.driver?.refreshProfiles(infos: profiles)
             }
         }
         if ChatUIKitContext.shared?.userProfileProviderOC != nil {

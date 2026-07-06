@@ -106,7 +106,7 @@ open class PullRefresher: UIView {
         var bounds = frame
         bounds.origin.y = 0
         let animator = Animator(frame: bounds)
-        self.init(frame: frame, animator: animator as! PullRefresherDelegate)
+        self.init(frame: frame, animator: animator as PullRefresherDelegate)
         self.action = action;
         addSubview(animator.animatorView)
     }

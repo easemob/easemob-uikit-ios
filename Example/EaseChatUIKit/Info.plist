@@ -23,7 +23,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string></string>
+	<string>For usage</string>
 	<key>NSFileProviderDomainUsageDescription</key>
 	<string>For usage</string>
 	<key>NSMicrophoneUsageDescription</key>

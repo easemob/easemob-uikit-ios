@@ -999,14 +999,7 @@ extension MessageListViewModel: GroupServiceListener {
     
     
     public func onCurrentUserLeft(groupId: String, reason: GroupLeaveReason) {
-        switch reason {
-        case .destroyed:
-            ""
-        case .beRemoved:
-            ""
-        default: break
-            
-        }
+
     }
     
     
@@ -1014,11 +1007,11 @@ extension MessageListViewModel: GroupServiceListener {
         
     }
     
-    public func onUserJoinedGroup(groupId: String, userId: String) {
+    public func onUserJoinedGroup(groupId: String, userIds: [String]) {
         
     }
     
-    public func onUserLeaveGroup(groupId: String, userId: String) {
+    public func onUserLeaveGroup(groupId: String, userIds: [String]) {
         
     }
         
@@ -1070,7 +1063,7 @@ extension MessageListViewModel: GroupChatThreadEventListener {
     
     public func onAttributesChangedOfGroupMember(groupId: String, userId: String, operatorId: String, attributes: Dictionary<String, String>) {
         if userId != ChatUIKitContext.shared?.currentUserId ?? "" {
-            ChatClient.shared().chatManager?.getConversationWithConvId(groupId)?.loadMessages(withKeyword: "", timestamp: Int64(Date().timeIntervalSince1970*1000), count: 1, fromUser: userId, searchDirection: .up, scope: .content, completion: { messages, error in
+            ChatClient.shared().chatManager?.getConversationWithConvId(groupId)?.loadMessages(withKeyword: "", timestamp: Int64(Date().timeIntervalSince1970*1000), count: 1, fromUsers: [userId], searchDirection: .up, scope: .content, completion: { messages, error in
                 if error === nil,let message = messages?.first {
                     message.ext?["remark"] = attributes["nickName"]
                     ChatClient.shared().chatManager?.update(message)
