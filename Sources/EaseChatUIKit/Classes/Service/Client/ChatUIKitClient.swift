@@ -86,13 +86,20 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
         ChatUIKitContext.shared?.currentUser = user
         ChatUIKitContext.shared?.chatCache?[user.id] = user
         ChatUIKitContext.shared?.userCache?[user.id] = user
-        updateUserInfoIfNeed(user: user)
         if self.userService != nil {
-            self.userService?.login(userId: user.id, token: token, completion: { success, error in
+            self.userService?.login(userId: user.id, token: token, completion: {[weak self] success, error in
+                if error == nil {
+                    self?.updateUserInfoIfNeed(user: user)
+                }
                 completion(error)
             })
         } else {
-            self.userService = UserServiceImplement(userInfo: user, token: token, completion: completion)
+            self.userService = UserServiceImplement(userInfo: user, token: token, completion: {[weak self] error in
+                if error == nil {
+                    self?.updateUserInfoIfNeed(user: user)
+                }
+                completion(error)
+            })
         }
     }
     
