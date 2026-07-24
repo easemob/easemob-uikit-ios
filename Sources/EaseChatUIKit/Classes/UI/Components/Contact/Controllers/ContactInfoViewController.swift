@@ -24,7 +24,6 @@ import UIKit
     
     public let service = ContactServiceImplement()
     
-    public let conversationService = ConversationServiceImplement()
     
     public private(set) var profile: ChatUserProfileProtocol = ChatUserProfile()
     
@@ -543,7 +542,9 @@ extension ContactInfoViewController: UITableViewDelegate,UITableViewDataSource {
     
     @objc open func operateDisturb(isOn: Bool,name: String) {
         if isOn {
-            self.conversationService.setSilentMode(conversationId: self.profile.id) { [weak self] result, error in
+            let params = SilentModeParam(paramType: .remindType)
+            params.remindType = .none
+            ChatClient.shared().pushManager?.setSilentModeForConversation(self.profile.id, conversationType: .chat, params: params) { [weak self] result, error in
                 guard let `self` = self else { return }
                 if error == nil {
                     self.processSilentMode(name: name, isOn: isOn)
@@ -553,7 +554,7 @@ extension ContactInfoViewController: UITableViewDelegate,UITableViewDataSource {
                 }
             }
         } else {
-            self.conversationService.clearSilentMode(conversationId: self.profile.id) { [weak self] result, error in
+            ChatClient.shared().pushManager?.clearRemindType(forConversation: self.profile.id, conversationType: .chat) {[weak self] result, error in
                 guard let `self` = self else { return }
                 if error == nil {
                     self.processSilentMode(name: name, isOn: isOn)
