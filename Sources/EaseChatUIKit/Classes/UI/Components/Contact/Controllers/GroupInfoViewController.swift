@@ -17,9 +17,7 @@ import UIKit
     public var chatGroup = ChatGroup()
     
     public private(set) var service: GroupService = GroupServiceImplement()
-    
-    public private(set) var conversationService = ConversationServiceImplement()
-    
+        
     /**
      A private array of `ActionSheetItem` objects representing the owner options in the group info view controller.
      Each `ActionSheetItem` contains a title, type, and tag.
@@ -609,7 +607,9 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
     @objc open func switchChanged(isOn: Bool, indexPath: IndexPath) {
         if let name = self.datas[safe: indexPath.section]?[safe: indexPath.row]?.title {
             if isOn {
-                self.conversationService.setSilentMode(conversationId: self.chatGroup.groupId) { [weak self] result, error in
+                let params = SilentModeParam(paramType: .remindType)
+                params.remindType = .mentionOnly
+                ChatClient.shared().pushManager?.setSilentModeForConversation(self.chatGroup.groupId, conversationType: .groupChat, params: params) { [weak self] result, error in
                     guard let `self` = self else { return }
                     if error == nil {
                         self.processSilentMode(name: name, isOn: isOn)
@@ -619,7 +619,7 @@ extension GroupInfoViewController: UITableViewDelegate,UITableViewDataSource {
                     }
                 }
             } else {
-                self.conversationService.clearSilentMode(conversationId: self.chatGroup.groupId) { [weak self] result, error in
+                ChatClient.shared().pushManager?.clearRemindType(forConversation: self.chatGroup.groupId, conversationType: .groupChat) { [weak self] result, error in
                     guard let `self` = self else { return }
                     if error == nil {
                         self.processSilentMode(name: name, isOn: isOn)
