@@ -19,7 +19,7 @@ extension UIButton {
     }
 
     private struct AssociatedKeys {
-        static var hitTestEdgeInsets = "hitTestEdgeInsets"
+        static var hitTestEdgeInsets: UInt8 = 0
     }
     
     open override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {

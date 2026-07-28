@@ -291,9 +291,7 @@ extension ContactViewModel: ContactListActionEventsDelegate {
                 guard let `self` = self else { return }
                 let profiles = await ChatUIKitContext.shared?.userProfileProvider?.fetchProfiles(profileIds: ids) ?? []
                 self.cacheProfiles(profiles: profiles)
-                DispatchQueue.main.async {
-                    self.driver?.refreshProfiles(infos: profiles)
-                }
+                self.driver?.refreshProfiles(infos: profiles)
             }
         }
         if ChatUIKitContext.shared?.userProfileProviderOC != nil {

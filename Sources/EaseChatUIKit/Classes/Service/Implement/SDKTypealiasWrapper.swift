@@ -14,7 +14,7 @@ import Foundation
  */
 
 #if canImport(HyphenateChat)
-import HyphenateChat
+@_exported import HyphenateChat
 public typealias ChatClient = EMClient
 public typealias ChatClientListener = EMClientDelegate
 public typealias ChatEventsListener = EMChatManagerDelegate

@@ -269,7 +269,9 @@ extension ConversationList: IConversationListDriver {
                 }
             }
         }
-        self.reloadData()
+        DispatchQueue.main.async { [weak self] in
+            self?.reloadData()
+        }
     }
     
     public func swipeMenuOperation(info: ConversationInfo, type: UIContextualActionType) {

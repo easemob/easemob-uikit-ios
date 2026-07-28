@@ -87,7 +87,7 @@ extension ChatServiceImplement: ChatService {
     
     public func send(message: ChatMessage, completion: @escaping (ChatError?, ChatMessage?) -> Void) {
         let message = message
-        ChatClient.shared().chatManager?.send(message, progress: nil, completion: { [weak self] message, error in
+        ChatClient.shared().chatManager?.send(message, progress: nil, completion: { message, error in
 //            self?.pushSendNotification(message: message)
             completion(error,message)
         })
@@ -204,7 +204,7 @@ extension ChatServiceImplement: ChatService {
     }
     
     public func searchMessage(keyword: String, pageSize: UInt, userId: String, completion: @escaping (ChatError?, [ChatMessage]) -> Void) {
-        ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.loadMessages(withKeyword: keyword, timestamp: -1, count: Int32(pageSize), fromUser: userId, searchDirection: .up, scope: .content, completion: { messages, error in
+        ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.loadMessages(withKeyword: keyword, timestamp: -1, count: Int32(pageSize), fromUsers: [userId], searchDirection: .up, scope: .content, completion: { messages, error in
             completion(error,messages ?? [])
         })
     }

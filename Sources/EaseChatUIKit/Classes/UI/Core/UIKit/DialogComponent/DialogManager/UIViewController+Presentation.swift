@@ -45,7 +45,7 @@ public extension UIViewController {
                 }
                 next = next?.superview
             }
-        } else if let view = view as? UIBarButtonItem {
+        } else if let _ = view as? UIBarButtonItem {
             var window = UIApplication.shared.chat.keyWindow
             if window?.windowLevel != .normal {
                 let windows = UIApplication.shared.windows
@@ -79,7 +79,7 @@ public extension UIViewController {
 }
 
 // MARK: -  UIViewControllerTransitioningDelegate
-extension UIViewController: UIViewControllerTransitioningDelegate {
+extension UIViewController: @retroactive UIViewControllerTransitioningDelegate {
     public func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
         return PresentationController(presentedViewController: presented, presenting: presenting)
     }

@@ -108,15 +108,11 @@ import UIKit
     }
     
     @objc public convenience init(items:[ActionSheetItemProtocol],withHeader: UIView? = nil,action: @escaping (ActionSheetItemProtocol) -> Void) {
-        let messageHeight = 0
         var contentHeight = 11+Int(Appearance.actionSheetRowHeight)*items.count+Int(Appearance.actionSheetRowHeight)+8+Int(BottomBarHeight)
         var itemCount = items.count
         if CGFloat(contentHeight) > ScreenHeight/2.0 {
             itemCount = items.count-2
             contentHeight = 11+Int(Appearance.actionSheetRowHeight)*itemCount+Int(Appearance.actionSheetRowHeight)+8+Int(BottomBarHeight)
-        }
-        if messageHeight > 0 {
-            contentHeight += (Int(messageHeight)+20)
         }
         if CGFloat(contentHeight) > ScreenHeight*(2/3.0) {
             contentHeight = Int(ScreenHeight*(2/3.0))

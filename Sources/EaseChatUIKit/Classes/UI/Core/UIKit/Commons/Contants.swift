@@ -20,7 +20,7 @@ public let edgeZero: UIEdgeInsets = .zero
 public let BottomBarHeight = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0
 
 /// The height of the status bar.
-public let StatusBarHeight :CGFloat = UIApplication.shared.statusBarFrame.height
+public let StatusBarHeight: CGFloat = UIApplication.shared.chat.keyWindow?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
 
 /// The height of the navigation bar, which includes the status bar.
 public let NavigationHeight :CGFloat = StatusBarHeight + 44

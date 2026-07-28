@@ -134,7 +134,7 @@ extension JoinedGroupsViewController: UITableViewDelegate,UITableViewDataSource 
     }
     
     @objc open func refreshGroup(groupId: String,name: String) {
-        for (index,profile) in self.datas.enumerated() {
+        for (_,profile) in self.datas.enumerated() {
             if profile.id == groupId {
                 profile.nickname = name
                 break
