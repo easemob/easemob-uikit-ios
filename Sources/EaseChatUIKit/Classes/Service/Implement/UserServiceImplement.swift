@@ -39,10 +39,14 @@ public var saveIdentifier: String {
     
     @objc public func registerEventListener() {
         ChatClient.shared().add(self, delegateQueue: nil)
+        if ChatClient.shared().options.enableUserInfo {
+            ChatClient.shared().userInfoManager?.add(self, delegateQueue: nil)
+        }
     }
     
     @objc public func removeEventListener() {
         ChatClient.shared().removeDelegate(self)
+        ChatClient.shared().userInfoManager?.remove(self)
     }
     
     deinit {
@@ -111,10 +115,13 @@ extension UserServiceImplement:UserServiceProtocol {
         }
     }
     
-    private func convertToUser(info: UserInfo) -> ChatUserProfile {
+    fileprivate func convertToUser(info: UserInfo) -> ChatUserProfile {
         let user = ChatUserProfile()
         user.id = info.userId ?? ""
         user.nickname = info.nickname ?? ""
+        if let remark = ChatClient.shared().contactManager?.getContact(user.id)?.remark {
+            user.remark = remark
+        }
         user.avatarURL = info.avatarUrl ?? ""
         return user
     }
@@ -130,7 +137,6 @@ extension UserServiceImplement:UserServiceProtocol {
 }
 
 //MARK: - ChatClientDelegate
-//MARK: - ChatClientDelegate
 extension UserServiceImplement: ChatClientListener {
     public func tokenDidExpire(_ aErrorCode: ChatErrorCode) {
         for response in self.responseDelegates.allObjects {
@@ -144,11 +150,9 @@ extension UserServiceImplement: ChatClientListener {
         }
     }
     
-    public func userAccountDidLogin(fromOtherDevice aDeviceName: String?) {
+    public func userAccountDidLoginFromOtherDevice(with info: LoginExtensionInfo?) {
         for response in self.responseDelegates.allObjects {
-            if let device = aDeviceName {
-                response.onUserLoginOtherDevice(device: device)
-            }
+            response.onUserLoginOtherDevice(device: info?.deviceName ?? "")
         }
     }
     
@@ -176,10 +180,32 @@ extension UserServiceImplement: ChatClientListener {
         }
     }
     
-    public func autoLoginDidCompleteWithError(_ aError: ChatError?) {
+    public func onDatabaseOpened(_ error: ChatError?, username: String) {
         for response in self.responseDelegates.allObjects {
-            response.onUserAutoLoginCompletion(error: aError)
+            response.onUserDatabaseOpened?(error: error, userId: username)
         }
+    }
+    
+    public func syncDataStart(with type: DataSyncType) {
+        for response in self.responseDelegates.allObjects {
+            response.onUserDataSyncStart?(type: type)
+        }
+    }
+    
+    public func syncDataFinished(_ error: ChatError?, type: DataSyncType) {
+        for response in self.responseDelegates.allObjects {
+            response.onUserDataSyncFinished?(error: error, type: type)
+        }
+    }
+}
+
+extension UserServiceImplement: UserInfoManagerDelegate {
+    public func onSelfUserInfoUpdate(_ aUserInfo: UserInfo) {
+        ChatUIKitContext.shared?.updateChatAndUserTypeCaches(profiles: [self.convertToUser(info: aUserInfo)])
+    }
+    
+    public func onUserInfoUpdate(_ aUserInfos: [String : UserInfo]) {
+        ChatUIKitContext.shared?.updateChatAndUserTypeCaches(profiles: aUserInfos.values.map { self.convertToUser(info: $0) })
     }
 }
 

@@ -77,7 +77,7 @@ import Combine
 extension ImageView {
     public func loadGif(from path: String) {
         DispatchQueue.global().async {
-            let cachedKey = NSString(string: path)
+//            let cachedKey = NSString(string: path)
             
             if let cachedImage = ImageCacheManager.shared.image(for: path) {
                 DispatchQueue.main.async {

@@ -83,18 +83,24 @@ import UIKit
                 if group.owner == ChatUIKitContext.shared?.currentUserId ?? "" {
                     ChatClient.shared().threadManager?.getChatThreadsFromServer(withParentId: self.groupId, cursor: self.cursor, pageSize: self.pageSize, completion: { [weak self] result, error in
                         guard let `self` = self else { return }
-                        self.loadingView.stopAnimating()
+                        DispatchQueue.main.async {
+                            self.loadingView.stopAnimating()
+                        }
                         self.handleThreadRequest(result: result, error: error)
                     })
                 } else {
                     ChatClient.shared().threadManager?.getJoinedChatThreadsFromServer(withParentId: self.groupId, cursor: self.cursor, pageSize: self.pageSize, completion: { [weak self] result, error in
                         guard let `self` = self else { return }
-                        self.loadingView.stopAnimating()
+                        DispatchQueue.main.async {
+                            self.loadingView.stopAnimating()
+                        }
                         self.handleThreadRequest(result: result, error: error)
                     })
                 }
             } else {
-                self.loadingView.stopAnimating()
+                DispatchQueue.main.async {
+                    self.loadingView.stopAnimating()
+                }
                 consoleLogInfo("requestGroupDetail error:\(error?.errorDescription ?? "")", type: .debug)
             }
         })

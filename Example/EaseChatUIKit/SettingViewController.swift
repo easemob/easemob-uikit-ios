@@ -36,6 +36,21 @@ class SettingViewController: UIViewController {
         } else {
             self.avatar.image = Appearance.avatarPlaceHolder
         }
+        // The storyboard pins the logout button with a fixed frame, so on taller screens / Mac it ends
+        // up underneath the tab bar. Re-anchor it above the safe-area bottom (which already accounts
+        // for the tab bar height) so it's never obscured.
+        self.logout.translatesAutoresizingMaskIntoConstraints = false
+        self.options.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            self.logout.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
+            self.logout.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            self.logout.widthAnchor.constraint(equalToConstant: 255),
+            self.logout.heightAnchor.constraint(equalToConstant: 52),
+            self.options.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
+            self.options.bottomAnchor.constraint(equalTo: self.logout.topAnchor, constant: -20),
+            self.options.widthAnchor.constraint(equalToConstant: 160),
+            self.options.heightAnchor.constraint(equalToConstant: 35)
+        ])
     }
     
     @IBAction func optionsAction(_ sender: UIButton) {

@@ -29,7 +29,6 @@
 "barrage_long_press_menu_delete" = "Delete";
 "barrage_long_press_menu_recall" = "Recall";
 "barrage_long_press_menu_reply" = "Reply";
-"barrage_long_press_menu_report" = "Report";
 "barrage_long_press_menu_forward" = "Forward";
 "barrage_long_press_menu_show_original_text" = "Hide";
 "barrage_long_press_menu_multi_select" = "Select";
@@ -40,7 +39,7 @@
 "barrage_long_press_menu_edit" = "Edit";
 "barrage_long_press_menu_copy" = "Copy";
 "Copied" = "Copied";
-"report_button_click_menu_button_cancel" = "Cancel";
+"common_button_cancel" = "Cancel";
 "Confirm" = "Confirm";
 "participant_list_title" = "Participants";
 "Ban List" = "Ban List";
@@ -50,15 +49,6 @@
 "Translated" = "Translated";
 "Mentioned" = "Mentioned";
 "recalled a message" = "recalled a message";
-"violation_reason_1" = "Unwelcome commercial content or spam";
-"violation_reason_2" = "Pornographic or explicit content";
-"violation_reason_3" = "Child abuse";
-"violation_reason_4" = "Hate speech or graphic violence";
-"violation_reason_5" = "Promote terrorism";
-"violation_reason_6" = "Harassment or bullying";
-"violation_reason_7" = "Suicide or self harm";
-"violation_reason_8" = "False information";
-"violation_reason_9" = "Others";
 "Search" = "Search";
 "participant_list_button_click_menu_remove" = "Remove";
 "Your were muted!" = "Your were muted!";

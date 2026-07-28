@@ -14,7 +14,7 @@ import Foundation
  */
 
 #if canImport(HyphenateChat)
-import HyphenateChat
+@_exported import HyphenateChat
 public typealias ChatClient = EMClient
 public typealias ChatClientListener = EMClientDelegate
 public typealias ChatEventsListener = EMChatManagerDelegate
@@ -63,6 +63,10 @@ public typealias GroupChatThreadEvent = EMChatThreadEvent
 public typealias GroupChatThread = EMChatThread
 public typealias MessagePinOperation = EMMessagePinOperation
 public typealias MessagePinInfo = EMMessagePinInfo
+public typealias UserInfoManagerDelegate = EMUserInfoManagerDelegate
+public typealias DataSyncType = EMDataSyncType
+public typealias LoginExtensionInfo = EMLoginExtensionInfo
+public typealias ChatFetchServerMessagesOption = EMFetchServerMessagesOption
 #elseif canImport(AgoraChat)
 import AgoraChat
 public typealias ChatClient = AgoraChatClient
@@ -113,6 +117,10 @@ public typealias GroupChatThreadEvent = AgoraChatThreadEvent
 public typealias GroupChatThread = AgoraChatThread
 public typealias MessagePinOperation = AgoraChatMessagePinOperation
 public typealias MessagePinInfo = AgoraChatMessagePinInfo
+public typealias UserInfoManagerDelegate = AgoraChatUserInfoManagerDelegate
+public typealias DataSyncType = AgoraChatDataSyncType
+public typealias LoginExtensionInfo = AgoraChatLoginExtensionInfo
+public typealias ChatFetchServerMessagesOption = AgoraChatFetchServerMessagesOption
 #endif
 
 

@@ -429,16 +429,10 @@ fileprivate extension Data {
 
     func readBufferData<Result>(range : Range<Data.Index>, type : Result.Type, capacity count: Int) -> [Result] {
         let subd = subdata(in: range)
-        let buffer = subd.withUnsafeBytes { (bytes : UnsafePointer<UInt8>) -> UnsafeBufferPointer<Result> in
-            return bytes.withMemoryRebound(to: Result.self, capacity: count, { (pointer : UnsafePointer<Result>) -> UnsafeBufferPointer<Result> in
-                return UnsafeBufferPointer<Result>(start: pointer, count: count)
-            })
+        return subd.withUnsafeBytes { rawBuffer -> [Result] in
+            let buffer = rawBuffer.bindMemory(to: Result.self)
+            return Array(buffer.prefix(count))
         }
-        var bytes = [Result]()
-        for (_, b) in buffer.enumerated() {
-            bytes.append(b)
-        }
-        return bytes
     }
 
     //    func readBufferData<Result>(range : Range<Data.Index>, type : Result.Type, capacity count: Int) -> UnsafeMutableBufferPointer<Result> {
@@ -452,10 +446,8 @@ fileprivate extension Data {
     //    }
 
     func readData<Result>(range : Range<Data.Index>, type : Result.Type) -> Result {
-        return self.subdata(in: range).withUnsafeBytes { (bytes : UnsafePointer<Int8>) -> Result in
-            return bytes.withMemoryRebound(to: Result.self, capacity: 1, { (st : UnsafePointer<Result>) -> Result in
-                return st.pointee
-            })
+        return self.subdata(in: range).withUnsafeBytes { rawBuffer -> Result in
+            rawBuffer.load(as: Result.self)
         }
     }
 }

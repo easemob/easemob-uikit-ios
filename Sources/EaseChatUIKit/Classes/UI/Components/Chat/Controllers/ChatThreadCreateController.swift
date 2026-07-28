@@ -10,6 +10,7 @@ import MobileCoreServices
 import QuickLook
 import AVFoundation
 import PhotosUI
+import UniformTypeIdentifiers
 
 @objcMembers open class ChatThreadCreateController: UIViewController {
     
@@ -255,7 +256,22 @@ import PhotosUI
      - Note: The selected file will be handled by the `UIDocumentPickerDelegate` methods implemented in the `MessageListController`.
      */
     @objc open func selectFile() {
-        let documentPicker = UIDocumentPickerViewController(documentTypes: ["public.content", "public.text", "public.source-code", "public.image", "public.jpeg", "public.png", "com.adobe.pdf", "com.apple.keynote.key", "com.microsoft.word.doc", "com.microsoft.excel.xls", "com.microsoft.powerpoint.ppt","public.data"], in: .open)
+        let contentTypes = [
+            "public.content",
+            "public.text",
+            "public.source-code",
+            "public.image",
+            "public.jpeg",
+            "public.png",
+            "com.adobe.pdf",
+            "com.apple.keynote.key",
+            "com.microsoft.word.doc",
+            "com.microsoft.excel.xls",
+            "com.microsoft.powerpoint.ppt",
+            "public.data"
+        ].map { UTType($0) ?? UTType(importedAs: $0) }
+        
+        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: contentTypes)
         documentPicker.delegate = self
         documentPicker.modalPresentationStyle = .fullScreen
         self.present(documentPicker, animated: true, completion: nil)
@@ -422,23 +438,21 @@ extension ChatThreadCreateController: UIDocumentPickerDelegate {
     }
     
     @objc open func documentPickerOpenFile(controller: UIDocumentPickerViewController,urls: [URL]) {
-        if controller.documentPickerMode == UIDocumentPickerMode.open {
-            guard let selectedFileURL = urls.first else {
-                return
+        guard let selectedFileURL = urls.first else {
+            return
+        }
+        if selectedFileURL.startAccessingSecurityScopedResource() {
+            let fileURL = URL(fileURLWithPath: MediaConvertor.filePath()+"/\(selectedFileURL.lastPathComponent)")
+            do {
+                try Data(contentsOf: selectedFileURL).write(to: fileURL)
+            } catch {
+                consoleLogInfo("write file error:\(error.localizedDescription)", type: .error)
             }
-            if selectedFileURL.startAccessingSecurityScopedResource() {
-                let fileURL = URL(fileURLWithPath: MediaConvertor.filePath()+"/\(selectedFileURL.lastPathComponent)")
-                do {
-                    try Data(contentsOf: selectedFileURL).write(to: fileURL)
-                } catch {
-                    consoleLogInfo("write file error:\(error.localizedDescription)", type: .error)
-                }
-                self.createChatThread(text: fileURL.path, type: .file)
-                selectedFileURL.stopAccessingSecurityScopedResource()
-            } else {
-                DialogManager.shared.showAlert(title: "permissions disable".chat.localize, content: "file_disable".chat.localize, showCancel: false, showConfirm: true) { _ in
-                    
-                }
+            self.createChatThread(text: fileURL.path, type: .file)
+            selectedFileURL.stopAccessingSecurityScopedResource()
+        } else {
+            DialogManager.shared.showAlert(title: "permissions disable".chat.localize, content: "file_disable".chat.localize, showCancel: false, showConfirm: true) { _ in
+                
             }
         }
     }

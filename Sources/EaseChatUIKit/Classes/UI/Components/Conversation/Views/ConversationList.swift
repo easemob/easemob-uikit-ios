@@ -169,14 +169,14 @@ extension ConversationList: UITableViewDelegate,UITableViewDataSource {
                     completion(true)
                 }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.neutralSpecialColor6:UIColor.theme.neutralSpecialColor5).icon(image: UIImage(chatNamed: "read"))
             case .delete:
-                return UIContextualActionChatUIKit(title: "conversation_right_slide_menu_delete".chat.localize, style: .normal, actionType: $0) { (action, view, completion) in
+                return UIContextualActionChatUIKit(title: "conversation_left_slide_menu_delete".chat.localize, style: .normal, actionType: $0) { (action, view, completion) in
                     for listener in self.eventHandlers.allObjects {
                         listener.onConversationSwipe(type: .delete, info: info)
                     }
                     completion(true)
                 }.backgroundColor(color: Theme.style == .dark ? UIColor.theme.errorColor6:UIColor.theme.errorColor5).icon(image: UIImage(chatNamed: "trash"))
             case .mute:
-                return UIContextualActionChatUIKit(title: "conversation_right_slide_menu_mute".chat.localize, style: .normal, actionType: $0) { (action, view, completion) in
+                return UIContextualActionChatUIKit(title: "conversation_left_slide_menu_mute".chat.localize, style: .normal, actionType: $0) { (action, view, completion) in
                     for listener in self.eventHandlers.allObjects {
                         listener.onConversationSwipe(type: .mute, info: info)
                     }
@@ -269,7 +269,9 @@ extension ConversationList: IConversationListDriver {
                 }
             }
         }
-        self.reloadData()
+        DispatchQueue.main.async { [weak self] in
+            self?.reloadData()
+        }
     }
     
     public func swipeMenuOperation(info: ConversationInfo, type: UIContextualActionType) {

@@ -11,10 +11,6 @@ import UIKit
     
     private let groupService = GroupServiceImplement()
     
-    private var page = UInt(0)
-    
-    private var loadFinished = false
-    
     public private(set) var datas: [ChatUserProfileProtocol] = [] {
         didSet {
             if self.datas.count <= 0 {
@@ -39,11 +35,10 @@ import UIKit
     
     private lazy var empty: EmptyStateView = {
         EmptyStateView(frame: CGRect(x: 0, y: 0, width: self.groupList.frame.width, height: self.groupList.frame.height),emptyImage: UIImage(chatNamed: "empty"), onRetry: { [weak self] in
-            self?.requestGroups()
+            self?.loadLocalGroups()
         }).backgroundColor(.clear)
     }()
-
-
+    
     open override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -56,7 +51,7 @@ import UIKit
         }
         Theme.registerSwitchThemeViews(view: self)
         self.switchTheme(style: Theme.style)
-        self.requestGroups()
+        self.loadLocalGroups()
         NotificationCenter.default.addObserver(self, selector: #selector(removeGroup(notification:)), name: Notification.Name("EaseChatUIKit_leaveGroup"), object: nil)
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: cache_update_notification), object: nil, queue: .main) { [weak self] notify in
             guard let `self` = self else { return }
@@ -86,31 +81,16 @@ import UIKit
         }
     }
     
-    @objc open func requestGroups() {
-        if !self.loadFinished {
-            self.groupService.getJoinedGroups(page: self.page, pageSize: 20, needMemberCount: true, needRole: true) { [weak self] groups, error in
-                guard let `self` = self else { return }
-                if error == nil {
-                    if let groups = groups {
-                        self.datas.append(contentsOf: groups.map({
-                            let profile = ChatUserProfile()
-                            profile.id = $0.groupId
-                            profile.nickname = $0.groupName
-                            profile.avatarURL = ChatUIKitContext.shared?.groupCache?[$0.groupId]?.avatarURL ?? ""
-                            return profile
-                        }))
-                        self.groupList.reloadData()
-                        if groups.count >= 20 {
-                            self.page += 1
-                        } else {
-                            self.loadFinished = true
-                        }
-                    }
-                } else {
-                    consoleLogInfo("requestGroups error:\(error?.errorDescription ?? "")", type: .error)
-                }
-            }
-        }
+    @objc open func loadLocalGroups() {
+        let groups = self.groupService.loadLocalJoinedGroups()
+        self.datas = groups.map({
+            let profile = ChatUserProfile()
+            profile.id = $0.groupId
+            profile.nickname = $0.groupName
+            profile.avatarURL = ChatUIKitContext.shared?.groupCache?[$0.groupId]?.avatarURL ?? ""
+            return profile
+        })
+        self.groupList.reloadData()
     }
 
 }
@@ -144,11 +124,6 @@ extension JoinedGroupsViewController: UITableViewDelegate,UITableViewDataSource 
         }
     }
     
-    public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row > self.datas.count-3,!self.loadFinished {
-            self.requestGroups()
-        }
-    }
     
     @objc open func chatTo(group: String) {
         let vc = ComponentsRegister.shared.GroupInfoController.init(group: group) { [weak self] groupId, name in
@@ -159,7 +134,7 @@ extension JoinedGroupsViewController: UITableViewDelegate,UITableViewDataSource 
     }
     
     @objc open func refreshGroup(groupId: String,name: String) {
-        for (index,profile) in self.datas.enumerated() {
+        for (_,profile) in self.datas.enumerated() {
             if profile.id == groupId {
                 profile.nickname = name
                 break

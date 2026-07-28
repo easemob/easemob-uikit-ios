@@ -62,16 +62,14 @@ extension GroupServiceImplement: GroupService {
         }
     }
     
-    public func createGroup(subject: String, description: String, inviterIds: [String], message: String, option: ChatGroupOption, completion: @escaping (ChatGroup?, ChatError?) -> Void) {
-        ChatClient.shared().groupManager?.createGroup(withSubject: subject, description: description, invitees: inviterIds, message: message, setting: option, completion: { group, error in
+    public func createGroup(subject: String, avatar: String?, description: String, inviterIds: [String], message: String, option: ChatGroupOption, completion: @escaping (ChatGroup?, ChatError?) -> Void) {
+        ChatClient.shared().groupManager?.createGroup(withSubject: subject, avatar: avatar, description: description, invitees: inviterIds, message: message, setting: option, completion: { group, error in
             completion(group,error)
         })
     }
     
-    public func getJoinedGroups(page: UInt, pageSize: UInt, needMemberCount: Bool, needRole: Bool, completion: @escaping ([ChatGroup]?, ChatError?) -> Void) {
-        ChatClient.shared().groupManager?.getJoinedGroupsFromServer(withPage: Int(page), pageSize: Int(pageSize), needMemberCount: needMemberCount, needRole: needRole, completion: { groups, error in
-            completion(groups,error)
-        })
+    public func loadLocalJoinedGroups() -> [ChatGroup] {
+        ChatClient.shared().groupManager?.getJoinedGroups() ?? []
     }
     
     public func invite(userIds: [String], to groupId: String, message: String, completion: @escaping (ChatGroup?, ChatError?) -> Void) {
@@ -272,15 +270,15 @@ extension GroupServiceImplement: GroupEventsListener {
         }
     }
     
-    public func userDidJoin(_ aGroup: ChatGroup, user aUsername: String) {
+    public func userDidJoin(_ group: ChatGroup, users userIds: [String]) {
         for listener in self.responseDelegates.allObjects {
-            listener.onUserJoinedGroup?(groupId: aGroup.groupId, userId: aUsername)
+            listener.onUserJoinedGroup?(groupId: group.groupId, userIds: userIds)
         }
     }
     
-    public func userDidLeave(_ aGroup: ChatGroup, user aUsername: String) {
+    public func userDidLeave(_ group: ChatGroup, users userIds: [String]) {
         for listener in self.responseDelegates.allObjects {
-            listener.onUserLeaveGroup?(groupId: aGroup.groupId, userId: aUsername)
+            listener.onUserLeaveGroup?(groupId: group.groupId, userIds: userIds)
         }
     }
     
@@ -317,3 +315,4 @@ extension GroupServiceImplement: GroupChatThreadListener {
         }
     }
 }
+

@@ -43,7 +43,7 @@ import UIKit
     }()
     
     lazy var cancel: UIButton = {
-        UIButton(type: .custom).frame(CGRect(x: 0, y: self.frame.height - Appearance.actionSheetRowHeight - BottomBarHeight, width: self.frame.width, height: Appearance.actionSheetRowHeight)).backgroundColor(UIColor.theme.neutralColor98).title("report_button_click_menu_button_cancel".chat.localize, .normal).font(UIFont.theme.labelLarge).textColor(UIColor.theme.primaryLightColor, .normal).addTargetFor(self, action: #selector(cancelAction), for: .touchUpInside)
+        UIButton(type: .custom).frame(CGRect(x: 0, y: self.frame.height - Appearance.actionSheetRowHeight - BottomBarHeight, width: self.frame.width, height: Appearance.actionSheetRowHeight)).backgroundColor(UIColor.theme.neutralColor98).title("common_button_cancel".chat.localize, .normal).font(UIFont.theme.labelLarge).textColor(UIColor.theme.primaryLightColor, .normal).addTargetFor(self, action: #selector(cancelAction), for: .touchUpInside)
     }()
 
     override init(frame: CGRect) {
@@ -108,15 +108,11 @@ import UIKit
     }
     
     @objc public convenience init(items:[ActionSheetItemProtocol],withHeader: UIView? = nil,action: @escaping (ActionSheetItemProtocol) -> Void) {
-        let messageHeight = 0
         var contentHeight = 11+Int(Appearance.actionSheetRowHeight)*items.count+Int(Appearance.actionSheetRowHeight)+8+Int(BottomBarHeight)
         var itemCount = items.count
         if CGFloat(contentHeight) > ScreenHeight/2.0 {
             itemCount = items.count-2
             contentHeight = 11+Int(Appearance.actionSheetRowHeight)*itemCount+Int(Appearance.actionSheetRowHeight)+8+Int(BottomBarHeight)
-        }
-        if messageHeight > 0 {
-            contentHeight += (Int(messageHeight)+20)
         }
         if CGFloat(contentHeight) > ScreenHeight*(2/3.0) {
             contentHeight = Int(ScreenHeight*(2/3.0))

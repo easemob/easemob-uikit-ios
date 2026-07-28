@@ -64,7 +64,9 @@ public extension UIView {
         if value == .large {
             radius = self.frame.height/2.0
             if radius == 0 {
-                radius = (self.heightAnchor as? NSLayoutConstraint)?.constant ?? 0
+                radius = (self.constraints.first {
+                    $0.firstAttribute == .height && $0.secondItem == nil
+                }?.constant ?? 0)/2.0
             }
         }
         view.clipsToBounds = true

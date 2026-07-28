@@ -12,7 +12,6 @@ public class PresentationSegue: UIStoryboardSegue {
        guard let destination = destination as? PresentationViewController else {
            fatalError("destination must comfirm to protocol PresentedViewType")
        }
-       guard let sourceVC = source as? UIViewController else { fatalError("destination must comfirm to protocol PresentedViewType") }
-       sourceVC.presentViewController(destination)
+       source.presentViewController(destination)
    }
 }

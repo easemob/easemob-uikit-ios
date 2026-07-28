@@ -689,8 +689,6 @@ extension MessageListController: MessageListDriverEventsListener {
             self.viewModel.processMessage(operation: .originalText, message: message)
         case "Delete":
             self.viewModel.processMessage(operation: .delete, message: message)
-        case "Report":
-            self.reportAction(message: message)
         case "Topic":
             self.toCreateThread(message: message)
         case "MultiSelect":
@@ -740,12 +738,6 @@ extension MessageListController: MessageListDriverEventsListener {
             DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.2) {
                 editor.editor.textView.becomeFirstResponder()
             }
-            
-        }
-    }
-    
-    @objc open func reportAction(message: ChatMessage) {
-        DialogManager.shared.showReportDialog(message: message) { error in
             
         }
     }
@@ -988,7 +980,22 @@ extension MessageListController: MessageListDriverEventsListener {
      - Note: The selected file will be handled by the `UIDocumentPickerDelegate` methods implemented in the `MessageListController`.
      */
     @objc open func selectFile() {
-        let documentPicker = UIDocumentPickerViewController(documentTypes: ["public.content", "public.text", "public.source-code", "public.image", "public.jpeg", "public.png", "com.adobe.pdf", "com.apple.keynote.key", "com.microsoft.word.doc", "com.microsoft.excel.xls", "com.microsoft.powerpoint.ppt","public.data"], in: .open)
+        let contentTypes = [
+            "public.content",
+            "public.text",
+            "public.source-code",
+            "public.image",
+            "public.jpeg",
+            "public.png",
+            "com.adobe.pdf",
+            "com.apple.keynote.key",
+            "com.microsoft.word.doc",
+            "com.microsoft.excel.xls",
+            "com.microsoft.powerpoint.ppt",
+            "public.data"
+        ].map { UTType($0) ?? UTType(importedAs: $0) }
+        
+        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: contentTypes)
         documentPicker.delegate = self
         documentPicker.modalPresentationStyle = .fullScreen
         self.present(documentPicker, animated: true, completion: nil)
@@ -1108,23 +1115,21 @@ extension MessageListController: UIDocumentPickerDelegate {
     }
     
     @objc open func documentPickerOpenFile(controller: UIDocumentPickerViewController,urls: [URL]) {
-        if controller.documentPickerMode == UIDocumentPickerMode.open {
-            guard let selectedFileURL = urls.first else {
-                return
+        guard let selectedFileURL = urls.first else {
+            return
+        }
+        if selectedFileURL.startAccessingSecurityScopedResource() {
+            let fileURL = URL(fileURLWithPath: MediaConvertor.filePath()+"/\(selectedFileURL.lastPathComponent)")
+            do {
+                try Data(contentsOf: selectedFileURL).write(to: fileURL)
+            } catch {
+                consoleLogInfo("write file error:\(error.localizedDescription)", type: .error)
             }
-            if selectedFileURL.startAccessingSecurityScopedResource() {
-                let fileURL = URL(fileURLWithPath: MediaConvertor.filePath()+"/\(selectedFileURL.lastPathComponent)")
-                do {
-                    try Data(contentsOf: selectedFileURL).write(to: fileURL)
-                } catch {
-                    consoleLogInfo("write file error:\(error.localizedDescription)", type: .error)
-                }
-                self.viewModel.sendMessage(text: fileURL.path, type: .file)
-                selectedFileURL.stopAccessingSecurityScopedResource()
-            } else {
-                DialogManager.shared.showAlert(title: "permissions disable".chat.localize, content: "file_disable".chat.localize, showCancel: false, showConfirm: true) { _ in
-                    
-                }
+            self.viewModel.sendMessage(text: fileURL.path, type: .file)
+            selectedFileURL.stopAccessingSecurityScopedResource()
+        } else {
+            DialogManager.shared.showAlert(title: "permissions disable".chat.localize, content: "file_disable".chat.localize, showCancel: false, showConfirm: true) { _ in
+                
             }
         }
     }

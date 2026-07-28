@@ -25,11 +25,6 @@ import Foundation
     /// - Parameter listener: ``ContactEmergencyListener``
     func unregisterEmergencyListener(listener: ContactEmergencyListener)
     
-    /// Fetch contacts form server.
-    /// - Parameters:
-    ///   - completion: Callback, if successful it will return a string array of user id, if it fails it will return an error.
-    func contacts(completion: @escaping (ChatError?,[Contact]) -> Void)
-    
     /// Add contact.
     /// - Parameters:
     ///   - userId: The ID of the user you want to add as a friend.

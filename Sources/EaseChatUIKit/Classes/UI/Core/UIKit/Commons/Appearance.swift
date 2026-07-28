@@ -137,7 +137,6 @@ import UIKit
             ActionSheetItem(title: "barrage_long_press_menu_pin".chat.localize, type: .normal,tag: "Pin",image: UIImage(chatNamed: "message_action_pin")),
             ActionSheetItem(title: "barrage_long_press_menu_translate".chat.localize, type: .normal,tag: "Translate",image: UIImage(chatNamed: "message_action_translation")),
             ActionSheetItem(title: "barrage_long_press_menu_show_original_text".chat.localize, type: .normal,tag: "OriginalText",image: UIImage(chatNamed: "message_action_translation")),
-            ActionSheetItem(title: "barrage_long_press_menu_report".chat.localize, type: .normal,tag: "Report",image: UIImage(chatNamed: "message_action_report")),
             ActionSheetItem(title: "barrage_long_press_menu_delete".chat.localize, type: .normal,tag: "Delete",image: UIImage(chatNamed: "message_action_delete"))
         ]
     }()
@@ -147,14 +146,6 @@ import UIKit
     
     /// You need to enable the translation function from the console first, and then set this property to true to experience the translation function.
     public var enableTranslation = false
-    
-    /// The label for message reporting types.
-    public var reportSelectionTags: [String] = ["tag1","tag2","tag3","tag4","tag5","tag6","tag7","tag8","tag9"]
-    
-    /// The label for message reporting reason.
-    lazy public var reportSelectionReasons: [String] = {
-        ["violation_reason_1".chat.localize,"violation_reason_2".chat.localize,"violation_reason_3".chat.localize,"violation_reason_4".chat.localize,"violation_reason_5".chat.localize,"violation_reason_6".chat.localize,"violation_reason_7".chat.localize,"violation_reason_8".chat.localize,"violation_reason_9".chat.localize]
-    }()
     
 //        /// Replace the emoji resource.``ChatEmojiConvertor``
 //        /// - Parameters:
