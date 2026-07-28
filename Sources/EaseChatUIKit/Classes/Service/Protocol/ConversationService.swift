@@ -25,14 +25,10 @@ import Foundation
     /// - Parameter listener: ``ConversationEmergencyListener``
     func unregisterEmergencyListener(listener: ConversationEmergencyListener)
     
-    /// Get all conversations from database.
+    /// Load all conversations that exist in the local database.
+    /// Since SDK 5.0 removed the server fetch APIs, conversations are synchronized by the SDK after login
+    /// and surfaced through the data-sync callback. Use this method to read the local data.
     func loadExistConversations()
-    
-    /// Get the session where the server is set to silent state
-    /// - Parameters:
-    ///   - conversationIds: `[String]`
-    ///   - completion: Callback. If successful, the silent state corresponding to the session ID will be returned. If failed, the failure reason will be returned.
-    func fetchSilentMode(conversationIds: [String],completion: @escaping (Dictionary<String,SilentModeResult>?,ChatError?) -> Void)
     
     /// Set a session to silent state
     /// - Parameters:
@@ -45,18 +41,6 @@ import Foundation
     ///   - conversationId: The id of the conversation.
     ///   - completion: Callback. If successful, the silent state corresponding to the session ID will be returned. If failed, the failure reason will be returned.
     func clearSilentMode(conversationId: String,completion: @escaping (SilentModeResult?,ChatError?) -> Void)
-    
-    /// Fetch conversations from server.
-    /// - Parameters:
-    ///   - completion: Callback, including session list results and error information. If successful, the session list will be returned. If failed, error information will be returned.
-    func fetchAllConversations(completion: ((CursorResult<ConversationInfo>?,ChatError?) -> Void)?)
-    
-    /// Fetch pinned conversations from server.
-    /// - Parameters:
-    ///   - cursor: Paging cursor.
-    ///   - pageSize: The size number of current page.
-    ///   - completion: Callback, including session list results and error information. If successful, the session list will be returned. If failed, error information will be returned.
-    func fetchPinnedConversations(cursor: String, pageSize:UInt8, completion: @escaping (CursorResult<ConversationInfo>?,ChatError?) -> Void)
     
     /// Pin a conversation to the top
     /// - Parameters:

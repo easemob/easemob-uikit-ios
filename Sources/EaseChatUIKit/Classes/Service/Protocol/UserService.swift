@@ -80,9 +80,22 @@ import Foundation
     /// The user account logout by server.
     func userAccountDidForcedToLogout(error: ChatError?)
     
-    /// When user auto login completion.
-    /// - Parameter error: ``ChatError``
-    func onUserAutoLoginCompletion(error: ChatError?)
+    /// Occurs when the local database is opened after login.
+    /// You can use this callback to display the page first with local data.
+    /// - Parameters:
+    ///   - error: The error information. It is nil when the database opened successfully.
+    ///   - userId: The username of the logged-in user.
+    @objc optional func onUserDatabaseOpened(error: ChatError?, userId: String)
+    
+    /// Occurs when a post-login data synchronization starts.
+    /// - Parameter type: The data type that starts synchronizing.``DataSyncType``
+    @objc optional func onUserDataSyncStart(type: DataSyncType)
+    
+    /// Occurs when a post-login data synchronization finishes.
+    /// - Parameters:
+    ///   - error: The error information. It is nil when the synchronization succeeds.
+    ///   - type: The data type that finished synchronizing.``DataSyncType``
+    @objc optional func onUserDataSyncFinished(error: ChatError?, type: DataSyncType)
         
 }
 

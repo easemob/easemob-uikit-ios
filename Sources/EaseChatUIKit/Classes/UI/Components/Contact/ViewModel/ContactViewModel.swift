@@ -14,6 +14,10 @@ import UIKit
     
     @objc public var viewContact: ((ChatUserProfileProtocol) -> Void)?
     
+    /// Callback when the contact data-sync status changes after login.
+    /// `true` means the SDK is syncing contacts (show loading), `false` means finished (hide loading).
+    @objc public var contactSyncClosure: ((Bool) -> Void)?
+    
     public var notifySelf = false
     
     @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Array<Dictionary<String,Any>>>()) private var newFriends
@@ -42,24 +46,32 @@ import UIKit
     open func bind(driver: IContactListDriver) {
         self.driver = driver
         if self.service == nil {
-            self.service = ContactServiceImplement()
+            self.service = ChatUIKitClient.shared.contactService ?? ContactServiceImplement()
         }
         if self.multiService == nil {
             self.multiService = MultiDeviceServiceImplement()
         }
         self.service?.unbindContactEventListener(listener: self)
         self.service?.bindContactEventListener(listener: self)
+        self.service?.unregisterEmergencyListener(listener: self)
+        self.service?.registerEmergencyListener(listener: self)
         self.multiService?.unbindMultiDeviceListener(listener: self)
         self.multiService?.bindMultiDeviceListener(listener: self)
         self.driver?.addActionHandler(actionHandler: self)
+        ChatUIKitClient.shared.addDataSyncListener(self)
         self.loadAllContacts()
+    }
+    
+    deinit {
+        ChatUIKitClient.shared.removeDataSyncListener(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
     /// Register to monitor when certain emergencies occur
     /// - Parameter listener: ``ContactEmergencyListener``
     @objc public func registerEventsListener(_ listener: ContactEmergencyListener) {
         if self.service == nil {
-            self.service = ContactServiceImplement()
+            self.service = ChatUIKitClient.shared.contactService ?? ContactServiceImplement()
         }
         self.service?.registerEmergencyListener(listener: listener)
     }
@@ -68,30 +80,13 @@ import UIKit
     /// - Parameter listener: ``ContactEmergencyListener``
     @objc public func unregisterEventsListener(_ listener: ContactEmergencyListener) {
         if self.service == nil {
-            self.service = ContactServiceImplement()
+            self.service = ChatUIKitClient.shared.contactService ?? ContactServiceImplement()
         }
         self.service?.unregisterEmergencyListener(listener: listener)
     }
     
     @objc open func addFriendRefreshList() {
-        DispatchQueue.main.async {
-            self.service?.contacts(completion: { [weak self] error, contacts in
-                if error == nil {
-                    if let infos = self?.filterContacts(contacts: contacts) {
-                        self?.driver?.refreshList(infos: infos)
-                        if infos.count < 7 {
-                            self?.requestDisplayInfos(ids: infos.map({ $0.id }))
-                        }
-                        DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {
-                            self?.notifySelf = false
-                        }
-                    }
-                } else {
-                    self?.driver?.occurError()
-                    consoleLogInfo("loadAllContacts error:\(error?.errorDescription ?? "")", type: .error)
-                }
-            })
-        }
+        loadAllContacts()
     }
     
     @objc open func loadAllContacts() {
@@ -99,22 +94,16 @@ import UIKit
             if self.notifySelf {
                 return
             }
-            self.service?.contacts(completion: { [weak self] error, contacts in
-                if error == nil {
-                    if let infos = self?.filterContacts(contacts: contacts) {
-                        self?.driver?.refreshList(infos: infos)
-                        if infos.count < 7 {
-                            self?.requestDisplayInfos(ids: infos.map({ $0.id }))
-                        }
-                        DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {
-                            self?.notifySelf = false
-                        }
-                    }
-                } else {
-                    self?.driver?.occurError()
-                    consoleLogInfo("loadAllContacts error:\(error?.errorDescription ?? "")", type: .error)
+            if let contacts = ChatClient.shared().contactManager?.getAllContacts() {
+                let infos = self.filterContacts(contacts: contacts)
+                self.driver?.refreshList(infos: infos)
+                if infos.count < 7 {
+                    self.requestDisplayInfos(ids: infos.map({ $0.id }))
                 }
-            })
+                DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.3) {
+                    self.notifySelf = false
+                }
+            }
         }
     }
     
@@ -132,8 +121,8 @@ import UIKit
         let infos = users.map({
             let profile = ChatUserProfile()
             profile.id = $0.userId
-            profile.nickname = ChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
-            profile.avatarURL = ChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
+            profile.nickname = $0.userInfo?.nickname ?? ChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
+            profile.avatarURL = $0.userInfo?.avatarUrl ?? ChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
             var remark = $0.remark ?? ""
             if remark.isEmpty {
                 remark = ChatUIKitContext.shared?.userCache?[$0.userId]?.remark ?? ""
@@ -160,6 +149,32 @@ import UIKit
         if let implement = self.service as? ContactServiceImplement {
             implement.handleResult(error: nil, type: .cleanFriendBadge, operatorId: ChatUIKitContext.shared?.currentUserId ?? "")
         }
+    }
+}
+
+extension ContactViewModel: ContactEmergencyListener {
+    public func onResult(error: ChatError?, type: ContactEmergencyType, operatorId: String) {
+        guard type == .fetchContacts else { return }
+        self.loadAllContacts()
+    }
+}
+
+//MARK: - ChatDataSyncListener (post-login data sync dispatched by ChatUIKitClient)
+extension ContactViewModel: ChatDataSyncListener {
+    
+    public var interestedSyncType: DataSyncType { .contacts }
+    
+    public func onChatDatabaseOpened() {
+        self.loadAllContacts()
+    }
+    
+    public func onChatDataSyncStart() {
+        self.contactSyncClosure?(true)
+    }
+    
+    public func onChatDataSyncFinished(error: ChatError?) {
+        self.contactSyncClosure?(false)
+        self.loadAllContacts()
     }
 }
 

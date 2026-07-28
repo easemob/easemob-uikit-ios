@@ -56,6 +56,15 @@ import UIKit
     @objc open func createContactList() -> ContactView {
         ContactView(frame: CGRect(x: 0, y: self.search.frame.maxY+10, width: self.view.frame.width, height: self.view.frame.height-self.search.frame.maxY-10-(self.tabBarController?.tabBar.frame.height ?? 0)),headerStyle: self.style).backgroundColor(.clear)
     }
+    
+    public private(set) lazy var loadingView: LoadingView = {
+        self.createLoading()
+    }()
+    
+    /// Creates the loading view shown while contacts are syncing after login.
+    @objc open func createLoading() -> LoadingView {
+        LoadingView(frame: self.contactList.frame)
+    }
             
     public private(set) var viewModel: ContactViewModel?
     
@@ -83,9 +92,19 @@ import UIKit
     
     open override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.addSubViews([self.navigation,self.search,self.contactList])
+        self.view.addSubViews([self.navigation,self.search,self.contactList,self.loadingView])
         if self.style != .newGroup || self.style != .newChat || self.style != .shareContact {
             self.navigation.separateLine.isHidden = true
+        }
+        //Show loading while the SDK is syncing contacts after login, hide it when finished.
+        self.viewModel?.contactSyncClosure = { [weak self] syncing in
+            DispatchQueue.main.async {
+                if syncing {
+                    self?.loadingView.startAnimating()
+                } else {
+                    self?.loadingView.stopAnimating()
+                }
+            }
         }
         self.viewModel?.bind(driver: self.contactList)
         self.setupTitle()

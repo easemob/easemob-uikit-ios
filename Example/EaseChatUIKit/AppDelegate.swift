@@ -6,34 +6,64 @@
 //  Copyright (c) 2023 zjc19891106. All rights reserved.
 //
 
-import UIKit
 import EaseChatUIKit
-
+import UIKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions:
+            [UIApplicationLaunchOptionsKey: Any]?
+    ) -> Bool {
         // Override point for customization after application launch.
+        // TODO: Replace with your own AppKey before running the demo.
         let option = ChatOptions(appkey: "")
         option.enableConsoleLog = true
+        option.enableUserInfo = true
+        option.dataSyncType = [.conversations, .contacts, .joinedGroups]
         _ = ChatUIKitClient.shared.setup(option: option)
-        let redPackage = ActionSheetItem(title: "Red".chat.localize, type: .normal,tag: "Red",image: UIImage(named: "photo", in: .chatBundle, with: nil))
-        let gift = ActionSheetItem(title: "Gift".chat.localize, type: .normal,tag: "Gift",image: UIImage(named: "photo", in: .chatBundle, with: nil))
-        let music = ActionSheetItem(title: "Music".chat.localize, type: .normal,tag: "Music",image: UIImage(named: "photo", in: .chatBundle, with: nil))
-        ComponentsRegister.shared.registerCustomCellClasses(cellType: RedPackageCell.self, identifier: redPackageIdentifier)
-        ComponentsRegister.shared.registerCustomCellClasses(cellType: GiftCell.self, identifier: giftIdentifier)
-        ComponentsRegister.shared.registerCustomCellClasses(cellType: MusicCell.self, identifier: musicIdentifier)
-        
+        let redPackage = ActionSheetItem(
+            title: "Red".chat.localize,
+            type: .normal,
+            tag: "Red",
+            image: UIImage(named: "photo", in: .chatBundle, with: nil)
+        )
+        let gift = ActionSheetItem(
+            title: "Gift".chat.localize,
+            type: .normal,
+            tag: "Gift",
+            image: UIImage(named: "photo", in: .chatBundle, with: nil)
+        )
+        let music = ActionSheetItem(
+            title: "Music".chat.localize,
+            type: .normal,
+            tag: "Music",
+            image: UIImage(named: "photo", in: .chatBundle, with: nil)
+        )
+        ComponentsRegister.shared.registerCustomCellClasses(
+            cellType: RedPackageCell.self,
+            identifier: redPackageIdentifier
+        )
+        ComponentsRegister.shared.registerCustomCellClasses(
+            cellType: GiftCell.self,
+            identifier: giftIdentifier
+        )
+        ComponentsRegister.shared.registerCustomCellClasses(
+            cellType: MusicCell.self,
+            identifier: musicIdentifier
+        )
+
         Appearance.chat.inputExtendActions.append(redPackage)
         Appearance.chat.inputExtendActions.append(gift)
         Appearance.chat.inputExtendActions.append(music)
         ComponentsRegister.shared.MessageRenderEntity = MineMessageEntity.self
         ComponentsRegister.shared.Conversation = MineConversationInfo.self
-        ComponentsRegister.shared.MessageViewController = CustomMessageListController.self
+        ComponentsRegister.shared.MessageViewController =
+            CustomMessageListController.self
         return true
     }
 
@@ -59,6 +89,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
-
 }
-

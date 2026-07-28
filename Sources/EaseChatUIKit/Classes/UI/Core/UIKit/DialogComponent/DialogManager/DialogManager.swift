@@ -12,22 +12,6 @@ import UIKit
     
     public static let shared = DialogManager()
     
-    
-    /// Shows the message reporting page.
-    /// - Parameter message: ``ChatMessage``
-    @objc public func showReportDialog(message: ChatMessage,errorClosure: @escaping (ChatError?)->Void) {
-        var vc = PageContainersDialogController()
-        let report = ComponentsRegister
-            .shared.ReportViewController.init(message: message) { error in
-                vc.dismiss(animated: true) {
-                    errorClosure(error)
-                }
-            }
-        vc = PageContainersDialogController(pageTitles: ["barrage_long_press_menu_report".chat.localize], childControllers: [report], constraintsSize: Appearance.pageContainerConstraintsSize)
-        
-        UIViewController.currentController?.presentViewController(vc)
-    }
-    
     /// Shows message operations.
     /// Generally, message operations are shown when you long-press a message.
     /// - Parameters:
@@ -90,7 +74,7 @@ import UIKit
             alert.textField.becomeFirstResponder()
         }
         if showCancel {
-            alert.leftButton(color: Theme.style == .dark ? UIColor.theme.neutralColor95:UIColor.theme.neutralColor3).leftButtonBorder(color: Theme.style == .dark ? UIColor.theme.neutralColor4:UIColor.theme.neutralColor7).leftButton(title: "report_button_click_menu_button_cancel".chat.localize).leftButtonRadius(cornerRadius: Appearance.alertStyle == .small ? .extraSmall:.large).leftButtonTapClosure {
+            alert.leftButton(color: Theme.style == .dark ? UIColor.theme.neutralColor95:UIColor.theme.neutralColor3).leftButtonBorder(color: Theme.style == .dark ? UIColor.theme.neutralColor4:UIColor.theme.neutralColor7).leftButton(title: "common_button_cancel".chat.localize).leftButtonRadius(cornerRadius: Appearance.alertStyle == .small ? .extraSmall:.large).leftButtonTapClosure {
                 cancelClosure?()
             }
         }

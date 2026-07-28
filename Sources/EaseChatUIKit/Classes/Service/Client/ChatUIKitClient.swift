@@ -41,10 +41,14 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
     /// User-related protocol implementation class.
     public private(set) lazy var userService: UserServiceProtocol? = nil
     
+    /// Contact-related protocol implementation class.
+    public private(set) lazy var contactService: ContactServiceProtocol? = nil
+    
     /// Options function wrapper.
     public var option: ChatUIKitOptions = ChatUIKitOptions()
     
-    @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Array<Dictionary<String,Any>>>()) private var newFriends
+    /// Business objects that want to be notified about the data-sync lifecycle.
+    private let dataSyncListeners = NSHashTable<ChatDataSyncListener>.weakObjects()
     
     /// Initializes the ease chat UIKit.
     /// - Parameters:
@@ -56,18 +60,55 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
         if let options = option {
             options.uiKitVersion = ChatUIKit_VERSION
             error = ChatClient.shared().initializeSDK(with: options)
+            if options.enableUserInfo {
+                self.userService = UserServiceImplement()
+            }
         } else {
             if let key = appKey {
                 let options = ChatOptions(appkey: key)
                 options.uiKitVersion = ChatUIKit_VERSION
+                options.enableUserInfo = true
+                options.dataSyncType = [.conversations, .contacts, .joinedGroups]
                 error = ChatClient.shared().initializeSDK(with: options)
+                self.userService = UserServiceImplement()
             }
             error = ChatError(description: "App key can't be nil", code: .invalidAppkey)
         }
         if ChatUIKitClient.shared.option.option_UI.enableContact {
-            ChatClient.shared().contactManager?.add(self, delegateQueue: nil)
+            self.contactService = ContactServiceImplement()
         }
+        ChatClient.shared().add(self, delegateQueue: .main)
         return error
+    }
+    
+    /// Registers a listener to receive the unified data-sync lifecycle events.
+    /// - Parameter listener: ``ChatDataSyncListener``
+    @objc public func addDataSyncListener(_ listener: ChatDataSyncListener) {
+        if !self.dataSyncListeners.contains(listener) {
+            self.dataSyncListeners.add(listener)
+        }
+    }
+    
+    /// Removes a previously registered data-sync listener.
+    /// - Parameter listener: ``ChatDataSyncListener``
+    @objc public func removeDataSyncListener(_ listener: ChatDataSyncListener) {
+        if self.dataSyncListeners.contains(listener) {
+            self.dataSyncListeners.remove(listener)
+        }
+    }
+    
+    /// Fans an action out to every registered listener (invoked on the main thread).
+    fileprivate func dispatchToDataSyncListeners(_ action: (ChatDataSyncListener) -> Void) {
+        for listener in self.dataSyncListeners.allObjects {
+            action(listener)
+        }
+    }
+    
+    /// Fans an action out to listeners whose interested type is contained in `type` (main thread).
+    fileprivate func dispatchToDataSyncListeners(type: DataSyncType, action: (ChatDataSyncListener) -> Void) {
+        for listener in self.dataSyncListeners.allObjects where type.contains(listener.interestedSyncType) {
+            action(listener)
+        }
     }
     
     /// Login user.
@@ -80,18 +121,24 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
         ChatUIKitContext.shared?.chatCache?[user.id] = user
         ChatUIKitContext.shared?.userCache?[user.id] = user
         if self.userService != nil {
-            self.userService?.login(userId: user.id, token: token, completion: { success, error in
+            self.userService?.login(userId: user.id, token: token, completion: {[weak self] success, error in
+                if error == nil {
+                    self?.updateUserInfoIfNeed(user: user)
+                }
                 completion(error)
             })
         } else {
-            self.userService = UserServiceImplement(userInfo: user, token: token, completion: completion)
+            self.userService = UserServiceImplement(userInfo: user, token: token, completion: {[weak self] error in
+                if error == nil {
+                    self?.updateUserInfoIfNeed(user: user)
+                }
+                completion(error)
+            })
         }
     }
     
     /// Logout user
     @objc public func logout(unbindNotificationDeviceToken: Bool = false,completion: @escaping (ChatError?) -> Void) {
-        UserDefaults.standard.removeObject(forKey: "EaseChatUIKit_contact_fetch_server_finished"+saveIdentifier)
-        
         ChatClient.shared().logout(unbindNotificationDeviceToken) { error in
             completion(error)
         }
@@ -134,33 +181,42 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
     public func refreshToken(token: String) {
         ChatClient.shared().renewToken(token)
     }
+    
+    
+    private func updateUserInfoIfNeed(user: ChatUserProfileProtocol) {
+        guard let profiles = ChatClient.shared().userInfoManager?.getUserInfo(byIds: [user.id]),
+           let profile = profiles[user.id] else {
+            let userInfo = UserInfo()
+            userInfo.userId = user.id
+            userInfo.avatarUrl = user.avatarURL
+            ChatClient.shared().userInfoManager?.updateOwn(userInfo)
+            return
+        }
+        if user.nickname == profile.nickname,
+           user.avatarURL == profile.avatarUrl {
+            return
+        }
+        let userInfo = profile
+        userInfo.nickname = user.nickname
+        userInfo.avatarUrl = user.avatarURL
+        ChatClient.shared().userInfoManager?.updateOwn(userInfo)
+    }
 }
 
-extension ChatUIKitClient: ContactEventsListener {
-    public func friendRequestDidReceive(fromUser aUsername: String, message aMessage: String?) {
-        let requestInfo: [String:Any] = ["userId":aUsername,"timestamp":Date().timeIntervalSince1970*1000,"groupApply":0,"read":0]
-        var exist = self.newFriends[saveIdentifier]
-        if exist == nil {
-            self.newFriends[saveIdentifier] = [requestInfo]
-        } else {
-            if exist?.first(where: { $0["userId"] as? String == aUsername }) == nil {
-                exist?.append(requestInfo)
-                self.newFriends[saveIdentifier] = exist
-            }
-        }
-        if let index = Appearance.contact.listHeaderExtensionActions.firstIndex(where: { $0.featureIdentify == "NewFriendRequest" }) {
-            let item = Appearance.contact.listHeaderExtensionActions[index]
-            item.showBadge = true
-            let unreadCount = self.newFriends[saveIdentifier]?.filter({ $0["read"] as? Int == 0 }).count ?? 0
-            item.numberCount = UInt(unreadCount)
-            Appearance.contact.listHeaderExtensionActions[index].numberCount = UInt(unreadCount)
-        }
+//MARK: - ChatClientListener
+extension ChatUIKitClient: ChatClientListener {
+    
+    public func onDatabaseOpened(_ error: ChatError?, username: String) {
+        guard error == nil else { return }
+        self.dispatchToDataSyncListeners { $0.onChatDatabaseOpened?() }
     }
     
-    public func friendRequestDidApprove(byUser aUsername: String) {
-        let conversation = ChatClient.shared().chatManager?.getConversation(aUsername, type: .chat, createIfNotExist: true)
-        let ext = ["something":("You have added".chat.localize+" "+aUsername+" "+"to say hello".chat.localize)]
-        let message = ChatMessage(conversationID: aUsername, body: ChatCustomMessageBody(event: EaseChatUIKit_alert_message, customExt: nil), ext: ext)
-        conversation?.insert(message, error: nil)
+    public func syncDataStart(with type: DataSyncType) {
+        self.dispatchToDataSyncListeners(type: type) { $0.onChatDataSyncStart?() }
+    }
+    
+    public func syncDataFinished(_ error: ChatError?, type: DataSyncType) {
+        self.dispatchToDataSyncListeners(type: type) { $0.onChatDataSyncFinished?(error: error) }
     }
 }
+

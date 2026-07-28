@@ -15,7 +15,7 @@ import UIKit
     
     private var selectClosure: ((ChatUserProfileProtocol) -> Void)?
     
-    private var service: ContactServiceProtocol = ContactServiceImplement()
+    private lazy var service: ContactServiceProtocol = ChatUIKitClient.shared.contactService ?? ContactServiceImplement()
     
     public private(set) var searchResults = [ChatUserProfileProtocol]() {
         didSet {
@@ -103,40 +103,33 @@ import UIKit
     }
     
     @objc public func loadAllContacts() {
-        self.service.contacts(completion: { [weak self] error, contacts in
-            if error == nil {
-                var infos = contacts.map({
-                    let profile = ChatUserProfile()
-                    profile.id = $0.userId
-                    profile.nickname = ChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
-                    profile.avatarURL = ChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
-                    profile.remark = ChatUIKitContext.shared?.userCache?[$0.userId]?.remark ?? ""
-                    return profile
-                })
-                self?.rawDatas.removeAll()
-                self?.searchResults.removeAll()
-                if let ignoreIds = self?.ignoreIds {
-                    for id in ignoreIds {
-                        if let index = infos.firstIndex(where: { $0.id == id }) {
-                            infos.remove(at: index)
-                        }
-                    }
+        if let contacts = ChatClient.shared().contactManager?.getAllContacts() {
+            var infos = contacts.map({
+                let profile = ChatUserProfile()
+                profile.id = $0.userId
+                profile.nickname = $0.userInfo?.nickname ?? ChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
+                profile.avatarURL = $0.userInfo?.avatarUrl ?? ChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
+                profile.remark = $0.remark ?? ChatUIKitContext.shared?.userCache?[$0.userId]?.remark ?? ""
+                return profile
+            })
+            self.rawDatas.removeAll()
+            self.searchResults.removeAll()
+            for id in self.ignoreIds {
+                if let index = infos.firstIndex(where: { $0.id == id }) {
+                    infos.remove(at: index)
                 }
-                if let selectProfiles = self?.selectProfiles {
-                    for profile in infos {
-                        if selectProfiles.contains(where: { $0.id == profile.id }) {
-                            profile.selected = true
-                        }
-                    }
-                }
-                self?.rawDatas = infos
-                if infos.count > 0 {
-                    self?.searchList.reloadData()
-                }
-            } else {
-                consoleLogInfo("ContactSearchResultController loadAllContacts error:\(error?.errorDescription ?? "")", type: .error)
             }
-        })
+            
+            for profile in infos {
+                if self.selectProfiles.contains(where: { $0.id == profile.id }) {
+                    profile.selected = true
+                }
+            }
+            self.rawDatas = infos
+            if infos.count > 0 {
+                self.searchList.reloadData()
+            }
+        }
     }
     
     open override func viewDidAppear(_ animated: Bool) {

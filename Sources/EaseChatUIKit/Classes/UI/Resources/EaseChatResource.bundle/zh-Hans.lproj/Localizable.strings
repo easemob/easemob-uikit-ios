@@ -28,7 +28,6 @@
 "barrage_long_press_menu_delete" = "删除";
 "barrage_long_press_menu_recall" = "撤回";
 "barrage_long_press_menu_reply" = "回复";
-"barrage_long_press_menu_report" = "举报";
 "barrage_long_press_menu_show_original_text" = "隐藏译文";
 "barrage_long_press_menu_multi_select" = "多选";
 "barrage_long_press_menu_topic" = "创建话题";
@@ -40,7 +39,7 @@
 "barrage_long_press_menu_cancel" = "取消";
 "barrage_long_press_menu_pin" = "置顶";
 
-"report_button_click_menu_button_cancel" = "取消";
+"common_button_cancel" = "取消";
 "Confirm" = "确认";
 "Editing" = "编辑中";
 "Edited" = "已编辑";
@@ -54,15 +53,6 @@
 
 "Ban List" = "禁言列表";
 
-"violation_reason_1" = "不受欢迎的商业内容或垃圾内容";
-"violation_reason_2" = "色情或露骨内容";
-"violation_reason_3" = "虐待儿童";
-"violation_reason_4" = "仇恨言论或过于写实的暴力内容";
-"violation_reason_5" = "宣扬恐怖主义";
-"violation_reason_6" = "骚扰或欺凌";
-"violation_reason_7" = "自杀或自残";
-"violation_reason_8" = "虚假信息";
-"violation_reason_9" = "其他";
 "Search" = "搜索";
 "participant_list_button_click_menu_remove" = "移除";
 "Your were muted!" = "您已被禁言";
@@ -122,8 +112,8 @@
 "conversation_left_slide_menu_delete" = "删除";
 "conversation_left_slide_menu_pin" = "置顶";
 "conversation_left_slide_menu_unpin" = "取消置顶";
-"conversation_left_slide_menu_mute" = "接受通知";
-"conversation_left_slide_menu_unmute" = "关闭通知";
+"conversation_left_slide_menu_mute" = "关闭通知";
+"conversation_left_slide_menu_unmute" = "接受通知";
 "conversation_right_slide_menu_read" = "标记已读";
 "conversation_right_slide_menu_more" = "更多";
 

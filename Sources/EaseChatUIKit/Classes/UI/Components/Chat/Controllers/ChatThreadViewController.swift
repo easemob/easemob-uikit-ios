@@ -556,8 +556,6 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
             self.viewModel.processMessage(operation: .originalText, message: message)
         case "Delete":
             self.viewModel.processMessage(operation: .delete, message: message)
-        case "Report":
-            self.reportAction(message: message)
         case "MultiSelect":
             self.multiSelect(message: message)
         case "Forward":
@@ -592,12 +590,6 @@ extension ChatThreadViewController: MessageListDriverEventsListener {
             DispatchQueue.main.asyncAfter(wallDeadline: .now()+0.5) {
                 editor.editor.textView.becomeFirstResponder()
             }
-        }
-    }
-    
-    @objc open func reportAction(message: ChatMessage) {
-        DialogManager.shared.showReportDialog(message: message) { error in
-            
         }
     }
     
