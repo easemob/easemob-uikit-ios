@@ -90,8 +90,9 @@ extension ConversationServiceImplement: ConversationService {
     }
     
     public func markAllMessagesAsRead(conversationId: String) {
-        let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(conversationId)
-        conversation?.markAllMessages(asRead: nil)
+        ChatClient.shared().chatManager?.clearConversationUnreadMessageCount(conversationId) { error in
+            self.handleResult(error: error, type: .read)
+        }
     }
     
     public func bindConversationEventsListener(listener: ConversationServiceListener) {

@@ -1050,7 +1050,7 @@ extension MessageListView: IMessageListViewDriver {
     private func convertStatus(message: ChatMessage) -> ChatMessageStatus {
         switch message.status {
         case .succeed:
-            if message.isReadAcked {
+            if message.isPeerRead {
                 return .read
             }
             if message.isDeliverAcked {

@@ -844,6 +844,15 @@ extension ChatMessage {
     
     /// ``ChatUserProfileProtocol``
     @objc public var user: ChatUserProfileProtocol? {
+        
+        if let senderInfo = senderInfo {
+            let user = ChatUserProfile()
+            user.id = from
+            user.avatarURL = senderInfo.avatarUrl ?? ""
+            user.nickname = senderInfo.nickname ?? ""
+            user.remark = senderInfo.remark ?? ""
+            return user
+        }
         let cacheUser = ChatUIKitContext.shared?.userCache?[self.from]
         if cacheUser != nil,let remark = cacheUser?.remark,!remark.isEmpty {
             ChatUIKitContext.shared?.chatCache?[self.from]?.remark = remark
@@ -854,14 +863,6 @@ extension ChatMessage {
         }
         if from == ChatClient.shared().currentUsername ?? "",let currentUser = ChatUIKitContext.shared?.currentUser {
             return currentUser
-        }
-        if let senderInfo = senderInfo {
-            let user = ChatUserProfile()
-            user.id = from
-            user.avatarURL = senderInfo.avatarUrl ?? ""
-            user.nickname = senderInfo.nickname ?? ""
-            user.remark = senderInfo.remark ?? ""
-            return user
         }
         if chatUser == nil,cacheUser != nil {
             return cacheUser

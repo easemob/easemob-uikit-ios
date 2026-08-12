@@ -276,7 +276,9 @@ import UIKit
      4. If there is no presenting view controller, creates a new instance of `ComponentsRegister.shared.MessageViewController` with the conversation ID and chat type set to `.group` and navigates to it using `ControllerStack.toDestination` method.
      */
     @objc open func alreadyChat() {
-        ChatClient.shared().chatManager?.ackConversationRead(self.chatGroup.groupId)
+        ChatClient.shared().chatManager?.clearConversationUnreadMessageCount(self.chatGroup.groupId) { error in
+            consoleLogInfo("ackConversationRead error:\(error?.errorDescription ?? "")", type: .error)
+        }
         if let count = self.navigationController?.viewControllers.count {
             if self.navigationController?.viewControllers[safe: count - 2] is MessageListController {
                 if let root = self.navigationController?.viewControllers[safe: count - 3] {

@@ -21,9 +21,9 @@ import Foundation
     @objc optional func onChatDatabaseOpened()
     
     /// A synchronization for ``interestedSyncType`` has started.
-    @objc optional func onChatDataSyncStart()
+    @objc optional func onChatDataSyncStart(type: DataSyncType)
     
     /// A synchronization for ``interestedSyncType`` has finished.
     /// - Parameter error: The error information. It is nil when the synchronization succeeded.
-    @objc optional func onChatDataSyncFinished(error: ChatError?)
+    @objc optional func onChatDataSyncFinished(error: ChatError?,type: DataSyncType)
 }

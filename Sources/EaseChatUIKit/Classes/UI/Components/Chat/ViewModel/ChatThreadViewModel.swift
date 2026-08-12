@@ -179,6 +179,12 @@ import UIKit
     @objc open func constructMessage(text: String,type: MessageCellStyle,extensionInfo: Dictionary<String,Any> = [:]) -> ChatMessage? {
         
         var ext = extensionInfo
+        if ChatUIKitClient.shared.option.option_UI.compatibilityModeForUserInfo {
+            let json = ChatUIKitContext.shared?.currentUser?.toJsonObject() ?? [:]
+            ext.merge(json) { _, new in
+                new
+            }
+        }
         var chatMessage: ChatMessage?
         switch type {
         case .text:
@@ -389,8 +395,9 @@ extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
     
     
     public func onMoreMessagesClicked() {
-        ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.markAllMessages(asRead: nil)
-//        ChatClient.shared().chatManager?.ackConversationRead(self.to)
+        if let threadId = self.chatThread?.threadId {
+            ChatClient.shared().chatManager?.clearConversationUnreadMessageCount(threadId)
+        }
     }
     
     public func onMessageMultiSelectBarClicked(operation: MessageMultiSelectedBottomBarOperation) {
@@ -443,12 +450,15 @@ extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
     
     @objc open func messageVisibleMark(entity: MessageEntity) {
         let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)
-        if !entity.message.isRead {
+        if !entity.message.isPeerRead,entity.message.direction == .receive,entity.message.isNeedReadReceipt  {
             if conversation?.type ?? .chat == .chat {
                 switch entity.message.body.type {
                 case .text,.location,.custom,.image:
-                    conversation?.markMessageAsRead(withId: entity.message.messageId, error: nil)
-//                    ChatClient.shared().chatManager?.sendMessageReadAck(entity.message.messageId, toUser: self.to)
+                    ChatClient.shared().chatManager?.sendMessageReadReceipts([entity.message]) { error in
+                        if error != nil {
+                            consoleLogInfo("sendMessageReadReceipts error:\(error?.errorDescription ?? "")", type: .error)
+                        }
+                    }
                 default:
                     break
                 }
@@ -681,6 +691,16 @@ extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
 }
 
 extension ChatThreadViewModel: ChatResponseListener {
+        
+    public func messageReadReceiptReceived(receipt: [MessageReadReceipt]) {
+        for r in receipt {
+            if r.conversationId == self.to {
+                if let message = ChatClient.shared().chatManager?.getMessageWithMessageId(r.messageId) {
+                    self.driver?.updateMessageStatus(message: message, status: r.isPeerReceipt ? .read:.delivered)
+                }
+            }
+        }
+    }
     public func onCMDMessageDidReceived(message: ChatMessage) {
         
     }

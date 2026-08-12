@@ -175,4 +175,9 @@ public let EaseChatUIKit_user_card_message = "userCard"
     /// Update messages read state on received channel ack.
     /// - Parameter conversationId: The ID of the conversation.
     func messagesAlreadyRead(conversationId: String)
+    
+    
+    /// When message read receipt received.
+    /// - Parameter receipt: ``MessageReadReceipt`` array.
+    func messageReadReceiptReceived(receipt: [MessageReadReceipt])
 }
