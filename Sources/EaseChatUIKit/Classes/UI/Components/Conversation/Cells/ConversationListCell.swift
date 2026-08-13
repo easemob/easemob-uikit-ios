@@ -287,7 +287,7 @@ extension ConversationListCell: ThemeSwitchProtocol {
         case .delivering:
             return .delivered
         default:
-            if message.isReadAcked {
+            if message.isPeerRead {
                 return .read
             }
             return .failure

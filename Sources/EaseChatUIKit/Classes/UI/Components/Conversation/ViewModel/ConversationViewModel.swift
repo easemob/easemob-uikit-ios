@@ -350,7 +350,11 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
     @objc open func conversationDidSelected(indexPath: IndexPath, info: ConversationInfo) {
         self.chatId = info.id
         self.service?.markAllMessagesAsRead(conversationId: info.id)
-        ChatClient.shared().chatManager?.ackConversationRead(info.id)
+        ChatClient.shared().chatManager?.clearConversationUnreadMessageCount(info.id) { error in
+            if error != nil {
+                consoleLogInfo("onConversationSwipe read:\(error?.errorDescription ?? "")", type: .error)
+            }
+        }
         self.driver?.swipeMenuOperation(info: info, type: .read)
         self.toChat?(indexPath,info)
         self.updateUnreadCount()
@@ -476,7 +480,16 @@ extension ConversationViewModel: MultiDeviceListener {
                 self.driver?.refreshList(infos: self.mapper(objects: infos))
                 self.service?.handleResult(error: nil, type: .delete)
             }
-            
+        case .conversationMuteInfoChanged:
+            if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
+                self.driver?.refreshList(infos: self.mapper(objects: infos))
+                self.service?.handleResult(error: nil, type: .setSilent)
+            }
+        case .conversationUnreadMessageCountCleared,.allConversationUnreadMessageCountCleared:
+            if let infos = ChatClient.shared().chatManager?.getAllConversations(true) {
+                self.driver?.refreshList(infos: self.mapper(objects: infos))
+                self.service?.handleResult(error: nil, type: .read)
+            }
         default: break
         }
     }

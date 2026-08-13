@@ -346,7 +346,11 @@ import UIKit
      4. If there is no presenting view controller, creates a new instance of MessageViewController with the selected conversation ID and sets it as the desired view controller using ControllerStack.
      */
     @objc open func alreadyChat() {
-        ChatClient.shared().chatManager?.ackConversationRead(self.profile.id)
+        ChatClient.shared().chatManager?.clearConversationUnreadMessageCount(self.profile.id) { error in
+            if error != nil {
+                consoleLogInfo("ContactInfoViewController clearConversationUnreadMessageCount error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        }
         if let count = self.navigationController?.viewControllers.count {
             if let _ = self.navigationController?.viewControllers[safe: count - 2] as? MessageListController {
                 if let root = self.navigationController?.viewControllers[safe: count - 3] {

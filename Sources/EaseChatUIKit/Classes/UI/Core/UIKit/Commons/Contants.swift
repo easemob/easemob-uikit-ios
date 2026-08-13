@@ -17,13 +17,35 @@ public let ScreenHeight = UIScreen.main.bounds.height
 public let edgeZero: UIEdgeInsets = .zero
 
 /// The height of the bottom safe area of the screen.
-public let BottomBarHeight = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0
+  public var BottomBarHeight: CGFloat {
+      guard let scene = UIApplication.shared.connectedScenes
+          .compactMap({ $0 as? UIWindowScene })
+          .first(where: { $0.activationState == .foregroundActive })
+          ?? UIApplication.shared.connectedScenes
+          .compactMap({ $0 as? UIWindowScene }).first
+      else { return 49 }
+   
+      let window: UIWindow?
+      if #available(iOS 15.0, *) {
+          window = scene.keyWindow ?? scene.windows.first
+      } else {
+          window = scene.windows.first(where: \.isKeyWindow) ?? scene.windows.first
+      }
+      // 注意:安全区底部在无 Home Indicator 机型上合法为 0,不可用 >0 判定有效性
+      return window?.safeAreaInsets.bottom ?? 49
+  }
 
 /// The height of the status bar.
-public let StatusBarHeight: CGFloat = UIApplication.shared.chat.keyWindow?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
+public var StatusBarHeight: CGFloat {
+      UIApplication.shared.connectedScenes
+          .compactMap { $0 as? UIWindowScene }
+          .first?.statusBarManager?.statusBarFrame.height ?? 0
+}
 
 /// The height of the navigation bar, which includes the status bar.
-public let NavigationHeight :CGFloat = StatusBarHeight + 44
+public var NavigationHeight :CGFloat {
+    StatusBarHeight + 44
+}
 
 /// A wrapper for a project-specific type.
 public struct ChatWrapper<Base> {

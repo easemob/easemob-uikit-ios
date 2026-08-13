@@ -109,11 +109,23 @@ extension ChatServiceImplement: ChatService {
     }
     
     public func markMessageAsRead(messageId: String) {
-        ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.markMessageAsRead(withId: messageId, error: nil)
+        if let message = ChatClient.shared().chatManager?.getMessageWithMessageId(messageId) {
+            ChatClient.shared().chatManager?.sendMessageReadReceipts([message]) { error in
+                
+                if error != nil {
+                    consoleLogInfo("sendMessageReadReceipts error:\(error?.errorDescription ?? "")", type: .error)
+                }
+            }
+        }
+        
     }
     
     public func markAllMessagesAsRead() {
-        ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.markAllMessages(asRead: nil)
+        ChatClient.shared().chatManager?.clearConversationUnreadMessageCount(self.to) { error in
+            if error != nil {
+                consoleLogInfo("clearConversationUnreadMessageCount error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        }
     }
     
     public func loadMessages(start messageId: String, cursor: String?, pageSize: UInt, searchMessage: Bool, completion: @escaping (ChatError?, [ChatMessage], String?) -> Void) {
@@ -236,11 +248,9 @@ extension ChatServiceImplement: ChatService {
 
 extension ChatServiceImplement: ChatEventsListener {
     
-    public func cmdMessagesDidReceive(_ aCmdMessages: [ChatMessage]) {
+    public func onMessageReadReceipts(_ aReceipts: [MessageReadReceipt]) {
         for listener in self.responseDelegates.allObjects {
-            for message in aCmdMessages {
-                listener.onCMDMessageDidReceived(message: message)
-            }
+            listener.messageReadReceiptReceived(receipt: aReceipts)
         }
     }
     
@@ -253,7 +263,45 @@ extension ChatServiceImplement: ChatEventsListener {
     public func messagesDidReceive(_ aMessages: [ChatMessage]) {
         for listener in self.responseDelegates.allObjects {
             for message in aMessages {
+                if message.senderInfo == nil {
+                    if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
+                        let profile = ChatUserProfile()
+                        profile.setValuesForKeys(dic)
+                        profile.id = message.from
+                        profile.modifyTime = message.timestamp
+                        ChatUIKitContext.shared?.chatCache?[message.from] = profile
+                        if ChatUIKitContext.shared?.userCache?[message.from] == nil {
+                            ChatUIKitContext.shared?.userCache?[message.from] = profile
+                        } else {
+                            ChatUIKitContext.shared?.userCache?[message.from]?.nickname = profile.nickname
+                            ChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
+                        }
+                    }
+                } else {
+                    if let profile = message.senderInfo {
+                        if ChatUIKitContext.shared?.userCache?[message.from] == nil {
+                            let user = ChatUserProfile()
+                            user.id = profile.userId ?? message.from
+                            user.nickname = profile.nickname ?? ""
+                            user.avatarURL = profile.avatarUrl ?? ""
+                            user.modifyTime = message.timestamp
+                            user.remark = profile.remark ?? ""
+                            ChatUIKitContext.shared?.userCache?[message.from] = user
+                        } else {
+                            ChatUIKitContext.shared?.userCache?[message.from]?.nickname = message.senderInfo?.nickname ?? ""
+                            ChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = message.senderInfo?.avatarUrl ?? ""
+                        }
+                    }
+                }
                 listener.onMessageDidReceived(message: message)
+            }
+        }
+    }
+    
+    public func cmdMessagesDidReceive(_ aCmdMessages: [ChatMessage]) {
+        for listener in self.responseDelegates.allObjects {
+            for message in aCmdMessages {
+                listener.onCMDMessageDidReceived(message: message)
             }
         }
     }
@@ -306,15 +354,7 @@ extension ChatServiceImplement: ChatEventsListener {
         }
     }
     
-    public func onConversationRead(_ from: String, to: String) {
-        if ChatUIKitContext.shared?.currentUserId ?? "" != from {
-            for listener in self.responseDelegates.allObjects {
-                listener.messagesAlreadyRead(conversationId: from)
-            }
-        } else {
-           //如果是多设备服务端会投递对方已读的状态给其他设备
-        }
-    }
+    
     
 }
 

@@ -194,7 +194,13 @@ public enum PHPickerMediaResolver {
                 audioView.audioIcon.stopAnimating()
             }
         }
-        ChatClient.shared().chatManager?.getConversationWithConvId(self.profile.id)?.markAllMessages(asRead: nil)
+        ChatClient.shared().chatManager?.clearConversationUnreadMessageCount(self.profile.id) { error in
+            if error == nil {
+                consoleLogInfo("Clear conversation unread message count success", type: .info)
+            } else {
+                consoleLogInfo("Clear conversation unread message count error:\(error?.errorDescription ?? "")", type: .error)
+            }
+        }
         self.viewModel.notifyUnreadCountChanged()
     }
     

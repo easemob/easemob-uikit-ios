@@ -190,7 +190,7 @@ import UIKit
             }
         })
     }
-
+    
     /// Send message with text&type&extension info.
     /// - Parameters:
     ///   - text: If it is a text message, this parameter is the text message content. If it is a location message, it is address,longitude&latitude save as extensionInfo. If it is a merged and forwarded message, it is the summary. If it is other messages, it is the path.
@@ -218,6 +218,12 @@ import UIKit
     @objc open func constructMessage(text: String,type: MessageCellStyle,extensionInfo: Dictionary<String,Any> = [:]) -> ChatMessage? {
         
         var ext = extensionInfo
+        if ChatUIKitClient.shared.option.option_UI.compatibilityModeForUserInfo {
+            let json = ChatUIKitContext.shared?.currentUser?.toJsonObject() ?? [:]
+            ext.merge(json) { _, new in
+                new
+            }
+        }
         var chatMessage: ChatMessage?
         switch type {
         case .text:
@@ -288,6 +294,9 @@ import UIKit
             chatMessage?.chatType = .groupChat
         case .chatroom:
             chatMessage?.chatType = .chatRoom
+        }
+        if !(type == .alert || type == .cmd) {
+            chatMessage?.isNeedReadReceipt = self.chatType == .chat
         }
         return chatMessage
     }
@@ -515,8 +524,9 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
     
     
     public func onMoreMessagesClicked() {
-        ChatClient.shared().chatManager?.getConversationWithConvId(self.to)?.markAllMessages(asRead: nil)
-        ChatClient.shared().chatManager?.ackConversationRead(self.to)
+        ChatClient.shared().chatManager?.clearConversationUnreadMessageCount(self.to) { error in
+            consoleLogInfo("clearConversationUnreadMessageCount error:\(error?.errorDescription ?? "")", type: .error)
+        }
     }
     
     
@@ -571,13 +581,14 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
     
     @objc open func messageVisibleMark(entity: MessageEntity) {
         let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)
-        if !entity.message.isRead {
+        if !entity.message.isPeerRead,entity.message.direction == .receive,entity.message.isNeedReadReceipt {
             
-            conversation?.markMessageAsRead(withId: entity.message.messageId, error: nil)
             if conversation?.type ?? .chat == .chat {
                 switch entity.message.body.type {
                 case .text,.location,.custom,.image:
-                    ChatClient.shared().chatManager?.sendMessageReadAck(entity.message.messageId, toUser: self.to)
+                    ChatClient.shared().chatManager?.sendMessageReadReceipts([entity.message]) { error in
+                        consoleLogInfo("sendMessageReadReceipts error:\(error?.errorDescription ?? "")", type: .error)
+                    }
                 default:
                     break
                 }
@@ -824,6 +835,17 @@ extension MessageListViewModel: MessageListViewActionEventsDelegate {
 }
 
 extension MessageListViewModel: ChatResponseListener {
+    
+    public func messageReadReceiptReceived(receipt: [MessageReadReceipt]) {
+        for r in receipt {
+            if r.conversationId == self.to {
+                if let message = ChatClient.shared().chatManager?.getMessageWithMessageId(r.messageId) {
+                    self.driver?.updateMessageStatus(message: message, status: r.isPeerReceipt ? .read:.delivered)
+                }
+            }
+        }
+    }
+    
     public func onCMDMessageDidReceived(message: ChatMessage) {
         if let body = message.body as? ChatCMDMessageBody,body.action == "TypingBegin",message.conversationId == self.to,message.from != ChatUIKitContext.shared?.currentUserId ?? "",self.chatType == .chat {
             for handler in self.handlers.allObjects {
@@ -877,11 +899,12 @@ extension MessageListViewModel: ChatResponseListener {
             self.driver?.showMessage(message: entity)
             if let scrolledBottom = self.driver?.scrolledBottom,scrolledBottom {
                 let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(self.to)
-                conversation?.markMessageAsRead(withId: message.messageId, error: nil)
                 if conversation?.type ?? .chat == .chat {
                     switch message.body.type {
                     case .text,.location,.custom,.image:
-                        ChatClient.shared().chatManager?.sendMessageReadAck(message.messageId, toUser: self.to)
+                        ChatClient.shared().chatManager?.sendMessageReadReceipts([message]) { error in
+                            consoleLogInfo("sendMessageReadReceipts error:\(error?.errorDescription ?? "")", type: .error)
+                        }
                     default:
                         break
                     }

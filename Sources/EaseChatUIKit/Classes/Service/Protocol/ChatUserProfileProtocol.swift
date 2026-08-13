@@ -20,9 +20,16 @@ import Foundation
     var selected: Bool {set get}
     var nickname: String {set get}
     var avatarURL: String {set get}
+    
+    func toJsonObject() -> Dictionary<String,Any>?
 }
 
 @objcMembers open class ChatUserProfile:NSObject, ChatUserProfileProtocol {
+    
+    public func toJsonObject() -> Dictionary<String, Any>? {
+        ["ease_chat_uikit_user_info":["nickname":self.nickname,"avatarURL":self.avatarURL,"userId":self.id]]
+    }
+    
     public var remark: String = ""
     
     public var id: String = ""

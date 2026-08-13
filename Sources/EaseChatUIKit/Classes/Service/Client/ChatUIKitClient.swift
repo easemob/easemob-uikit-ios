@@ -32,6 +32,9 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
     
     /// Whether using contact list module.
     public var enableContact = true
+    
+    /// Whether compatible with older versions of user information transmission or not.
+    public var compatibilityModeForUserInfo = false
 }
 
 @objcMembers public class ChatUIKitClient: NSObject {
@@ -212,11 +215,11 @@ extension ChatUIKitClient: ChatClientListener {
     }
     
     public func syncDataStart(with type: DataSyncType) {
-        self.dispatchToDataSyncListeners(type: type) { $0.onChatDataSyncStart?() }
+        self.dispatchToDataSyncListeners(type: type) { $0.onChatDataSyncStart?(type: type) }
     }
     
     public func syncDataFinished(_ error: ChatError?, type: DataSyncType) {
-        self.dispatchToDataSyncListeners(type: type) { $0.onChatDataSyncFinished?(error: error) }
+        self.dispatchToDataSyncListeners(type: type) { $0.onChatDataSyncFinished?(error: error,type: type) }
     }
 }
 
