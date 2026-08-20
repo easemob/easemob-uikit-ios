@@ -17,11 +17,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions:
-            [UIApplicationLaunchOptionsKey: Any]?
+            [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         // Override point for customization after application launch.
         // TODO: Replace with your own AppKey before running the demo.
-        let option = ChatOptions(appkey: "")
+        let option = ChatOptions(appkey: <##Your AppKey#>)
         option.enableConsoleLog = true
         option.enableUserInfo = true
         option.dataSyncType = [.conversations, .contacts, .joinedGroups]

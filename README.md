@@ -43,7 +43,27 @@
 
 # 安装
 
-您可以使用 CocoaPods 安装 EaseChatUIKit 作为 Xcode 项目的依赖项。
+您可以使用 CocoaPods 或 Swift Package Manager 安装 EaseChatUIKit 作为 Xcode 项目的依赖项。
+
+## Swift Package Manager
+
+在 Xcode 中选择 **File → Add Package Dependencies...**，输入仓库地址：
+
+```
+https://github.com/easemob/easemob-uikit-ios.git
+```
+
+版本选择 `5.0.0` 及以上。添加后勾选产品 `EaseChatUIKit`。
+
+也可以在自己的 `Package.swift` 中声明依赖：
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/easemob/easemob-uikit-ios.git", from: "5.0.0")
+]
+```
+
+SPM 会自动拉取 [HyphenateChat_iOS](https://github.com/easemob/HyphenateChat_iOS)（IM SDK，5.0.0+）和 FLAnimatedImage。
 
 ## CocoaPods
 
@@ -112,6 +132,26 @@ Classes
        └─ Extension // 一些方便的系统类扩展。
 ```
 # 运行示例项目
+
+示例 Demo 源码在 `Example/EaseChatUIKit`，可通过 CocoaPods 或 Swift Package Manager 两种方式打开。
+
+### CocoaPods
+
+```bash
+cd Example
+pod install
+open EaseChatUIKit.xcworkspace
+```
+
+### Swift Package Manager
+
+直接打开本地包示例工程（无需 `pod install`）：
+
+```bash
+open ExampleSPM/EaseChatUIKitSPMExample.xcodeproj
+```
+
+该工程通过 Swift Package 的本地路径引用仓库根目录的 `EaseChatUIKit`，并复用 `Example/EaseChatUIKit` 中的 Demo 源码。
 
 - [注册环信AppKey](https://docs-im-beta.easemob.com/product/enable_and_configure_IM.html#%E8%8E%B7%E5%8F%96%E7%8E%AF%E4%BF%A1%E5%8D%B3%E6%97%B6%E9%80%9A%E8%AE%AF-im-%E7%9A%84%E4%BF%A1%E6%81%AF)
 - 在Appdelegate.swift 中找到

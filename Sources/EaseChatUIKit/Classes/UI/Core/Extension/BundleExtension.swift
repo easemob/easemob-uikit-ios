@@ -30,6 +30,8 @@ public extension Bundle {
                 .flatMap(Bundle.init(url:))!
 #elseif SWIFT_PACKAGE
             return Bundle.module
+                .url(forResource: "EaseChatResource", withExtension: "bundle")
+                .flatMap(Bundle.init(url:)) ?? Bundle.module
 #elseif STATIC_LIBRARY
             return Bundle.main
                 .url(forResource: "EaseChatResource", withExtension: "bundle")

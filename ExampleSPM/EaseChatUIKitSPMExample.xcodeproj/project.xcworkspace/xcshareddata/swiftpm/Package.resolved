@@ -1,0 +1,33 @@
+{
+  "originHash" : "c486e9a42495ec827591151207277d52fcecd905d52ebcdc6089c1223d6ededa",
+  "pins" : [
+    {
+      "identity" : "flanimatedimage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Flipboard/FLAnimatedImage.git",
+      "state" : {
+        "revision" : "d4f07b6f164d53c1212c3e54d6460738b1981e9f",
+        "version" : "1.0.17"
+      }
+    },
+    {
+      "identity" : "hyphenatechat_ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/easemob/HyphenateChat_iOS.git",
+      "state" : {
+        "revision" : "172f3e8a15cdafe7241c565889fe08a151017742",
+        "version" : "5.0.0"
+      }
+    },
+    {
+      "identity" : "shengwanginfra_ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Shengwang-Lab/ShengwangInfra_iOS.git",
+      "state" : {
+        "revision" : "1610332f1c9218f8d6abba2223eebc6884cd16c5",
+        "version" : "1.3.5"
+      }
+    }
+  ],
+  "version" : 3
+}

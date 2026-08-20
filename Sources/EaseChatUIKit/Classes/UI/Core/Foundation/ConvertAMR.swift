@@ -7,6 +7,9 @@
 
 
 import UIKit
+#if canImport(AMRCodec)
+import AMRCodec
+#endif
 
 public struct ChunkDWord : CustomStringConvertible {
 
