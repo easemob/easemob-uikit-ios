@@ -18,8 +18,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        let option = ChatOptions(appkey: "")
+        let option = ChatOptions(appkey: <#AppKey#>)
         option.enableConsoleLog = true
+        option.enableUserInfo = true
+        option.enableAutoSyncContacts = true
         _ = ChatUIKitClient.shared.setup(option: option)
         let redPackage = ActionSheetItem(title: "Red".chat.localize, type: .normal,tag: "Red",image: UIImage(named: "photo", in: .chatBundle, with: nil))
         let gift = ActionSheetItem(title: "Gift".chat.localize, type: .normal,tag: "Gift",image: UIImage(named: "photo", in: .chatBundle, with: nil))

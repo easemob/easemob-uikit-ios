@@ -346,19 +346,6 @@ extension ConversationServiceImplement: ConversationService {
             }
             conversation.unreadCount = UInt($0.unreadMessagesCount)
             conversation.lastMessage = $0.latestMessage
-            if let dic = conversation.lastMessage?.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-                let from = conversation.lastMessage?.from ?? ""
-                let profile_chat = ChatUserProfile()
-                profile_chat.setValuesForKeys(dic)
-                profile_chat.id = from
-                profile_chat.modifyTime = conversation.lastMessage?.timestamp ?? 0
-                if ChatUIKitContext.shared?.userCache?[from] == nil {
-                    ChatUIKitContext.shared?.userCache?[from] = profile_chat
-                } else {
-                    ChatUIKitContext.shared?.userCache?[from]?.nickname = profile_chat.nickname
-                    ChatUIKitContext.shared?.userCache?[from]?.avatarURL = profile_chat.avatarURL
-                }
-            }
             conversation.type = ChatUserProfileProviderType(rawValue: UInt($0.type.rawValue)) ?? .chat
             conversation.pinned = $0.isPinned
             if ChatUIKitClient.shared.option.option_UI.saveConversationInfo {
@@ -425,19 +412,6 @@ extension ConversationServiceImplement: ChatEventsListener {
         }
         if !message.mention.isEmpty {
             conversation.ext?["EaseChatUIKit_mention"] = true
-        }
-        if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-            let profile = ChatUserProfile()
-            profile.setValuesForKeys(dic)
-            profile.id = message.from
-            profile.modifyTime = message.timestamp
-            ChatUIKitContext.shared?.chatCache?[message.from] = profile
-            if ChatUIKitContext.shared?.userCache?[message.from] == nil {
-                ChatUIKitContext.shared?.userCache?[message.from] = profile
-            } else {
-                ChatUIKitContext.shared?.userCache?[message.from]?.nickname = profile.nickname
-                ChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
-            }
         }
         let list = self.mapper(objects: [conversation])
         for listener in self.responseDelegates.allObjects {

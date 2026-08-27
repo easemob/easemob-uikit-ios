@@ -855,6 +855,14 @@ extension ChatMessage {
         if from == ChatClient.shared().currentUsername ?? "",let currentUser = ChatUIKitContext.shared?.currentUser {
             return currentUser
         }
+        if let senderInfo = senderInfo {
+            let user = ChatUserProfile()
+            user.id = from
+            user.avatarURL = senderInfo.avatarUrl ?? ""
+            user.nickname = senderInfo.nickname ?? ""
+            user.remark = senderInfo.remark ?? ""
+            return user
+        }
         if chatUser == nil,cacheUser != nil {
             return cacheUser
         }

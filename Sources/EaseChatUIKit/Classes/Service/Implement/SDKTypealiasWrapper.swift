@@ -63,6 +63,7 @@ public typealias GroupChatThreadEvent = EMChatThreadEvent
 public typealias GroupChatThread = EMChatThread
 public typealias MessagePinOperation = EMMessagePinOperation
 public typealias MessagePinInfo = EMMessagePinInfo
+public typealias UserInfoManagerDelegate = EMUserInfoManagerDelegate
 #elseif canImport(AgoraChat)
 import AgoraChat
 public typealias ChatClient = AgoraChatClient
@@ -113,6 +114,7 @@ public typealias GroupChatThreadEvent = AgoraChatThreadEvent
 public typealias GroupChatThread = AgoraChatThread
 public typealias MessagePinOperation = AgoraChatMessagePinOperation
 public typealias MessagePinInfo = AgoraChatMessagePinInfo
+public typealias UserInfoManagerDelegate = AgoraChatUserInfoManagerDelegate
 #endif
 
 

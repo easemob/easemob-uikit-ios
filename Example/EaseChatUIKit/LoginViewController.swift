@@ -51,11 +51,28 @@ extension LoginViewController {
             self.passWord = passWord
             let profile = ChatUserProfile()
             profile.id = userName.lowercased()
-            profile.nickname = "Tester 001"
-            profile.avatarURL = "https://xxx"
             ChatUIKitClient.shared.login(user: profile, token: passWord) { error in
                 if error == nil {
-                    UIApplication.shared.chat.keyWindow?.rootViewController = MainViewController()
+                    ChatClient.shared().userInfoManager?.fetchUserInfo(byId: [userName], completion: { userInfos, error in
+                        if let _ = error {
+                            self.showToast(toast: "Fetch user information error:\(error?.errorDescription ?? "")",duration: 3)
+                            return
+                        }
+                        if let userInfos = userInfos {
+                            let profiles = userInfos.values.map { info in
+                                let profile = ChatUserProfile()
+                                profile.id = info.userId ?? ""
+                                profile.nickname = info.nickname ?? ""
+                                profile.avatarURL = info.avatarUrl ?? ""
+                                return profile
+                            }
+                            if let profile = profiles.first {
+                                ChatUIKitContext.shared?.currentUser = profile
+                            }
+                            ChatUIKitContext.shared?.updateChatAndUserTypeCaches(profiles: profiles)
+                        }
+                        UIApplication.shared.chat.keyWindow?.rootViewController = MainViewController()
+                    })
                 } else {
                     self.showToast(toast: "login error:\(error?.errorDescription ?? "")",duration: 3)
                 }

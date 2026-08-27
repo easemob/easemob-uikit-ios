@@ -20,8 +20,8 @@ import UIKit
     
     public var agreeClosure: ((String) -> Void)?
     
-    lazy var avatar: UIImageView = {
-        UIImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-40)/2.0, width: 40, height: 40)).cornerRadius(Appearance.avatarRadius).image(Appearance.avatarPlaceHolder).contentMode(.scaleAspectFill)
+    lazy var avatar: ImageView = {
+        ImageView(frame: CGRect(x: 16, y: (self.contentView.frame.height-40)/2.0, width: 40, height: 40)).cornerRadius(Appearance.avatarRadius).image(Appearance.avatarPlaceHolder).contentMode(.scaleAspectFill)
     }()
     
     lazy var nickName: UILabel = {
@@ -66,6 +66,9 @@ import UIKit
     
     @objc public func refresh(request: NewContactRequest) {
         self.request = request
+        if !request.avatarURL.isEmpty {
+            self.avatar.image(with: request.avatarURL, placeHolder: Appearance.avatarPlaceHolder)
+        }
         self.nickName.text = "contactID".chat.localize + ": " + request.userId
         self.content.text = "NewRequestDetail".chat.localize
     }
