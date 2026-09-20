@@ -523,6 +523,8 @@ extension ChatThreadViewModel: MessageListViewActionEventsDelegate {
                                 body?.localPath = tuple.1
                                 ChatClient.shared().chatManager?.update(message.message)
                                 self.audioMessagePlay(message: message)
+                            } else {
+                                consoleLogInfo("audio message decode failed, localPath: \(path)", type: .error)
                             }
                         }
                     }

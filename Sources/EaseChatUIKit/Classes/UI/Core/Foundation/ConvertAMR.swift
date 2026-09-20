@@ -7,6 +7,7 @@
 
 
 import UIKit
+import AMRCodec
 
 public struct ChunkDWord : CustomStringConvertible {
 
@@ -80,62 +81,67 @@ func convertAMRNBToWave(data : Data) -> Data? {
 /// - Parameter data: amr-wb data
 /// - Returns: wave data
 func convertAMRWBToWave(data : Data) -> Data? {
-    return convertAmrToWave(isWB: false, data: data)
+    return convertAmrToWave(isWB: true, data: data)
 }
 
 /// Read wave data chunk structure, if the data format is unknown, return nil.
 public func readWaveStructure(data : Data) -> (ckFmt : ChunkFormat, ckData : ChunkHeader, dataOffset : Int)? {
 
-    guard let waveHeader = data.readWaveHeader(),
-        waveHeader.header.ckID.description == "RIFF",
-        waveHeader.ckFmt.description == "WAVE" else {
-            return nil
-    }
-
-    var readOffset = 12
-    var readFmt = false
-    var fmt : ChunkFormat!
-
-    // Ignore other sub chunks, only need fmt.
-    while !readFmt {
-        guard let header = data.readChunkHeader(offset: readOffset) else {
-            // invalid header
-            return nil
-        }
-        if header.ckID.description == "fmt " {
-            guard let tempFmt = data.readChunkFmt(offset: readOffset) else {
-                return nil
-            }
-            fmt = tempFmt
-            readFmt = true
-        }
-        readOffset += 8 + Int(header.ckSize)
-    }
-
-
-    var dataChunkHeader : ChunkHeader!
-    var readDataOffset = readOffset
-
-    repeat {
-        if let chunkHeader = data.readChunkHeader(offset: readDataOffset) {
-            if chunkHeader.ckID.description == "data" {
-                dataChunkHeader = chunkHeader
-                break
-            }
-            else {
-                readDataOffset += 8 + Int(chunkHeader.ckSize)
-            }
-        }
-        else {
-            return nil
-        }
-    } while true
-
-    guard data.count >= (Int(dataChunkHeader.ckSize) + readDataOffset + 8) else {
+    guard data.count >= 12,
+          data.fourCC(at: 0) == "RIFF",
+          data.fourCC(at: 8) == "WAVE" else {
         return nil
     }
 
-    return (fmt, dataChunkHeader, readDataOffset + 8)
+    var offset = 12
+    var fmt: ChunkFormat?
+
+    while offset + 8 <= data.count {
+        let chunkID = data.fourCC(at: offset)
+        let chunkSize = Int(data.leUInt32(at: offset + 4))
+        let payloadOffset = offset + 8
+        guard chunkSize >= 0, payloadOffset <= data.count else {
+            break
+        }
+
+        if chunkID == "fmt ", chunkSize >= 16, payloadOffset + 16 <= data.count {
+            let header = ChunkHeader(ckID: ChunkDWord(fourCC: "fmt "), ckSize: UInt32(chunkSize))
+            fmt = ChunkFormat(
+                header: header,
+                audioFormat: data.leUInt16(at: payloadOffset),
+                numChannels: data.leUInt16(at: payloadOffset + 2),
+                sampleRate: data.leUInt32(at: payloadOffset + 4),
+                byteRate: data.leUInt32(at: payloadOffset + 8),
+                blockAlign: data.leUInt16(at: payloadOffset + 12),
+                bitsPerSample: data.leUInt16(at: payloadOffset + 14)
+            )
+        } else if chunkID == "data", let fmt {
+            let available = data.count - payloadOffset
+            // AVAudioRecorder sometimes writes data size as 0; use remaining bytes.
+            let rawSize = chunkSize > 0 ? chunkSize : available
+            let pcmSize = UInt32(min(rawSize, available))
+            guard pcmSize > 0 else { return nil }
+            let header = ChunkHeader(ckID: ChunkDWord(fourCC: "data"), ckSize: pcmSize)
+            return (fmt, header, payloadOffset)
+        }
+
+        var next = payloadOffset + chunkSize
+        if chunkSize % 2 == 1 {
+            next += 1
+        }
+        if next <= offset {
+            break
+        }
+        offset = next
+    }
+
+    return nil
+}
+
+public func makeMono16BitWave(sampleRate: UInt32, pcm: Data) -> Data {
+    var data = waveHeaderData(sampleRate: sampleRate, dataSize: UInt32(pcm.count))
+    data.append(pcm)
+    return data
 }
 
 ////////  Private functions
@@ -152,7 +158,13 @@ fileprivate func convertWaveToAmr(isWB : Bool, data : Data) -> Data? {
     var offset = rlt.dataOffset
     let dtx : Int32 = 0
     var mode : Int32
-    let frameSize = Int(Float(UInt32(rlt.ckFmt.numChannels * rlt.ckFmt.bitsPerSample/8) * rlt.ckFmt.sampleRate) * 0.02)
+    let bytesPerSample = max(Int(rlt.ckFmt.bitsPerSample / 8), 1)
+    let channels = max(Int(rlt.ckFmt.numChannels), 1)
+    let sampleRate = max(Int(rlt.ckFmt.sampleRate), 1)
+    let frameSize = Int(Double(channels * bytesPerSample * sampleRate) * 0.02)
+    guard frameSize > 0 else {
+        return nil
+    }
     var state : UnsafeMutableRawPointer
 
     if isWB {
@@ -174,19 +186,22 @@ fileprivate func convertWaveToAmr(isWB : Bool, data : Data) -> Data? {
 
             var resultBytes : [UInt8]
 
+            let encoded: Int
             if isWB {
                 let bytesNum = 61 // 1 + ceil(23.85 * 1000 * 0.02 / 8) = 61
                 resultBytes = [UInt8](repeating: 0, count: bytesNum)
-                E_IF_encode(state, mode, &speech, &resultBytes, dtx)
+                encoded = Int(E_IF_encode(state, mode, &speech, &resultBytes, dtx))
             }
             else {
                 let bytesNum = 32 // 1 + ceil(12.2 * 1000 * 0.02 / 8) = 32
                 resultBytes = [UInt8](repeating: 0, count: bytesNum)
-                Encoder_Interface_Encode(state, Mode(rawValue: UInt32(mode)), &speech, &resultBytes, dtx)
+                encoded = Int(Encoder_Interface_Encode(state, Mode(rawValue: UInt32(mode)), &speech, &resultBytes, dtx))
             }
 
-            let frameData = Data(bytes: &resultBytes, count: resultBytes.count)
-            amrData.append(frameData)
+            guard encoded > 0 else {
+                continue
+            }
+            amrData.append(contentsOf: resultBytes.prefix(encoded))
         }
         else {
             break
@@ -351,26 +366,57 @@ fileprivate let amrwbModeFrameSize = [18, 24, 33, 37, 41, 47, 51, 59, 61]
 
 /// Utils
 
+fileprivate extension ChunkDWord {
+    init(fourCC: String) {
+        let bytes = Array(fourCC.utf8)
+        self.init(
+            c1: Int8(bitPattern: bytes.count > 0 ? bytes[0] : 0),
+            c2: Int8(bitPattern: bytes.count > 1 ? bytes[1] : 0),
+            c3: Int8(bitPattern: bytes.count > 2 ? bytes[2] : 0),
+            c4: Int8(bitPattern: bytes.count > 3 ? bytes[3] : 0)
+        )
+    }
+}
+
 fileprivate extension Data {
 
     // http://soundfile.sapp.org/doc/WaveFormat/
 
+    func fourCC(at offset: Int) -> String {
+        guard count >= offset + 4 else { return "" }
+        return String(data: subdata(in: offset..<(offset + 4)), encoding: .ascii) ?? ""
+    }
+
+    func leUInt16(at offset: Int) -> UInt16 {
+        guard count >= offset + 2 else { return 0 }
+        return subdata(in: offset..<(offset + 2)).withUnsafeBytes { buffer in
+            buffer.loadUnaligned(as: UInt16.self)
+        }
+    }
+
+    func leUInt32(at offset: Int) -> UInt32 {
+        guard count >= offset + 4 else { return 0 }
+        return subdata(in: offset..<(offset + 4)).withUnsafeBytes { buffer in
+            buffer.loadUnaligned(as: UInt32.self)
+        }
+    }
+
     func readWaveHeader() -> WaveHeader? {
-        guard self.count > 12 else {
+        guard self.count >= 12 else {
             return nil
         }
         return readData(range: 0..<12, type: WaveHeader.self)
     }
 
     func readChunkFmt(offset : Int) -> ChunkFormat? {
-        guard self.count > offset + 24 else {
+        guard self.count >= offset + 24 else {
             return nil
         }
         return readData(range: offset..<offset + 24, type: ChunkFormat.self)
     }
 
     func readChunkHeader(offset : Int) -> ChunkHeader? {
-        guard self.count > offset + 8 else {
+        guard self.count >= offset + 8 else {
             return nil
         }
         return readData(range: offset..<(offset+8), type: ChunkHeader.self)
@@ -380,7 +426,7 @@ fileprivate extension Data {
 
         var speech : [Int16]! = [Int16](repeating:0, count: frameSize/Int(numChannels)/Int(bitsPerSample/8))
 
-        guard self.count > (offset + frameSize) else {
+        guard self.count >= (offset + frameSize) else {
             return nil
         }
 
