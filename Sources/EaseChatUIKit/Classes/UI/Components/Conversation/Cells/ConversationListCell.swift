@@ -297,5 +297,16 @@ extension ConversationListCell: ThemeSwitchProtocol {
     required public override init() {
         
     }
+
+    /// Fills empty nickname/avatar from SDK conversation fields (5.0+).
+    /// Cache / provider values already written on this object win.
+    @objc open func applySDKDisplayInfoIfNeeded(from conversation: ChatConversation) {
+        if self.nickname.isEmpty, let name = conversation.conversationName, !name.isEmpty {
+            self.nickname = name
+        }
+        if self.avatarURL.isEmpty, let avatar = conversation.conversationAvatar, !avatar.isEmpty {
+            self.avatarURL = avatar
+        }
+    }
     
 }
