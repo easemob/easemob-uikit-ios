@@ -9,9 +9,6 @@
 #ifndef codec_h
 #define codec_h
 
-#import "interf_dec.h"
-#import "interf_enc.h"
-#import "dec_if.h"
-#import "enc_if.h"
+#import <AMRCodec/AmrCodec.h>
 
 #endif /* codec_h */

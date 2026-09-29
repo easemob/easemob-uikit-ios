@@ -224,6 +224,7 @@ import UIKit
         self.recordIcon.setImage(self.icon, for: .normal)
         self.trash.isHidden = true
         self.send.isHidden = true
+        AudioTools.shared.discardPreviewFile()
         if let url = AudioTools.shared.audioFileURL {
             do {
                 try FileManager.default.removeItem(at: url)
@@ -242,6 +243,7 @@ import UIKit
         if let url = AudioTools.shared.audioFileURL {
             self.sendAction?(url,self.duration)
         }
+        AudioTools.shared.discardPreviewFile()
         self.duration = 0
         self.recordIcon.setTitle(nil, for: .normal)
         self.recordIcon.setImage(self.icon, for: .normal)

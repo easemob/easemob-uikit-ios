@@ -28,12 +28,17 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/easemob/easemob-uikit-ios.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '14.0'
+  s.ios.deployment_target = '15.0'
 
-  s.xcconfig = {'ENABLE_BITCODE' => 'NO'}
 #  s.public_header_files = ['Sources/EaseChatUIKit/Classes/*/*.h']
   
   s.source_files = [ 'Sources/EaseChatUIKit/Classes/**/*.{h,swift}' ]
+  s.exclude_files = [
+    'Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/opencore-amr/**/*',
+    'Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/vo-amrwbenc/**/*',
+    'Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/AmrCodec.h',
+    'Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/AMRCodec.xcframework/**/*'
+  ]
 #  s.private_header_files = ['Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*']
   s.resources = ['Sources/EaseChatUIKit/Classes/UI/**/*.bundle','Sources/EaseChatUIKit/Classes/UI/**/*.xcprivacy']
   s.dependency 'HyphenateChat','>=4.22.0'
@@ -48,20 +53,11 @@ TODO: Add long description of the pod here.
   #import "EaseChatUIKit-Bridge.h"
   # endif
   '
-  s.public_header_files = 'Sources/EaseChatUIKit/Classes/UI/Foundation/EaseChatUIKit-Bridge.h'
+  s.public_header_files = 'Sources/EaseChatUIKit/Classes/UI/Core/Foundation/EaseChatUIKit-Bridge.h'
 
-  s.preserve_paths =  ['Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*.a','Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/vo-amrwbenc/lib/*.a']
-  
+  s.vendored_frameworks = 'Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/AMRCodec.xcframework'
 
-  s.vendored_libraries = ['Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*.a','Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/vo-amrwbenc/lib/*.a']
-
-  s.xcconfig = { 'LIBRARY_SEARCH_PATHS' => '$(PODS_ROOT)/Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*' } #
-
-  
-  s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64',
-                            'VALID_ARCHS' => 'arm64 armv7 x86_64'
-                          }
-  s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+  s.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO' }
 
   s.frameworks = 'UIKit', 'Foundation', 'Combine', 'AudioToolbox', 'AVFoundation','AVFAudio','Photos'
 end
