@@ -1,0 +1,5 @@
+framework module AMRCodec {
+    umbrella header "AmrCodec.h"
+    export *
+    module * { export * }
+}
