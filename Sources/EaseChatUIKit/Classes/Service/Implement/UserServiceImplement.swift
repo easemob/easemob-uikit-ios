@@ -191,7 +191,9 @@ extension UserServiceImplement: ChatClientListener {
 
 extension UserServiceImplement: UserInfoManagerDelegate {
     public func onSelfUserInfoUpdate(_ aUserInfo: UserInfo) {
-        ChatUIKitContext.shared?.updateChatAndUserTypeCaches(profiles: [self.convertToUser(info: aUserInfo)])
+        let profile = self.convertToUser(info: aUserInfo)
+        ChatUIKitContext.shared?.currentUser = profile
+        ChatUIKitContext.shared?.updateChatAndUserTypeCaches(profiles: [profile])
     }
     
     public func onUserInfoUpdate(_ aUserInfos: [String : UserInfo]) {

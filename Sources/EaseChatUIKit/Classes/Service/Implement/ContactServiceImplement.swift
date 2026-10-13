@@ -58,6 +58,12 @@ extension ContactServiceImplement: ContactServiceProtocol {
     }
     
     public func contacts(completion: @escaping (ChatError?, [Contact]) -> Void) {
+        if !ChatClient.shared().options.enableAutoSyncContacts {
+            ChatClient.shared().contactManager?.getAllContactsFromServer(completion: { contacts, error in
+                completion(error, contacts ?? [])
+            })
+            return
+        }
         if self.isFriendSyncing {
             self.pendingContactCompletions.append(completion)
             return

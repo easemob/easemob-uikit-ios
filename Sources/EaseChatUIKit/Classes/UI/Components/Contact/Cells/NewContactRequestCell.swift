@@ -66,9 +66,7 @@ import UIKit
     
     @objc public func refresh(request: NewContactRequest) {
         self.request = request
-        if !request.avatarURL.isEmpty {
-            self.avatar.image(with: request.avatarURL, placeHolder: Appearance.avatarPlaceHolder)
-        }
+        self.avatar.image(with: request.avatarURL, placeHolder: Appearance.avatarPlaceHolder)
         self.nickName.text = "contactID".chat.localize + ": " + request.userId
         self.content.text = "NewRequestDetail".chat.localize
     }

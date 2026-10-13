@@ -858,9 +858,9 @@ extension ChatMessage {
         if let senderInfo = senderInfo {
             let user = ChatUserProfile()
             user.id = from
-            user.avatarURL = senderInfo.avatarUrl ?? ""
-            user.nickname = senderInfo.nickname ?? ""
-            user.remark = senderInfo.remark ?? ""
+            user.avatarURL = senderInfo.avatarUrl ?? chatUser?.avatarURL ?? cacheUser?.avatarURL ?? ""
+            user.nickname = senderInfo.nickname ?? chatUser?.nickname ?? cacheUser?.nickname ?? ""
+            user.remark = senderInfo.remark ?? chatUser?.remark ?? cacheUser?.remark ?? ""
             return user
         }
         if chatUser == nil,cacheUser != nil {

@@ -238,6 +238,7 @@ extension MainViewController: ChatUserProfileProvider,ChatGroupProfileProvider {
         profile.id = info.userId ?? ""
         profile.nickname = info.nickname ?? ""
         profile.avatarURL = info.avatarUrl ?? ""
+        profile.remark = ChatClient.shared().contactManager?.getContact(profile.id)?.remark ?? ""
         return profile
     }
     

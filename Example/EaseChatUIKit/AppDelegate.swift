@@ -18,7 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        let option = ChatOptions(appkey: <#AppKey#>)
+        // Replace with your App Key from the EaseMob console.
+        let option = ChatOptions(appkey: "YourAppKey")
         option.enableConsoleLog = true
         option.enableUserInfo = true
         option.enableAutoSyncContacts = true

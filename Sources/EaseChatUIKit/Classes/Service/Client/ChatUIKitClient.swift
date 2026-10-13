@@ -154,6 +154,7 @@ public let cache_update_notification = "ChatUIKitContextUpdateCache"
            let profile = profiles[user.id] else {
             let userInfo = UserInfo()
             userInfo.userId = user.id
+            userInfo.nickname = user.nickname
             userInfo.avatarUrl = user.avatarURL
             ChatClient.shared().userInfoManager?.updateOwn(userInfo)
             return

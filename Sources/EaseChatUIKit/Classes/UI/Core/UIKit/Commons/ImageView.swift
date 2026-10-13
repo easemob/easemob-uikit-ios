@@ -27,7 +27,9 @@ import Combine
     ///   - url: The URL of the image to load.
     ///   - placeHolder: An optional placeholder image to display while the image is being loaded.
     @MainActor public func image(with url: String,placeHolder: UIImage?) {
+        self.cancellables.removeAll()
         self.image = placeHolder
+        guard !url.isEmpty else { return }
         var urlString = ""
         if url.hasSuffix(".png") || url.hasSuffix(".jpg") || url.hasSuffix(".jpeg") {
             urlString = url
@@ -59,7 +61,9 @@ import Combine
     ///   - placeHolder: An optional placeholder image to display while the image is being loaded.
     ///   - loadFinished: Load finished callback.
     public func image(with url: String,placeHolder: UIImage?,loadFinished: @escaping (UIImage?) -> Void) {
+        self.cancellables.removeAll()
         self.image = placeHolder
+        guard !url.isEmpty else { return }
         guard let imageURL = URL(string: url) else {
             return
         }
