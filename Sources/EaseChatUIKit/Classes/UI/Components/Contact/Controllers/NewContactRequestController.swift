@@ -11,7 +11,7 @@ import UIKit
         
     @UserDefault("EaseChatUIKit_contact_new_request", defaultValue: Dictionary<String,Array<Dictionary<String,Any>>>()) private var newFriends
     
-    public let contactService = ContactServiceImplement()
+    public let contactService: ContactServiceImplement = ChatUIKitClient.shared.contactService as? ContactServiceImplement ?? ContactServiceImplement()
     
     public lazy var datas: [NewContactRequest] = {
         self.fillDatas()
