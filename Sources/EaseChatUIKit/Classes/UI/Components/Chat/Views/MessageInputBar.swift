@@ -81,6 +81,8 @@ import UIKit
     
     private var hiddenDuration = Double(0.2)
     
+    private var lastTypingTime: TimeInterval = 0
+    
     public private(set) lazy var rightView: UIButton = {
         UIButton(type: .custom).frame(CGRect(x: self.frame.width-80, y: self.inputField.frame.maxY-32, width: 30, height: 30)).addTargetFor(self, action: #selector(changeToEmoji), for: .touchUpInside).backgroundColor(.clear)
     }()
@@ -289,7 +291,11 @@ extension MessageInputBar: UITextViewDelegate {
         if textView.text.isEmpty {
             self.updateHeight()
         }
-        self.actionClosure?(.startTyping,nil)
+        let currentTime = Date().timeIntervalSince1970
+        if currentTime - self.lastTypingTime >= 5.0 {
+            self.lastTypingTime = currentTime
+            self.actionClosure?(.startTyping,nil)
+        }
     }
     
     public func textViewDidEndEditing(_ textView: UITextView) {
