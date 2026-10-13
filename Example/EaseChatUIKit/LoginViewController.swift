@@ -54,9 +54,8 @@ extension LoginViewController {
             ChatUIKitClient.shared.login(user: profile, token: passWord) { error in
                 if error == nil {
                     ChatClient.shared().userInfoManager?.fetchUserInfo(byId: [userName], completion: { userInfos, error in
-                        if let _ = error {
-                            self.showToast(toast: "Fetch user information error:\(error?.errorDescription ?? "")",duration: 3)
-                            return
+                        if let error = error {
+                            self.showToast(toast: "Fetch user information error:\(error.errorDescription ?? "")",duration: 3)
                         }
                         if let userInfos = userInfos {
                             let profiles = userInfos.values.map { info in
