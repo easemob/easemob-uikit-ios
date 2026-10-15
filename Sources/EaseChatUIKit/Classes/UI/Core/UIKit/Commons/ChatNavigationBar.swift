@@ -110,7 +110,7 @@ import UIKit
     }
     
     public private(set) lazy var titleLabel: UILabel = {
-        UILabel(frame: CGRect(x: self.avatar.frame.maxX+4, y: (nearStatusBar ? StatusBarHeight:0)+2, width: ScreenWidth-self.avatar.frame.maxX*2-8*3, height: 22)).font(UIFont.theme.headlineSmall).textColor(UIColor.theme.neutralColor1).backgroundColor(.clear).tag(2)
+        UILabel(frame: CGRect(x: self.avatar.frame.maxX+4, y: (nearStatusBar ? self.navigationTopInset:0)+2, width: ScreenWidth-self.avatar.frame.maxX*2-8*3, height: 22)).font(UIFont.theme.headlineSmall).textColor(UIColor.theme.neutralColor1).backgroundColor(.clear).tag(2)
     }()
     
     public private(set) lazy var detail: UILabel = {
@@ -146,6 +146,11 @@ import UIKit
     
     public var nearStatusBar = true
 
+    // A 44pt sheet header does not include the window's status bar area.
+    private var navigationTopInset: CGFloat {
+        max(0, self.bounds.height - 44)
+    }
+
     public override init(frame: CGRect) {
         super.init(frame: frame)
     }
@@ -172,7 +177,7 @@ import UIKit
             } else {
                 self.addSubViews([self.leftItem,self.avatar,self.status,self.titleLabel,self.detail,self.rightItems,self.separateLine,self.cancel])
             }
-            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: (nearStatusBar ? StatusBarHeight:0)+4, width: ScreenWidth - width*2 - 4, height: 22)
+            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: (nearStatusBar ? self.navigationTopInset:0)+4, width: ScreenWidth - width*2 - 4, height: 22)
             if textAlignment == .center {
                 self.titleLabel.center = CGPoint(x: self.center.x, y: self.titleLabel.center.y)
             }
@@ -185,7 +190,7 @@ import UIKit
             }
             self.bringSubviewToFront(self.avatar)
             self.bringSubviewToFront(self.status)
-            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: (nearStatusBar ? StatusBarHeight:0), width: ScreenWidth - CGFloat(self.rightImages.count*36)*2, height: 22)
+            self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: (nearStatusBar ? self.navigationTopInset:0), width: ScreenWidth - CGFloat(self.rightImages.count*36)*2, height: 22)
             if textAlignment == .center {
                 self.titleLabel.center = CGPoint(x: self.center.x, y: self.titleLabel.center.y)
             }
@@ -205,7 +210,7 @@ import UIKit
         self.leftItem.center = CGPoint(x: self.leftItem.center.x, y: self.leftItem.center.y-2)
         self.avatar.frame = CGRect(x: self.showLeft ? self.leftItem.frame.maxX:CGFloat(10), y: self.frame.height-38, width: 32, height: 32)
         self.updateRightItems(images: rightImages)
-        self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: (nearStatusBar ? StatusBarHeight:0)+4, width: ScreenWidth - self.rightItems.frame.width - 8 - ((hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8), height: 22)
+        self.titleLabel.frame = CGRect(x: (hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8, y: (nearStatusBar ? self.navigationTopInset:0)+4, width: ScreenWidth - self.rightItems.frame.width - 8 - ((hiddenAvatar ? self.leftItem.frame.maxX:self.avatar.frame.maxX)+8), height: 22)
         self.detail.frame = CGRect(x: self.titleLabel.frame.minX, y: self.titleLabel.frame.maxY, width: self.titleLabel.frame.width, height: 14)
         self.status.isHidden = Appearance.hiddenPresence
         Theme.registerSwitchThemeViews(view: self)
@@ -220,9 +225,9 @@ import UIKit
         self.init(frame: frame)
         self.addSubViews([self.leftItem,self.titleLabel,self.detail,self.rightItem,self.separateLine,self.cancel])
         self.leftItem.setHitTestEdgeInsets(UIEdgeInsets(top: -10, left: -10, bottom: -10, right: -10))
-        self.titleLabel.frame = CGRect(x: self.leftItem.frame.maxX+4, y: StatusBarHeight+4, width: ScreenWidth - 168, height: 22)
+        self.titleLabel.frame = CGRect(x: self.leftItem.frame.maxX+4, y: self.navigationTopInset+4, width: ScreenWidth - 168, height: 22)
         if textAlignment == .center {
-            self.titleLabel.frame = CGRect(x: 84, y: StatusBarHeight+4, width: ScreenWidth - 168, height: 22)
+            self.titleLabel.frame = CGRect(x: 84, y: self.navigationTopInset+4, width: ScreenWidth - 168, height: 22)
             self.titleLabel.center = CGPoint(x: self.center.x, y: self.titleLabel.center.y)
         }
         self.rightItem.contentHorizontalAlignment = .right
@@ -283,7 +288,7 @@ import UIKit
         } else {
             self.rightImages.append(contentsOf: images)
         }
-        self.rightItems.frame = CGRect(x: ScreenWidth-CGFloat(images.count*36)-8, y: (nearStatusBar ? StatusBarHeight:0)+6, width: CGFloat(images.count*36), height: 36)
+        self.rightItems.frame = CGRect(x: ScreenWidth-CGFloat(images.count*36)-8, y: (nearStatusBar ? self.navigationTopInset:0)+6, width: CGFloat(images.count*36), height: 36)
         self.rightItems.center = CGPoint(x: self.rightItems.center.x, y: self.avatar.center.y)
         self.rightItems.reloadData()
     }
