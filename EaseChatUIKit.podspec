@@ -41,7 +41,7 @@ TODO: Add long description of the pod here.
   ]
 #  s.private_header_files = ['Sources/EaseChatUIKit/Classes/UI/Core/Foundation/third-party/**/*']
   s.resources = ['Sources/EaseChatUIKit/Classes/UI/**/*.bundle','Sources/EaseChatUIKit/Classes/UI/**/*.xcprivacy']
-  s.dependency 'HyphenateChat','>=4.22.0'
+  s.dependency 'HyphenateChat','>= 4.22.0', '< 5.0'
   s.dependency 'FLAnimatedImage', '~> 1.0'
   s.static_framework = true
   

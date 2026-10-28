@@ -14,7 +14,7 @@ class CustomMessageListController: MessageListController {
     override func handleAttachmentAction(item: any ActionSheetItemProtocol) {
         switch item.tag {
         case "File": self.selectFile()
-        case "Photo": self.selectPhoto()
+        case "Photo": self.selectPhotoWithPHPicker()
         case "Camera": self.openCamera()
         case "Contact": self.selectContact()
         case "Red": self.redPackageMessage()

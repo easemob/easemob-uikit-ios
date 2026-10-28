@@ -260,14 +260,16 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-EaseChatUIKit_Example/Pods-EaseChatUIKit_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/FLAnimatedImage/FLAnimatedImage.framework",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/AgoraInfra_iOS/aosl.framework/aosl",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/EaseChatUIKit/AMRCodec.framework/AMRCodec",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/HyphenateChat/HyphenateChat.framework/HyphenateChat",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ShengwangInfra_iOS/aosl.framework/aosl",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FLAnimatedImage.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/aosl.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AMRCodec.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HyphenateChat.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/aosl.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -451,7 +453,7 @@
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				INFOPLIST_FILE = EaseChatUIKit/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = EaseChat;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1;
 				MODULE_NAME = ExampleApp;
@@ -475,7 +477,7 @@
 				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
 				INFOPLIST_FILE = EaseChatUIKit/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = EaseChat;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1;
 				MODULE_NAME = ExampleApp;
