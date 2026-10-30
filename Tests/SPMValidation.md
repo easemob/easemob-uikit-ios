@@ -50,3 +50,21 @@ Xcode 在此 Debug 宿主测试配置中同时把资源包放入 App 根目录�
 
 尚未执行真机签名安装、麦克风录音和扬声器播放验收；未运行 Intel 模拟器或 iOS 15。
 模拟器中的 AMR 编解码与动态库加载已经实际执行，不只是编译检查。
+
+## GitHub Actions 命令复验（2026-10-30）
+
+GitHub 通用 Swift 模板中的 `swift build` / `swift test` 默认面向 macOS，
+会在 FLAnimatedImage 导入 `UIKit/UIKit.h` 时失败。新的
+`.github/workflows/swift.yml` 使用 `xcodebuild` 测试当前检出的本地 package，
+并自动选择 runner 上可用的 iPhone 模拟器。
+
+本机直接提取并执行了 workflow 中的模拟器选择、测试和归档脚本，采用与
+Actions 相同的 Bash `-e -o pipefail` 设置。Xcode 26.0.1 自动选中
+iPhone 17 Pro / iOS 26.2 / arm64；12 项宿主测试通过，0 失败、0 跳过。
+Debug App 资源检查、iOS Release 无签名归档及归档资源检查均通过。
+YAML 解析、各步骤 Bash 语法和 `git diff --check` 也通过。
+
+本次日志与产物位于 `/private/tmp/easechatuikit-ci-9ukm82iw/`：
+`test.log`、`archive.log`、`EaseChatUIKit-Tests.xcresult` 及
+`EaseChatUIKitSPMExample.xcarchive`。这属于 workflow 命令的本机验证；
+GitHub runner 的执行结果仍需在提交并推送 workflow 后确认。

@@ -55,6 +55,8 @@ https://github.com/easemob/easemob-uikit-ios.git
 
 选择包含 `Package.swift` 的发布版本，并将 `EaseChatUIKit` product 添加到 App target。开发当前仓库时可使用 **Add Local…** 选择仓库根目录，或直接打开 `ExampleSPM/EaseChatUIKitSPMExample.xcodeproj`。
 
+验证远程发布版本可打开 [ExampleSPMRemote](ExampleSPMRemote/README.md) 中的工程。该独立示例固定使用 `https://github.com/zjc19891106/easemob-uikit-ios.git` 的 `4.26.0`，附带 `Package.resolved` 锁定依赖；可将整个示例目录复制到其他位置使用。
+
 ```swift
 import EaseChatUIKit
 ```
@@ -104,6 +106,8 @@ end
 
 ## 集成验证
 
+GitHub Actions 使用 [.github/workflows/swift.yml](.github/workflows/swift.yml)，通过 `xcodebuild` 在 iOS 模拟器运行当前提交的本地 SPM 示例及宿主测试，再检查 iOS Release 归档。不要套用 `swift build` / `swift test` 的 macOS 模板：这些命令默认使用宿主 macOS SDK，即使 `Package.swift` 声明了 iOS 平台，也不会自动改为 iOS 构建，因此会报 `UIKit/UIKit.h` 找不到。
+
 `ExampleSPM` 是无需登录的检查 App，展示图片、语言切换、GIF 和 AMR 编码；其共享 scheme 带有宿主 XCTest。测试源码与 CocoaPods `IntegrationTests` test spec 共用，覆盖图片完整性、自定义资源、宿主覆盖和 AMR NB/WB 往返转换。单独运行 package tests 时，依赖宿主覆盖资源的两项测试会跳过；完整验收请运行示例的宿主测试。
 
 ```sh
@@ -137,6 +141,8 @@ python3 scripts/verify_integration_artifacts.py /tmp/EaseChatUIKitSPMExample.xca
 检查脚本也接受 CocoaPods 构建的 `.app` 或 `.xcarchive`，会核对图片清单、两种翻译、隐私清单和 AMR 动态库嵌入。上述无签名归档只检查产物；发布前还需配置签名，在真机运行、录音、转换和播放，验证动态库加载与音频行为。
 
 SPM 本地集成的实际验证结果见 [验证记录](Tests/SPMValidation.md)。Xcode 可能在调试 App 与自动生成的 package framework 中各放一份资源包；检查脚本会逐份核对内容。
+
+远程 `4.26.0` 示例的依赖版本、模拟器测试和归档结果见 [远程验证记录](ExampleSPMRemote/VALIDATION.md)。
 
 # 结构
 
