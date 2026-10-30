@@ -15,6 +15,7 @@
 		7E8026EF887245FA6C3CC312 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9E83762896765A4A1591444E /* Localizable.strings */; };
 		9586B899E85C33759D2E73F2 /* ResourceBundleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77FFF6965C78A9BC8E87A6B7 /* ResourceBundleTests.swift */; };
 		BCC941602A0E91CF20D9D13D /* EaseChatUIKitTestHost.plist in Resources */ = {isa = PBXBuildFile; fileRef = F6555CCA88D5292795A4287D /* EaseChatUIKitTestHost.plist */; };
+		C05506FB92C3335B491FCAF2 /* NavigationLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C01D3E1CC29D946CC383C43 /* NavigationLayoutTests.swift */; };
 		C10FC1BC8D95DBCA5ED32458 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC985E046670067DB405458C /* AppDelegate.swift */; };
 		F0C9AF2B7D527B66098F0F2F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E92A338DBF10B0D8EDB4F939 /* Foundation.framework */; };
 /* End PBXBuildFile section */
@@ -31,6 +32,7 @@
 
 /* Begin PBXFileReference section */
 		0742782C2AA3FE02FA3C03E6 /* copy.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = copy.png; sourceTree = "<group>"; };
+		2C01D3E1CC29D946CC383C43 /* NavigationLayoutTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NavigationLayoutTests.swift; sourceTree = "<group>"; };
 		5FC29D675F2B1EE69D1FAFDC /* EaseChatUIKitSPMExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EaseChatUIKitSPMExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		77FFF6965C78A9BC8E87A6B7 /* ResourceBundleTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ResourceBundleTests.swift; sourceTree = "<group>"; };
 		AE4BA3E1B929FC10787CF0F5 /* EaseChatUIKitSPMExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EaseChatUIKitSPMExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -108,6 +110,7 @@
 				77FFF6965C78A9BC8E87A6B7 /* ResourceBundleTests.swift */,
 				DE98B39C8EC1369B28578C1E /* AMRCodecTests.swift */,
 				A785B69178C27952723308DB /* Host Resources */,
+				2C01D3E1CC29D946CC383C43 /* NavigationLayoutTests.swift */,
 			);
 			name = "Shared Tests";
 			path = ../Tests/EaseChatUIKitTests;
@@ -244,6 +247,7 @@
 			files = (
 				9586B899E85C33759D2E73F2 /* ResourceBundleTests.swift in Sources */,
 				589210BBD96732F634A11D9C /* AMRCodecTests.swift in Sources */,
+				C05506FB92C3335B491FCAF2 /* NavigationLayoutTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
