@@ -43,7 +43,27 @@
 
 # 安装
 
-您可以使用 CocoaPods 安装 EaseChatUIKit 作为 Xcode 项目的依赖项。
+您可以使用 Swift Package Manager 或 CocoaPods 安装 EaseChatUIKit。同一个 App target 选择一种方式，避免重复链接 EaseChatUIKit、IM SDK 和 AMRCodec。
+
+## Swift Package Manager
+
+在 Xcode 的 **File → Add Package Dependencies…** 中添加本仓库地址：
+
+```text
+https://github.com/easemob/easemob-uikit-ios.git
+```
+
+选择包含 `Package.swift` 的发布版本，并将 `EaseChatUIKit` product 添加到 App target。开发当前仓库时可使用 **Add Local…** 选择仓库根目录，或直接打开 `ExampleSPM/EaseChatUIKitSPMExample.xcodeproj`。
+
+验证远程发布版本可打开 [ExampleSPMRemote](ExampleSPMRemote/README.md) 中的工程。该独立示例固定使用 `https://github.com/zjc19891106/easemob-uikit-ios.git` 的 `4.26.0`，附带 `Package.resolved` 锁定依赖；可将整个示例目录复制到其他位置使用。
+
+```swift
+import EaseChatUIKit
+```
+
+包声明使用 Swift tools 5.7、Swift 5 语言模式和 iOS 15；实际开发工具要求见上文。SPM 自动引入 HyphenateChat（4.22.1 至 5.0 之前）、FLAnimatedImage（1.0.16 至 2.0 之前）和仓库内的 AMRCodec.xcframework，无需手动添加桥接头或旧 AMR 静态库。基础网络库由 HyphenateChat 的 package 负责引入。
+
+AMRCodec 包含 arm64 真机与 arm64/x86_64 模拟器切片，是动态 framework；Xcode 应自动将其嵌入 App 并在签名构建中签名。当前包面向 iOS，不声明 Mac Catalyst、macOS 或其他平台支持。
 
 ## CocoaPods
 
@@ -57,15 +77,6 @@ target 'YourTarget' do
   use_frameworks!
 
   pod 'EaseChatUIKit'
-end
-
-post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-      config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
-    end
-  end
 end
 ```
 
@@ -81,6 +92,57 @@ end
 
 > 如果`pod install`失败报错 RuntimeError - `PBXGroup` attempted to initialize an object with unknown ISA `PBXFileSystemSynchronizedRootGroup` from attributes: `{"isa"=>"PBXFileSystemSynchronizedRootGroup"`，请尝试升级pod版本为1.14.3
  Xcode16及其以下版本打开会报错 `Adjust the project format using a compatible version of Xcode to allow it to be opened by this version of Xcode.`
+
+不需要全局排除模拟器 arm64。CocoaPods 保留静态 EaseChatUIKit framework 与动态 AMRCodec 的既有配置；也可使用 `use_frameworks! :linkage => :static`。若不使用 `use_frameworks!`，请在同一 target 中额外声明 `pod 'FLAnimatedImage', :modular_headers => true`，使 Swift 能导入该 Objective-C 依赖。最终 App 均需要正确嵌入 AMRCodec。
+
+## 图片、国际化与自定义资源
+
+两种集成方式共用 `EaseChatResource.bundle`，保留原始图片文件名、@2x/@3x 和 `en.lproj` / `zh-Hans.lproj`。SPM 将它复制到自动生成的资源 bundle 内，CocoaPods 按原有方式复制。业务代码通过 `Bundle.chatBundle` 获取内层资源包，不要拼接 SPM 生成的 bundle 名称。
+
+- SDK 图片仍优先采用宿主 App 的同名图片。
+- `Appearance.resourceBundle` 仍可替换 SDK 资源包；设回 `nil` 恢复默认资源。请在创建 UI 之前设置，已初始化的图片不会自动刷新。
+- 默认语言仍是中文；宿主对应语言目录中的 `Localizable.strings` 仍可覆盖 SDK 文案。本次不改变语言选择、区域语言匹配和回退规则。
+- `PrivacyInfo.xcprivacy` 由包管理器复制，不要把它漏在手动资源拷贝之外。隐私声明内容未改变。
+
+## 集成验证
+
+GitHub Actions 使用 [.github/workflows/swift.yml](.github/workflows/swift.yml)，通过 `xcodebuild` 在 iOS 模拟器运行当前提交的本地 SPM 示例及宿主测试，再检查 iOS Release 归档。不要套用 `swift build` / `swift test` 的 macOS 模板：这些命令默认使用宿主 macOS SDK，即使 `Package.swift` 声明了 iOS 平台，也不会自动改为 iOS 构建，因此会报 `UIKit/UIKit.h` 找不到。
+
+`ExampleSPM` 是无需登录的检查 App，展示图片、语言切换、GIF 和 AMR 编码；其共享 scheme 带有宿主 XCTest。测试源码与 CocoaPods `IntegrationTests` test spec 共用，覆盖图片完整性、自定义资源、宿主覆盖和 AMR NB/WB 往返转换。单独运行 package tests 时，依赖宿主覆盖资源的两项测试会跳过；完整验收请运行示例的宿主测试。
+
+```sh
+# 在仓库根目录执行，将 destination 替换为本机可用的 iOS 模拟器。
+xcodebuild test \
+  -project ExampleSPM/EaseChatUIKitSPMExample.xcodeproj \
+  -scheme EaseChatUIKitSPMExample \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
+  -parallel-testing-enabled NO
+
+# CocoaPods 三种集成方式，共用相同测试；Debug 开启 @testable 所需的测试支持。
+pod lib lint EaseChatUIKit.podspec --allow-warnings --configuration=Debug --test-specs=IntegrationTests
+pod lib lint EaseChatUIKit.podspec --allow-warnings --configuration=Debug --test-specs=IntegrationTests --use-static-frameworks
+pod lib lint EaseChatUIKit.podspec --allow-warnings --configuration=Debug --test-specs=IntegrationTests --use-libraries --use-modular-headers
+```
+
+现有 CocoaPods 示例启用了同一 test spec。从旧检出升级时，在 `Example` 中运行 `pod update EaseChatUIKit HyphenateChat FLAnimatedImage` 更新过期的锁文件，再打开生成的 workspace。
+
+Release 归档和产物检查：
+
+```sh
+xcodebuild archive \
+  -project ExampleSPM/EaseChatUIKitSPMExample.xcodeproj \
+  -scheme EaseChatUIKitSPMExample \
+  -destination 'generic/platform=iOS' \
+  -archivePath /tmp/EaseChatUIKitSPMExample.xcarchive \
+  CODE_SIGNING_ALLOWED=NO
+python3 scripts/verify_integration_artifacts.py /tmp/EaseChatUIKitSPMExample.xcarchive
+```
+
+检查脚本也接受 CocoaPods 构建的 `.app` 或 `.xcarchive`，会核对图片清单、两种翻译、隐私清单和 AMR 动态库嵌入。上述无签名归档只检查产物；发布前还需配置签名，在真机运行、录音、转换和播放，验证动态库加载与音频行为。
+
+SPM 本地集成的实际验证结果见 [验证记录](Tests/SPMValidation.md)。Xcode 可能在调试 App 与自动生成的 package framework 中各放一份资源包；检查脚本会逐份核对内容。
+
+远程 `4.26.0` 示例的依赖版本、模拟器测试和归档结果见 [远程验证记录](ExampleSPMRemote/VALIDATION.md)。
 
 # 结构
 
@@ -574,4 +636,3 @@ EaseChatUIKit 可在 MIT 许可下使用。 有关详细信息，请参阅许可
 ## 更新日志
 
 [更新日志](https://doc.easemob.com/uikit/chatuikit/ios/releasenote.html)
-

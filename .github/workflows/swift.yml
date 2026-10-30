@@ -1,22 +1,82 @@
-# This workflow will build a Swift project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-swift
-
 name: Swift
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
-
     runs-on: macos-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: swift build -v
-    - name: Run tests
-      run: swift test -v
+      - uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Select an available iPhone simulator
+        id: simulator
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import subprocess
+
+          devices = json.loads(subprocess.check_output(
+              ["xcrun", "simctl", "list", "devices", "available", "--json"], text=True
+          ))["devices"]
+          runtimes = sorted(
+              (runtime for runtime in devices if ".iOS-" in runtime),
+              key=lambda runtime: tuple(map(int, runtime.split(".iOS-")[1].split("-"))),
+              reverse=True,
+          )
+          for runtime in runtimes:
+              for device in devices[runtime]:
+                  if device["isAvailable"] and device["name"].startswith("iPhone"):
+                      with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+                          output.write(f"id={device['udid']}\n")
+                      print(f"Selected {device['name']} ({runtime}): {device['udid']}")
+                      raise SystemExit(0)
+          raise SystemExit("No available iPhone simulator; install an iOS runtime in Xcode")
+          PY
+
+      # The local package reference validates this checkout, including pull requests.
+      # Plain swift build/test selects the macOS host SDK, which has no UIKit.
+      - name: Build and test the iOS Swift package
+        env:
+          CI_SIMULATOR_ID: ${{ steps.simulator.outputs.id }}
+        run: |
+          xcodebuild test \
+            -project ExampleSPM/EaseChatUIKitSPMExample.xcodeproj \
+            -scheme EaseChatUIKitSPMExample \
+            -destination "platform=iOS Simulator,id=${CI_SIMULATOR_ID}" \
+            -derivedDataPath "${RUNNER_TEMP}/EaseChatUIKit-DerivedData" \
+            -resultBundlePath "${RUNNER_TEMP}/EaseChatUIKit-Tests.xcresult" \
+            -parallel-testing-enabled NO \
+            CODE_SIGNING_ALLOWED=NO
+          python3 scripts/verify_integration_artifacts.py \
+            "${RUNNER_TEMP}/EaseChatUIKit-DerivedData/Build/Products/Debug-iphonesimulator/EaseChatUIKitSPMExample.app"
+
+      - name: Archive and verify resources and AMR
+        run: |
+          xcodebuild archive \
+            -project ExampleSPM/EaseChatUIKitSPMExample.xcodeproj \
+            -scheme EaseChatUIKitSPMExample \
+            -destination 'generic/platform=iOS' \
+            -configuration Release \
+            -derivedDataPath "${RUNNER_TEMP}/EaseChatUIKit-DerivedData" \
+            -archivePath "${RUNNER_TEMP}/EaseChatUIKitSPMExample.xcarchive" \
+            -disableAutomaticPackageResolution \
+            CODE_SIGNING_ALLOWED=NO
+          python3 scripts/verify_integration_artifacts.py \
+            "${RUNNER_TEMP}/EaseChatUIKitSPMExample.xcarchive"

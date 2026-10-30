@@ -1,7 +1,19 @@
 
 *.xcscheme
+!ExampleSPM/EaseChatUIKitSPMExample.xcodeproj/xcshareddata/xcschemes/*.xcscheme
+!ExampleSPMRemote/EaseChatUIKitSPMRemoteExample.xcodeproj/xcshareddata/xcschemes/*.xcscheme
+!Example/EaseChatUIKit.xcodeproj/xcshareddata/xcschemes/*.xcscheme
+.build/
+.swiftpm/
+DerivedData/
+*.xcresult
+*.xcarchive
+ExampleSPM/**/xcuserdata/
+ExampleSPMRemote/**/xcuserdata/
+ExampleSPM/**/Package.resolved
 Example/pods/
 Example/EaseChatUIKit.xcworkspace
 Example/Podfile.lock
 .omx/
 /.code-abyss
+/ExampleSPMRemote

@@ -20,10 +20,23 @@ public let edgeZero: UIEdgeInsets = .zero
 public let BottomBarHeight = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0
 
 /// The height of the status bar.
-public let StatusBarHeight :CGFloat = UIApplication.shared.statusBarFrame.height
+public var StatusBarHeight: CGFloat {
+    let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+    let scene = scenes.first(where: { $0.windows.contains(where: { $0.isKeyWindow }) })
+        ?? scenes.first(where: { $0.activationState == .foregroundActive })
+        ?? scenes.first(where: { $0.activationState == .foregroundInactive })
+        ?? scenes.first
+    guard let scene = scene else { return 0 }
+    let window = scene.windows.first(where: { $0.isKeyWindow })
+        ?? scene.windows.first(where: { $0.windowLevel == .normal })
+    // The root safe area can exceed statusBarFrame on devices with a sensor housing.
+    // The scene's manager also works during connection, before a key window exists.
+    return max(window?.safeAreaInsets.top ?? 0,
+               scene.statusBarManager?.statusBarFrame.height ?? 0)
+}
 
 /// The height of the navigation bar, which includes the status bar.
-public let NavigationHeight :CGFloat = StatusBarHeight + 44
+public var NavigationHeight: CGFloat { StatusBarHeight + 44 }
 
 /// A wrapper for a project-specific type.
 public struct ChatWrapper<Base> {

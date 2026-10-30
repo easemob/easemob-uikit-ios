@@ -3,5 +3,5 @@ use_frameworks!
 platform :ios, '15.0'
 
 target 'EaseChatUIKit_Example' do
-  pod 'EaseChatUIKit', :path => '../'
+  pod 'EaseChatUIKit', :path => '../', :testspecs => ['IntegrationTests']
 end
