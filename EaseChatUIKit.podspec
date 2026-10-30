@@ -60,4 +60,18 @@ TODO: Add long description of the pod here.
   s.pod_target_xcconfig = { 'ENABLE_BITCODE' => 'NO' }
 
   s.frameworks = 'UIKit', 'Foundation', 'Combine', 'AudioToolbox', 'AVFoundation','AVFAudio','Photos'
+
+  # Opt-in fixtures live in the host app so Bundle.main overrides are tested.
+  s.app_spec 'TestHost' do |app|
+    app.source_files = 'Tests/HostApp/*.swift'
+    app.resources = 'Tests/EaseChatUIKitTests/HostResources/**/*'
+    app.info_plist = { 'UILaunchScreen' => {} }
+  end
+
+  s.test_spec 'IntegrationTests' do |test|
+    test.source_files = 'Tests/EaseChatUIKitTests/*.swift'
+    test.dependency 'EaseChatUIKit/TestHost'
+    test.requires_app_host = true
+    test.app_host_name = 'EaseChatUIKit/TestHost'
+  end
 end

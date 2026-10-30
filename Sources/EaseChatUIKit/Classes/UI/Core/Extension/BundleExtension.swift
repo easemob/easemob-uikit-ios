@@ -7,36 +7,33 @@
 
 import Foundation
 
-/**
- A type extension to provide a computed property for ChatroomResourceBundle.
- 
- This extension provides a computed property `chatBundle` of type `Bundle` to access the ChatroomResourceBundle. If the ChatroomResourceBundle is already initialized, it returns the existing instance. Otherwise, it initializes the ChatroomResourceBundle with the path of the "ChatRoomResource.bundle" file in the main bundle. If the bundle is not found, it returns the main bundle.
- */
-fileprivate var ChatResourceBundle: Bundle?
+private enum ChatResources {
+    static let bundle: Bundle = {
+#if SWIFT_PACKAGE
+        // SwiftPM copies the existing resource bundle inside its generated bundle.
+        let containers = [Bundle.module]
+#elseif COCOAPODS || STATIC_LIBRARY
+        // CocoaPods can copy resources alongside the framework or into the app.
+        let containers = [Bundle(for: Theme.self), Bundle.main]
+#else
+        return Bundle(for: Theme.self)
+#endif
+#if SWIFT_PACKAGE || COCOAPODS || STATIC_LIBRARY
+        for container in containers {
+            if let url = container.url(forResource: "EaseChatResource", withExtension: "bundle"),
+               let bundle = Bundle(url: url) {
+                return bundle
+            }
+        }
+        preconditionFailure("EaseChatUIKit: EaseChatResource.bundle is missing. Check the package resource copy step.")
+#endif
+    }()
+}
 
 public extension Bundle {
-    /**
-     A computed property to access the ChatroomResourceBundle.
-     
-     This computed property returns the ChatroomResourceBundle. If the ChatroomResourceBundle is already initialized, it returns the existing instance. Otherwise, it initializes the ChatroomResourceBundle with the path of the "ChatRoomResource.bundle" file in the main bundle. If the bundle is not found, it returns the main bundle.
-     */
+    /// The custom resource bundle, or the bundled EaseChatUIKit images and strings.
+    /// Set `Appearance.resourceBundle` before creating views that cache images.
     class var chatBundle: Bundle {
-        if Appearance.resourceBundle != nil {
-            return Appearance.resourceBundle!
-        } else {
-#if COCOAPODS
-            return Bundle(for: Theme.self)
-                .url(forResource: "EaseChatResource", withExtension: "bundle")
-                .flatMap(Bundle.init(url:))!
-#elseif SWIFT_PACKAGE
-            return Bundle.module
-#elseif STATIC_LIBRARY
-            return Bundle.main
-                .url(forResource: "EaseChatResource", withExtension: "bundle")
-                .flatMap(Bundle.init(url:))!
-#else
-            return Bundle(for: Theme.self)
-#endif
-        }
+        Appearance.resourceBundle ?? ChatResources.bundle
     }
 }

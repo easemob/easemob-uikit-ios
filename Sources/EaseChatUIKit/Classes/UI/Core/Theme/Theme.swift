@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 /// Contain light and dark themes of the ease chat UIKit.If you want to switch custom theme,you'll modify primary&secondary&error&neutral&neutralSpecial hues properties in ``Appearance``.Then call `Theme.switchTheme(style: .custom)` method
 @objc public enum ThemeStyle: UInt {

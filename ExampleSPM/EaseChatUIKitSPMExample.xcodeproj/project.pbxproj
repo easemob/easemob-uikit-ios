@@ -1,0 +1,540 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1485A29335AD83A81AA052E6 /* copy.png in Resources */ = {isa = PBXBuildFile; fileRef = 0742782C2AA3FE02FA3C03E6 /* copy.png */; };
+		3CF04F88D6CF0CA7548DC3EC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E92A338DBF10B0D8EDB4F939 /* Foundation.framework */; };
+		3EB6765AE4D4580B50288CEB /* EaseChatUIKit in Frameworks */ = {isa = PBXBuildFile; productRef = FD82D283135BA0B485EA4A19 /* EaseChatUIKit */; };
+		589210BBD96732F634A11D9C /* AMRCodecTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE98B39C8EC1369B28578C1E /* AMRCodecTests.swift */; };
+		74D9C66C1876E26C2332708D /* EaseChatUIKit in Frameworks */ = {isa = PBXBuildFile; productRef = B4AE38DDBD0F9EBA8182BDEF /* EaseChatUIKit */; };
+		7E8026EF887245FA6C3CC312 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9E83762896765A4A1591444E /* Localizable.strings */; };
+		9586B899E85C33759D2E73F2 /* ResourceBundleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77FFF6965C78A9BC8E87A6B7 /* ResourceBundleTests.swift */; };
+		BCC941602A0E91CF20D9D13D /* EaseChatUIKitTestHost.plist in Resources */ = {isa = PBXBuildFile; fileRef = F6555CCA88D5292795A4287D /* EaseChatUIKitTestHost.plist */; };
+		C10FC1BC8D95DBCA5ED32458 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC985E046670067DB405458C /* AppDelegate.swift */; };
+		F0C9AF2B7D527B66098F0F2F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E92A338DBF10B0D8EDB4F939 /* Foundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6B92B20CD2C3C1DB475BF15C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F59B956ABE6EE9C6911A80EF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8655D2326D6DAF4BB077342F;
+			remoteInfo = EaseChatUIKitSPMExample;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0742782C2AA3FE02FA3C03E6 /* copy.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = copy.png; sourceTree = "<group>"; };
+		5FC29D675F2B1EE69D1FAFDC /* EaseChatUIKitSPMExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EaseChatUIKitSPMExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		77FFF6965C78A9BC8E87A6B7 /* ResourceBundleTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ResourceBundleTests.swift; sourceTree = "<group>"; };
+		AE4BA3E1B929FC10787CF0F5 /* EaseChatUIKitSPMExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EaseChatUIKitSPMExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C3576CEF73E26BCC4CB0FE00 /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CDF154BC0025AC35AED5E2A5 /* zh-Hans */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		DE98B39C8EC1369B28578C1E /* AMRCodecTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AMRCodecTests.swift; sourceTree = "<group>"; };
+		E92A338DBF10B0D8EDB4F939 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		F6555CCA88D5292795A4287D /* EaseChatUIKitTestHost.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = EaseChatUIKitTestHost.plist; sourceTree = "<group>"; };
+		FC985E046670067DB405458C /* AppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		03C80D80E3BBDAF200E2AACA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3CF04F88D6CF0CA7548DC3EC /* Foundation.framework in Frameworks */,
+				74D9C66C1876E26C2332708D /* EaseChatUIKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2A501F64D936E42E382D4BC2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F0C9AF2B7D527B66098F0F2F /* Foundation.framework in Frameworks */,
+				3EB6765AE4D4580B50288CEB /* EaseChatUIKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		13ACDBD987F666BBB139DA38 = {
+			isa = PBXGroup;
+			children = (
+				F88292F2140EC10EF8152CEE /* Products */,
+				E94EFF9B6043536B601720C1 /* Frameworks */,
+				A19655C8535E779671AA8672 /* EaseChatUIKitSPMExample */,
+				C36620D5652DF7B59397C641 /* Shared Tests */,
+			);
+			sourceTree = "<group>";
+		};
+		501DE745DA369B8D1CB63F3D /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				E92A338DBF10B0D8EDB4F939 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		A19655C8535E779671AA8672 /* EaseChatUIKitSPMExample */ = {
+			isa = PBXGroup;
+			children = (
+				FC985E046670067DB405458C /* AppDelegate.swift */,
+			);
+			name = EaseChatUIKitSPMExample;
+			path = EaseChatUIKitSPMExample;
+			sourceTree = "<group>";
+		};
+		A785B69178C27952723308DB /* Host Resources */ = {
+			isa = PBXGroup;
+			children = (
+				0742782C2AA3FE02FA3C03E6 /* copy.png */,
+				F6555CCA88D5292795A4287D /* EaseChatUIKitTestHost.plist */,
+				9E83762896765A4A1591444E /* Localizable.strings */,
+			);
+			name = "Host Resources";
+			path = HostResources;
+			sourceTree = "<group>";
+		};
+		C36620D5652DF7B59397C641 /* Shared Tests */ = {
+			isa = PBXGroup;
+			children = (
+				77FFF6965C78A9BC8E87A6B7 /* ResourceBundleTests.swift */,
+				DE98B39C8EC1369B28578C1E /* AMRCodecTests.swift */,
+				A785B69178C27952723308DB /* Host Resources */,
+			);
+			name = "Shared Tests";
+			path = ../Tests/EaseChatUIKitTests;
+			sourceTree = "<group>";
+		};
+		E94EFF9B6043536B601720C1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				501DE745DA369B8D1CB63F3D /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F88292F2140EC10EF8152CEE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5FC29D675F2B1EE69D1FAFDC /* EaseChatUIKitSPMExample.app */,
+				AE4BA3E1B929FC10787CF0F5 /* EaseChatUIKitSPMExampleTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8655D2326D6DAF4BB077342F /* EaseChatUIKitSPMExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C3CEF8AB1D0E491D894181C0 /* Build configuration list for PBXNativeTarget "EaseChatUIKitSPMExample" */;
+			buildPhases = (
+				CEF130124BC7823F0D491BE8 /* Sources */,
+				2A501F64D936E42E382D4BC2 /* Frameworks */,
+				8DD1D7279FAAB07DFF65A2A2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EaseChatUIKitSPMExample;
+			packageProductDependencies = (
+				FD82D283135BA0B485EA4A19 /* EaseChatUIKit */,
+			);
+			productName = EaseChatUIKitSPMExample;
+			productReference = 5FC29D675F2B1EE69D1FAFDC /* EaseChatUIKitSPMExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		BFFE7CA1C61540393D6660D2 /* EaseChatUIKitSPMExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC40E8BEFB1748D3B296A1D0 /* Build configuration list for PBXNativeTarget "EaseChatUIKitSPMExampleTests" */;
+			buildPhases = (
+				370EE4D8F13293D69299B6FA /* Sources */,
+				03C80D80E3BBDAF200E2AACA /* Frameworks */,
+				D6B07A1AD8DC2DC968B19B9D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2F526A9B306E45377145E6BD /* PBXTargetDependency */,
+			);
+			name = EaseChatUIKitSPMExampleTests;
+			packageProductDependencies = (
+				B4AE38DDBD0F9EBA8182BDEF /* EaseChatUIKit */,
+			);
+			productName = EaseChatUIKitSPMExampleTests;
+			productReference = AE4BA3E1B929FC10787CF0F5 /* EaseChatUIKitSPMExampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F59B956ABE6EE9C6911A80EF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					8655D2326D6DAF4BB077342F = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					BFFE7CA1C61540393D6660D2 = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = 8655D2326D6DAF4BB077342F;
+					};
+				};
+			};
+			buildConfigurationList = 2935CB48B56AC2CBE3A041DB /* Build configuration list for PBXProject "EaseChatUIKitSPMExample" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				"zh-Hans",
+				Base,
+			);
+			mainGroup = 13ACDBD987F666BBB139DA38;
+			minimizedProjectReferenceProxies = 0;
+			packageReferences = (
+				429CDE32C9EC23937089CDAF /* XCLocalSwiftPackageReference ".." */,
+			);
+			preferredProjectObjectVersion = 100;
+			productRefGroup = F88292F2140EC10EF8152CEE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8655D2326D6DAF4BB077342F /* EaseChatUIKitSPMExample */,
+				BFFE7CA1C61540393D6660D2 /* EaseChatUIKitSPMExampleTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8DD1D7279FAAB07DFF65A2A2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1485A29335AD83A81AA052E6 /* copy.png in Resources */,
+				BCC941602A0E91CF20D9D13D /* EaseChatUIKitTestHost.plist in Resources */,
+				7E8026EF887245FA6C3CC312 /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D6B07A1AD8DC2DC968B19B9D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		370EE4D8F13293D69299B6FA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9586B899E85C33759D2E73F2 /* ResourceBundleTests.swift in Sources */,
+				589210BBD96732F634A11D9C /* AMRCodecTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEF130124BC7823F0D491BE8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C10FC1BC8D95DBCA5ED32458 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2F526A9B306E45377145E6BD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = EaseChatUIKitSPMExample;
+			target = 8655D2326D6DAF4BB077342F /* EaseChatUIKitSPMExample */;
+			targetProxy = 6B92B20CD2C3C1DB475BF15C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		9E83762896765A4A1591444E /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C3576CEF73E26BCC4CB0FE00 /* en */,
+				CDF154BC0025AC35AED5E2A5 /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		2353DD1F56B0E3FE2C21AC52 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "EaseChatUIKit SPM";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.easemob.EaseChatUIKitSPMExample;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		66F372DF6F04D7E80E6FCDC8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.easemob.EaseChatUIKitSPMExampleTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EaseChatUIKitSPMExample.app/EaseChatUIKitSPMExample";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		B63F6D426E83AC859AA26F5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.easemob.EaseChatUIKitSPMExampleTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EaseChatUIKitSPMExample.app/EaseChatUIKitSPMExample";
+			};
+			name = Debug;
+		};
+		BADE1154D97B5FB47E0F7757 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "EaseChatUIKit SPM";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.easemob.EaseChatUIKitSPMExample;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C0A2EC853EA2E7A318F35FAF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		E3A560C140857A2536EF8CD5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2935CB48B56AC2CBE3A041DB /* Build configuration list for PBXProject "EaseChatUIKitSPMExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0A2EC853EA2E7A318F35FAF /* Debug */,
+				E3A560C140857A2536EF8CD5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C3CEF8AB1D0E491D894181C0 /* Build configuration list for PBXNativeTarget "EaseChatUIKitSPMExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BADE1154D97B5FB47E0F7757 /* Release */,
+				2353DD1F56B0E3FE2C21AC52 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC40E8BEFB1748D3B296A1D0 /* Build configuration list for PBXNativeTarget "EaseChatUIKitSPMExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66F372DF6F04D7E80E6FCDC8 /* Release */,
+				B63F6D426E83AC859AA26F5A /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		429CDE32C9EC23937089CDAF /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B4AE38DDBD0F9EBA8182BDEF /* EaseChatUIKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EaseChatUIKit;
+		};
+		FD82D283135BA0B485EA4A19 /* EaseChatUIKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EaseChatUIKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = F59B956ABE6EE9C6911A80EF /* Project object */;
+}
