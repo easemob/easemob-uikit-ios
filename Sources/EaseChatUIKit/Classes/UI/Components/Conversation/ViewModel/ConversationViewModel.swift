@@ -154,6 +154,12 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
         var groupChats = [String]()
         for id in ids {
             if let conversation = ChatClient.shared().chatManager?.getConversationWithConvId(id) {
+                // SDK 会话昵称、头像都齐时，不再向接入方 provider 要资料
+                let sdkName = conversation.conversationName ?? ""
+                let sdkAvatar = conversation.conversationAvatar ?? ""
+                if !sdkName.isEmpty, !sdkAvatar.isEmpty {
+                    continue
+                }
                 if conversation.type == .chat {
                     if let userCache = ChatUIKitContext.shared?.userCache?[id],!userCache.nickname.isEmpty {
                         continue
@@ -167,7 +173,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
                 }
             }
         }
-        if ChatUIKitContext.shared?.userProfileProvider != nil {
+        if !privateChats.isEmpty, ChatUIKitContext.shared?.userProfileProvider != nil {
             let userIds = privateChats.map { $0 }
             Task(priority: .background) { [weak self] in
                 guard let `self` = self else { return }
@@ -176,7 +182,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
                 self.renderDriver(infos: profiles)
             }
         }
-        if ChatUIKitContext.shared?.groupProfileProvider != nil {
+        if !groupChats.isEmpty, ChatUIKitContext.shared?.groupProfileProvider != nil {
             let groupIds = groupChats
             Task(priority: .background) { [weak self] in
                 guard let `self` = self else { return }
@@ -185,7 +191,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
                 self.driver?.refreshProfiles(infos: profiles)
             }
         }
-        if ChatUIKitContext.shared?.userProfileProviderOC != nil {
+        if !privateChats.isEmpty, ChatUIKitContext.shared?.userProfileProviderOC != nil {
             ChatUIKitContext.shared?.userProfileProviderOC?.fetchProfiles(profileIds: privateChats, completion: { [weak self] profiles in
                 self?.cacheUser(profiles: profiles)
                 DispatchQueue.main.async {
@@ -193,7 +199,7 @@ extension ConversationViewModel: ConversationListActionEventsDelegate {
                 }
             })
         }
-        if ChatUIKitContext.shared?.groupProfileProviderOC != nil {
+        if !groupChats.isEmpty, ChatUIKitContext.shared?.groupProfileProviderOC != nil {
             ChatUIKitContext.shared?.groupProfileProviderOC?.fetchGroupProfiles(profileIds: groupChats, completion: { [weak self] profiles in
                 self?.cacheGroup(profiles: profiles)
                 DispatchQueue.main.async {
@@ -525,6 +531,7 @@ extension ConversationViewModel: MultiDeviceListener {
             conversation.nickname = profile?.nickname ?? ""
             conversation.remark = profile?.remark ?? ""
             conversation.avatarURL = profile?.avatarURL ?? ""
+            conversation.applySDKDisplayInfoIfNeeded(from: $0)
             conversation.doNotDisturb = $0.disturbType != .all
             
             _ = conversation.showContent

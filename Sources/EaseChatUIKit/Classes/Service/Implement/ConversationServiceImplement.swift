@@ -185,6 +185,7 @@ extension ConversationServiceImplement: ConversationService {
                     }
                 }
             }
+            conversation.applySDKDisplayInfoIfNeeded(from: $0)
             conversation.doNotDisturb = $0.disturbType != .all
             
             _ = conversation.showContent
