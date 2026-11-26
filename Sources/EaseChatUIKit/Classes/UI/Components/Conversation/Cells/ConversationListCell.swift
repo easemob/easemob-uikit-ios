@@ -209,23 +209,9 @@ extension ConversationListCell: ThemeSwitchProtocol {
     @objc open func contentAttribute() -> NSAttributedString {
         guard let message = self.lastMessage else { return NSAttributedString() }
         var text = NSMutableAttributedString()
-        if let dic = message.ext?["ease_chat_uikit_user_info"] as? Dictionary<String,Any> {
-            let profile = ChatUserProfile()
-            profile.setValuesForKeys(dic)
-            profile.id = message.from
-            profile.modifyTime = message.timestamp
-            ChatUIKitContext.shared?.chatCache?[message.from] = profile
-            if ChatUIKitContext.shared?.userCache?[message.from] == nil {
-                ChatUIKitContext.shared?.userCache?[message.from] = profile
-            } else {
-                ChatUIKitContext.shared?.userCache?[message.from]?.nickname = profile.nickname
-                ChatUIKitContext.shared?.userCache?[message.from]?.avatarURL = profile.avatarURL
-            }
-        }
-        
         let from = message.from
         let mentionText = "Mentioned".chat.localize
-        var user = ChatUIKitContext.shared?.userCache?[from]
+        let user = ChatUIKitContext.shared?.userCache?[from]
         var nickName = user?.remark ?? ""
         if nickName.isEmpty {
             nickName = user?.nickname ?? ""

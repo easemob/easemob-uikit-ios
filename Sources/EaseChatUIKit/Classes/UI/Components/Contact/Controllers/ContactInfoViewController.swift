@@ -22,7 +22,7 @@ import UIKit
  */
 @objc open class ContactInfoViewController: UIViewController {
     
-    public let service = ContactServiceImplement()
+    public let service: ContactServiceImplement = ChatUIKitClient.shared.contactService as? ContactServiceImplement ?? ContactServiceImplement()
     
     
     public private(set) var profile: ChatUserProfileProtocol = ChatUserProfile()

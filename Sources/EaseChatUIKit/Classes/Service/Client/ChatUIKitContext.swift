@@ -107,4 +107,12 @@ import UIKit
         }
         NotificationCenter.default.post(name: Notification.Name(rawValue: cache_update_notification), object: nil, userInfo: nil)
     }
+    
+    public func updateChatAndUserTypeCaches(profiles: [ChatUserProfileProtocol]) {
+        profiles.forEach { profile in
+            self.chatCache?[profile.id] = profile
+            self.userCache?[profile.id] = profile
+        }
+        NotificationCenter.default.post(name: Notification.Name(rawValue: cache_update_notification), object: nil, userInfo: nil)
+    }
 }

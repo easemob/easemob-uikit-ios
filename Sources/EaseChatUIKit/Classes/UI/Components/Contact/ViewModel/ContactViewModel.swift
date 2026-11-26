@@ -42,13 +42,15 @@ import UIKit
     open func bind(driver: IContactListDriver) {
         self.driver = driver
         if self.service == nil {
-            self.service = ContactServiceImplement()
+            self.service = ChatUIKitClient.shared.contactService ?? ContactServiceImplement()
         }
         if self.multiService == nil {
             self.multiService = MultiDeviceServiceImplement()
         }
         self.service?.unbindContactEventListener(listener: self)
         self.service?.bindContactEventListener(listener: self)
+        self.service?.unregisterEmergencyListener(listener: self)
+        self.service?.registerEmergencyListener(listener: self)
         self.multiService?.unbindMultiDeviceListener(listener: self)
         self.multiService?.bindMultiDeviceListener(listener: self)
         self.driver?.addActionHandler(actionHandler: self)
@@ -59,7 +61,7 @@ import UIKit
     /// - Parameter listener: ``ContactEmergencyListener``
     @objc public func registerEventsListener(_ listener: ContactEmergencyListener) {
         if self.service == nil {
-            self.service = ContactServiceImplement()
+            self.service = ChatUIKitClient.shared.contactService ?? ContactServiceImplement()
         }
         self.service?.registerEmergencyListener(listener: listener)
     }
@@ -68,7 +70,7 @@ import UIKit
     /// - Parameter listener: ``ContactEmergencyListener``
     @objc public func unregisterEventsListener(_ listener: ContactEmergencyListener) {
         if self.service == nil {
-            self.service = ContactServiceImplement()
+            self.service = ChatUIKitClient.shared.contactService ?? ContactServiceImplement()
         }
         self.service?.unregisterEmergencyListener(listener: listener)
     }
@@ -132,8 +134,8 @@ import UIKit
         let infos = users.map({
             let profile = ChatUserProfile()
             profile.id = $0.userId
-            profile.nickname = ChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
-            profile.avatarURL = ChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
+            profile.nickname = $0.userInfo?.nickname ?? ChatUIKitContext.shared?.userCache?[$0.userId]?.nickname ?? ""
+            profile.avatarURL = $0.userInfo?.avatarUrl ?? ChatUIKitContext.shared?.userCache?[$0.userId]?.avatarURL ?? ""
             var remark = $0.remark ?? ""
             if remark.isEmpty {
                 remark = ChatUIKitContext.shared?.userCache?[$0.userId]?.remark ?? ""
@@ -160,6 +162,13 @@ import UIKit
         if let implement = self.service as? ContactServiceImplement {
             implement.handleResult(error: nil, type: .cleanFriendBadge, operatorId: ChatUIKitContext.shared?.currentUserId ?? "")
         }
+    }
+}
+
+extension ContactViewModel: ContactEmergencyListener {
+    public func onResult(error: ChatError?, type: ContactEmergencyType, operatorId: String) {
+        guard type == .fetchContacts else { return }
+        self.loadAllContacts()
     }
 }
 
